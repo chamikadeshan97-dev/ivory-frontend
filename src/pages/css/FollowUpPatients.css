@@ -1,0 +1,431 @@
+/* --------------------------------------------------------
+   Header date control
+-------------------------------------------------------- */
+
+.follow-up-date-control {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 7px;
+  border: 1px solid #dfe7f1;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow:
+    0 5px 15px rgba(15, 23, 42, 0.04);
+}
+
+.follow-up-date-control__icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.follow-up-date-picker {
+  width: 175px;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* --------------------------------------------------------
+   Reminder alert
+-------------------------------------------------------- */
+
+.follow-up-reminder-alert {
+  margin-bottom: 16px;
+  border-radius: 14px;
+}
+
+/* --------------------------------------------------------
+   Summary cards
+-------------------------------------------------------- */
+
+.follow-up-summary-row {
+  margin-bottom: 16px;
+}
+
+.follow-up-summary-card {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid #edf1f7;
+  border-radius: 18px;
+  box-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.05);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.follow-up-summary-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(37, 99, 235, 0.22);
+  box-shadow:
+    0 14px 30px rgba(15, 23, 42, 0.09);
+}
+
+.follow-up-summary-card::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  content: "";
+}
+
+.follow-up-summary-card--blue::before {
+  background: #2563eb;
+}
+
+.follow-up-summary-card--green::before {
+  background: #16a34a;
+}
+
+.follow-up-summary-card--orange::before {
+  background: #f59e0b;
+}
+
+.follow-up-summary-card--red::before {
+  background: #dc2626;
+}
+
+.follow-up-summary-card
+  .ant-card-body {
+  padding: 20px;
+}
+
+.follow-up-summary-card__content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.follow-up-summary-card__title {
+  display: block;
+  margin-bottom: 7px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.follow-up-summary-card__value {
+  color: #172033;
+  font-size: 29px;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.follow-up-summary-card__helper {
+  display: block;
+  margin-top: 5px;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.follow-up-summary-card__icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 47px;
+  height: 47px;
+  border-radius: 14px;
+  font-size: 21px;
+}
+
+.follow-up-summary-card--blue
+  .follow-up-summary-card__icon {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.follow-up-summary-card--green
+  .follow-up-summary-card__icon {
+  color: #16a34a;
+  background: #f0fdf4;
+}
+
+.follow-up-summary-card--orange
+  .follow-up-summary-card__icon {
+  color: #d97706;
+  background: #fffbeb;
+}
+
+.follow-up-summary-card--red
+  .follow-up-summary-card__icon {
+  color: #dc2626;
+  background: #fef2f2;
+}
+
+/* --------------------------------------------------------
+   Directory card
+-------------------------------------------------------- */
+
+.follow-up-directory-card {
+  border: 1px solid #e8edf5;
+  border-radius: 18px;
+  box-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.045);
+}
+
+.follow-up-directory-card
+  > .ant-card-body {
+  padding: 22px;
+}
+
+.follow-up-directory-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.follow-up-directory-header
+  .ant-typography {
+  margin-top: 0;
+  margin-bottom: 2px;
+}
+
+.follow-up-directory-header__meta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.follow-up-directory-header__meta
+  .ant-tag {
+  margin-inline-end: 0;
+  padding: 4px 10px;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------
+   Toolbar
+-------------------------------------------------------- */
+
+.follow-up-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding: 14px;
+  border: 1px solid #edf1f7;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.follow-up-search-input {
+  width: 100%;
+  max-width: 520px;
+}
+
+.follow-up-filter {
+  flex: 0 0 auto;
+}
+
+/* --------------------------------------------------------
+   Patient table cell
+-------------------------------------------------------- */
+
+.follow-up-patient-avatar {
+  flex: 0 0 auto;
+  color: #2563eb;
+  background:
+    linear-gradient(
+      135deg,
+      #eff6ff,
+      #dbeafe
+    );
+}
+
+.follow-up-patient-avatar--allergy {
+  color: #dc2626;
+  background:
+    linear-gradient(
+      135deg,
+      #fef2f2,
+      #fee2e2
+    );
+}
+
+.follow-up-patient-cell {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.follow-up-patient-cell
+  .ant-typography-secondary {
+  font-size: 11px;
+}
+
+.follow-up-allergy-tag {
+  margin-inline-end: 0;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------
+   Contact cell
+-------------------------------------------------------- */
+
+.follow-up-contact-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.follow-up-missing-phone {
+  color: #d97706;
+}
+
+/* --------------------------------------------------------
+   Treatment cell
+-------------------------------------------------------- */
+
+.follow-up-treatment-cell {
+  min-width: 0;
+}
+
+.follow-up-treatment-icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  color: #7c3aed;
+  background: #f5f3ff;
+}
+
+.follow-up-treatment-cell
+  .ant-space-item:last-child {
+  min-width: 0;
+}
+
+.follow-up-treatment-cell
+  .ant-space-item:last-child
+  > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.follow-up-treatment-cell
+  .ant-typography-secondary {
+  font-size: 11px;
+}
+
+/* --------------------------------------------------------
+   Notes and dates
+-------------------------------------------------------- */
+
+.follow-up-doctor-notes {
+  margin-bottom: 0 !important;
+  color: #475569;
+}
+
+.follow-up-date-tag {
+  margin-inline-end: 0;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------
+   Table rows
+-------------------------------------------------------- */
+
+.follow-up-row--allergy td {
+  background: #fffafa !important;
+}
+
+.follow-up-row--allergy
+  td:first-child {
+  border-left: 4px solid #dc2626;
+}
+
+.follow-up-row--missing-phone td {
+  background: #fffdf7;
+}
+
+.follow-up-row--missing-phone
+  td:first-child {
+  border-left: 4px solid #f59e0b;
+}
+
+/* --------------------------------------------------------
+   Empty state
+-------------------------------------------------------- */
+
+.follow-up-empty-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: center;
+}
+
+/* --------------------------------------------------------
+   Responsive
+-------------------------------------------------------- */
+
+@media (max-width: 1000px) {
+  .follow-up-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .follow-up-search-input {
+    max-width: none;
+  }
+
+  .follow-up-filter {
+    width: 100%;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .follow-up-date-control {
+    width: 100%;
+  }
+
+  .follow-up-date-picker {
+    width: 100%;
+  }
+
+  .follow-up-directory-card
+    > .ant-card-body {
+    padding: 17px;
+  }
+
+  .follow-up-directory-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 520px) {
+  .follow-up-summary-card__value {
+    font-size: 25px;
+  }
+
+  .follow-up-filter
+    .ant-segmented-item-label {
+    padding-inline: 8px;
+    font-size: 12px;
+  }
+}

@@ -1,0 +1,723 @@
+/* --------------------------------------------------------
+   Page and selectors
+-------------------------------------------------------- */
+
+.current-treatment-page {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.current-treatment-patient-selector {
+  width: 290px;
+}
+
+.current-treatment-empty-card {
+  min-height: 380px;
+  border: 1px solid #e8edf5;
+  border-radius: 18px;
+  box-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.current-treatment-empty-card
+  .ant-card-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 380px;
+}
+
+.current-treatment-empty-content {
+  max-width: 480px;
+  text-align: center;
+}
+
+.current-treatment-empty-content
+  .ant-typography {
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+
+/* --------------------------------------------------------
+   Current patient summary
+-------------------------------------------------------- */
+
+.current-treatment-patient {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+  padding: 20px 22px;
+  border: 1px solid #dbeafe;
+  border-left: 5px solid #2563eb;
+  border-radius: 18px;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(37, 99, 235, 0.08),
+      transparent 260px
+    ),
+    linear-gradient(
+      135deg,
+      #ffffff,
+      #f4f8ff
+    );
+  box-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.current-treatment-patient--allergy {
+  border-color: #fecaca;
+  border-left-color: #dc2626;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(220, 38, 38, 0.08),
+      transparent 260px
+    ),
+    linear-gradient(
+      135deg,
+      #ffffff,
+      #fff7f7
+    );
+}
+
+.current-treatment-patient__identity {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 15px;
+}
+
+.current-treatment-patient__avatar {
+  flex: 0 0 auto;
+  color: #2563eb;
+  border: 3px solid #dbeafe;
+  background:
+    linear-gradient(
+      135deg,
+      #eff6ff,
+      #dbeafe
+    );
+}
+
+.current-treatment-patient__avatar--allergy {
+  color: #dc2626;
+  border-color: #fecaca;
+  background:
+    linear-gradient(
+      135deg,
+      #fef2f2,
+      #fee2e2
+    );
+}
+
+.current-treatment-patient__details {
+  min-width: 0;
+}
+
+.current-treatment-patient__eyebrow {
+  display: block;
+  margin-bottom: 2px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.current-treatment-patient__details
+  h3.ant-typography {
+  margin: 0;
+  color: #172033;
+  font-weight: 750;
+}
+
+.current-treatment-status-tag,
+.current-treatment-allergy-tag {
+  margin-inline-end: 0;
+  font-weight: 650;
+}
+
+.current-treatment-patient__meta {
+  display: flex;
+  align-items: center;
+  gap: 7px 17px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.current-treatment-patient__meta
+  span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.current-treatment-allergy-alert {
+  margin-bottom: 16px;
+  border-radius: 14px;
+}
+
+/* --------------------------------------------------------
+   Workspace
+-------------------------------------------------------- */
+
+.current-treatment-workspace {
+  overflow: hidden;
+  border: 1px solid #e8edf5;
+  border-radius: 20px;
+  box-shadow:
+    0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.current-treatment-workspace
+  > .ant-card-body {
+  padding: 0;
+}
+
+.current-treatment-progress {
+  padding: 24px 28px;
+  border-bottom: 1px solid #e8edf5;
+  background:
+    linear-gradient(
+      135deg,
+      #f8fbff,
+      #ffffff
+    );
+}
+
+.current-treatment-progress
+  .ant-steps {
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+.current-treatment-step {
+  padding: 26px 28px 10px;
+}
+
+.current-treatment-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.current-treatment-section-heading
+  .ant-typography {
+  margin-top: 0;
+  margin-bottom: 2px;
+}
+
+.current-treatment-section-icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 47px;
+  height: 47px;
+  border-radius: 14px;
+  color: #2563eb;
+  font-size: 21px;
+  background: #eff6ff;
+}
+
+.current-treatment-section-icon--green {
+  color: #16a34a;
+  background: #f0fdf4;
+}
+
+/* --------------------------------------------------------
+   Treatment form
+-------------------------------------------------------- */
+
+.current-treatment-name-input--locked
+  .ant-input {
+  color: #334155;
+  font-weight: 650;
+  background: #f8fafc;
+}
+
+.current-treatment-name-input
+  .ant-input-group-addon {
+  padding-inline: 5px;
+  background: #ffffff;
+}
+
+.current-treatment-details-input {
+  font-size: 15px;
+  resize: none;
+}
+
+.current-treatment-extra-details {
+  overflow: hidden;
+  margin-top: 6px;
+  border: 1px solid #e8edf5;
+  border-radius: 13px;
+  background: #f8fafc;
+}
+
+.current-treatment-extra-details
+  .ant-collapse-header {
+  align-items: center !important;
+}
+
+.current-treatment-extra-details
+  .ant-collapse-content {
+  border-top: 1px solid #e8edf5;
+  background: #ffffff;
+}
+
+/* --------------------------------------------------------
+   Finish cards
+-------------------------------------------------------- */
+
+.current-treatment-finish-card {
+  height: 100%;
+  border: 1px solid #e8edf5;
+  border-radius: 17px;
+  box-shadow:
+    0 7px 22px rgba(15, 23, 42, 0.04);
+}
+
+.current-treatment-finish-card
+  .ant-card-body {
+  padding: 21px;
+}
+
+.current-treatment-finish-card--fee {
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #f7fbff
+    );
+}
+
+.current-treatment-finish-card--follow-up {
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #f8fffb
+    );
+}
+
+.current-treatment-finish-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 19px;
+}
+
+.current-treatment-finish-heading
+  > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.current-treatment-finish-heading
+  .ant-typography {
+  margin: 0;
+}
+
+.current-treatment-finish-icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  font-size: 21px;
+}
+
+.current-treatment-finish-icon--fee {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.current-treatment-finish-icon--follow-up {
+  color: #16a34a;
+  background: #f0fdf4;
+}
+
+.current-treatment-fee-input {
+  width: 100%;
+  min-height: 50px;
+  font-size: 18px;
+}
+
+.current-treatment-fee-input
+  .ant-input-number-input {
+  height: 48px;
+  font-weight: 650;
+}
+
+.current-treatment-quick-label {
+  display: block;
+  margin-top: 3px;
+}
+
+.current-treatment-amount-grid {
+  margin-top: 10px;
+}
+
+.current-treatment-amount-button {
+  min-height: 42px;
+  font-weight: 600;
+}
+
+.current-treatment-selected-fee {
+  margin-top: 15px;
+  border-radius: 11px;
+}
+
+/* --------------------------------------------------------
+   Follow-up
+-------------------------------------------------------- */
+
+.current-treatment-follow-up-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.current-treatment-follow-up-button {
+  min-height: 43px;
+  font-weight: 600;
+}
+
+.current-treatment-follow-up-button--none-selected {
+  border-color: #64748b !important;
+  background: #64748b !important;
+}
+
+.current-treatment-custom-date {
+  margin-top: 16px;
+  margin-bottom: 0;
+}
+
+.current-treatment-follow-up-alert {
+  margin-top: 16px;
+  border-radius: 11px;
+}
+
+.current-treatment-final-summary {
+  margin-top: 18px;
+  border-radius: 13px;
+}
+
+/* --------------------------------------------------------
+   Sticky actions
+-------------------------------------------------------- */
+
+.current-treatment-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 16px 28px;
+  border-top: 1px solid #e8edf5;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(10px);
+}
+
+.current-treatment-actions--first {
+  justify-content: flex-end;
+}
+
+.current-treatment-back-button {
+  min-width: 140px;
+  height: 46px;
+}
+
+.current-treatment-continue-button {
+  min-width: 220px;
+  height: 46px;
+  font-weight: 650;
+}
+
+.current-treatment-save-button {
+  min-width: 240px;
+  height: 48px;
+  border-color: #16a34a;
+  font-size: 15px;
+  font-weight: 700;
+  background: #16a34a;
+  box-shadow:
+    0 8px 18px rgba(22, 163, 74, 0.2);
+}
+
+.current-treatment-save-button:hover {
+  border-color: #15803d !important;
+  background: #15803d !important;
+}
+
+/* --------------------------------------------------------
+   Patient details modal
+-------------------------------------------------------- */
+
+.current-patient-details-modal
+  .ant-modal-content {
+  overflow: hidden;
+  padding: 0;
+  border-radius: 20px;
+  box-shadow:
+    0 24px 60px rgba(15, 23, 42, 0.22);
+}
+
+.current-patient-details-modal
+  .ant-modal-body {
+  padding: 0;
+  background: #f4f7fb;
+}
+
+.current-patient-details-modal
+  .ant-modal-footer {
+  margin-top: 0;
+  padding: 15px 21px;
+  border-top: 1px solid #e8edf5;
+  background: #ffffff;
+}
+
+.current-patient-details-modal
+  .ant-modal-close {
+  top: 15px;
+  right: 15px;
+  color: #ffffff;
+  background: rgba(
+    255,
+    255,
+    255,
+    0.16
+  );
+}
+
+.current-patient-details-modal
+  .ant-modal-close:hover {
+  color: #ffffff;
+  background: rgba(
+    255,
+    255,
+    255,
+    0.26
+  );
+}
+
+.current-patient-details-header {
+  display: flex;
+  align-items: center;
+  min-height: 135px;
+  gap: 15px;
+  padding: 26px 28px;
+  color: #ffffff;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.2),
+      transparent 240px
+    ),
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #0284c7
+    );
+}
+
+.current-patient-details-modal--allergy
+  .current-patient-details-header {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.16),
+      transparent 240px
+    ),
+    linear-gradient(
+      135deg,
+      #b91c1c,
+      #dc2626
+    );
+}
+
+.current-patient-details-header__avatar {
+  flex: 0 0 auto;
+  color: #2563eb;
+  border: 4px solid rgba(
+    255,
+    255,
+    255,
+    0.42
+  );
+  background: #ffffff;
+}
+
+.current-patient-details-modal--allergy
+  .current-patient-details-header__avatar {
+  color: #dc2626;
+}
+
+.current-patient-details-header
+  > div:last-child {
+  min-width: 0;
+}
+
+.current-patient-details-header
+  .ant-typography {
+  margin: 0;
+  color: #ffffff;
+}
+
+.current-patient-details-header
+  > div:last-child
+  > .ant-typography:first-child {
+  color: rgba(
+    255,
+    255,
+    255,
+    0.76
+  );
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.current-patient-details-header
+  h3.ant-typography {
+  margin: 2px 0 7px;
+}
+
+.current-patient-details-content {
+  display: flex;
+  padding: 20px;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.current-patient-details-alert {
+  border-radius: 12px;
+}
+
+.current-patient-descriptions
+  .ant-descriptions-item-label {
+  width: 125px;
+  color: #64748b;
+  font-weight: 600;
+  background: #f8fafc !important;
+}
+
+.current-patient-descriptions
+  .ant-descriptions-item-content {
+  background: #ffffff;
+}
+
+/* --------------------------------------------------------
+   Responsive
+-------------------------------------------------------- */
+
+@media (max-width: 768px) {
+  .current-treatment-patient-selector {
+    width: 100%;
+  }
+
+  .current-treatment-patient {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .current-treatment-patient
+    > .ant-btn {
+    width: 100%;
+  }
+
+  .current-treatment-progress {
+    padding: 21px 18px;
+  }
+
+  .current-treatment-step {
+    padding: 21px 18px 8px;
+  }
+
+  .current-treatment-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .current-treatment-actions {
+    padding: 15px 18px;
+  }
+
+  .current-patient-details-header {
+    padding: 24px 20px;
+  }
+
+  .current-patient-details-content {
+    padding: 16px;
+  }
+
+  .current-patient-descriptions
+    .ant-descriptions-item-label {
+    width: auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .current-treatment-patient__identity {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .current-treatment-patient__details
+    h3.ant-typography {
+    font-size: 21px;
+  }
+
+  .current-treatment-patient__meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .current-treatment-actions {
+    position: static;
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .current-treatment-actions
+    .ant-btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .current-treatment-finish-card
+    .ant-card-body {
+    padding: 16px;
+  }
+
+  .current-patient-details-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .current-patient-details-modal
+    .ant-modal-footer {
+    display: flex;
+  }
+
+  .current-patient-details-modal
+    .ant-modal-footer
+    .ant-btn {
+    flex: 1;
+  }
+}

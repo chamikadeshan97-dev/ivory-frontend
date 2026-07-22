@@ -1,0 +1,801 @@
+/* --------------------------------------------------------
+   Main modal
+-------------------------------------------------------- */
+
+.appointment-details-modal
+  .ant-modal-content {
+  overflow: hidden;
+  padding: 0;
+  border-radius: 20px;
+  box-shadow:
+    0 24px 60px rgba(15, 23, 42, 0.22);
+}
+
+.appointment-details-modal
+  .ant-modal-body {
+  padding: 0;
+  background: #f4f7fb;
+}
+
+.appointment-details-modal
+  .ant-modal-footer {
+  margin-top: 0;
+  padding: 15px 22px;
+  border-top: 1px solid #e8edf5;
+  background: #ffffff;
+}
+
+.appointment-details-modal
+  .ant-modal-close {
+  top: 16px;
+  right: 16px;
+  color: #ffffff;
+  background: rgba(
+    255,
+    255,
+    255,
+    0.16
+  );
+}
+
+.appointment-details-modal
+  .ant-modal-close:hover {
+  color: #ffffff;
+  background: rgba(
+    255,
+    255,
+    255,
+    0.26
+  );
+}
+
+/* --------------------------------------------------------
+   Loading and empty states
+-------------------------------------------------------- */
+
+.appointment-details-loading,
+.appointment-details-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 430px;
+  padding: 40px;
+  flex-direction: column;
+  gap: 14px;
+  background: #ffffff;
+}
+
+/* --------------------------------------------------------
+   Main header
+-------------------------------------------------------- */
+
+.appointment-details-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 160px;
+  gap: 24px;
+  padding: 30px 34px;
+  color: #ffffff;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.2),
+      transparent 290px
+    ),
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #0284c7
+    );
+}
+
+.appointment-details-modal--cancelled
+  .appointment-details-header {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.16),
+      transparent 290px
+    ),
+    linear-gradient(
+      135deg,
+      #991b1b,
+      #dc2626
+    );
+}
+
+.appointment-details-header__patient {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 17px;
+}
+
+.appointment-details-header__avatar {
+  flex: 0 0 auto;
+  color: #2563eb;
+  border: 4px solid rgba(
+    255,
+    255,
+    255,
+    0.45
+  );
+  background: #ffffff;
+  box-shadow:
+    0 10px 25px rgba(15, 23, 42, 0.2);
+}
+
+.appointment-details-modal--cancelled
+  .appointment-details-header__avatar {
+  color: #dc2626;
+}
+
+.appointment-details-header__identity {
+  min-width: 0;
+}
+
+.appointment-details-header__eyebrow {
+  display: block;
+  margin-bottom: 3px;
+  color: rgba(
+    255,
+    255,
+    255,
+    0.74
+  );
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.appointment-details-header__identity
+  h3.ant-typography {
+  margin: 0;
+  color: #ffffff;
+  font-weight: 750;
+}
+
+.appointment-details-header__status {
+  margin-inline-end: 0;
+  padding: 4px 11px;
+  font-weight: 700;
+}
+
+.appointment-details-header__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px 18px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.appointment-details-header__meta
+  span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(
+    255,
+    255,
+    255,
+    0.88
+  );
+  font-size: 13px;
+}
+
+.appointment-details-header__dentist {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  max-width: 310px;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid rgba(
+    255,
+    255,
+    255,
+    0.28
+  );
+  border-radius: 14px;
+  background: rgba(
+    255,
+    255,
+    255,
+    0.14
+  );
+  backdrop-filter: blur(8px);
+}
+
+.appointment-details-header__dentist-icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 43px;
+  height: 43px;
+  border-radius: 12px;
+  color: #2563eb;
+  font-size: 19px;
+  background: #ffffff;
+}
+
+.appointment-details-header__dentist
+  > div:last-child {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.appointment-details-header__dentist
+  .ant-typography {
+  overflow: hidden;
+  margin: 0;
+  color: #ffffff;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.appointment-details-header__dentist
+  h5.ant-typography {
+  font-size: 16px;
+}
+
+/* --------------------------------------------------------
+   Main content
+-------------------------------------------------------- */
+
+.appointment-details-content {
+  display: flex;
+  padding: 22px;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.appointment-allergy-alert,
+.appointment-cancelled-alert {
+  border-radius: 14px;
+}
+
+/* --------------------------------------------------------
+   Section headings
+-------------------------------------------------------- */
+
+.appointment-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.appointment-section-heading
+  .ant-typography {
+  margin-top: 0;
+  margin-bottom: 2px;
+}
+
+.appointment-section-heading--finance {
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+.appointment-section-icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 43px;
+  height: 43px;
+  border-radius: 13px;
+  font-size: 19px;
+}
+
+.appointment-section-icon--blue {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.appointment-section-icon--purple {
+  color: #7c3aed;
+  background: #f5f3ff;
+}
+
+/* --------------------------------------------------------
+   Progress
+-------------------------------------------------------- */
+
+.appointment-progress-card {
+  border: 1px solid #e8edf5;
+  border-radius: 16px;
+  box-shadow:
+    0 7px 22px rgba(15, 23, 42, 0.04);
+}
+
+.appointment-progress-card
+  .ant-card-body {
+  padding: 20px;
+}
+
+.appointment-progress-scroll {
+  overflow-x: auto;
+  padding: 6px 2px 8px;
+}
+
+.appointment-progress-scroll
+  .ant-steps {
+  min-width: 900px;
+}
+
+/* --------------------------------------------------------
+   Information cards
+-------------------------------------------------------- */
+
+.appointment-information-card {
+  height: 100%;
+  border: 1px solid #e8edf5;
+  border-radius: 16px;
+  box-shadow:
+    0 7px 22px rgba(15, 23, 42, 0.04);
+}
+
+.appointment-information-card
+  .ant-card-body {
+  padding: 20px;
+}
+
+.appointment-descriptions
+  .ant-descriptions-item-label {
+  width: 145px;
+  color: #64748b;
+  font-weight: 600;
+  background: #f8fafc !important;
+}
+
+.appointment-descriptions
+  .ant-descriptions-item-content {
+  background: #ffffff;
+}
+
+/* --------------------------------------------------------
+   Finance cards
+-------------------------------------------------------- */
+
+.appointment-finance-card {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid #e8edf5;
+  border-radius: 15px;
+  box-shadow:
+    0 7px 20px rgba(15, 23, 42, 0.04);
+}
+
+.appointment-finance-card::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  content: "";
+}
+
+.appointment-finance-card--blue::before {
+  background: #2563eb;
+}
+
+.appointment-finance-card--green::before {
+  background: #16a34a;
+}
+
+.appointment-finance-card--red::before {
+  background: #dc2626;
+}
+
+.appointment-finance-card--orange::before {
+  background: #f59e0b;
+}
+
+.appointment-finance-card
+  .ant-card-body {
+  padding: 18px;
+}
+
+.appointment-finance-card__content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.appointment-finance-card
+  .ant-statistic-title {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.appointment-finance-card
+  .ant-statistic-content {
+  color: #172033;
+  font-size: 22px;
+  font-weight: 750;
+}
+
+.appointment-finance-card__icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 43px;
+  height: 43px;
+  border-radius: 13px;
+  font-size: 19px;
+}
+
+.appointment-finance-card--blue
+  .appointment-finance-card__icon {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.appointment-finance-card--green
+  .appointment-finance-card__icon {
+  color: #16a34a;
+  background: #f0fdf4;
+}
+
+.appointment-finance-card--red
+  .appointment-finance-card__icon {
+  color: #dc2626;
+  background: #fef2f2;
+}
+
+.appointment-finance-card--orange
+  .appointment-finance-card__icon {
+  color: #d97706;
+  background: #fffbeb;
+}
+
+.appointment-finance-status {
+  padding: 4px 11px;
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------
+   Detail action buttons
+-------------------------------------------------------- */
+
+.appointment-detail-actions {
+  margin-top: 2px;
+}
+
+.appointment-detail-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 54px;
+  gap: 8px;
+  border-radius: 13px;
+  font-weight: 650;
+}
+
+.appointment-detail-action--treatment {
+  color: #7c3aed;
+  border-color: #ddd6fe;
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff,
+      #faf5ff
+    );
+}
+
+.appointment-detail-action--payment {
+  color: #15803d;
+  border-color: #bbf7d0;
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff,
+      #f0fdf4
+    );
+}
+
+/* --------------------------------------------------------
+   Sub modals
+-------------------------------------------------------- */
+
+.appointment-sub-modal
+  .ant-modal-content {
+  overflow: hidden;
+  padding: 0;
+  border-radius: 20px;
+  box-shadow:
+    0 24px 60px rgba(15, 23, 42, 0.22);
+}
+
+.appointment-sub-modal
+  .ant-modal-body {
+  padding: 0;
+  background: #f4f7fb;
+}
+
+.appointment-sub-modal
+  .ant-modal-footer {
+  margin-top: 0;
+  padding: 15px 22px;
+  border-top: 1px solid #e8edf5;
+  background: #ffffff;
+}
+
+.appointment-sub-modal
+  .ant-modal-close {
+  top: 16px;
+  right: 16px;
+  color: #ffffff;
+  background: rgba(
+    255,
+    255,
+    255,
+    0.16
+  );
+}
+
+.appointment-sub-modal
+  .ant-modal-close:hover {
+  color: #ffffff;
+  background: rgba(
+    255,
+    255,
+    255,
+    0.25
+  );
+}
+
+.appointment-sub-modal__header {
+  display: flex;
+  align-items: center;
+  min-height: 125px;
+  gap: 14px;
+  padding: 25px 30px;
+  color: #ffffff;
+}
+
+.appointment-sub-modal__header--treatment {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.18),
+      transparent 260px
+    ),
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #4f46e5
+    );
+}
+
+.appointment-sub-modal__header--payment {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.18),
+      transparent 260px
+    ),
+    linear-gradient(
+      135deg,
+      #15803d,
+      #0f766e
+    );
+}
+
+.appointment-sub-modal__header-icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 55px;
+  height: 55px;
+  border: 1px solid rgba(
+    255,
+    255,
+    255,
+    0.34
+  );
+  border-radius: 16px;
+  font-size: 24px;
+  background: rgba(
+    255,
+    255,
+    255,
+    0.16
+  );
+}
+
+.appointment-sub-modal__header
+  .ant-typography {
+  margin: 0;
+  color: #ffffff;
+}
+
+.appointment-sub-modal__content {
+  padding: 22px;
+}
+
+.appointment-sub-summary {
+  margin-bottom: 16px;
+}
+
+.appointment-sub-summary__item {
+  display: flex;
+  min-height: 72px;
+  padding: 13px 15px;
+  border: 1px solid #e8edf5;
+  border-radius: 12px;
+  background: #ffffff;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.appointment-payment-summary {
+  margin-bottom: 16px;
+}
+
+/* --------------------------------------------------------
+   Tables
+-------------------------------------------------------- */
+
+.appointment-detail-table {
+  overflow: hidden;
+  border: 1px solid #e8edf5;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.appointment-detail-id {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 9px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.appointment-detail-id--purple {
+  color: #7c3aed;
+  background: #f5f3ff;
+}
+
+.appointment-detail-id--green {
+  color: #15803d;
+  background: #f0fdf4;
+}
+
+.payment-installment-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin: auto;
+  border-radius: 10px;
+  color: #2563eb;
+  font-weight: 700;
+  background: #eff6ff;
+}
+
+.payment-value {
+  font-weight: 700;
+}
+
+.payment-value--paid {
+  color: #15803d;
+}
+
+.payment-value--remaining {
+  color: #d97706;
+}
+
+.appointment-payment-status {
+  min-width: 75px;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------
+   Responsive
+-------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .appointment-details-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .appointment-details-header__dentist {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .appointment-details-header {
+    padding: 26px 21px;
+  }
+
+  .appointment-details-header__patient {
+    align-items: flex-start;
+  }
+
+  .appointment-details-header__avatar {
+    width: 59px !important;
+    height: 59px !important;
+    font-size: 23px !important;
+  }
+
+  .appointment-details-header__meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .appointment-details-content,
+  .appointment-sub-modal__content {
+    padding: 16px;
+  }
+
+  .appointment-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .appointment-information-card
+    .ant-card-body {
+    padding: 15px;
+  }
+
+  .appointment-descriptions
+    .ant-descriptions-item-label {
+    width: auto;
+  }
+
+  .appointment-sub-modal__header {
+    padding: 24px 20px;
+  }
+}
+
+@media (max-width: 520px) {
+  .appointment-details-header__patient {
+    flex-direction: column;
+  }
+
+  .appointment-details-header__identity
+    h3.ant-typography {
+    font-size: 21px;
+  }
+
+  .appointment-details-modal
+    .ant-modal-footer,
+  .appointment-sub-modal
+    .ant-modal-footer {
+    display: flex;
+  }
+
+  .appointment-details-modal
+    .ant-modal-footer
+    .ant-btn,
+  .appointment-sub-modal
+    .ant-modal-footer
+    .ant-btn {
+    flex: 1;
+  }
+
+  .appointment-finance-card
+    .ant-statistic-content {
+    font-size: 20px;
+  }
+}

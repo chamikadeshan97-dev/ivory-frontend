@@ -1,0 +1,788 @@
+/* --------------------------------------------------------
+   Header date filter
+-------------------------------------------------------- */
+
+.booking-date-filter {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 8px;
+  border: 1px solid #dfe7f1;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow:
+    0 5px 15px rgba(15, 23, 42, 0.04);
+}
+
+.booking-date-filter__icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.booking-date-filter__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.booking-date-filter__content
+  > .ant-typography {
+  font-size: 11px;
+}
+
+.booking-date-filter__picker {
+  width: 175px;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* --------------------------------------------------------
+   Summary cards
+-------------------------------------------------------- */
+
+.booking-summary-row {
+  margin-bottom: 16px;
+}
+
+.booking-summary-card {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid #edf1f7;
+  border-radius: 18px;
+  box-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.05);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.booking-summary-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(37, 99, 235, 0.22);
+  box-shadow:
+    0 14px 30px rgba(15, 23, 42, 0.09);
+}
+
+.booking-summary-card::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  content: "";
+}
+
+.booking-summary-card--blue::before {
+  background: #2563eb;
+}
+
+.booking-summary-card--purple::before {
+  background: #7c3aed;
+}
+
+.booking-summary-card--cyan::before {
+  background: #0891b2;
+}
+
+.booking-summary-card--green::before {
+  background: #16a34a;
+}
+
+.booking-summary-card
+  .ant-card-body {
+  padding: 20px;
+}
+
+.booking-summary-card__content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.booking-summary-card__title {
+  display: block;
+  margin-bottom: 7px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.booking-summary-card__value {
+  color: #172033;
+  font-size: 29px;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.booking-summary-card__helper {
+  display: block;
+  margin-top: 5px;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.booking-summary-card__icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 47px;
+  height: 47px;
+  border-radius: 14px;
+  font-size: 21px;
+}
+
+.booking-summary-card--blue
+  .booking-summary-card__icon {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.booking-summary-card--purple
+  .booking-summary-card__icon {
+  color: #7c3aed;
+  background: #f5f3ff;
+}
+
+.booking-summary-card--cyan
+  .booking-summary-card__icon {
+  color: #0891b2;
+  background: #ecfeff;
+}
+
+.booking-summary-card--green
+  .booking-summary-card__icon {
+  color: #16a34a;
+  background: #f0fdf4;
+}
+
+/* --------------------------------------------------------
+   Appointment directory
+-------------------------------------------------------- */
+
+.booking-directory-card {
+  border: 1px solid #e8edf5;
+  border-radius: 18px;
+  box-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.045);
+}
+
+.booking-directory-card
+  > .ant-card-body {
+  padding: 22px;
+}
+
+.booking-directory-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.booking-directory-header
+  .ant-typography {
+  margin-top: 0;
+  margin-bottom: 2px;
+}
+
+.booking-result-count {
+  padding: 4px 11px;
+  font-weight: 600;
+}
+
+.booking-table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding: 14px;
+  border: 1px solid #edf1f7;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.booking-search-input {
+  width: 100%;
+  max-width: 500px;
+}
+
+.booking-status-filter {
+  flex: 0 0 auto;
+}
+
+/* --------------------------------------------------------
+   Table cells
+-------------------------------------------------------- */
+
+.booking-number-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.booking-number-cell
+  .ant-typography-secondary {
+  font-size: 10px;
+}
+
+.booking-number-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 47px;
+  min-height: 35px;
+  border-radius: 10px;
+  color: #2563eb;
+  font-weight: 750;
+  background: #eff6ff;
+}
+
+.booking-date-icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 39px;
+  height: 39px;
+  border-radius: 11px;
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.booking-date-cell,
+.booking-person-cell {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.booking-date-cell
+  .ant-typography-secondary,
+.booking-person-cell
+  .ant-typography-secondary {
+  font-size: 12px;
+}
+
+.booking-patient-avatar {
+  color: #2563eb;
+  background:
+    linear-gradient(
+      135deg,
+      #eff6ff,
+      #dbeafe
+    );
+}
+
+.booking-patient-avatar--allergy {
+  color: #dc2626;
+  background:
+    linear-gradient(
+      135deg,
+      #fef2f2,
+      #fee2e2
+    );
+}
+
+.booking-allergy-tag {
+  margin-inline-end: 0;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.booking-phone-icon {
+  color: #64748b;
+}
+
+.booking-dentist-icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  color: #7c3aed;
+  background: #f5f3ff;
+}
+
+.booking-status-select {
+  width: 145px;
+}
+
+.booking-status-select
+  .ant-select-selector {
+  padding-inline: 5px !important;
+}
+
+.booking-status-label {
+  margin-inline-end: 0;
+  border: none;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------
+   Table rows
+-------------------------------------------------------- */
+
+.booking-row--allergy td {
+  background: #fffafa !important;
+}
+
+.booking-row--allergy
+  td:first-child {
+  border-left: 4px solid #dc2626;
+}
+
+.booking-row--checked-in td {
+  background: #f0fdff !important;
+}
+
+.booking-row--checked-in
+  td:first-child {
+  border-left: 4px solid #0891b2;
+}
+
+.booking-row--completed td {
+  background: #fbfffc;
+}
+
+.booking-row--completed
+  td:first-child {
+  border-left: 4px solid #16a34a;
+}
+
+.booking-row--cancelled td {
+  color: #94a3b8;
+  background: #fafafa !important;
+}
+
+.booking-row--cancelled
+  td:first-child {
+  border-left: 4px solid #dc2626;
+}
+
+/* --------------------------------------------------------
+   Modal title
+-------------------------------------------------------- */
+
+.booking-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.booking-modal-title__icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 39px;
+  height: 39px;
+  border-radius: 11px;
+  color: #ffffff;
+  font-size: 17px;
+  background:
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #0284c7
+    );
+}
+
+.booking-modal-title
+  > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.booking-modal-title
+  .ant-typography-secondary {
+  font-size: 12px;
+  font-weight: 400;
+}
+
+/* --------------------------------------------------------
+   Modal form sections
+-------------------------------------------------------- */
+
+.booking-form-modal
+  .ant-modal-content {
+  overflow: hidden;
+}
+
+.booking-form-modal
+  .ant-modal-body {
+  max-height: 75vh;
+  overflow-y: auto;
+  padding-top: 20px;
+}
+
+.booking-form-section {
+  margin-bottom: 16px;
+  padding: 17px;
+  border: 1px solid #e8edf5;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.booking-form-section--additional,
+.booking-form-section--schedule {
+  height: calc(100% - 16px);
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #f8fbff
+    );
+}
+
+.booking-form-section__heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 17px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #edf1f7;
+}
+
+.booking-form-section__heading
+  > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.booking-form-section__heading
+  .ant-typography-secondary {
+  font-size: 12px;
+}
+
+.booking-form-section__icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 37px;
+  height: 37px;
+  border-radius: 10px;
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.booking-form-section__icon--allergy {
+  color: #dc2626;
+  background: #fef2f2;
+}
+
+.booking-form-section__icon--additional {
+  color: #7c3aed;
+  background: #f5f3ff;
+}
+
+.booking-form-section__icon--schedule {
+  color: #0891b2;
+  background: #ecfeff;
+}
+
+/* --------------------------------------------------------
+   Allergy fields
+-------------------------------------------------------- */
+
+.booking-allergy-form-section {
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #fffafa
+    );
+}
+
+.booking-allergy-choice {
+  display: grid;
+  grid-template-columns:
+    repeat(2, 1fr);
+  gap: 9px;
+}
+
+.booking-allergy-choice__button {
+  height: 42px;
+  font-weight: 600;
+}
+
+.booking-allergy-choice__button--no {
+  color: #ffffff !important;
+  border-color: #16a34a !important;
+  background: #16a34a !important;
+}
+
+.booking-allergy-choice__button--yes {
+  color: #ffffff !important;
+  border-color: #dc2626 !important;
+  background: #dc2626 !important;
+}
+
+.booking-allergy-form-alert {
+  margin-top: 5px;
+}
+
+.booking-allergy-form-alert
+  .ant-alert-description {
+  margin-top: 12px;
+}
+
+.booking-allergy-details-item {
+  margin-bottom: 0;
+}
+
+.booking-more-options {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.booking-more-options
+  .ant-btn {
+  padding-inline: 0;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------
+   Appointment number panel
+-------------------------------------------------------- */
+
+.booking-appointment-number {
+  margin-bottom: 16px;
+  padding: 22px;
+  border-radius: 16px;
+  color: #ffffff;
+  text-align: center;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.2),
+      transparent 180px
+    ),
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #0284c7
+    );
+  box-shadow:
+    0 10px 25px rgba(37, 99, 235, 0.2);
+}
+
+.booking-appointment-number
+  > .ant-typography {
+  color: rgba(
+    255,
+    255,
+    255,
+    0.84
+  );
+}
+
+.booking-appointment-number__value {
+  margin: 4px 0;
+  font-size: 54px;
+  font-weight: 800;
+  line-height: 1.05;
+}
+
+.booking-last-appointment {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 13px;
+  padding: 8px 11px;
+  border: 1px solid rgba(
+    255,
+    255,
+    255,
+    0.25
+  );
+  border-radius: 9px;
+  font-size: 12px;
+  background: rgba(
+    255,
+    255,
+    255,
+    0.16
+  );
+}
+
+/* --------------------------------------------------------
+   Patient select
+-------------------------------------------------------- */
+
+.booking-patient-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 7px;
+  border-radius: 7px;
+}
+
+.booking-patient-option
+  > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.booking-patient-option--allergy {
+  background: #fff1f0;
+}
+
+.booking-selected-allergy-icon {
+  color: #dc2626;
+}
+
+.booking-selected-allergy-alert {
+  margin-top: -8px;
+  margin-bottom: 16px;
+  border-radius: 11px;
+}
+
+.booking-selected-allergy-details {
+  margin-top: 5px;
+}
+
+.booking-new-patient-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: -5px;
+  margin-bottom: 18px;
+  padding: 10px 12px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+/* --------------------------------------------------------
+   Dentist selection
+-------------------------------------------------------- */
+
+.booking-dentist-selection {
+  margin-top: 3px;
+}
+
+.booking-field-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #172033;
+  font-weight: 600;
+}
+
+.booking-dentist-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.booking-dentist-buttons
+  .ant-btn {
+  min-height: 39px;
+}
+
+/* --------------------------------------------------------
+   Workflow alert
+-------------------------------------------------------- */
+
+.booking-workflow-alert {
+  margin-top: 4px;
+  border-radius: 11px;
+}
+
+/* --------------------------------------------------------
+   Responsive
+-------------------------------------------------------- */
+
+@media (max-width: 1000px) {
+  .booking-table-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .booking-search-input {
+    max-width: none;
+  }
+
+  .booking-status-filter {
+    width: 100%;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .booking-date-filter {
+    width: 100%;
+  }
+
+  .booking-date-filter__content {
+    flex: 1;
+  }
+
+  .booking-date-filter__picker {
+    width: 100%;
+  }
+
+  .booking-directory-card
+    > .ant-card-body {
+    padding: 17px;
+  }
+
+  .booking-directory-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .booking-form-section {
+    padding: 14px;
+  }
+
+  .booking-allergy-choice {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .booking-summary-card__value {
+    font-size: 25px;
+  }
+
+  .booking-status-filter
+    .ant-segmented-item-label {
+    padding-inline: 8px;
+    font-size: 12px;
+  }
+
+  .booking-new-patient-action {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .booking-dentist-buttons {
+    flex-direction: column;
+  }
+
+  .booking-dentist-buttons
+    .ant-btn {
+    width: 100%;
+  }
+}

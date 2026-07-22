@@ -1,0 +1,605 @@
+/* --------------------------------------------------------
+   Main modal
+-------------------------------------------------------- */
+
+.treatment-payment-details-modal
+  .ant-modal-content {
+  overflow: hidden;
+  padding: 0;
+  border-radius: 20px;
+  box-shadow:
+    0 24px 60px rgba(15, 23, 42, 0.22);
+}
+
+.treatment-payment-details-modal
+  .ant-modal-body {
+  padding: 0;
+  background: #f4f7fb;
+}
+
+.treatment-payment-details-modal
+  .ant-modal-footer {
+  margin-top: 0;
+  padding: 15px 22px;
+  border-top: 1px solid #e8edf5;
+  background: #ffffff;
+}
+
+.treatment-payment-details-modal
+  .ant-modal-close {
+  top: 16px;
+  right: 16px;
+  color: #ffffff;
+  background: rgba(
+    255,
+    255,
+    255,
+    0.16
+  );
+}
+
+.treatment-payment-details-modal
+  .ant-modal-close:hover {
+  color: #ffffff;
+  background: rgba(
+    255,
+    255,
+    255,
+    0.26
+  );
+}
+
+/* --------------------------------------------------------
+   Loading and empty
+-------------------------------------------------------- */
+
+.treatment-payment-loading,
+.treatment-payment-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 420px;
+  padding: 40px;
+  flex-direction: column;
+  gap: 14px;
+  background: #ffffff;
+}
+
+/* --------------------------------------------------------
+   Header
+-------------------------------------------------------- */
+
+.treatment-payment-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 155px;
+  gap: 22px;
+  padding: 29px 32px;
+  color: #ffffff;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.2),
+      transparent 280px
+    ),
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #0284c7
+    );
+}
+
+.treatment-payment-details-modal--paid
+  .treatment-payment-header {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.18),
+      transparent 280px
+    ),
+    linear-gradient(
+      135deg,
+      #15803d,
+      #0f766e
+    );
+}
+
+.treatment-payment-header__patient {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 16px;
+}
+
+.treatment-payment-header__avatar {
+  flex: 0 0 auto;
+  color: #2563eb;
+  border: 4px solid rgba(
+    255,
+    255,
+    255,
+    0.45
+  );
+  background: #ffffff;
+  box-shadow:
+    0 10px 25px rgba(15, 23, 42, 0.2);
+}
+
+.treatment-payment-details-modal--paid
+  .treatment-payment-header__avatar {
+  color: #15803d;
+}
+
+.treatment-payment-header__identity {
+  min-width: 0;
+}
+
+.treatment-payment-header__eyebrow {
+  display: block;
+  margin-bottom: 3px;
+  color: rgba(
+    255,
+    255,
+    255,
+    0.75
+  );
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.treatment-payment-header__identity
+  h3.ant-typography {
+  margin: 0;
+  color: #ffffff;
+  font-weight: 750;
+}
+
+.treatment-payment-header__status {
+  margin-inline-end: 0;
+  padding: 4px 11px;
+  font-weight: 700;
+}
+
+.treatment-payment-header__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px 17px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.treatment-payment-header__meta
+  span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(
+    255,
+    255,
+    255,
+    0.88
+  );
+  font-size: 13px;
+}
+
+.treatment-payment-header__treatment {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  max-width: 290px;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid rgba(
+    255,
+    255,
+    255,
+    0.28
+  );
+  border-radius: 14px;
+  background: rgba(
+    255,
+    255,
+    255,
+    0.14
+  );
+  backdrop-filter: blur(8px);
+}
+
+.treatment-payment-header__treatment-icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 43px;
+  height: 43px;
+  border-radius: 12px;
+  color: #2563eb;
+  font-size: 19px;
+  background: #ffffff;
+}
+
+.treatment-payment-details-modal--paid
+  .treatment-payment-header__treatment-icon {
+  color: #15803d;
+}
+
+.treatment-payment-header__treatment
+  > div:last-child {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.treatment-payment-header__treatment
+  .ant-typography {
+  overflow: hidden;
+  margin: 0;
+  color: #ffffff;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* --------------------------------------------------------
+   Main content
+-------------------------------------------------------- */
+
+.treatment-payment-content {
+  display: flex;
+  padding: 22px;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* --------------------------------------------------------
+   Information card
+-------------------------------------------------------- */
+
+.treatment-payment-information-card,
+.treatment-payment-progress-card,
+.treatment-installment-card {
+  border: 1px solid #e8edf5;
+  border-radius: 16px;
+  box-shadow:
+    0 7px 22px rgba(15, 23, 42, 0.04);
+}
+
+.treatment-payment-information-card
+  .ant-card-body,
+.treatment-payment-progress-card
+  .ant-card-body,
+.treatment-installment-card
+  .ant-card-body {
+  padding: 20px;
+}
+
+.treatment-payment-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.treatment-payment-section-heading
+  .ant-typography {
+  margin-top: 0;
+  margin-bottom: 2px;
+}
+
+.treatment-payment-descriptions
+  .ant-descriptions-item-label {
+  width: 145px;
+  color: #64748b;
+  font-weight: 600;
+  background: #f8fafc !important;
+}
+
+.treatment-payment-descriptions
+  .ant-descriptions-item-content {
+  background: #ffffff;
+}
+
+/* --------------------------------------------------------
+   Summary cards
+-------------------------------------------------------- */
+
+.treatment-payment-summary-card {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid #e8edf5;
+  border-radius: 15px;
+  box-shadow:
+    0 7px 20px rgba(15, 23, 42, 0.04);
+}
+
+.treatment-payment-summary-card::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  content: "";
+}
+
+.treatment-payment-summary-card--blue::before {
+  background: #2563eb;
+}
+
+.treatment-payment-summary-card--green::before {
+  background: #16a34a;
+}
+
+.treatment-payment-summary-card--orange::before {
+  background: #f59e0b;
+}
+
+.treatment-payment-summary-card
+  .ant-card-body {
+  padding: 18px;
+}
+
+.treatment-payment-summary-card__content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.treatment-payment-summary-card
+  .ant-statistic-title {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.treatment-payment-summary-card
+  .ant-statistic-content {
+  color: #172033;
+  font-size: 22px;
+  font-weight: 750;
+}
+
+.treatment-payment-summary-card__icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 43px;
+  height: 43px;
+  border-radius: 13px;
+  font-size: 19px;
+}
+
+.treatment-payment-summary-card--blue
+  .treatment-payment-summary-card__icon {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.treatment-payment-summary-card--green
+  .treatment-payment-summary-card__icon {
+  color: #16a34a;
+  background: #f0fdf4;
+}
+
+.treatment-payment-summary-card--orange
+  .treatment-payment-summary-card__icon {
+  color: #d97706;
+  background: #fffbeb;
+}
+
+/* --------------------------------------------------------
+   Payment progress
+-------------------------------------------------------- */
+
+.treatment-payment-progress-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.treatment-payment-progress-header
+  > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* --------------------------------------------------------
+   Payment alerts
+-------------------------------------------------------- */
+
+.treatment-payment-alert {
+  border-radius: 14px;
+}
+
+.treatment-payment-warning-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+/* --------------------------------------------------------
+   Installment table
+-------------------------------------------------------- */
+
+.treatment-installment-table {
+  overflow: hidden;
+  border: 1px solid #e8edf5;
+  border-radius: 14px;
+}
+
+.treatment-installment-number {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 750;
+  background: #eff6ff;
+}
+
+.treatment-payment-date-cell,
+.treatment-payment-balance-cell {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.treatment-payment-date-cell
+  .ant-typography-secondary {
+  font-size: 11px;
+}
+
+.treatment-payment-balance-cell {
+  align-items: flex-end;
+}
+
+.treatment-payment-id {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 9px;
+  border-radius: 8px;
+  color: #15803d;
+  font-size: 12px;
+  font-weight: 700;
+  background: #f0fdf4;
+}
+
+.treatment-payment-amount {
+  font-weight: 700;
+}
+
+.treatment-payment-amount--primary {
+  color: #2563eb;
+}
+
+.treatment-payment-amount--paid {
+  color: #15803d;
+}
+
+.treatment-payment-amount--balance {
+  color: #d97706;
+}
+
+.treatment-payment-status-tag {
+  min-width: 72px;
+  margin: 0;
+  border-radius: 16px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.treatment-payment-method-tag {
+  margin: 0;
+  border-radius: 16px;
+  white-space: normal;
+}
+
+/* --------------------------------------------------------
+   Responsive
+-------------------------------------------------------- */
+
+@media (max-width: 850px) {
+  .treatment-payment-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .treatment-payment-header__treatment {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .treatment-payment-header {
+    padding: 25px 21px;
+  }
+
+  .treatment-payment-header__patient {
+    align-items: flex-start;
+  }
+
+  .treatment-payment-header__avatar {
+    width: 59px !important;
+    height: 59px !important;
+    font-size: 23px !important;
+  }
+
+  .treatment-payment-header__meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .treatment-payment-content {
+    padding: 16px;
+  }
+
+  .treatment-payment-section-heading,
+  .treatment-payment-warning-content {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .treatment-payment-information-card
+    .ant-card-body,
+  .treatment-payment-progress-card
+    .ant-card-body,
+  .treatment-installment-card
+    .ant-card-body {
+    padding: 15px;
+  }
+
+  .treatment-payment-descriptions
+    .ant-descriptions-item-label {
+    width: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .treatment-payment-header__patient {
+    flex-direction: column;
+  }
+
+  .treatment-payment-header__identity
+    h3.ant-typography {
+    font-size: 21px;
+  }
+
+  .treatment-payment-details-modal
+    .ant-modal-footer {
+    display: flex;
+  }
+
+  .treatment-payment-details-modal
+    .ant-modal-footer
+    .ant-btn {
+    flex: 1;
+  }
+
+  .treatment-payment-summary-card
+    .ant-statistic-content {
+    font-size: 20px;
+  }
+
+  .treatment-payment-warning-content
+    .ant-btn {
+    width: 100%;
+  }
+}

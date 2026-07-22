@@ -1,0 +1,377 @@
+.dashboard-summary-row {
+  margin-bottom: 16px;
+}
+
+.dashboard-summary-card {
+  height: 100%;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid #edf1f7;
+  box-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.05);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.dashboard-summary-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(37, 99, 235, 0.2);
+  box-shadow:
+    0 14px 32px rgba(15, 23, 42, 0.09);
+}
+
+.dashboard-summary-card::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  content: "";
+}
+
+.dashboard-summary-card--blue::before {
+  background: #2563eb;
+}
+
+.dashboard-summary-card--cyan::before {
+  background: #0891b2;
+}
+
+.dashboard-summary-card--purple::before {
+  background: #7c3aed;
+}
+
+.dashboard-summary-card--orange::before {
+  background: #f59e0b;
+}
+
+.dashboard-summary-card--green::before {
+  background: #16a34a;
+}
+
+.dashboard-summary-card--red::before {
+  background: #dc2626;
+}
+
+.dashboard-summary-card__content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.dashboard-summary-card__title {
+  display: block;
+  margin-bottom: 5px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dashboard-summary-card__helper {
+  display: block;
+  margin-top: 2px;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.dashboard-summary-card__icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  font-size: 21px;
+}
+
+.dashboard-summary-card--blue
+  .dashboard-summary-card__icon {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.dashboard-summary-card--cyan
+  .dashboard-summary-card__icon {
+  color: #0891b2;
+  background: #ecfeff;
+}
+
+.dashboard-summary-card--purple
+  .dashboard-summary-card__icon {
+  color: #7c3aed;
+  background: #f5f3ff;
+}
+
+.dashboard-summary-card--orange
+  .dashboard-summary-card__icon {
+  color: #d97706;
+  background: #fffbeb;
+}
+
+.dashboard-summary-card--green
+  .dashboard-summary-card__icon {
+  color: #16a34a;
+  background: #f0fdf4;
+}
+
+.dashboard-summary-card--red
+  .dashboard-summary-card__icon {
+  color: #dc2626;
+  background: #fef2f2;
+}
+
+.dashboard-card {
+  margin-bottom: 16px;
+  border: 1px solid #e8edf5;
+  box-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.045);
+}
+
+.dashboard-card .ant-card-body {
+  padding: 22px;
+}
+
+.dashboard-quick-actions {
+  background:
+    linear-gradient(
+      110deg,
+      #ffffff 0%,
+      #f8fbff 100%
+    );
+}
+
+.dashboard-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.dashboard-section-heading
+  .ant-typography {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.dashboard-section-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  font-size: 19px;
+}
+
+.dashboard-section-icon--blue {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.dashboard-section-icon--purple {
+  color: #7c3aed;
+  background: #f5f3ff;
+}
+
+.dashboard-section-icon--orange {
+  color: #d97706;
+  background: #fffbeb;
+}
+
+.dashboard-section-icon--red {
+  color: #dc2626;
+  background: #fef2f2;
+}
+
+.dashboard-section-icon--green {
+  color: #16a34a;
+  background: #f0fdf4;
+}
+
+.dashboard-current-treatment {
+  min-height: 410px;
+}
+
+.dashboard-treatment-content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.dashboard-current-patient {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.dashboard-current-patient
+  .ant-typography {
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+
+.dashboard-current-patient__avatar {
+  color: #ffffff;
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #2563eb
+    );
+}
+
+.dashboard-treatment-details {
+  margin-top: 2px;
+}
+
+.dashboard-detail-box {
+  height: 100%;
+  padding: 14px;
+  border: 1px solid #edf1f7;
+  border-radius: 13px;
+  background: #f8fafc;
+}
+
+.dashboard-detail-box
+  .ant-typography {
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+.dashboard-alert-card {
+  min-height: 410px;
+}
+
+.dashboard-all-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 270px;
+  text-align: center;
+  flex-direction: column;
+}
+
+.dashboard-all-clear
+  > .anticon {
+  margin-bottom: 14px;
+  color: #16a34a;
+  font-size: 52px;
+}
+
+.dashboard-all-clear
+  .ant-typography {
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+
+.dashboard-queue-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  color: #ffffff;
+  font-weight: 700;
+  background:
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #0284c7
+    );
+}
+
+.dashboard-patient-avatar {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.dashboard-next-patient-row td {
+  background: #eff6ff !important;
+}
+
+.dashboard-next-patient-row td:first-child {
+  border-left: 4px solid #2563eb;
+}
+
+.dashboard-treatment-row td {
+  background: #f5f3ff !important;
+}
+
+.dashboard-treatment-row td:first-child {
+  border-left: 4px solid #7c3aed;
+}
+
+.dashboard-allergy-row td {
+  background: #fff7f7;
+}
+
+.dashboard-allergy-row td:first-child {
+  border-left: 4px solid #dc2626;
+}
+
+.dashboard-progress-card {
+  height: calc(100% - 16px);
+  text-align: center;
+}
+
+.dashboard-progress-card
+  .ant-progress {
+  margin: 14px 0 24px;
+}
+
+.dashboard-progress-statistics {
+  display: grid;
+  grid-template-columns:
+    repeat(3, 1fr);
+  gap: 10px;
+}
+
+.dashboard-progress-statistics
+  > div {
+  padding: 12px 8px;
+  border: 1px solid #edf1f7;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.dashboard-progress-statistics
+  .ant-typography {
+  margin-top: 3px;
+  margin-bottom: 0;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-current-treatment,
+  .dashboard-alert-card {
+    min-height: auto;
+  }
+
+  .dashboard-progress-card {
+    height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-card .ant-card-body {
+    padding: 17px;
+  }
+
+  .dashboard-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dashboard-current-patient {
+    align-items: flex-start;
+  }
+
+  .dashboard-progress-statistics {
+    grid-template-columns: 1fr;
+  }
+}

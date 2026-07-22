@@ -1,0 +1,432 @@
+.queue-page {
+  min-height: 100vh;
+  width: 100%;
+  padding: 34px;
+  background: linear-gradient(135deg, #f8fbff 0%, #eef6ff 50%, #fff7ed 100%);
+}
+
+.queue-wrapper {
+  width: 100%;
+  max-width: 1450px;
+  margin: 0 auto;
+}
+
+/* Header */
+.queue-header,
+.patient-guide-card,
+.main-card,
+.summary-card,
+.loading-card {
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+}
+
+.queue-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 30px 36px;
+}
+
+.queue-title {
+  margin: 0 !important;
+  font-size: 50px !important;
+  font-weight: 950 !important;
+  color: #0f172a !important;
+}
+
+.queue-subtitle {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  font-size: 18px;
+  font-weight: 800;
+  color: #2563eb;
+}
+
+.queue-clock-box {
+  min-width: 330px;
+  padding: 20px 26px;
+  text-align: right;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+}
+
+.queue-date {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+.queue-clock {
+  margin: 0 !important;
+  font-size: 42px !important;
+  font-weight: 950 !important;
+  color: #ffffff !important;
+}
+
+/* Patient Notice */
+.patient-guide-card .ant-card-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 26px;
+}
+
+.patient-guide-content {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.patient-guide-icon,
+.summary-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.patient-guide-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  background: #eff6ff;
+  color: #1677ff;
+  font-size: 26px;
+}
+
+.patient-guide-title {
+  margin: 0 0 4px !important;
+  font-weight: 900 !important;
+  color: #0f172a !important;
+}
+
+.patient-guide-text {
+  font-size: 17px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.refresh-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  font-weight: 700;
+  color: #64748b;
+}
+
+/* Main Queue Cards */
+.main-card {
+  position: relative;
+  min-height: 430px;
+  height: 100%;
+  overflow: hidden;
+  border-width: 2px;
+}
+
+.main-card .ant-card-body {
+  min-height: 430px;
+  height: 100%;
+  padding: 38px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.inside-card {
+  background: linear-gradient(180deg, #ffffff 0%, #eff6ff 100%);
+  border-color: #93c5fd;
+}
+
+.next-card {
+  background: linear-gradient(180deg, #ffffff 0%, #fff7ed 100%);
+  border-color: #fdba74;
+}
+
+.inside-card::before,
+.next-card::before {
+  position: absolute;
+  top: 24px;
+  right: 26px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 950;
+  letter-spacing: 1px;
+}
+
+.inside-card::before {
+  content: "NOW";
+  background: #1677ff;
+}
+
+.next-card::before {
+  content: "GET READY";
+  background: #fa8c16;
+}
+
+.card-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 28px;
+  font-size: 30px;
+  font-weight: 950;
+  color: #1e293b;
+  text-align: center;
+}
+
+.card-label .anticon {
+  font-size: 32px;
+}
+
+/* Queue Circle Number */
+.queue-number-circle {
+  width: 230px;
+  height: 230px;
+  margin: 0 auto 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 92px;
+  font-weight: 1000;
+  line-height: 1;
+  color: #ffffff;
+  text-shadow: 0 5px 14px rgba(0, 0, 0, 0.22);
+}
+
+.queue-number-circle.blue {
+  background: linear-gradient(135deg, #60a5fa, #1677ff);
+  box-shadow: 0 22px 45px rgba(22, 119, 255, 0.3);
+}
+
+.queue-number-circle.orange {
+  background: linear-gradient(135deg, #fb923c, #f97316);
+  box-shadow: 0 22px 45px rgba(249, 115, 22, 0.3);
+}
+
+/* Status */
+.status-tag {
+  padding: 10px 26px;
+  border-radius: 999px;
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.pulse-tag {
+  animation: pulseTag 1.5s infinite;
+}
+
+@keyframes pulseTag {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(22, 119, 255, 0.36);
+  }
+
+  70% {
+    transform: scale(1.04);
+    box-shadow: 0 0 0 16px rgba(22, 119, 255, 0);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(22, 119, 255, 0);
+  }
+}
+
+.fade-up {
+  animation: fadeUp 0.45s ease both;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Summary Cards */
+.summary-card .ant-card-body {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 24px;
+}
+
+.summary-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 22px;
+  font-size: 30px;
+}
+
+.total-card .summary-icon {
+  background: #eff6ff;
+  color: #1677ff;
+}
+
+.waiting-card .summary-icon {
+  background: #fff7ed;
+  color: #fa8c16;
+}
+
+.completed-card .summary-icon {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.summary-label {
+  font-size: 16px;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.summary-value {
+  margin: 2px 0 0 !important;
+  font-size: 40px !important;
+  font-weight: 950 !important;
+  color: #0f172a !important;
+}
+
+/* Empty / Loading */
+.loading-card {
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ant-empty-description {
+  color: #64748b !important;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .queue-page {
+    padding: 24px;
+  }
+
+  .queue-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .queue-clock-box {
+    width: 100%;
+    min-width: unset;
+    text-align: left;
+  }
+
+  .queue-title {
+    font-size: 40px !important;
+  }
+
+  .main-card,
+  .main-card .ant-card-body {
+    min-height: 360px;
+  }
+}
+
+@media (max-width: 768px) {
+  .queue-page {
+    padding: 18px;
+  }
+
+  .queue-header,
+  .patient-guide-card .ant-card-body {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .queue-title {
+    font-size: 34px !important;
+  }
+
+  .queue-clock {
+    font-size: 34px !important;
+  }
+
+  .card-label {
+    font-size: 24px;
+  }
+
+  .queue-number-circle {
+    width: 185px;
+    height: 185px;
+    font-size: 72px;
+  }
+
+  .status-tag {
+    font-size: 17px;
+  }
+
+  .refresh-info {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 576px) {
+  .queue-page {
+    padding: 14px;
+  }
+
+  .queue-header {
+    padding: 20px;
+  }
+
+  .queue-title {
+    font-size: 28px !important;
+  }
+
+  .queue-clock {
+    font-size: 28px !important;
+  }
+
+  .main-card .ant-card-body {
+    padding: 28px 18px;
+  }
+
+  .queue-number-circle {
+    width: 155px;
+    height: 155px;
+    font-size: 58px;
+  }
+
+  .card-label {
+    font-size: 21px;
+  }
+
+  .inside-card::before,
+  .next-card::before {
+    top: 16px;
+    right: 16px;
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}
