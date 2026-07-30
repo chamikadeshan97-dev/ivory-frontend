@@ -193,3 +193,13 @@ export const getFollowUpPatients = (date) => {
 export const registerUser = (data) => {
   return axiosInstance.post("/auth/register", data);
 };
+
+
+export const getAppointmentsTreatmentsByDateRange = (startDate, endDate) => {
+  return axiosInstance.get("/reports/appointments-treatments-range", {
+    params: {
+      start_date: startDate,
+      end_date: endDate,
+    },
+  });
+};

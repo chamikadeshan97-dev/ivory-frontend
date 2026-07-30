@@ -1562,40 +1562,13 @@ const CurrentTreatment = () => {
                 />
               )}
 
-              {selectedFollowUp ===
-                "none" && (
-                <Alert
-                  type="info"
-                  showIcon
-                  message="No follow-up required"
-                  description="No return date will be recorded for this treatment."
-                  className="current-treatment-follow-up-alert"
-                />
-              )}
+              
+              
             </Card>
           </Col>
         </Row>
 
-        <Alert
-          type={
-            treatmentCharge > 0
-              ? "success"
-              : "warning"
-          }
-          showIcon
-          message={`${patientInformation.name} — ${
-            selectedTreatment ||
-            "Treatment"
-          }`}
-          description={
-            treatmentCharge > 0
-              ? `Treatment fee: ${formatCurrency(
-                  treatmentCharge,
-                )}`
-              : "Select the treatment fee before saving."
-          }
-          className="current-treatment-final-summary"
-        />
+
       </div>
     );
   };

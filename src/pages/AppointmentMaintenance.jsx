@@ -84,16 +84,9 @@ const formatTime = (value) => {
     return "-";
   }
 
-  const parsedTime = dayjs(value, [
-    "HH:mm",
-    "HH:mm:ss",
-    "h:mm A",
-    "hh:mm A",
-  ]);
+  const parsedTime = dayjs(value, ["HH:mm", "HH:mm:ss", "h:mm A", "hh:mm A"]);
 
-  return parsedTime.isValid()
-    ? parsedTime.format("hh:mm A")
-    : value;
+  return parsedTime.isValid() ? parsedTime.format("hh:mm A") : value;
 };
 
 const formatDateTime = (value) => {
@@ -103,9 +96,7 @@ const formatDateTime = (value) => {
 
   const parsedDate = dayjs(value);
 
-  return parsedDate.isValid()
-    ? parsedDate.format("hh:mm A")
-    : value;
+  return parsedDate.isValid() ? parsedDate.format("hh:mm A") : value;
 };
 
 /* --------------------------------------------------------
@@ -113,33 +104,23 @@ const formatDateTime = (value) => {
 -------------------------------------------------------- */
 
 const AppointmentMaintenance = () => {
-  const [selectedDate, setSelectedDate] = useState(
-    getTodayDate(),
-  );
+  const [selectedDate, setSelectedDate] = useState(getTodayDate());
 
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [updatingId, setUpdatingId] = useState(null);
 
-  const [paymentModalOpen, setPaymentModalOpen] =
-    useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
 
-  const [paymentAppointment, setPaymentAppointment] =
-    useState(null);
+  const [paymentAppointment, setPaymentAppointment] = useState(null);
 
-  const [paymentLoading, setPaymentLoading] =
-    useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(false);
 
-  const [treatmentModalOpen, setTreatmentModalOpen] =
-    useState(false);
+  const [treatmentModalOpen, setTreatmentModalOpen] = useState(false);
 
-  const [
-    treatmentAppointment,
-    setTreatmentAppointment,
-  ] = useState(null);
+  const [treatmentAppointment, setTreatmentAppointment] = useState(null);
 
-  const [treatmentLoading, setTreatmentLoading] =
-    useState(false);
+  const [treatmentLoading, setTreatmentLoading] = useState(false);
 
   /* --------------------------------------------------------
      API
@@ -149,74 +130,55 @@ const AppointmentMaintenance = () => {
     try {
       setLoading(true);
 
-      const [appointmentsRes, patientsRes] =
-        await Promise.all([
-          getAppointmentsByDate(selectedDate),
-          getPatients(),
-        ]);
+      const [appointmentsRes, patientsRes] = await Promise.all([
+        getAppointmentsByDate(selectedDate),
+        getPatients(),
+      ]);
 
-      const appointmentList = Array.isArray(
-        appointmentsRes?.data,
-      )
+      const appointmentList = Array.isArray(appointmentsRes?.data)
         ? appointmentsRes.data
         : Array.isArray(appointmentsRes?.data?.data)
           ? appointmentsRes.data.data
-          : Array.isArray(
-                appointmentsRes?.data?.appointments,
-              )
+          : Array.isArray(appointmentsRes?.data?.appointments)
             ? appointmentsRes.data.appointments
             : [];
 
-      const patientList = Array.isArray(
-        patientsRes?.data,
-      )
+      const patientList = Array.isArray(patientsRes?.data)
         ? patientsRes.data
         : Array.isArray(patientsRes?.data?.data)
           ? patientsRes.data.data
           : [];
 
       const patientMap = new Map(
-        patientList.map((patient) => [
-          patient.id,
-          patient,
-        ]),
+        patientList.map((patient) => [patient.id, patient]),
       );
 
-      const mergedAppointments = appointmentList.map(
-        (appointment) => {
-          const patient = patientMap.get(
-            appointment.patient_id,
-          );
+      const mergedAppointments = appointmentList.map((appointment) => {
+        const patient = patientMap.get(appointment.patient_id);
 
-          return {
-            ...appointment,
+        return {
+          ...appointment,
 
-            patient_name:
-              appointment.patient_name ||
-              patient?.name ||
-              "Unknown Patient",
+          patient_name:
+            appointment.patient_name || patient?.name || "Unknown Patient",
 
-            phone:
-              appointment.phone ||
-              patient?.phone ||
-              "",
+          phone: appointment.phone || patient?.phone || "",
 
-            is_allergies: convertToBoolean(
-              appointment.is_allergies ??
-                appointment.has_allergies ??
-                patient?.is_allergies ??
-                patient?.has_allergies,
-            ),
+          is_allergies: convertToBoolean(
+            appointment.is_allergies ??
+              appointment.has_allergies ??
+              patient?.is_allergies ??
+              patient?.has_allergies,
+          ),
 
-            allergies:
-              appointment.allergies ||
-              appointment.allergy_details ||
-              patient?.allergies ||
-              patient?.allergy_details ||
-              "",
-          };
-        },
-      );
+          allergies:
+            appointment.allergies ||
+            appointment.allergy_details ||
+            patient?.allergies ||
+            patient?.allergy_details ||
+            "",
+        };
+      });
 
       setAppointments(mergedAppointments);
     } catch (error) {
@@ -242,8 +204,7 @@ const AppointmentMaintenance = () => {
 
   const currentTreatmentPatient = useMemo(() => {
     return appointments.find(
-      (appointment) =>
-        appointment.status === "In Treatment",
+      (appointment) => appointment.status === "In Treatment",
     );
   }, [appointments]);
 
@@ -251,13 +212,12 @@ const AppointmentMaintenance = () => {
     return appointments
       .filter(
         (appointment) =>
-          appointment.status === "Checked In" &&
-          appointment.checked_in_time,
+          appointment.status === "Checked In" && appointment.checked_in_time,
       )
       .sort((a, b) => {
         return (
-          dayjs(a.checked_in_time).valueOf() -
-          dayjs(b.checked_in_time).valueOf()
+          dayjs(a.appointment_time).valueOf() -
+          dayjs(b.appointment_time).valueOf()
         );
       })
       .map((appointment, index) => ({
@@ -268,11 +228,9 @@ const AppointmentMaintenance = () => {
 
   const sortedAppointments = useMemo(() => {
     return [...appointments].sort((a, b) => {
-      const aIsInTreatment =
-        a.status === "In Treatment";
+      const aIsInTreatment = a.status === "In Treatment";
 
-      const bIsInTreatment =
-        b.status === "In Treatment";
+      const bIsInTreatment = b.status === "In Treatment";
 
       if (aIsInTreatment && !bIsInTreatment) {
         return -1;
@@ -282,9 +240,7 @@ const AppointmentMaintenance = () => {
         return 1;
       }
 
-      return String(
-        a.appointment_time || "",
-      ).localeCompare(
+      return String(a.appointment_time || "").localeCompare(
         String(b.appointment_time || ""),
       );
     });
@@ -294,18 +250,15 @@ const AppointmentMaintenance = () => {
     const total = appointments.length;
 
     const waiting = appointments.filter(
-      (appointment) =>
-        appointment.status === "Checked In",
+      (appointment) => appointment.status === "Checked In",
     ).length;
 
     const inTreatment = appointments.filter(
-      (appointment) =>
-        appointment.status === "In Treatment",
+      (appointment) => appointment.status === "In Treatment",
     ).length;
 
     const completed = appointments.filter(
-      (appointment) =>
-        appointment.status === "Completed",
+      (appointment) => appointment.status === "Completed",
     ).length;
 
     return {
@@ -316,26 +269,18 @@ const AppointmentMaintenance = () => {
     };
   }, [appointments]);
 
-  const nextCheckedInAppointmentId =
-    checkedInQueue[0]?.appointment_id;
+  const nextCheckedInAppointmentId = checkedInQueue[0]?.appointment_id;
 
   /* --------------------------------------------------------
      Modal handlers
   -------------------------------------------------------- */
-
-  const openTreatmentModal = (appointment) => {
-    setTreatmentAppointment(appointment);
-    setTreatmentModalOpen(true);
-  };
 
   const openPaymentModal = (appointment) => {
     setPaymentAppointment(appointment);
     setPaymentModalOpen(true);
   };
 
-  const handleTreatmentSubmit = async (
-    treatmentData,
-  ) => {
+  const handleTreatmentSubmit = async (treatmentData) => {
     try {
       setTreatmentLoading(true);
 
@@ -346,9 +291,7 @@ const AppointmentMaintenance = () => {
         "Treatment Done",
       );
 
-      message.success(
-        "Treatment details saved successfully",
-      );
+      message.success("Treatment details saved successfully");
 
       setTreatmentModalOpen(false);
       setTreatmentAppointment(null);
@@ -358,8 +301,7 @@ const AppointmentMaintenance = () => {
       console.error(error);
 
       message.error(
-        error?.response?.data?.message ||
-          "Failed to save treatment details",
+        error?.response?.data?.message || "Failed to save treatment details",
       );
     } finally {
       setTreatmentLoading(false);
@@ -372,14 +314,9 @@ const AppointmentMaintenance = () => {
 
       await createPayment(paymentData);
 
-      await updateAppointmentStatus(
-        paymentAppointment.appointment_id,
-        "Paid",
-      );
+      await updateAppointmentStatus(paymentAppointment.appointment_id, "Paid");
 
-      message.success(
-        "Payment completed successfully",
-      );
+      message.success("Payment completed successfully");
 
       setPaymentModalOpen(false);
       setPaymentAppointment(null);
@@ -388,10 +325,7 @@ const AppointmentMaintenance = () => {
     } catch (error) {
       console.error(error);
 
-      message.error(
-        error?.response?.data?.message ||
-          "Failed to save payment",
-      );
+      message.error(error?.response?.data?.message || "Failed to save payment");
     } finally {
       setPaymentLoading(false);
     }
@@ -401,13 +335,9 @@ const AppointmentMaintenance = () => {
      Appointment actions
   -------------------------------------------------------- */
 
-  const handleStatusUpdate = async (
-    appointmentId,
-    status,
-  ) => {
+  const handleStatusUpdate = async (appointmentId, status) => {
     const selectedAppointment = appointments.find(
-      (appointment) =>
-        appointment.appointment_id === appointmentId,
+      (appointment) => appointment.appointment_id === appointmentId,
     );
 
     if (!selectedAppointment) {
@@ -418,13 +348,11 @@ const AppointmentMaintenance = () => {
     if (
       status === "In Treatment" &&
       currentTreatmentPatient &&
-      currentTreatmentPatient.appointment_id !==
-        appointmentId
+      currentTreatmentPatient.appointment_id !== appointmentId
     ) {
       message.warning(
         `${
-          currentTreatmentPatient.patient_name ||
-          "Another patient"
+          currentTreatmentPatient.patient_name || "Another patient"
         } is currently in treatment`,
       );
 
@@ -434,14 +362,9 @@ const AppointmentMaintenance = () => {
     try {
       setUpdatingId(appointmentId);
 
-      await updateAppointmentStatus(
-        appointmentId,
-        status,
-      );
+      await updateAppointmentStatus(appointmentId, status);
 
-      message.success(
-        `Appointment updated to ${status}`,
-      );
+      message.success(`Appointment updated to ${status}`);
 
       await fetchAppointments();
 
@@ -481,30 +404,20 @@ const AppointmentMaintenance = () => {
     const isCompleted = status === "Completed";
     const isCancelled = status === "Cancelled";
 
-    const canCheckIn = [
-      "Pending",
-      "Confirmed",
-    ].includes(status);
+    const canCheckIn = ["Pending", "Confirmed"].includes(status);
 
     const anotherPatientInTreatment =
       currentTreatmentPatient &&
-      currentTreatmentPatient.appointment_id !==
-        record.appointment_id;
+      currentTreatmentPatient.appointment_id !== record.appointment_id;
 
     const canStartTreatment =
-      status === "Checked In" &&
-      !anotherPatientInTreatment;
+      status === "Checked In" && !anotherPatientInTreatment;
 
-    const canFinishTreatment =
-      status === "In Treatment";
+    const canFinishTreatment = status === "In Treatment";
 
-    const canAddPayment =
-      status === "Treatment Done";
+    const canAddPayment = status === "Treatment Done";
 
-    const canComplete = [
-      "Payment Pending",
-      "Paid",
-    ].includes(status);
+    const canComplete = ["Payment Pending", "Paid"].includes(status);
 
     return {
       isCompleted,
@@ -523,22 +436,19 @@ const AppointmentMaintenance = () => {
   -------------------------------------------------------- */
 
   const renderQueueNextStep = (record, index) => {
-    const isUpdating =
-      updatingId === record.appointment_id;
+    const isUpdating = updatingId === record.appointment_id;
 
     const isNextPatient = index === 0;
 
     const anotherPatientInTreatment =
       currentTreatmentPatient &&
-      currentTreatmentPatient.appointment_id !==
-        record.appointment_id;
+      currentTreatmentPatient.appointment_id !== record.appointment_id;
 
     if (anotherPatientInTreatment) {
       return (
         <Tooltip
           title={`${
-            currentTreatmentPatient?.patient_name ||
-            "Another patient"
+            currentTreatmentPatient?.patient_name || "Another patient"
           } is currently in treatment`}
         >
           <Button
@@ -553,21 +463,6 @@ const AppointmentMaintenance = () => {
       );
     }
 
-    if (!isNextPatient) {
-      return (
-        <Tooltip title="This patient is waiting for their turn">
-          <Button
-            block
-            disabled
-            className="side-queue-action-button"
-            icon={<ClockCircleOutlined />}
-          >
-            Waiting in Queue
-          </Button>
-        </Tooltip>
-      );
-    }
-
     return (
       <Button
         block
@@ -576,9 +471,7 @@ const AppointmentMaintenance = () => {
         icon={<PlayCircleOutlined />}
         loading={isUpdating}
         disabled={isUpdating}
-        onClick={() =>
-          handleStartTreatment(record)
-        }
+        onClick={() => handleStartTreatment(record)}
       >
         Start Next Treatment
       </Button>
@@ -591,6 +484,36 @@ const AppointmentMaintenance = () => {
 
   const columns = [
     {
+      title: "Number",
+      dataIndex: "appointment_number",
+      key: "appointment_number",
+      width: 110,
+      align: "center",
+
+      render: (value, record) => {
+        const appointmentNumber =
+          value !== null && value !== undefined
+            ? String(value).padStart(2, "0")
+            : "--";
+
+        return (
+          <div
+            className={[
+              "appointment-number-cell",
+              record.status === "In Treatment"
+                ? "appointment-number-cell-active"
+                : "",
+              record.is_allergies ? "appointment-number-cell-allergy" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
+            <div className="appointment-number-badge">{appointmentNumber}</div>
+          </div>
+        );
+      },
+    },
+    {
       title: "Patient",
       dataIndex: "patient_name",
       width: 240,
@@ -600,9 +523,7 @@ const AppointmentMaintenance = () => {
           <div
             className={[
               "patient-avatar",
-              record.is_allergies
-                ? "patient-avatar-allergy"
-                : "",
+              record.is_allergies ? "patient-avatar-allergy" : "",
             ]
               .filter(Boolean)
               .join(" ")}
@@ -612,9 +533,7 @@ const AppointmentMaintenance = () => {
 
           <div className="patient-details">
             <Space size={6} wrap>
-              <Text strong>
-                {value || "Unknown Patient"}
-              </Text>
+              <Text strong>{value || "Unknown Patient"}</Text>
 
               {record.is_allergies && (
                 <Tooltip
@@ -630,20 +549,13 @@ const AppointmentMaintenance = () => {
             </Space>
 
             {record.phone && (
-              <Text
-                type="secondary"
-                className="small-text"
-              >
+              <Text type="secondary" className="small-text">
                 {record.phone}
               </Text>
             )}
 
             {record.is_allergies && (
-              <Text
-                type="danger"
-                strong
-                className="allergy-alert-text"
-              >
+              <Text type="danger" strong className="allergy-alert-text">
                 ALLERGY ALERT
               </Text>
             )}
@@ -656,17 +568,11 @@ const AppointmentMaintenance = () => {
       key: "appointment",
 
       render: (_, record) => (
-        <Space direction="vertical" size={2}>
-          <Text strong>
-            {formatTime(record.appointment_time)}
-          </Text>
+        <Space direction="vertical" size={1}>
+          <Text strong>{formatTime(record.appointment_time)}</Text>
 
-          <Text
-            type="secondary"
-            className="small-text reason-text"
-          >
-            {record.reason_for_visit ||
-              "General consultation"}
+          <Text type="secondary" className="small-text reason-text">
+            {record.reason_for_visit || "General consultation"}
           </Text>
         </Space>
       ),
@@ -677,12 +583,7 @@ const AppointmentMaintenance = () => {
       width: 145,
 
       render: (status) => (
-        <Tag
-          color={
-            statusColors[status] || "default"
-          }
-          className="status-tag"
-        >
+        <Tag color={statusColors[status] || "default"} className="status-tag">
           {status || "Pending"}
         </Tag>
       ),
@@ -695,8 +596,7 @@ const AppointmentMaintenance = () => {
       render: (_, record) => {
         const rules = getActionRules(record);
 
-        const isUpdating =
-          updatingId === record.appointment_id;
+        const isUpdating = updatingId === record.appointment_id;
 
         if (rules.isCompleted) {
           return (
@@ -712,10 +612,7 @@ const AppointmentMaintenance = () => {
 
         if (rules.isCancelled) {
           return (
-            <Tag
-              color="error"
-              className="final-status-tag"
-            >
+            <Tag color="error" className="final-status-tag">
               Appointment Cancelled
             </Tag>
           );
@@ -730,10 +627,7 @@ const AppointmentMaintenance = () => {
               loading={isUpdating}
               disabled={isUpdating}
               onClick={() =>
-                handleStatusUpdate(
-                  record.appointment_id,
-                  "Checked In",
-                )
+                handleStatusUpdate(record.appointment_id, "Checked In")
               }
             >
               1. Check In Patient
@@ -750,24 +644,18 @@ const AppointmentMaintenance = () => {
               icon={<PlayCircleOutlined />}
               loading={isUpdating}
               disabled={isUpdating}
-              onClick={() =>
-                handleStartTreatment(record)
-              }
+              onClick={() => handleStartTreatment(record)}
             >
               2. Start Treatment
             </Button>
           );
         }
 
-        if (
-          record.status === "Checked In" &&
-          rules.anotherPatientInTreatment
-        ) {
+        if (record.status === "Checked In" && rules.anotherPatientInTreatment) {
           return (
             <Tooltip
               title={`${
-                currentTreatmentPatient?.patient_name ||
-                "Another patient"
+                currentTreatmentPatient?.patient_name || "Another patient"
               } is currently in treatment`}
             >
               <Button
@@ -789,12 +677,10 @@ const AppointmentMaintenance = () => {
               className="step-button treatment-done-button"
               icon={<MedicineBoxOutlined />}
               loading={treatmentLoading}
-              disabled={treatmentLoading}
-              onClick={() =>
-                openTreatmentModal(record)
-              }
+              disabled={true}
+              onClick={() => openTreatmentModal(record)}
             >
-              3. Add Treatment
+              In Treatment Room
             </Button>
           );
         }
@@ -807,9 +693,7 @@ const AppointmentMaintenance = () => {
               icon={<DollarOutlined />}
               loading={paymentLoading}
               disabled={paymentLoading}
-              onClick={() =>
-                openPaymentModal(record)
-              }
+              onClick={() => openPaymentModal(record)}
             >
               4. Add Payment
             </Button>
@@ -826,10 +710,7 @@ const AppointmentMaintenance = () => {
               loading={isUpdating}
               disabled={isUpdating}
               onClick={() =>
-                handleStatusUpdate(
-                  record.appointment_id,
-                  "Completed",
-                )
+                handleStatusUpdate(record.appointment_id, "Completed")
               }
             >
               5. Complete Visit
@@ -838,11 +719,7 @@ const AppointmentMaintenance = () => {
         }
 
         return (
-          <Button
-            block
-            disabled
-            className="step-button"
-          >
+          <Button block disabled className="step-button">
             No Action Available
           </Button>
         );
@@ -870,11 +747,7 @@ const AppointmentMaintenance = () => {
             value={dayjs(selectedDate)}
             format="YYYY-MM-DD"
             onChange={(date) =>
-              setSelectedDate(
-                date
-                  ? date.format("YYYY-MM-DD")
-                  : getTodayDate(),
-              )
+              setSelectedDate(date ? date.format("YYYY-MM-DD") : getTodayDate())
             }
             className="header-date-picker"
           />
@@ -895,10 +768,7 @@ const AppointmentMaintenance = () => {
       <div className="appointment-maintenance-page">
         {/* Summary cards */}
 
-        <Row
-          gutter={[16, 16]}
-          className="summary-row"
-        >
+        <Row gutter={[16, 16]} className="summary-row">
           <Col xs={12} md={6}>
             <Card className="summary-card total-summary-card">
               <Statistic
@@ -955,22 +825,14 @@ const AppointmentMaintenance = () => {
                     Patient Currently In Treatment
                   </Text>
 
-                  <Title
-                    level={4}
-                    className="current-patient-name"
-                  >
-                    {currentTreatmentPatient.patient_name ||
-                      "Unknown Patient"}
+                  <Title level={4} className="current-patient-name">
+                    {currentTreatmentPatient.patient_name || "Unknown Patient"}
                   </Title>
 
                   <Space
                     size={10}
                     wrap
-                    split={
-                      <span className="detail-separator">
-                        •
-                      </span>
-                    }
+                    split={<span className="detail-separator">•</span>}
                   >
                     <Text type="secondary">
                       {currentTreatmentPatient.reason_for_visit ||
@@ -986,9 +848,7 @@ const AppointmentMaintenance = () => {
 
                   {currentTreatmentPatient.is_allergies && (
                     <Tag
-                      icon={
-                        <ExclamationCircleFilled />
-                      }
+                      icon={<ExclamationCircleFilled />}
                       color="error"
                       className="current-allergy-tag"
                     >
@@ -1003,10 +863,7 @@ const AppointmentMaintenance = () => {
               <div className="treatment-pulse-wrapper">
                 <span className="treatment-pulse" />
 
-                <Tag
-                  color="processing"
-                  className="current-treatment-tag"
-                >
+                <Tag color="processing" className="current-treatment-tag">
                   Treatment In Progress
                 </Tag>
               </div>
@@ -1017,7 +874,188 @@ const AppointmentMaintenance = () => {
         {/* Main content */}
 
         <Row gutter={[16, 16]} align="top">
-          <Col xs={24} xl={17}>
+          {/* Top row - Checked-in queue */}
+
+          <Col xs={24}>
+            <Card
+              className="checked-in-side-card checked-in-top-card"
+              title={
+                <Space>
+                  <div className="card-title-icon cyan-icon">
+                    <TeamOutlined />
+                  </div>
+
+                  <div>
+                    <Text strong className="side-queue-title">
+                      Checked-In Queue
+                    </Text>
+
+                    <Text type="secondary" className="side-queue-description">
+                      Patients are ordered by arrival time
+                    </Text>
+                  </div>
+                </Space>
+              }
+              extra={
+                <Tag color="cyan" className="side-queue-count">
+                  {checkedInQueue.length}
+                </Tag>
+              }
+            >
+              {checkedInQueue.length === 0 ? (
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description={
+                    <Space direction="vertical" size={2}>
+                      <Text strong>No patients waiting</Text>
+
+                      <Text type="secondary" className="small-text">
+                        Checked-in patients will appear here
+                      </Text>
+                    </Space>
+                  }
+                />
+              ) : (
+                <Row gutter={[16, 16]} className="checked-in-queue-row">
+                  {checkedInQueue.map((record, index) => (
+                    <Col
+                      key={record.appointment_id}
+                      xs={24}
+                      sm={12}
+                      md={8}
+                      lg={6}
+                      xl={6}
+                      xxl={4}
+                      className="checked-in-queue-column"
+                    >
+                      <div
+                        className={[
+                          "side-queue-item",
+                          index === 0 ? "next-side-queue-item" : "",
+                          record.is_allergies ? "side-queue-allergy-item" : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
+                      >
+                        <div className="side-queue-item-header">
+                          <div className="side-queue-number-group">
+                            <div
+                              className={[
+                                "side-queue-position",
+                                index === 0 ? "next-side-queue-position" : "",
+                              ]
+                                .filter(Boolean)
+                                .join(" ")}
+                            >
+                              {index === 0 ? "NEXT" : `#${index + 1}`}
+                            </div>
+
+                            <Text
+                              strong
+                              className="side-appointment-number-value"
+                            >
+                              {record.appointment_number !== null &&
+                              record.appointment_number !== undefined
+                                ? String(record.appointment_number).padStart(
+                                    2,
+                                    "0",
+                                  )
+                                : "--"}
+                            </Text>
+                          </div>
+
+                          {record.is_allergies && (
+                            <Tooltip
+                              title={
+                                record.allergies
+                                  ? `Allergies: ${record.allergies}`
+                                  : "This patient has allergies"
+                              }
+                            >
+                              <Tag
+                                icon={<ExclamationCircleFilled />}
+                                color="error"
+                                className="side-allergy-tag"
+                              >
+                                Allergy
+                              </Tag>
+                            </Tooltip>
+                          )}
+                        </div>
+
+                        <div className="side-queue-patient">
+                          <div className="side-queue-avatar">
+                            <UserOutlined />
+                          </div>
+
+                          <div className="side-queue-patient-details">
+                            <Text strong className="side-queue-patient-name">
+                              {record.patient_name || "Unknown Patient"}
+                            </Text>
+
+                            {record.phone && (
+                              <Text
+                                type="secondary"
+                                className="side-queue-phone"
+                              >
+                                {record.phone}
+                              </Text>
+                            )}
+                          </div>
+                        </div>
+
+                        <Row gutter={[8, 8]} className="side-queue-time-box">
+                          <Col span={12}>
+                            <Text type="secondary" className="side-time-label">
+                              Checked In
+                            </Text>
+
+                            <Space size={6}>
+                              <ClockCircleOutlined />
+
+                              <Text strong>
+                                {formatDateTime(record.checked_in_time)}
+                              </Text>
+                            </Space>
+                          </Col>
+
+                          <Col span={12}>
+                            <Text type="secondary" className="side-time-label">
+                              Appointment
+                            </Text>
+
+                            <Text strong>
+                              {formatTime(record.appointment_time)}
+                            </Text>
+                          </Col>
+                        </Row>
+
+                        {record.reason_for_visit && (
+                          <div className="side-reason-box">
+                            <Text type="secondary" className="side-time-label">
+                              Reason
+                            </Text>
+
+                            <Text className="side-reason-text">
+                              {record.reason_for_visit}
+                            </Text>
+                          </div>
+                        )}
+
+                        <div className="side-queue-action">
+                          {renderQueueNextStep(record, index)}
+                        </div>
+                      </div>
+                    </Col>
+                  ))}
+                </Row>
+              )}
+            </Card>
+          </Col>
+
+          {/* Bottom row - Appointment Workflow */}
+
+          <Col xs={24}>
             <Card
               className="appointments-card"
               title={
@@ -1027,19 +1065,12 @@ const AppointmentMaintenance = () => {
                   </div>
 
                   <div>
-                    <Text
-                      strong
-                      className="card-title-text"
-                    >
+                    <Text strong className="card-title-text">
                       Appointment Workflow
                     </Text>
 
-                    <Text
-                      type="secondary"
-                      className="card-title-description"
-                    >
-                      Follow the next available action
-                      for each patient
+                    <Text type="secondary" className="card-title-description">
+                      Follow the next available action for each patient
                     </Text>
                   </div>
                 </Space>
@@ -1059,39 +1090,25 @@ const AppointmentMaintenance = () => {
                 pagination={{
                   pageSize: 8,
                   showSizeChanger: false,
-                  showTotal: (total) =>
-                    `${total} appointments`,
+                  showTotal: (total) => `${total} appointments`,
                 }}
                 rowClassName={(record) => {
                   const classNames = [];
 
                   if (record.is_allergies) {
-                    classNames.push(
-                      "allergy-alert-row",
-                    );
+                    classNames.push("allergy-alert-row");
                   }
 
-                  if (
-                    record.status === "In Treatment"
-                  ) {
-                    classNames.push(
-                      "in-treatment-row",
-                    );
+                  if (record.status === "In Treatment") {
+                    classNames.push("in-treatment-row");
                   }
 
-                  if (
-                    record.status === "Completed"
-                  ) {
+                  if (record.status === "Completed") {
                     classNames.push("completed-row");
                   }
 
-                  if (
-                    record.appointment_id ===
-                    nextCheckedInAppointmentId
-                  ) {
-                    classNames.push(
-                      "next-patient-row",
-                    );
+                  if (record.appointment_id === nextCheckedInAppointmentId) {
+                    classNames.push("next-patient-row");
                   }
 
                   return classNames.join(" ");
@@ -1099,220 +1116,12 @@ const AppointmentMaintenance = () => {
                 locale={{
                   emptyText: (
                     <Empty
-                      image={
-                        Empty.PRESENTED_IMAGE_SIMPLE
-                      }
+                      image={Empty.PRESENTED_IMAGE_SIMPLE}
                       description="No appointments found for the selected date"
                     />
                   ),
                 }}
               />
-            </Card>
-          </Col>
-
-          {/* Checked-in queue */}
-
-          <Col xs={24} xl={7}>
-            <Card
-              className="checked-in-side-card"
-              title={
-                <Space>
-                  <div className="card-title-icon cyan-icon">
-                    <TeamOutlined />
-                  </div>
-
-                  <div>
-                    <Text
-                      strong
-                      className="side-queue-title"
-                    >
-                      Checked-In Queue
-                    </Text>
-
-                    <Text
-                      type="secondary"
-                      className="side-queue-description"
-                    >
-                      Ordered by arrival time
-                    </Text>
-                  </div>
-                </Space>
-              }
-              extra={
-                <Tag
-                  color="cyan"
-                  className="side-queue-count"
-                >
-                  {checkedInQueue.length}
-                </Tag>
-              }
-            >
-              {checkedInQueue.length === 0 ? (
-                <Empty
-                  image={
-                    Empty.PRESENTED_IMAGE_SIMPLE
-                  }
-                  description={
-                    <Space direction="vertical" size={2}>
-                      <Text strong>
-                        No patients waiting
-                      </Text>
-
-                      <Text
-                        type="secondary"
-                        className="small-text"
-                      >
-                        Checked-in patients will appear
-                        here
-                      </Text>
-                    </Space>
-                  }
-                />
-              ) : (
-                <div className="side-queue-list">
-                  {checkedInQueue.map(
-                    (record, index) => (
-                      <div
-                        key={record.appointment_id}
-                        className={[
-                          "side-queue-item",
-                          index === 0
-                            ? "next-side-queue-item"
-                            : "",
-                          record.is_allergies
-                            ? "side-queue-allergy-item"
-                            : "",
-                        ]
-                          .filter(Boolean)
-                          .join(" ")}
-                      >
-                        <div className="side-queue-item-header">
-                          <div
-                            className={[
-                              "side-queue-position",
-                              index === 0
-                                ? "next-side-queue-position"
-                                : "",
-                            ]
-                              .filter(Boolean)
-                              .join(" ")}
-                          >
-                            {index === 0
-                              ? "NEXT"
-                              : `#${index + 1}`}
-                          </div>
-
-                          {record.is_allergies && (
-                            <Tooltip
-                              title={
-                                record.allergies
-                                  ? `Allergies: ${record.allergies}`
-                                  : "This patient has allergies"
-                              }
-                            >
-                              <Tag
-                                icon={
-                                  <ExclamationCircleFilled />
-                                }
-                                color="error"
-                                className="side-allergy-tag"
-                              >
-                                Allergy
-                              </Tag>
-                            </Tooltip>
-                          )}
-                        </div>
-
-                        <div className="side-queue-patient">
-                          <div className="side-queue-avatar">
-                            <UserOutlined />
-                          </div>
-
-                          <div className="side-queue-patient-details">
-                            <Text
-                              strong
-                              className="side-queue-patient-name"
-                            >
-                              {record.patient_name ||
-                                "Unknown Patient"}
-                            </Text>
-
-                            {record.phone && (
-                              <Text
-                                type="secondary"
-                                className="side-queue-phone"
-                              >
-                                {record.phone}
-                              </Text>
-                            )}
-                          </div>
-                        </div>
-
-                        <Row
-                          gutter={[8, 8]}
-                          className="side-queue-time-box"
-                        >
-                          <Col span={12}>
-                            <Text
-                              type="secondary"
-                              className="side-time-label"
-                            >
-                              Checked In
-                            </Text>
-
-                            <Space size={6}>
-                              <ClockCircleOutlined />
-
-                              <Text strong>
-                                {formatDateTime(
-                                  record.checked_in_time,
-                                )}
-                              </Text>
-                            </Space>
-                          </Col>
-
-                          <Col span={12}>
-                            <Text
-                              type="secondary"
-                              className="side-time-label"
-                            >
-                              Appointment
-                            </Text>
-
-                            <Text strong>
-                              {formatTime(
-                                record.appointment_time,
-                              )}
-                            </Text>
-                          </Col>
-                        </Row>
-
-                        {record.reason_for_visit && (
-                          <div className="side-reason-box">
-                            <Text
-                              type="secondary"
-                              className="side-time-label"
-                            >
-                              Reason
-                            </Text>
-
-                            <Text className="side-reason-text">
-                              {
-                                record.reason_for_visit
-                              }
-                            </Text>
-                          </div>
-                        )}
-
-                        {renderQueueNextStep(
-                          record,
-                          index,
-                        )}
-                      </div>
-                    ),
-                  )}
-                </div>
-              )}
             </Card>
           </Col>
         </Row>
@@ -1328,17 +1137,6 @@ const AppointmentMaintenance = () => {
             setPaymentAppointment(null);
           }}
           onSubmit={handlePaymentSubmit}
-        />
-
-        <TreatmentModal
-          open={treatmentModalOpen}
-          loading={treatmentLoading}
-          appointment={treatmentAppointment}
-          onCancel={() => {
-            setTreatmentModalOpen(false);
-            setTreatmentAppointment(null);
-          }}
-          onSubmit={handleTreatmentSubmit}
         />
 
         <style>{`
@@ -2037,7 +1835,409 @@ const AppointmentMaintenance = () => {
             border-radius: 9px;
             font-weight: 650;
           }
+            /* --------------------------------------------------------
+   Side Queue Appointment Number
+-------------------------------------------------------- */
 
+.side-queue-number-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.side-appointment-number {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  min-height: 32px;
+  padding: 5px 10px;
+
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+
+  background: linear-gradient(
+    135deg,
+    #f8fbff 0%,
+    #eff6ff 100%
+  );
+}
+
+.side-appointment-number-label {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+.side-appointment-number-value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 25px;
+  height: 23px;
+  padding: 0 6px;
+
+  border-radius: 7px;
+  background: #dbeafe;
+
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* First patient */
+
+.next-side-queue-item .side-appointment-number {
+  border-color: #bfdbfe;
+  background: linear-gradient(
+    135deg,
+    #eff6ff 0%,
+    #dbeafe 100%
+  );
+}
+
+.next-side-queue-item .side-appointment-number-value {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+/* Allergy patient */
+
+.side-queue-allergy-item .side-appointment-number {
+  border-color: #fecaca;
+  background: linear-gradient(
+    135deg,
+    #fff7f7 0%,
+    #fef2f2 100%
+  );
+}
+
+.side-queue-allergy-item .side-appointment-number-value {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+@media (max-width: 576px) {
+  .side-queue-item-header {
+    align-items: flex-start;
+  }
+
+  .side-queue-number-group {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .side-appointment-number {
+    padding: 4px 8px;
+  }
+
+  .side-appointment-number-label {
+    font-size: 9px;
+  }
+}
+.checked-in-top-card {
+  width: 100%;
+}
+
+.checked-in-queue-row {
+  width: 100%;
+}
+
+.checked-in-queue-column {
+  display: flex;
+}
+
+.side-queue-item {
+  width: 100%;
+  min-height: 100%;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #dbeafe;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.side-queue-item:hover {
+  transform: translateY(-3px);
+  border-color: #93c5fd;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.1);
+}
+
+.next-side-queue-item {
+  border: 2px solid #22c55e;
+  background: linear-gradient(
+    145deg,
+    rgba(240, 253, 244, 0.98),
+    rgba(255, 255, 255, 1)
+  );
+  box-shadow: 0 10px 28px rgba(34, 197, 94, 0.14);
+}
+
+.side-queue-allergy-item {
+  border-color: #fca5a5;
+  background: linear-gradient(
+    145deg,
+    rgba(254, 242, 242, 0.95),
+    rgba(255, 255, 255, 1)
+  );
+}
+
+.side-queue-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.side-queue-position {
+  min-width: 46px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.next-side-queue-position {
+  background: #22c55e;
+  color: #ffffff;
+}
+
+.side-queue-patient {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.side-queue-avatar {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #dbeafe, #cffafe);
+  color: #0284c7;
+  font-size: 21px;
+}
+
+.side-queue-patient-details {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.side-queue-patient-name {
+  display: block;
+  overflow: hidden;
+  color: #0f172a;
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.side-queue-phone {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+}
+
+.side-queue-time-box {
+  margin-bottom: 14px;
+  padding: 12px 8px;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.side-time-label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+}
+
+.side-reason-box {
+  margin-bottom: 14px;
+  padding: 11px 12px;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.side-reason-text {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 13px;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.side-queue-action {
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+@media (max-width: 575px) {
+  .side-queue-item {
+    padding: 15px;
+  }
+
+  .side-queue-time-box > .ant-col {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+/* --------------------------------------------------------
+   Appointment Number Column
+-------------------------------------------------------- */
+
+.appointment-number-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 72px;
+}
+
+.appointment-number-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 48px;
+  height: 48px;
+
+  border: 1px solid #bfdbfe;
+  border-radius: 14px;
+
+  background: linear-gradient(
+    135deg,
+    #eff6ff 0%,
+    #dbeafe 100%
+  );
+
+  color: #1d4ed8;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.5px;
+
+  box-shadow:
+    0 5px 14px rgba(37, 99, 235, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.appointment-number-label {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Hover effect */
+
+.ant-table-tbody > tr:hover .appointment-number-badge {
+  transform: translateY(-1px);
+  border-color: #93c5fd;
+
+  box-shadow:
+    0 8px 18px rgba(37, 99, 235, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Patient currently in treatment */
+
+.appointment-number-cell-active .appointment-number-badge {
+  border-color: #86efac;
+
+  background: linear-gradient(
+    135deg,
+    #f0fdf4 0%,
+    #dcfce7 100%
+  );
+
+  color: #15803d;
+
+  box-shadow:
+    0 5px 14px rgba(22, 163, 74, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Allergy warning */
+
+.appointment-number-cell-allergy .appointment-number-badge {
+  border-color: #fecaca;
+
+  background: linear-gradient(
+    135deg,
+    #fff7f7 0%,
+    #fee2e2 100%
+  );
+
+  color: #dc2626;
+
+  box-shadow:
+    0 5px 14px rgba(220, 38, 38, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Allergy takes priority when also in treatment */
+
+.appointment-number-cell-active.appointment-number-cell-allergy
+  .appointment-number-badge {
+  border-color: #fca5a5;
+
+  background: linear-gradient(
+    135deg,
+    #fff1f2 0%,
+    #ffe4e6 100%
+  );
+
+  color: #be123c;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .appointment-number-cell {
+    min-width: 60px;
+  }
+
+  .appointment-number-badge {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    font-size: 16px;
+  }
+
+  .appointment-number-label {
+    font-size: 9px;
+  }
+}
           /* --------------------------------------------------
              Responsive
           -------------------------------------------------- */

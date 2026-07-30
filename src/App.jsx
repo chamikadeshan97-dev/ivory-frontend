@@ -21,6 +21,7 @@ import CashierPayment from "./pages/CashierPayment";
 import FollowUpPatients from "./pages/FollowUpPatients";
 import UserRegistration from "./pages/UserRegistration";
 import QueueDisplay from "./pages/QueueDisplay";
+import PaymentDashboard from "./pages/PaymentDashboard";
 /* --------------------------------------------------------
    Layout wrapper
 -------------------------------------------------------- */
@@ -95,11 +96,20 @@ const App = () => {
             </RoleRoute>
           }
         />
-
+        <Route
+          path="/payments"
+          element={
+            <RoleRoute allowedRoles={["Admin", "Cashier" ,  "Dentist"]}>
+              <LayoutPage>
+                <PaymentDashboard />
+              </LayoutPage>
+            </RoleRoute>
+          }
+        />
         <Route
           path="/daily-income"
           element={
-            <RoleRoute allowedRoles={["Admin", "Cashier"]}>
+            <RoleRoute allowedRoles={["Admin", "Dentist"]}>
               <LayoutPage>
                 <DailyIncome />
               </LayoutPage>
@@ -134,7 +144,7 @@ const App = () => {
         <Route
           path="/appointment-maintenance"
           element={
-            <RoleRoute allowedRoles={["Admin", "Receptionist"]}>
+            <RoleRoute allowedRoles={["Admin", "Receptionist", "Dentist"]}>
               <LayoutPage>
                 <AppointmentMaintenance />
               </LayoutPage>
@@ -156,7 +166,7 @@ const App = () => {
         <Route
           path="/cashier-payment"
           element={
-            <RoleRoute allowedRoles={["Admin", "Cashier"]}>
+            <RoleRoute allowedRoles={["Admin", "Cashier", "Dentist"]}>
               <LayoutPage>
                 <CashierPayment />
               </LayoutPage>

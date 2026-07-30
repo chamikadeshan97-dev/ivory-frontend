@@ -1,9 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   Alert,
@@ -52,10 +47,7 @@ import PaymentModal from "./PaymentModal";
 
 import "./css/TreatmentPaymentDetailsModal.css";
 
-const {
-  Text,
-  Title,
-} = Typography;
+const { Text, Title } = Typography;
 
 /* --------------------------------------------------------
    General helpers
@@ -64,23 +56,15 @@ const {
 const toNumber = (value) => {
   const number = Number(value || 0);
 
-  return Number.isFinite(number)
-    ? number
-    : 0;
+  return Number.isFinite(number) ? number : 0;
 };
 
 const hasValue = (value) => {
-  return (
-    value !== undefined &&
-    value !== null &&
-    value !== ""
-  );
+  return value !== undefined && value !== null && value !== "";
 };
 
 const formatCurrency = (value) => {
-  return `Rs. ${toNumber(
-    value,
-  ).toLocaleString("en-LK", {
+  return `Rs. ${toNumber(value).toLocaleString("en-LK", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
@@ -93,9 +77,7 @@ const formatDate = (value) => {
 
   const date = dayjs(value);
 
-  return date.isValid()
-    ? date.format("DD MMM YYYY")
-    : value;
+  return date.isValid() ? date.format("DD MMM YYYY") : value;
 };
 
 const formatDateTime = (value) => {
@@ -105,53 +87,28 @@ const formatDateTime = (value) => {
 
   const date = dayjs(value);
 
-  return date.isValid()
-    ? date.format(
-        "DD MMM YYYY, h:mm A",
-      )
-    : value;
+  return date.isValid() ? date.format("DD MMM YYYY, h:mm A") : value;
 };
 
-const getPaymentAmount = (
-  payment,
-) => {
-  return toNumber(
-    payment?.payment_amount ??
-      payment?.amount ??
-      0,
-  );
+const getPaymentAmount = (payment) => {
+  return toNumber(payment?.payment_amount ?? payment?.amount ?? 0);
 };
 
-const getTreatmentCharge = (
-  record,
-) => {
+const getTreatmentCharge = (record) => {
   return toNumber(
-    record?.treatment_charge ??
-      record?.treatment_fee ??
-      record?.charge ??
-      0,
+    record?.treatment_charge ?? record?.treatment_fee ?? record?.charge ?? 0,
   );
 };
 
 const extractData = (response) => {
-  return (
-    response?.data?.data ??
-    response?.data ??
-    null
-  );
+  return response?.data?.data ?? response?.data ?? null;
 };
 
 const getPaymentId = (record) => {
-  return (
-    record?.payment_id ||
-    record?.id ||
-    "-"
-  );
+  return record?.payment_id || record?.id || "-";
 };
 
-const getPaymentStatusColor = (
-  status,
-) => {
+const getPaymentStatusColor = (status) => {
   const colors = {
     Paid: "success",
     Full: "success",
@@ -166,12 +123,7 @@ const getPaymentStatusColor = (
    Summary card
 -------------------------------------------------------- */
 
-const PaymentSummaryCard = ({
-  title,
-  value,
-  icon,
-  tone,
-}) => {
+const PaymentSummaryCard = ({ title, value, icon, tone }) => {
   return (
     <Card
       bordered={false}
@@ -185,9 +137,7 @@ const PaymentSummaryCard = ({
           precision={2}
         />
 
-        <div className="treatment-payment-summary-card__icon">
-          {icon}
-        </div>
+        <div className="treatment-payment-summary-card__icon">{icon}</div>
       </div>
     </Card>
   );
@@ -203,28 +153,20 @@ const TreatmentPaymentDetailsModal = ({
   patientName,
   onClose,
 }) => {
-  const [loading, setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [saving, setSaving] =
-    useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const [details, setDetails] =
-    useState(null);
+  const [details, setDetails] = useState(null);
 
-  const [
-    paymentModalOpen,
-    setPaymentModalOpen,
-  ] = useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
 
   /* ------------------------------------------------------
      Load treatment payment details
   ------------------------------------------------------ */
 
   const loadDetails = useCallback(
-    async ({
-      silent = false,
-    } = {}) => {
+    async ({ silent = false } = {}) => {
       if (!treatmentId) {
         return;
       }
@@ -234,23 +176,14 @@ const TreatmentPaymentDetailsModal = ({
       }
 
       try {
-        const response =
-          await getTreatmentPaymentSummary(
-            treatmentId,
-          );
+        const response = await getTreatmentPaymentSummary(treatmentId);
 
-        setDetails(
-          extractData(response),
-        );
+        setDetails(extractData(response));
       } catch (error) {
-        console.error(
-          "Failed to load payment details:",
-          error,
-        );
+        console.error("Failed to load payment details:", error);
 
         message.error(
-          error?.response?.data
-            ?.message ||
+          error?.response?.data?.message ||
             error?.message ||
             "Failed to load payment details",
         );
@@ -274,11 +207,7 @@ const TreatmentPaymentDetailsModal = ({
     if (treatmentId) {
       loadDetails();
     }
-  }, [
-    open,
-    treatmentId,
-    loadDetails,
-  ]);
+  }, [open, treatmentId, loadDetails]);
 
   /* ------------------------------------------------------
      Main details
@@ -298,16 +227,13 @@ const TreatmentPaymentDetailsModal = ({
 
   const treatmentName =
     details?.treatment_name ||
-    details?.treatment
-      ?.treatment_performed ||
-    details?.treatment
-      ?.treatment_name ||
+    details?.treatment?.treatment_performed ||
+    details?.treatment?.treatment_name ||
     "Dental Treatment";
 
   const treatmentDate =
     details?.treatment_date ||
-    details?.treatment
-      ?.treatment_date ||
+    details?.treatment?.treatment_date ||
     details?.treatment?.created_at;
 
   /* ------------------------------------------------------
@@ -315,235 +241,122 @@ const TreatmentPaymentDetailsModal = ({
   ------------------------------------------------------ */
 
   const payments = useMemo(() => {
-    const rows = Array.isArray(
-      details?.payments,
-    )
-      ? details.payments
-      : [];
+    const rows = Array.isArray(details?.payments) ? details.payments : [];
 
-    return [...rows].sort(
-      (first, second) => {
-        const firstDate = dayjs(
-          first?.created_at ||
-            first?.payment_date,
-        );
+    return [...rows].sort((first, second) => {
+      const firstDate = dayjs(first?.created_at || first?.payment_date);
 
-        const secondDate = dayjs(
-          second?.created_at ||
-            second?.payment_date,
-        );
+      const secondDate = dayjs(second?.created_at || second?.payment_date);
 
-        if (
-          !firstDate.isValid() ||
-          !secondDate.isValid()
-        ) {
-          return 0;
-        }
+      if (!firstDate.isValid() || !secondDate.isValid()) {
+        return 0;
+      }
 
-        return (
-          firstDate.valueOf() -
-          secondDate.valueOf()
-        );
-      },
-    );
+      return firstDate.valueOf() - secondDate.valueOf();
+    });
   }, [details]);
 
   /* ------------------------------------------------------
      Treatment charge
   ------------------------------------------------------ */
 
-  const treatmentCharge =
-    useMemo(() => {
-      const summaryCharge =
-        toNumber(
-          details?.treatment_charge ??
-            details?.total_treatment_charge ??
-            details?.total_charge ??
-            details?.treatment
-              ?.treatment_charge ??
-            details?.treatment
-              ?.treatment_fee ??
-            0,
-        );
-
-      if (summaryCharge > 0) {
-        return summaryCharge;
-      }
-
-      return payments.reduce(
-        (
-          largestCharge,
-          payment,
-        ) =>
-          Math.max(
-            largestCharge,
-            getTreatmentCharge(
-              payment,
-            ),
-          ),
+  const treatmentCharge = useMemo(() => {
+    const summaryCharge = toNumber(
+      details?.treatment_charge ??
+        details?.total_treatment_charge ??
+        details?.total_charge ??
+        details?.treatment?.treatment_charge ??
+        details?.treatment?.treatment_fee ??
         0,
-      );
-    }, [
-      details,
-      payments,
-    ]);
+    );
+
+    if (summaryCharge > 0) {
+      return summaryCharge;
+    }
+
+    return payments.reduce(
+      (largestCharge, payment) =>
+        Math.max(largestCharge, getTreatmentCharge(payment)),
+      0,
+    );
+  }, [details, payments]);
 
   /* ------------------------------------------------------
      Installment rows
   ------------------------------------------------------ */
 
-  const installmentRows =
-    useMemo(() => {
-      let runningPaid = 0;
+  const installmentRows = useMemo(() => {
+    let runningPaid = 0;
 
-      return payments.map(
-        (payment, index) => {
-          const currentPayment =
-            getPaymentAmount(
-              payment,
-            );
+    return payments.map((payment, index) => {
+      const currentPayment = getPaymentAmount(payment);
 
-          const previouslyPaid =
-            hasValue(
-              payment?.previously_paid,
-            )
-              ? toNumber(
-                  payment.previously_paid,
-                )
-              : runningPaid;
+      const previouslyPaid = hasValue(payment?.previously_paid)
+        ? toNumber(payment.previously_paid)
+        : runningPaid;
 
-          const calculatedTotal =
-            previouslyPaid +
-            currentPayment;
+      const calculatedTotal = previouslyPaid + currentPayment;
 
-          const totalPaid =
-            hasValue(
-              payment?.total_paid,
-            )
-              ? toNumber(
-                  payment.total_paid,
-                )
-              : calculatedTotal;
+      const totalPaid = hasValue(payment?.total_paid)
+        ? toNumber(payment.total_paid)
+        : calculatedTotal;
 
-          const calculatedRemaining =
-            Math.max(
-              treatmentCharge -
-                totalPaid,
-              0,
-            );
+      const calculatedRemaining = Math.max(treatmentCharge - totalPaid, 0);
 
-          const remainingAmount =
-            hasValue(
-              payment?.remaining_amount,
-            )
-              ? Math.max(
-                  toNumber(
-                    payment.remaining_amount,
-                  ),
-                  0,
-                )
-              : calculatedRemaining;
+      const remainingAmount = hasValue(payment?.remaining_amount)
+        ? Math.max(toNumber(payment.remaining_amount), 0)
+        : calculatedRemaining;
 
-          runningPaid = Math.max(
-            runningPaid,
-            totalPaid,
-          );
+      runningPaid = Math.max(runningPaid, totalPaid);
 
-          return {
-            ...payment,
+      return {
+        ...payment,
 
-            installment_number:
-              payment
-                ?.installment_number ||
-              index + 1,
+        installment_number: payment?.installment_number || index + 1,
 
-            calculated_payment:
-              currentPayment,
+        calculated_payment: currentPayment,
 
-            calculated_previous:
-              previouslyPaid,
+        calculated_previous: previouslyPaid,
 
-            calculated_total:
-              totalPaid,
+        calculated_total: totalPaid,
 
-            calculated_remaining:
-              remainingAmount,
+        calculated_remaining: remainingAmount,
 
-            calculated_status:
-              remainingAmount <= 0
-                ? "Paid"
-                : "Partial",
-          };
-        },
-      );
-    }, [
-      payments,
-      treatmentCharge,
-    ]);
+        calculated_status: remainingAmount <= 0 ? "Paid" : "Partial",
+      };
+    });
+  }, [payments, treatmentCharge]);
 
   /* ------------------------------------------------------
      Payment summary
   ------------------------------------------------------ */
 
-  const calculatedTotalPaid =
-    useMemo(() => {
-      return payments.reduce(
-        (total, payment) =>
-          total +
-          getPaymentAmount(
-            payment,
-          ),
-        0,
-      );
-    }, [payments]);
+  const calculatedTotalPaid = useMemo(() => {
+    return payments.reduce(
+      (total, payment) => total + getPaymentAmount(payment),
+      0,
+    );
+  }, [payments]);
 
-  const savedTotalPaid = toNumber(
-    details?.total_paid,
-  );
+  const savedTotalPaid = toNumber(details?.total_paid);
 
-  const totalPaid = Math.max(
-    savedTotalPaid,
-    calculatedTotalPaid,
-  );
+  const totalPaid = Math.max(savedTotalPaid, calculatedTotalPaid);
 
-  const savedRemaining =
-    hasValue(
-      details?.remaining_amount,
-    )
-      ? toNumber(
-          details.remaining_amount,
-        )
-      : null;
+  const savedRemaining = hasValue(details?.remaining_amount)
+    ? toNumber(details.remaining_amount)
+    : null;
 
   const remainingAmount =
     savedRemaining !== null
-      ? Math.max(
-          savedRemaining,
-          0,
-        )
-      : Math.max(
-          treatmentCharge -
-            totalPaid,
-          0,
-        );
+      ? Math.max(savedRemaining, 0)
+      : Math.max(treatmentCharge - totalPaid, 0);
 
   const paymentStatus =
-    totalPaid <= 0
-      ? "Unpaid"
-      : remainingAmount > 0
-        ? "Partial"
-        : "Paid";
+    totalPaid <= 0 ? "Unpaid" : remainingAmount > 0 ? "Partial" : "Paid";
 
   const paidPercentage =
     treatmentCharge > 0
-      ? Math.min(
-          Math.round(
-            (totalPaid /
-              treatmentCharge) *
-              100,
-          ),
-          100,
-        )
+      ? Math.min(Math.round((totalPaid / treatmentCharge) * 100), 100)
       : 0;
 
   /* ------------------------------------------------------
@@ -551,10 +364,7 @@ const TreatmentPaymentDetailsModal = ({
   ------------------------------------------------------ */
 
   const openPaymentModal = () => {
-    if (
-      !treatmentId ||
-      remainingAmount <= 0
-    ) {
+    if (!treatmentId || remainingAmount <= 0) {
       return;
     }
 
@@ -573,102 +383,69 @@ const TreatmentPaymentDetailsModal = ({
      Save payment
   ------------------------------------------------------ */
 
-  const handlePaymentSubmit =
-    async (paymentData) => {
-      if (!treatmentId) {
-        message.error(
-          "Treatment ID is missing",
-        );
+  const handlePaymentSubmit = async (paymentData) => {
+    if (!treatmentId) {
+      message.error("Treatment ID is missing");
 
-        return;
+      return;
+    }
+
+    setSaving(true);
+
+    try {
+      await createPayment(paymentData);
+
+      const appointmentResponse = await getAppointmentByTreatment(treatmentId);
+
+      const appointmentData = extractData(appointmentResponse);
+
+      const appointment = appointmentData?.appointment || appointmentData;
+
+      const appointmentId = appointment?.appointment_id || appointment?.id;
+
+      const paymentAmount = toNumber(paymentData?.payment_amount);
+
+      const newRemainingAmount = Math.max(remainingAmount - paymentAmount, 0);
+
+      const isFullPayment = newRemainingAmount <= 0;
+
+      if (appointmentId) {
+        await updateAppointmentStatus(
+          appointmentId,
+          isFullPayment ? "Paid" : "Payment Pending",
+        );
+      } else {
+        console.warn(
+          "Appointment ID was not returned for treatment:",
+          treatmentId,
+        );
       }
 
-      setSaving(true);
+      message.success(
+        isFullPayment
+          ? "Full payment saved successfully"
+          : "Partial payment saved successfully",
+      );
 
-      try {
-        await createPayment(
-          paymentData,
-        );
+      setPaymentModalOpen(false);
 
-        const appointmentResponse =
-          await getAppointmentByTreatment(
-            treatmentId,
-          );
+      await loadDetails({
+        silent: true,
+      });
+    } catch (error) {
+      console.error("Could not save payment:", error);
 
-        const appointmentData =
-          extractData(
-            appointmentResponse,
-          );
+      message.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Could not save the payment",
+      );
 
-        const appointment =
-          appointmentData
-            ?.appointment ||
-          appointmentData;
-
-        const appointmentId =
-          appointment
-            ?.appointment_id ||
-          appointment?.id;
-
-        const paymentAmount =
-          toNumber(
-            paymentData
-              ?.payment_amount,
-          );
-
-        const newRemainingAmount =
-          Math.max(
-            remainingAmount -
-              paymentAmount,
-            0,
-          );
-
-        const isFullPayment =
-          newRemainingAmount <= 0;
-
-        if (appointmentId) {
-          await updateAppointmentStatus(
-            appointmentId,
-            isFullPayment
-              ? "Paid"
-              : "Payment Pending",
-          );
-        } else {
-          console.warn(
-            "Appointment ID was not returned for treatment:",
-            treatmentId,
-          );
-        }
-
-        message.success(
-          isFullPayment
-            ? "Full payment saved successfully"
-            : "Partial payment saved successfully",
-        );
-
-        setPaymentModalOpen(false);
-
-        await loadDetails({
-          silent: true,
-        });
-      } catch (error) {
-        console.error(
-          "Could not save payment:",
-          error,
-        );
-
-        message.error(
-          error?.response?.data
-            ?.message ||
-            error?.message ||
-            "Could not save the payment",
-        );
-
-        throw error;
-      } finally {
-        setSaving(false);
-      }
-    };
+      throw error;
+    } finally {
+      setSaving(false);
+    }
+  };
 
   /* ------------------------------------------------------
      Installment columns
@@ -682,28 +459,18 @@ const TreatmentPaymentDetailsModal = ({
       fixed: "left",
 
       render: (_, record) => (
-        <Space
-          size={10}
-          align="start"
-        >
+        <Space size={10} align="start">
           <div className="treatment-installment-number">
-            #
-            {
-              record.installment_number
-            }
+            #{record.installment_number}
           </div>
 
           <div className="treatment-payment-date-cell">
             <Text strong>
-              {formatDate(
-                record?.payment_date ||
-                  record?.created_at,
-              )}
+              {formatDate(record?.payment_date || record?.created_at)}
             </Text>
 
             <Text type="secondary">
-              {record?.receipt_number ||
-                "No receipt"}
+              {record?.receipt_number || "No receipt"}
             </Text>
           </div>
         </Space>
@@ -716,16 +483,13 @@ const TreatmentPaymentDetailsModal = ({
 
       render: (_, record) => (
         <div className="treatment-payment-id">
-          <Text copyable>
-            {getPaymentId(record)}
-          </Text>
+          <Text copyable>{getPaymentId(record)}</Text>
         </div>
       ),
     },
     {
       title: "This Payment",
-      dataIndex:
-        "calculated_payment",
+      dataIndex: "calculated_payment",
       key: "payment",
       width: 150,
       align: "right",
@@ -738,22 +502,16 @@ const TreatmentPaymentDetailsModal = ({
     },
     {
       title: "Previously Paid",
-      dataIndex:
-        "calculated_previous",
+      dataIndex: "calculated_previous",
       key: "previously_paid",
       width: 150,
       align: "right",
 
-      render: (value) => (
-        <Text>
-          {formatCurrency(value)}
-        </Text>
-      ),
+      render: (value) => <Text>{formatCurrency(value)}</Text>,
     },
     {
       title: "Total Paid",
-      dataIndex:
-        "calculated_total",
+      dataIndex: "calculated_total",
       key: "total_paid",
       width: 150,
       align: "right",
@@ -774,45 +532,32 @@ const TreatmentPaymentDetailsModal = ({
         <div className="treatment-payment-balance-cell">
           <Text
             className={
-              record
-                .calculated_remaining >
-              0
+              record.calculated_remaining > 0
                 ? "treatment-payment-amount treatment-payment-amount--balance"
                 : "treatment-payment-amount treatment-payment-amount--paid"
             }
           >
-            {formatCurrency(
-              record
-                .calculated_remaining,
-            )}
+            {formatCurrency(record.calculated_remaining)}
           </Text>
 
           <Tag
-            color={getPaymentStatusColor(
-              record
-                .calculated_status,
-            )}
+            color={getPaymentStatusColor(record.calculated_status)}
             className="treatment-payment-status-tag"
           >
-            {
-              record.calculated_status
-            }
+            {record.calculated_status}
           </Tag>
         </div>
       ),
     },
     {
       title: "Method",
-      dataIndex:
-        "payment_method",
+      dataIndex: "payment_method",
       key: "payment_method",
       width: 125,
       align: "center",
 
       render: (value) => (
-        <Tag className="treatment-payment-method-tag">
-          {value || "-"}
-        </Tag>
+        <Tag className="treatment-payment-method-tag">{value || "-"}</Tag>
       ),
     },
   ];
@@ -841,23 +586,17 @@ const TreatmentPaymentDetailsModal = ({
 
     patient_id: patientId,
 
-    patient_name:
-      displayedPatientName,
+    patient_name: displayedPatientName,
 
-    treatment_name:
-      treatmentName,
+    treatment_name: treatmentName,
 
-    treatment_charge:
-      treatmentCharge,
+    treatment_charge: treatmentCharge,
 
-    total_paid:
-      totalPaid,
+    total_paid: totalPaid,
 
-    remaining_amount:
-      remainingAmount,
+    remaining_amount: remainingAmount,
 
-    payment_status:
-      paymentStatus,
+    payment_status: paymentStatus,
   };
 
   return (
@@ -881,11 +620,7 @@ const TreatmentPaymentDetailsModal = ({
           },
         }}
         footer={[
-          <Button
-            key="close"
-            onClick={handleClose}
-            disabled={saving}
-          >
+          <Button key="close" onClick={handleClose} disabled={saving}>
             Close
           </Button>,
 
@@ -894,12 +629,8 @@ const TreatmentPaymentDetailsModal = ({
                 <Button
                   key="payment"
                   type="primary"
-                  icon={
-                    <DollarOutlined />
-                  }
-                  onClick={
-                    openPaymentModal
-                  }
+                  icon={<DollarOutlined />}
+                  onClick={openPaymentModal}
                 >
                   Add Payment
                 </Button>,
@@ -911,9 +642,7 @@ const TreatmentPaymentDetailsModal = ({
           <div className="treatment-payment-loading">
             <Spin size="large" />
 
-            <Text type="secondary">
-              Loading payment details...
-            </Text>
+            <Text type="secondary">Loading payment details...</Text>
           </div>
         ) : !details ? (
           <div className="treatment-payment-empty">
@@ -927,9 +656,7 @@ const TreatmentPaymentDetailsModal = ({
               <div className="treatment-payment-header__patient">
                 <Avatar
                   size={70}
-                  icon={
-                    <UserOutlined />
-                  }
+                  icon={<UserOutlined />}
                   className="treatment-payment-header__avatar"
                 />
 
@@ -938,18 +665,11 @@ const TreatmentPaymentDetailsModal = ({
                     Treatment Payment
                   </Text>
 
-                  <Space
-                    wrap
-                    size={8}
-                  >
-                    <Title level={3}>
-                      {displayedPatientName}
-                    </Title>
+                  <Space wrap size={8}>
+                    <Title level={3}>{displayedPatientName}</Title>
 
                     <Tag
-                      color={getPaymentStatusColor(
-                        paymentStatus,
-                      )}
+                      color={getPaymentStatusColor(paymentStatus)}
                       className="treatment-payment-header__status"
                     >
                       {paymentStatus}
@@ -971,15 +691,8 @@ const TreatmentPaymentDetailsModal = ({
 
                     <span>
                       <HistoryOutlined />
-
-                      {
-                        installmentRows.length
-                      }{" "}
-                      installment
-                      {installmentRows.length ===
-                      1
-                        ? ""
-                        : "s"}
+                      {installmentRows.length} installment
+                      {installmentRows.length === 1 ? "" : "s"}
                     </span>
                   </div>
                 </div>
@@ -991,19 +704,11 @@ const TreatmentPaymentDetailsModal = ({
                 </div>
 
                 <div>
-                  <Text>
-                    Treatment
-                  </Text>
+                  <Text>Treatment</Text>
 
-                  <Title level={5}>
-                    {treatmentName}
-                  </Title>
+                  <Title level={5}>{treatmentName}</Title>
 
-                  <Text>
-                    {formatDate(
-                      treatmentDate,
-                    )}
-                  </Text>
+                  <Text>{formatDate(treatmentDate)}</Text>
                 </div>
               </div>
             </div>
@@ -1017,23 +722,17 @@ const TreatmentPaymentDetailsModal = ({
               >
                 <div className="treatment-payment-section-heading">
                   <div>
-                    <Title level={4}>
-                      Payment Information
-                    </Title>
+                    <Title level={4}>Payment Information</Title>
 
                     <Text type="secondary">
-                      Treatment and patient
-                      payment details.
+                      Treatment and patient payment details.
                     </Text>
                   </div>
 
                   <Tag
-                    color={getPaymentStatusColor(
-                      paymentStatus,
-                    )}
+                    color={getPaymentStatusColor(paymentStatus)}
                     icon={
-                      paymentStatus ===
-                      "Paid" ? (
+                      paymentStatus === "Paid" ? (
                         <CheckCircleOutlined />
                       ) : (
                         <WarningOutlined />
@@ -1054,17 +753,11 @@ const TreatmentPaymentDetailsModal = ({
                   className="treatment-payment-descriptions"
                 >
                   <Descriptions.Item label="Patient">
-                    <Text strong>
-                      {
-                        displayedPatientName
-                      }
-                    </Text>
+                    <Text strong>{displayedPatientName}</Text>
                   </Descriptions.Item>
 
                   <Descriptions.Item label="Patient ID">
-                    <Text copyable>
-                      {patientId}
-                    </Text>
+                    <Text copyable>{patientId}</Text>
                   </Descriptions.Item>
 
                   <Descriptions.Item label="Treatment">
@@ -1072,25 +765,19 @@ const TreatmentPaymentDetailsModal = ({
                   </Descriptions.Item>
 
                   <Descriptions.Item label="Treatment ID">
-                    <Text copyable>
-                      {treatmentId}
-                    </Text>
+                    <Text copyable>{treatmentId}</Text>
                   </Descriptions.Item>
 
                   <Descriptions.Item label="Treatment Date">
                     <Space size={7}>
                       <CalendarOutlined />
 
-                      {formatDate(
-                        treatmentDate,
-                      )}
+                      {formatDate(treatmentDate)}
                     </Space>
                   </Descriptions.Item>
 
                   <Descriptions.Item label="Installments">
-                    {
-                      installmentRows.length
-                    }
+                    {installmentRows.length}
                   </Descriptions.Item>
                 </Descriptions>
               </Card>
@@ -1098,53 +785,30 @@ const TreatmentPaymentDetailsModal = ({
               {/* Summary cards */}
 
               <Row gutter={[14, 14]}>
-                <Col
-                  xs={24}
-                  sm={8}
-                >
+                <Col xs={24} sm={8}>
                   <PaymentSummaryCard
                     title="Treatment Fee"
-                    value={
-                      treatmentCharge
-                    }
+                    value={treatmentCharge}
                     tone="blue"
-                    icon={
-                      <MedicineBoxOutlined />
-                    }
+                    icon={<MedicineBoxOutlined />}
                   />
                 </Col>
 
-                <Col
-                  xs={24}
-                  sm={8}
-                >
+                <Col xs={24} sm={8}>
                   <PaymentSummaryCard
                     title="Total Paid"
                     value={totalPaid}
                     tone="green"
-                    icon={
-                      <CheckCircleOutlined />
-                    }
+                    icon={<CheckCircleOutlined />}
                   />
                 </Col>
 
-                <Col
-                  xs={24}
-                  sm={8}
-                >
+                <Col xs={24} sm={8}>
                   <PaymentSummaryCard
                     title="Remaining"
-                    value={
-                      remainingAmount
-                    }
-                    tone={
-                      remainingAmount > 0
-                        ? "orange"
-                        : "green"
-                    }
-                    icon={
-                      <WalletOutlined />
-                    }
+                    value={remainingAmount}
+                    tone={remainingAmount > 0 ? "orange" : "green"}
+                    icon={<WalletOutlined />}
                   />
                 </Col>
               </Row>
@@ -1157,140 +821,53 @@ const TreatmentPaymentDetailsModal = ({
               >
                 <div className="treatment-payment-progress-header">
                   <div>
-                    <Text strong>
-                      Payment Progress
-                    </Text>
+                    <Text strong>Payment Progress</Text>
 
                     <Text type="secondary">
-                      {formatCurrency(
-                        totalPaid,
-                      )}{" "}
-                      received from{" "}
-                      {formatCurrency(
-                        treatmentCharge,
-                      )}
+                      {formatCurrency(totalPaid)} received from{" "}
+                      {formatCurrency(treatmentCharge)}
                     </Text>
                   </div>
 
-                  <Text strong>
-                    {paidPercentage}%
-                  </Text>
+                  <Text strong>{paidPercentage}%</Text>
                 </div>
 
                 <Progress
-                  percent={
-                    paidPercentage
-                  }
-                  status={
-                    paymentStatus ===
-                    "Paid"
-                      ? "success"
-                      : "active"
-                  }
+                  percent={paidPercentage}
+                  status={paymentStatus === "Paid" ? "success" : "active"}
                   showInfo={false}
                 />
               </Card>
 
               {/* Payment state */}
 
-              {remainingAmount > 0 ? (
-                <Alert
-                  type="warning"
-                  showIcon
-                  icon={
-                    <WarningOutlined />
-                  }
-                  message="Payment is not completed"
-                  description={
-                    <div className="treatment-payment-warning-content">
-                      <span>
-                        Remaining balance:{" "}
-                        <strong>
-                          {formatCurrency(
-                            remainingAmount,
-                          )}
-                        </strong>
-                      </span>
-
-                      <Button
-                        type="primary"
-                        icon={
-                          <DollarOutlined />
-                        }
-                        onClick={
-                          openPaymentModal
-                        }
-                      >
-                        Pay Now
-                      </Button>
-                    </div>
-                  }
-                  className="treatment-payment-alert"
-                />
-              ) : (
-                <Alert
-                  type="success"
-                  showIcon
-                  icon={
-                    <CheckCircleOutlined />
-                  }
-                  message="Treatment payment completed"
-                  description={`${installmentRows.length} installment${
-                    installmentRows.length ===
-                    1
-                      ? ""
-                      : "s"
-                  } recorded for this treatment.`}
-                  className="treatment-payment-alert"
-                />
-              )}
-
               {/* Installment history */}
 
-              <Card
-                bordered={false}
-                className="treatment-installment-card"
-              >
+              <Card bordered={false} className="treatment-installment-card">
                 <div className="treatment-payment-section-heading">
                   <div>
-                    <Title level={4}>
-                      Installment History
-                    </Title>
+                    <Title level={4}>Installment History</Title>
 
                     <Text type="secondary">
-                      All payment
-                      transactions recorded
-                      for this treatment.
+                      All payment transactions recorded for this treatment.
                     </Text>
                   </div>
 
                   <Tag color="blue">
-                    {
-                      installmentRows.length
-                    }{" "}
-                    record
-                    {installmentRows.length ===
-                    1
-                      ? ""
-                      : "s"}
+                    {installmentRows.length} record
+                    {installmentRows.length === 1 ? "" : "s"}
                   </Tag>
                 </div>
 
                 <Table
-                  rowKey={(
-                    record,
-                    index,
-                  ) =>
+                  rowKey={(record, index) =>
                     record?.payment_id ||
                     record?.id ||
-                    record
-                      ?.receipt_number ||
+                    record?.receipt_number ||
                     `payment-${index}`
                   }
                   columns={columns}
-                  dataSource={
-                    installmentRows
-                  }
+                  dataSource={installmentRows}
                   pagination={false}
                   scroll={{
                     x: 1050,
@@ -1299,9 +876,7 @@ const TreatmentPaymentDetailsModal = ({
                   locale={{
                     emptyText: (
                       <Empty
-                        image={
-                          Empty.PRESENTED_IMAGE_SIMPLE
-                        }
+                        image={Empty.PRESENTED_IMAGE_SIMPLE}
                         description="No installments found"
                       />
                     ),
@@ -1316,15 +891,9 @@ const TreatmentPaymentDetailsModal = ({
       <PaymentModal
         open={paymentModalOpen}
         loading={saving}
-        appointment={
-          paymentModalAppointment
-        }
-        onCancel={
-          closePaymentModal
-        }
-        onSubmit={
-          handlePaymentSubmit
-        }
+        appointment={paymentModalAppointment}
+        onCancel={closePaymentModal}
+        onSubmit={handlePaymentSubmit}
       />
     </>
   );

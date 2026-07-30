@@ -302,7 +302,7 @@ const DailyIncome = () => {
   );
 
   const [viewMode, setViewMode] =
-    useState("installments");
+    useState("treatment");
 
   const [search, setSearch] =
     useState("");

@@ -232,11 +232,15 @@ const FollowUpPatients = () => {
     setFollowUps,
   ] = useState([]);
 
-  const [loading, setLoading] =
-    useState(false);
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
 
-  const [search, setSearch] =
-    useState("");
+  const [
+    search,
+    setSearch,
+  ] = useState("");
 
   const [
     contactFilter,
@@ -260,6 +264,12 @@ const FollowUpPatients = () => {
   const isSelectedDateToday =
     selectedDate.isSame(
       dayjs(),
+      "day",
+    );
+
+  const isSelectedDateTomorrow =
+    selectedDate.isSame(
+      dayjs().add(1, "day"),
       "day",
     );
 
@@ -401,6 +411,12 @@ const FollowUpPatients = () => {
 
   const handleToday = () => {
     setSelectedDate(dayjs());
+  };
+
+  const handleTomorrow = () => {
+    setSelectedDate(
+      dayjs().add(1, "day"),
+    );
   };
 
   /* ------------------------------------------------------
@@ -823,6 +839,21 @@ const FollowUpPatients = () => {
         </Button>,
 
         <Button
+          key="tomorrow"
+          icon={
+            <CalendarOutlined />
+          }
+          type={
+            isSelectedDateTomorrow
+              ? "primary"
+              : "default"
+          }
+          onClick={handleTomorrow}
+        >
+          Tomorrow
+        </Button>,
+
+        <Button
           key="refresh"
           icon={
             <ReloadOutlined />
@@ -960,6 +991,17 @@ const FollowUpPatients = () => {
                 }
               >
                 Today
+              </Tag>
+            )}
+
+            {isSelectedDateTomorrow && (
+              <Tag
+                color="blue"
+                icon={
+                  <CalendarOutlined />
+                }
+              >
+                Tomorrow
               </Tag>
             )}
           </div>

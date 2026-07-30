@@ -1,0 +1,234 @@
+.payment-filter-card,
+.payment-summary-card,
+.payment-progress-card,
+.payment-table-card {
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+}
+
+.payment-filter-card {
+  margin-bottom: 18px;
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.payment-date-shortcuts {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.payment-summary-row {
+  margin-bottom: 18px;
+}
+
+.payment-summary-card {
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.payment-summary-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.1);
+}
+
+.payment-summary-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 100%;
+}
+
+.charge-card::before {
+  background: #2563eb;
+}
+
+.paid-card::before {
+  background: #16a34a;
+}
+
+.balance-card::before {
+  background: #dc2626;
+}
+
+.appointment-card::before {
+  background: #9333ea;
+}
+
+.payment-summary-card .ant-statistic-title {
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.payment-summary-card .ant-statistic-content {
+  color: #0f172a;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.payment-progress-card {
+  margin-bottom: 18px;
+}
+
+.payment-progress-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.payment-progress-heading h4 {
+  margin: 0 !important;
+}
+
+.payment-progress-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 15px;
+  color: #ffffff;
+  font-size: 22px;
+  background: linear-gradient(
+    135deg,
+    #2563eb,
+    #06b6d4
+  );
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+}
+
+.payment-table-card .ant-card-head {
+  min-height: 78px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.payment-card-title-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  color: #2563eb;
+  font-size: 20px;
+  background: #eff6ff;
+}
+
+.payment-card-title {
+  display: block;
+  color: #0f172a;
+  font-size: 16px;
+}
+
+.payment-record-count {
+  margin: 0;
+  padding: 5px 12px;
+  border-radius: 999px;
+  color: #1d4ed8;
+  font-weight: 700;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+}
+
+.payment-table-controls {
+  margin-bottom: 18px;
+}
+
+.payment-status-filter {
+  width: 100%;
+}
+
+.payment-status-tag {
+  min-width: 82px;
+  margin: 0;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.payment-paid-text {
+  color: #15803d;
+  font-weight: 800;
+}
+
+.payment-balance-text {
+  color: #dc2626;
+  font-weight: 800;
+}
+
+.payment-zero-balance-text {
+  color: #15803d;
+  font-weight: 800;
+}
+
+.payment-unpaid-row td:first-child {
+  border-left: 4px solid #ef4444;
+}
+
+.payment-partial-row td:first-child {
+  border-left: 4px solid #f59e0b;
+}
+
+.payment-unpaid-row:hover > td {
+  background: #fff7f7 !important;
+}
+
+.payment-partial-row:hover > td {
+  background: #fffbeb !important;
+}
+
+.payment-modal-content {
+  padding-top: 8px;
+}
+
+.payment-installment-title {
+  margin-top: 24px !important;
+  margin-bottom: 12px !important;
+  color: #0f172a !important;
+}
+
+@media (max-width: 991px) {
+  .payment-date-shortcuts {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 575px) {
+  .payment-filter-card,
+  .payment-summary-card,
+  .payment-progress-card,
+  .payment-table-card {
+    border-radius: 16px;
+  }
+
+  .payment-date-shortcuts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .payment-date-shortcuts .ant-btn {
+    width: 100%;
+  }
+
+  .payment-summary-card .ant-statistic-content {
+    font-size: 21px;
+  }
+
+  .payment-table-card .ant-card-head {
+    padding: 0 16px;
+  }
+
+  .payment-table-card .ant-card-body {
+    padding: 16px;
+  }
+}
