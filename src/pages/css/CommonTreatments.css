@@ -1,0 +1,461 @@
+/* ========================================================
+   Common Treatments Admin Page
+   File: CommonTreatments.css
+======================================================== */
+
+/* --------------------------------------------------------
+   Page
+-------------------------------------------------------- */
+
+
+
+/* --------------------------------------------------------
+   Header
+-------------------------------------------------------- */
+
+.common-treatments-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+
+.common-treatments-title-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.common-treatments-title-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 52px;
+  height: 52px;
+
+  flex-shrink: 0;
+
+  color: #ffffff;
+  font-size: 24px;
+
+  border-radius: 16px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #1677ff 0%,
+      #0958d9 100%
+    );
+
+  box-shadow:
+    0 10px 24px rgba(22, 119, 255, 0.24);
+}
+
+.common-treatments-title {
+  margin: 0 !important;
+  color: #102a43 !important;
+  font-size: 28px !important;
+  line-height: 1.25 !important;
+}
+
+.common-treatments-subtitle {
+  display: block;
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+.common-treatment-add-button {
+  min-height: 38px;
+  font-weight: 600;
+  border-radius: 9px;
+}
+
+/* --------------------------------------------------------
+   Statistics
+-------------------------------------------------------- */
+
+.common-treatment-statistics-row {
+  margin-bottom: 18px;
+}
+
+.common-treatment-stat-card {
+  height: 100%;
+
+  border: 1px solid #e7edf5;
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #f8fbff 100%
+    );
+
+  box-shadow:
+    0 5px 18px rgba(15, 42, 67, 0.06);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.common-treatment-stat-card:hover {
+  transform: translateY(-2px);
+  border-color: #c9def7;
+
+  box-shadow:
+    0 10px 26px rgba(15, 42, 67, 0.1);
+}
+
+.common-treatment-stat-card
+  .ant-statistic-title {
+  margin-bottom: 8px;
+  color: #627d98;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.common-treatment-stat-card
+  .ant-statistic-content {
+  color: #102a43;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.statistic-prefix-icon {
+  margin-right: 5px;
+  color: #1677ff;
+}
+
+/* --------------------------------------------------------
+   Table card
+-------------------------------------------------------- */
+
+.common-treatments-table-card {
+  overflow: hidden;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+
+  box-shadow:
+    0 8px 28px rgba(15, 42, 67, 0.07);
+}
+
+.common-treatments-table-card
+  > .ant-card-body {
+  padding: 0;
+}
+
+.common-treatments-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 20px 20px 18px;
+
+  border-bottom: 1px solid #edf2f7;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #fbfdff 100%
+    );
+}
+
+.common-treatments-table-title {
+  display: block;
+  color: #102a43;
+  font-size: 17px;
+}
+
+.common-treatments-table-description {
+  display: block;
+  margin-top: 3px;
+  font-size: 13px;
+}
+
+.common-treatment-search {
+  width: 100%;
+  max-width: 440px;
+}
+
+.common-treatment-search .ant-input-affix-wrapper {
+  min-height: 40px;
+}
+
+.common-treatment-search .ant-btn {
+  min-height: 40px;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------
+   Table
+-------------------------------------------------------- */
+
+.common-treatments-table-card .ant-table {
+  font-size: 14px;
+}
+
+.common-treatments-table-card
+  .ant-table-thead
+  > tr
+  > th {
+  color: #486581;
+  font-size: 13px;
+  font-weight: 700;
+
+  background: #f7fafc;
+  border-bottom-color: #e2e8f0;
+}
+
+.common-treatments-table-card
+  .ant-table-tbody
+  > tr
+  > td {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  border-bottom-color: #edf2f7;
+}
+
+.common-treatments-table-card
+  .ant-table-tbody
+  > tr:hover
+  > td {
+  background: #f7fbff !important;
+}
+
+.common-treatment-id-tag {
+  min-width: 92px;
+  margin: 0;
+  padding: 4px 10px;
+
+  color: #0958d9;
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+
+  border: 1px solid #bae0ff;
+  border-radius: 7px;
+
+  background: #e6f4ff;
+}
+
+.common-treatment-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.common-treatment-table-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 34px;
+  height: 34px;
+
+  flex-shrink: 0;
+
+  color: #1677ff;
+  font-size: 16px;
+
+  border: 1px solid #d6e4ff;
+  border-radius: 9px;
+
+  background: #f0f5ff;
+}
+
+.common-treatment-fee {
+  color: #087443;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.common-treatment-edit-button,
+.common-treatment-delete-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 34px;
+  height: 34px;
+
+  border-radius: 8px;
+}
+
+.common-treatment-edit-button {
+  color: #1677ff;
+}
+
+.common-treatment-edit-button:hover {
+  color: #0958d9 !important;
+  background: #e6f4ff !important;
+}
+
+.common-treatment-delete-button:hover {
+  background: #fff1f0 !important;
+}
+
+.common-treatments-table-card
+  .ant-pagination {
+  margin: 18px 20px;
+}
+
+/* --------------------------------------------------------
+   Modal
+-------------------------------------------------------- */
+
+.common-treatment-modal .ant-modal-content {
+  border-radius: 16px;
+}
+
+.common-treatment-modal .ant-modal-header {
+  margin-bottom: 22px;
+}
+
+.common-treatment-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.common-treatment-modal-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  color: #ffffff;
+  font-size: 18px;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #1677ff 0%,
+      #0958d9 100%
+    );
+
+  box-shadow:
+    0 7px 16px rgba(22, 119, 255, 0.22);
+}
+
+.common-treatment-modal-subtitle {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.common-treatment-fee-input {
+  width: 100%;
+}
+
+/* --------------------------------------------------------
+   Responsive
+-------------------------------------------------------- */
+
+@media (max-width: 991px) {
+  .common-treatments-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .common-treatment-search {
+    max-width: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .common-treatments-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .common-treatments-header > .ant-space {
+    width: 100%;
+  }
+
+  .common-treatments-header
+    > .ant-space
+    > .ant-space-item {
+    flex: 1;
+  }
+
+  .common-treatments-header
+    > .ant-space
+    .ant-btn {
+    width: 100%;
+  }
+
+  .common-treatments-title-icon {
+    width: 46px;
+    height: 46px;
+    font-size: 21px;
+    border-radius: 13px;
+  }
+
+  .common-treatments-title {
+    font-size: 23px !important;
+  }
+
+  .common-treatments-subtitle {
+    font-size: 13px;
+  }
+
+  .common-treatments-toolbar {
+    padding: 16px;
+  }
+
+  .common-treatment-search {
+    display: flex;
+  }
+
+  .common-treatment-search
+    .ant-input-affix-wrapper {
+    flex: 1;
+  }
+
+  .common-treatments-table-card
+    .ant-pagination {
+    margin-right: 14px;
+    margin-left: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .common-treatments-title-row {
+    align-items: flex-start;
+  }
+
+  .common-treatment-search {
+    display: block;
+  }
+
+  .common-treatment-search
+    .ant-input-affix-wrapper {
+    width: 100%;
+    border-radius: 8px !important;
+  }
+
+  .common-treatment-search .ant-btn {
+    width: 100%;
+    margin-top: 8px;
+    border-radius: 8px !important;
+  }
+}

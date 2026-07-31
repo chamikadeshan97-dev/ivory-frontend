@@ -1,0 +1,212 @@
+/* ========================================================
+   User Management
+   File: UserRegistration.css
+======================================================== */
+
+/* --------------------------------------------------------
+   Page
+-------------------------------------------------------- */
+
+.user-management-page {
+  width: 100%;
+}
+
+/* --------------------------------------------------------
+   Summary cards
+-------------------------------------------------------- */
+
+.user-summary-row {
+  margin-bottom: 24px;
+}
+
+.user-summary-card {
+  height: 100%;
+  border-radius: 16px;
+  border: 1px solid #e6edf5;
+  box-shadow: 0 8px 24px rgba(15, 45, 75, 0.06);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.user-summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(15, 45, 75, 0.1);
+}
+
+.user-summary-card .ant-card-body {
+  padding: 20px;
+}
+
+.user-summary-card .ant-statistic-title {
+  margin-bottom: 8px;
+  color: #66788a;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.user-summary-card .ant-statistic-content {
+  color: #16324f;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------
+   Table card
+-------------------------------------------------------- */
+
+.user-table-card {
+  border-radius: 16px;
+  border: 1px solid #e6edf5;
+  box-shadow: 0 8px 24px rgba(15, 45, 75, 0.06);
+}
+
+.user-table-card .ant-card-head {
+  min-height: 72px;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.user-table-card .ant-card-head-title {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.user-table-card .ant-card-extra {
+  padding: 14px 0;
+}
+
+.user-search-input {
+  width: 240px;
+}
+
+.user-role-filter {
+  width: 170px;
+}
+
+.user-page-alert {
+  margin-bottom: 20px;
+}
+
+/* --------------------------------------------------------
+   Table
+-------------------------------------------------------- */
+
+.user-table-card .ant-table-thead > tr > th {
+  background: #f7faff;
+  color: #314a62;
+  font-weight: 700;
+}
+
+.user-table-card .ant-table-tbody > tr > td {
+  vertical-align: middle;
+}
+
+.user-table-card .ant-table-tbody > tr:hover > td {
+  background: #f5faff;
+}
+
+/* --------------------------------------------------------
+   Role access guide
+-------------------------------------------------------- */
+
+.role-guide-card {
+  margin-top: 24px;
+  border-radius: 16px;
+  border: 1px solid #e6edf5;
+  box-shadow: 0 8px 24px rgba(15, 45, 75, 0.06);
+}
+
+.role-guide-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 110px;
+  padding: 16px;
+  border: 1px solid #e8eef5;
+  border-radius: 14px;
+  background: #fbfdff;
+}
+
+.role-guide-item .ant-tag {
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------
+   User modal
+-------------------------------------------------------- */
+
+.user-modal-alert {
+  margin-bottom: 20px;
+}
+
+.user-management-page .ant-modal-content {
+  border-radius: 18px;
+}
+
+.user-management-page .ant-form-item-label > label {
+  color: #29435c;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------
+   Responsive
+-------------------------------------------------------- */
+
+@media (max-width: 991px) {
+  .user-table-card .ant-card-head {
+    display: block;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .user-table-card .ant-card-head-wrapper {
+    display: block;
+  }
+
+  .user-table-card .ant-card-extra {
+    width: 100%;
+    margin-top: 14px;
+    margin-left: 0;
+  }
+
+  .user-table-card .ant-card-extra .ant-space {
+    width: 100%;
+  }
+
+  .user-search-input {
+    width: 100%;
+    min-width: 220px;
+  }
+
+  .user-role-filter {
+    width: 170px;
+  }
+}
+
+@media (max-width: 575px) {
+  .user-summary-card .ant-card-body {
+    padding: 18px;
+  }
+
+  .user-summary-card .ant-statistic-content {
+    font-size: 25px;
+  }
+
+  .user-search-input,
+  .user-role-filter {
+    width: 100%;
+  }
+
+  .user-table-card .ant-card-extra .ant-space-item {
+    width: 100%;
+  }
+
+  .user-table-card .ant-card-extra button {
+    width: 100%;
+  }
+
+  .role-guide-item {
+    min-height: auto;
+  }
+}

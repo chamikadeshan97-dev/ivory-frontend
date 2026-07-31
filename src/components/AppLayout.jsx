@@ -198,6 +198,19 @@ const allMenuItems = [
       },
     ],
   },
+  {
+    type: "group",
+    label: "System Administration",
+    children: [
+      {
+        key: "/common-treatments",
+        icon: <MedicineBoxOutlined />,
+        roles: [ROLES.ADMIN],
+        label: <Link to="/common-treatments">Common Treatments</Link>,
+      },
+    ],
+  },
+  
 ];
 
 /* --------------------------------------------------------

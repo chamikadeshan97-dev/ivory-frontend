@@ -22,6 +22,7 @@ import FollowUpPatients from "./pages/FollowUpPatients";
 import UserRegistration from "./pages/UserRegistration";
 import QueueDisplay from "./pages/QueueDisplay";
 import PaymentDashboard from "./pages/PaymentDashboard";
+import CommonTreatments from "./pages/CommonTreatments";
 /* --------------------------------------------------------
    Layout wrapper
 -------------------------------------------------------- */
@@ -99,7 +100,7 @@ const App = () => {
         <Route
           path="/payments"
           element={
-            <RoleRoute allowedRoles={["Admin", "Cashier" ,  "Dentist"]}>
+            <RoleRoute allowedRoles={["Admin", "Cashier", "Dentist"]}>
               <LayoutPage>
                 <PaymentDashboard />
               </LayoutPage>
@@ -195,8 +196,17 @@ const App = () => {
           </RoleRoute>
         }
       />
+      <Route
+        path="/common-treatments"
+        element={
+          <RoleRoute allowedRoles={["Admin"]}>
+            <LayoutPage>
+              <CommonTreatments />
+            </LayoutPage>
+          </RoleRoute>
+        }
+      />
       {/* Unknown routes */}
-
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
