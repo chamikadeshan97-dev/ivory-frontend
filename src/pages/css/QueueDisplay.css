@@ -1,126 +1,66 @@
 /* ========================================================
-   Queue Display
-   Full-screen mode + internal clinic mode
+   Page
 ======================================================== */
 
-/* --------------------------------------------------------
-   Global queue variables
--------------------------------------------------------- */
-
 .queue-display-page {
-  --queue-blue: #087df5;
-  --queue-blue-dark: #075fc3;
-  --queue-blue-soft: #e6f4ff;
-  --queue-blue-border: #b7dcff;
-
-  --queue-green: #00aa76;
-  --queue-green-dark: #00875e;
-  --queue-green-soft: #e7fff6;
-  --queue-green-border: #a9ead3;
-
-  --queue-pending: #b46a00;
-  --queue-pending-soft: #fff5df;
-  --queue-pending-border: #ffd28a;
-
-  --queue-checked-in: #076bcc;
-  --queue-checked-in-soft: #e5f3ff;
-  --queue-checked-in-border: #a7d5ff;
-
-  --queue-treatment: #087df5;
-  --queue-treatment-soft: #e5f3ff;
-  --queue-treatment-border: #a7d5ff;
-
-  --queue-completed: #00875e;
-  --queue-completed-soft: #e1faef;
-  --queue-completed-border: #9be2c7;
-
-  --queue-cancelled: #c93636;
-  --queue-cancelled-soft: #fff0f0;
-  --queue-cancelled-border: #ffb8b8;
-
-  --queue-heading: #082940;
-  --queue-text: #1f2328;
-  --queue-secondary: #5e7d99;
-  --queue-muted: #7891a8;
-
+  --queue-blue: #1677ff;
+  --queue-blue-dark: #0958d9;
+  --queue-cyan: #06b6d4;
+  --queue-green: #16a34a;
+  --queue-green-light: #22c55e;
+  --queue-orange: #f59e0b;
+  --queue-red: #dc2626;
+  --queue-slate: #0f172a;
+  --queue-muted: #64748b;
+  --queue-border: #dbe7f3;
   --queue-surface: #ffffff;
-  --queue-background: #edf7fc;
-  --queue-border: #d5e4ef;
-
-  position: relative;
+  --queue-background: #eef6ff;
 
   width: 100%;
+  min-height: 100vh;
 
-  color: var(--queue-text);
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(56, 189, 248, 0.18),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at top right,
+      rgba(37, 99, 235, 0.15),
+      transparent 34%
+    ),
+    linear-gradient(
+      180deg,
+      #f8fbff 0%,
+      #eef6ff 100%
+    );
+
+  color: var(--queue-slate);
 
   font-family:
     Inter,
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
-    Roboto,
-    Arial,
     sans-serif;
-
-  box-sizing: border-box;
 }
-
-.queue-display-page *,
-.queue-display-page *::before,
-.queue-display-page *::after {
-  box-sizing: border-box;
-}
-
-/* ========================================================
-   Full-screen page
-======================================================== */
 
 .queue-display-page-fullscreen {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-
-  width: 100%;
-  min-height: 100vh;
-
-  padding: 16px;
-
-  overflow-x: hidden;
-
-  background:
-    radial-gradient(
-      circle at 91% 4%,
-      rgba(56, 161, 255, 0.14),
-      transparent 24%
-    ),
-    radial-gradient(
-      circle at 4% 92%,
-      rgba(0, 170, 118, 0.12),
-      transparent 27%
-    ),
-    linear-gradient(
-      135deg,
-      #f7fbfe 0%,
-      #edf7fc 48%,
-      #eefbf7 100%
-    );
+  position: fixed;
+  inset: 0;
+  z-index: 999;
 }
 
-/* ========================================================
-   Internal clinic mode
-======================================================== */
-
 .queue-display-page-embedded {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-
-  width: 100%;
-  min-height: auto;
-
-  padding: 0;
-
-  background: transparent;
+  position: relative;
+  min-height: 720px;
+  border-radius: 24px;
 }
 
 /* ========================================================
@@ -128,998 +68,1041 @@
 ======================================================== */
 
 .queue-display-header {
-  position: relative;
-  z-index: 2;
+  min-height: 132px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 30px;
 
-  width: 100%;
-  min-height: 158px;
-
-  padding: 25px 29px;
-
-  background:
-    rgba(255, 255, 255, 0.97);
-
-  border: 1px solid
-    var(--queue-border);
-  border-radius: 24px;
-
-  box-shadow:
-    0 14px 40px
-      rgba(29, 77, 110, 0.08);
-}
-
-.queue-display-brand {
-  display: flex;
-  align-items: center;
-  gap: 19px;
-
-  min-width: 0;
-}
-
-.queue-display-brand-icon {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-
-  width: 72px;
-  height: 72px;
-
-  color: #ffffff;
-
-  font-size: 34px;
+  padding: 24px 42px;
 
   background:
     linear-gradient(
-      145deg,
-      #0d8dff,
-      #0475e8
+      135deg,
+      #063f89 0%,
+      #075dbb 48%,
+      #0891b2 100%
     );
 
-  border-radius: 21px;
+  border-bottom:
+    1px solid
+    rgba(255, 255, 255, 0.2);
 
   box-shadow:
-    0 13px 25px
-      rgba(8, 125, 245, 0.26);
+    0 14px 34px
+    rgba(15, 23, 42, 0.18);
+
+  color: #ffffff;
+}
+
+.queue-display-brand {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 20px;
+}
+
+.queue-display-brand-icon {
+  width: 78px;
+  height: 78px;
+
+  flex: 0 0 78px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.3);
+
+  border-radius: 24px;
+
+  background:
+    rgba(255, 255, 255, 0.15);
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.25),
+    0 16px 36px
+      rgba(0, 0, 0, 0.16);
+
+  backdrop-filter: blur(10px);
+
+  color: #ffffff;
+
+  font-size: 38px;
 }
 
 .queue-display-brand-content {
   min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
 }
 
 .queue-display-eyebrow.ant-typography {
-  display: block;
+  margin: 0;
 
-  margin-bottom: 6px;
+  color:
+    rgba(255, 255, 255, 0.76);
 
-  color: #0064d8;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.3;
 
-  font-size: clamp(
-    14px,
-    1vw,
-    18px
-  );
-
-  font-weight: 900;
-
-  line-height: 1.2;
-
-  letter-spacing: 2.3px;
+  letter-spacing: 0.2em;
 }
 
 .queue-display-title.ant-typography {
   margin: 0 !important;
 
-  color: var(--queue-heading);
+  color: #ffffff;
 
-  font-size: clamp(
-    37px,
-    3vw,
-    52px
-  );
+  font-size:
+    clamp(28px, 3vw, 44px);
 
-  font-weight: 900;
+  font-weight: 850;
+  line-height: 1.1;
 
-  line-height: 1.08;
-
-  letter-spacing: -1.4px;
+  letter-spacing: -0.035em;
 }
 
 .queue-display-subtitle.ant-typography {
-  display: block;
+  margin-top: 4px;
 
-  margin-top: 8px;
+  color:
+    rgba(255, 255, 255, 0.82);
 
-  color: var(--queue-secondary);
+  font-size:
+    clamp(13px, 1.35vw, 18px);
 
-  font-size: clamp(
-    17px,
-    1.35vw,
-    22px
-  );
-
-  font-weight: 500;
-
-  line-height: 1.35;
+  line-height: 1.5;
 }
 
-/* --------------------------------------------------------
-   Date and time
--------------------------------------------------------- */
-
 .queue-display-date-time {
-  display: flex;
   flex: 0 0 auto;
+
+  display: flex;
   flex-direction: column;
   align-items: flex-end;
+
+  gap: 5px;
+
+  text-align: right;
 }
 
 .queue-display-date {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: flex-end;
 
-  color: var(--queue-secondary);
+  gap: 9px;
 
-  font-size: clamp(
-    15px,
-    1.1vw,
-    18px
-  );
+  color:
+    rgba(255, 255, 255, 0.84);
 
-  font-weight: 700;
+  font-size:
+    clamp(13px, 1.2vw, 17px);
 
-  line-height: 1.3;
+  font-weight: 600;
 }
 
 .queue-display-date .anticon {
-  display: none;
+  font-size: 17px;
 }
 
 .queue-display-time {
-  margin-top: 7px;
+  color: #ffffff;
 
-  color: var(--queue-heading);
+  font-size:
+    clamp(28px, 3.4vw, 48px);
 
-  font-size: clamp(
-    36px,
-    3.4vw,
-    50px
-  );
+  font-weight: 850;
+  line-height: 1.1;
 
-  font-weight: 900;
+  letter-spacing: -0.035em;
 
-  line-height: 1;
-
-  letter-spacing: 1px;
-
-  white-space: nowrap;
+  font-variant-numeric:
+    tabular-nums;
 }
 
 .queue-display-live-status {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+
   gap: 8px;
 
-  margin-top: 10px;
+  margin-top: 5px;
+  padding: 6px 12px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.22);
+
+  border-radius: 999px;
+
+  background:
+    rgba(255, 255, 255, 0.12);
+
+  backdrop-filter: blur(10px);
 }
 
 .queue-display-live-status
   .ant-typography {
-  color: #202020;
+  color: #ffffff;
 
-  font-size: 14px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 750;
 }
 
 .queue-display-live-dot {
-  position: relative;
-
-  display: block;
-
-  width: 12px;
-  height: 12px;
-
-  background: var(--queue-green);
+  width: 8px;
+  height: 8px;
 
   border-radius: 50%;
 
+  background: #4ade80;
+
   box-shadow:
-    0 0 0 6px
-      rgba(0, 170, 118, 0.12);
-}
-
-.queue-display-live-dot::after {
-  position: absolute;
-  inset: 0;
-
-  content: "";
-
-  background: var(--queue-green);
-
-  border-radius: inherit;
+    0 0 0 5px
+    rgba(74, 222, 128, 0.17);
 
   animation:
-    queueLivePulse
-    1.8s ease-out infinite;
+    queue-live-pulse 1.7s
+    ease-in-out infinite;
 }
 
 .queue-display-live-status-error
   .queue-display-live-dot {
-  background: #e59b16;
+  background: #fbbf24;
 
   box-shadow:
-    0 0 0 6px
-      rgba(229, 155, 22, 0.14);
-}
-
-.queue-display-live-status-error
-  .queue-display-live-dot::after {
-  background: #e59b16;
-}
-
-@keyframes queueLivePulse {
-  0% {
-    opacity: 0.7;
-    transform: scale(1);
-  }
-
-  100% {
-    opacity: 0;
-    transform: scale(2.4);
-  }
+    0 0 0 5px
+    rgba(251, 191, 36, 0.18);
 }
 
 /* ========================================================
-   Error message
+   Error and loading
 ======================================================== */
 
 .queue-display-error {
-  position: relative;
-  z-index: 2;
-
   display: flex;
   align-items: center;
+  justify-content: center;
+
   gap: 10px;
 
-  width: 100%;
+  padding: 10px 24px;
 
-  padding: 13px 17px;
+  background: #fff1f2;
 
-  color: var(--queue-cancelled);
+  border-bottom:
+    1px solid #fecdd3;
 
-  background:
-    var(--queue-cancelled-soft);
-
-  border: 1px solid
-    var(--queue-cancelled-border);
-  border-radius: 14px;
-}
-
-.queue-display-error
-  > .anticon {
-  flex: 0 0 auto;
-
-  font-size: 20px;
+  color: #be123c;
 }
 
 .queue-display-error
   .ant-typography {
-  color: inherit;
+  color: #be123c;
 
-  font-size: 16px;
   font-weight: 700;
 }
 
-/* ========================================================
-   Loading state
-======================================================== */
-
 .queue-display-loading {
-  display: flex;
   flex: 1;
+
+  min-height: 380px;
+
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 20px;
 
-  width: 100%;
-  min-height: 500px;
-
-  background:
-    rgba(255, 255, 255, 0.95);
-
-  border: 1px solid
-    var(--queue-border);
-  border-radius: 24px;
-
-  box-shadow:
-    0 14px 40px
-      rgba(29, 77, 110, 0.08);
-}
-
-.queue-display-loading
-  .ant-spin-dot {
-  font-size: 46px;
+  gap: 16px;
 }
 
 .queue-display-loading
   .ant-typography {
-  color: var(--queue-secondary);
+  color: var(--queue-muted);
 
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 650;
 }
 
 /* ========================================================
-   Main two-column area
+   Main cards layout
 ======================================================== */
 
 .queue-display-main {
-  position: relative;
-  z-index: 1;
-
-  display: grid;
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-  gap: 24px;
-
-  width: 100%;
-
   flex: 1;
 
-  min-height: 520px;
+  min-height: 0;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  align-items: stretch;
+
+  gap: 22px;
+
+  padding: 26px 34px 24px;
 }
 
 /* ========================================================
-   Patient panels
+   Patient card
 ======================================================== */
 
 .queue-patient-panel {
+  min-width: 0;
+  min-height: 390px;
+
   display: flex;
   flex-direction: column;
 
-  width: 100%;
-  min-width: 0;
-  min-height: 520px;
-
   overflow: hidden;
 
-  background: var(--queue-surface);
+  border:
+    1px solid
+    rgba(148, 163, 184, 0.26);
 
-  border: 1px solid transparent;
-  border-radius: 27px;
+  border-radius: 26px;
+
+  background:
+    rgba(255, 255, 255, 0.96);
 
   box-shadow:
-    0 16px 42px
-      rgba(35, 83, 114, 0.09);
+    0 20px 50px
+    rgba(15, 23, 42, 0.11);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
-.queue-treatment-panel {
-  border-color:
-    var(--queue-blue-border);
+.queue-patient-panel-active {
+  box-shadow:
+    0 22px 56px
+    rgba(15, 23, 42, 0.14);
 }
-
-.queue-ready-panel {
-  border-color:
-    var(--queue-green-border);
-}
-
-/* --------------------------------------------------------
-   Patient panel header
--------------------------------------------------------- */
 
 .queue-patient-panel-header {
-  position: relative;
+  min-height: 96px;
 
   display: flex;
   align-items: center;
-  justify-content: center;
 
-  min-height: 145px;
+  padding: 18px 22px;
 
-  padding: 25px 32px;
-
-  border-bottom: 1px solid transparent;
+  color: #ffffff;
 }
 
 .queue-treatment-panel
   .queue-patient-panel-header {
   background:
     linear-gradient(
-      180deg,
-      #e2f3ff 0%,
-      #f2f9ff 100%
+      135deg,
+      #0756b3 0%,
+      #1677ff 56%,
+      #22a8e8 100%
     );
-
-  border-bottom-color:
-    var(--queue-blue-border);
 }
 
 .queue-ready-panel
   .queue-patient-panel-header {
   background:
     linear-gradient(
-      180deg,
-      #dcf9ee 0%,
-      #effcf7 100%
+      135deg,
+      #b45309 0%,
+      #f59e0b 55%,
+      #fbbf24 100%
     );
+}
 
-  border-bottom-color:
-    var(--queue-green-border);
+.queue-completed-panel
+  .queue-patient-panel-header {
+  background:
+    linear-gradient(
+      135deg,
+      #08783d 0%,
+      #16a34a 52%,
+      #34d399 100%
+    );
 }
 
 .queue-panel-header-content {
+  width: 100%;
+
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 15px;
 
-  width: 100%;
+  gap: 16px;
 }
 
 .queue-panel-icon {
+  width: 58px;
+  height: 58px;
+
+  flex: 0 0 58px;
+
   display: flex;
-  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
 
-  width: 56px;
-  height: 56px;
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.3);
 
-  color: #ffffff;
+  border-radius: 18px;
 
-  font-size: 27px;
-
-  border-radius: 17px;
-}
-
-.queue-treatment-panel
-  .queue-panel-icon {
   background:
-    linear-gradient(
-      145deg,
-      #0e86ff,
-      #006be3
-    );
+    rgba(255, 255, 255, 0.17);
 
   box-shadow:
-    0 10px 20px
-      rgba(8, 125, 245, 0.25);
-}
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.22);
 
-.queue-ready-panel
-  .queue-panel-icon {
-  background:
-    linear-gradient(
-      145deg,
-      #00b67d,
-      #009565
-    );
-
-  box-shadow:
-    0 10px 20px
-      rgba(0, 170, 118, 0.24);
+  font-size: 28px;
 }
 
 .queue-panel-heading {
   min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
 }
 
 .queue-panel-title.ant-typography {
-  display: block;
+  margin: 0;
 
-  color: #1e2227;
+  color:
+    rgba(255, 255, 255, 0.8);
 
-  font-size: clamp(
-    26px,
-    2.35vw,
-    39px
-  );
+  font-size: 11px;
+  font-weight: 850;
 
-  font-weight: 950;
-
-  line-height: 1.05;
-
-  letter-spacing: 1px;
+  letter-spacing: 0.17em;
 }
 
 .queue-panel-subtitle.ant-typography {
-  margin:
-    8px 0 0 !important;
+  margin: 0 !important;
 
-  color: #202327;
+  color: #ffffff;
 
-  font-size: clamp(
-    26px,
-    2.4vw,
-    40px
-  );
+  font-size:
+    clamp(23px, 2vw, 31px);
 
-  font-weight: 800;
+  font-weight: 830;
+  line-height: 1.2;
 
-  line-height: 1.05;
+  letter-spacing: -0.025em;
 }
 
-/* --------------------------------------------------------
-   Patient panel body
--------------------------------------------------------- */
-
 .queue-patient-panel-body {
-  display: flex;
   flex: 1;
+
+  min-height: 0;
+
+  display: flex;
   align-items: center;
   justify-content: center;
 
-  min-height: 375px;
-
-  padding: 30px;
+  padding: 22px;
 }
 
+/* ========================================================
+   Queue number content
+======================================================== */
+
 .queue-number-content {
+  width: 100%;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-
-  width: 100%;
 
   text-align: center;
 }
 
 .queue-number-caption.ant-typography {
-  color: var(--queue-secondary);
+  margin-bottom: 12px;
 
-  font-size: clamp(
-    18px,
-    1.5vw,
-    24px
-  );
+  color: #64748b;
 
-  font-weight: 900;
+  font-size: 11px;
+  font-weight: 850;
 
-  line-height: 1.2;
-
-  letter-spacing: 3.5px;
+  letter-spacing: 0.15em;
 }
-
-/* --------------------------------------------------------
-   Large queue number circle
--------------------------------------------------------- */
 
 .queue-number-circle-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
 
-  margin-top: 22px;
-  margin-bottom: 20px;
-
-  padding: 20px;
-
-  border-radius: 50%;
-}
-
-.queue-treatment-panel
-  .queue-number-circle-wrapper {
-  background:
-    rgba(8, 125, 245, 0.09);
-
-  box-shadow:
-    0 0 0 12px
-      rgba(8, 125, 245, 0.06);
-}
-
-.queue-ready-panel
-  .queue-number-circle-wrapper {
-  background:
-    rgba(0, 170, 118, 0.1);
-
-  box-shadow:
-    0 0 0 12px
-      rgba(0, 170, 118, 0.07);
+  margin:
+    0 auto 15px;
 }
 
 .queue-number-circle {
+  width:
+    clamp(138px, 12vw, 184px);
+
+  height:
+    clamp(138px, 12vw, 184px);
+
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: clamp(
-    200px,
-    18vw,
-    270px
-  );
-
-  height: clamp(
-    200px,
-    18vw,
-    270px
-  );
-
-  padding: 15px;
-
-  color: #ffffff;
+  border: 8px solid;
 
   border-radius: 50%;
 
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #eff6ff
+    );
+
   box-shadow:
-    0 20px 42px
-      rgba(28, 68, 94, 0.16);
+    0 19px 38px
+    rgba(15, 23, 42, 0.16),
+    inset 0 0 0 7px
+    rgba(255, 255, 255, 0.82);
 }
 
 .queue-treatment-panel
   .queue-number-circle {
-  background:
-    linear-gradient(
-      145deg,
-      #118cff,
-      #006bdd
-    );
+  border-color: #1677ff;
+
+  box-shadow:
+    0 20px 42px
+    rgba(22, 119, 255, 0.22),
+    inset 0 0 0 7px
+    rgba(255, 255, 255, 0.82);
 }
 
 .queue-ready-panel
   .queue-number-circle {
+  border-color: #f59e0b;
+
   background:
     linear-gradient(
       145deg,
-      #04b67e,
-      #008d61
+      #ffffff,
+      #fffbeb
     );
+
+  box-shadow:
+    0 20px 42px
+    rgba(245, 158, 11, 0.23),
+    inset 0 0 0 7px
+    rgba(255, 255, 255, 0.82);
+}
+
+.queue-completed-panel
+  .queue-number-circle {
+  border-color: #22c55e;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #ecfdf5
+    );
+
+  box-shadow:
+    0 20px 42px
+    rgba(22, 163, 74, 0.22),
+    inset 0 0 0 7px
+    rgba(255, 255, 255, 0.82);
 }
 
 .queue-number-circle span {
-  max-width: 100%;
+  display: block;
 
-  overflow: hidden;
+  color: var(--queue-slate);
 
-  font-size: clamp(
-    90px,
-    10vw,
-    150px
-  );
+  font-size:
+    clamp(58px, 6vw, 88px);
 
-  font-weight: 950;
-
+  font-weight: 900;
   line-height: 1;
 
-  letter-spacing: -6px;
+  letter-spacing: -0.06em;
 
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-variant-numeric:
+    tabular-nums;
 }
 
-/* --------------------------------------------------------
-   Status pill
--------------------------------------------------------- */
+.queue-treatment-panel
+  .queue-number-circle span {
+  color: #0958d9;
+}
+
+.queue-ready-panel
+  .queue-number-circle span {
+  color: #b45309;
+}
+
+.queue-completed-panel
+  .queue-number-circle span {
+  color: #15803d;
+}
 
 .queue-number-status {
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  min-height: 42px;
+  min-height: 34px;
 
-  padding: 8px 27px;
+  padding: 7px 15px;
 
-  font-size: clamp(
-    16px,
-    1.3vw,
-    22px
-  );
-
-  font-weight: 950;
-
-  line-height: 1.15;
-
-  letter-spacing: 1.2px;
-
+  border: 1px solid;
   border-radius: 999px;
+
+  font-size:
+    clamp(10px, 1vw, 13px);
+
+  font-weight: 850;
+
+  letter-spacing: 0.08em;
 }
 
 .queue-treatment-panel
   .queue-number-status {
-  color: var(--queue-blue-dark);
-
-  background:
-    var(--queue-blue-soft);
+  border-color: #bfdbfe;
+  background: #dbeafe;
+  color: #0756b3;
 }
 
 .queue-ready-panel
   .queue-number-status {
-  color: var(--queue-green-dark);
+  border-color: #fde68a;
+  background: #fef3c7;
+  color: #a16207;
+}
 
-  background:
-    var(--queue-green-soft);
+.queue-completed-panel
+  .queue-number-status {
+  border-color: #bbf7d0;
+  background: #dcfce7;
+  color: #15803d;
 }
 
 .queue-number-message.ant-typography {
-  display: block;
+  max-width: 310px;
 
-  margin-top: 18px;
+  margin-top: 12px;
 
-  color: var(--queue-secondary);
+  color: #64748b;
 
-  font-size: clamp(
-    15px,
-    1.15vw,
-    18px
-  );
+  font-size:
+    clamp(12px, 1.05vw, 15px);
 
-  font-weight: 500;
-
-  line-height: 1.45;
+  line-height: 1.55;
 }
 
-/* --------------------------------------------------------
-   Empty patient state
--------------------------------------------------------- */
+/* ========================================================
+   Empty card state
+======================================================== */
+
+.queue-patient-panel-empty {
+  border-style: dashed;
+
+  box-shadow:
+    0 14px 32px
+    rgba(15, 23, 42, 0.07);
+}
 
 .queue-panel-empty-content {
+  width: 100%;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
 
-  width: 100%;
-  max-width: 520px;
+  padding: 20px;
 
   text-align: center;
 }
 
 .queue-panel-empty-icon {
+  width: 82px;
+  height: 82px;
+
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 106px;
-  height: 106px;
-
-  margin-bottom: 25px;
-
-  font-size: 51px;
+  margin-bottom: 18px;
 
   border-radius: 50%;
-}
 
-.queue-treatment-panel
-  .queue-panel-empty-icon {
-  color: var(--queue-blue);
+  background: #eef6ff;
 
-  background: #e1f2ff;
+  color: #60a5fa;
+
+  font-size: 36px;
 }
 
 .queue-ready-panel
   .queue-panel-empty-icon {
-  color: var(--queue-green);
+  background: #fffbeb;
+  color: #f59e0b;
+}
 
-  background: #def8ee;
+.queue-completed-panel
+  .queue-panel-empty-icon {
+  background: #ecfdf5;
+  color: #22c55e;
 }
 
 .queue-panel-empty-title.ant-typography {
-  display: block;
+  color: #1e293b;
 
-  color: #25282c;
-
-  font-size: clamp(
-    21px,
-    1.8vw,
-    28px
-  );
-
+  font-size: 19px;
   font-weight: 800;
-
-  line-height: 1.3;
 }
 
 .queue-panel-empty-description.ant-typography {
-  display: block;
+  max-width: 300px;
 
-  margin-top: 13px;
+  margin-top: 7px;
 
-  color: var(--queue-secondary);
+  color: #64748b;
 
-  font-size: clamp(
-    15px,
-    1.15vw,
-    18px
-  );
-
-  font-weight: 500;
-
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.55;
 }
 
 /* ========================================================
-   Bottom scrolling queue
+   Bottom ticker
 ======================================================== */
 
 .queue-bottom-scroller {
-  position: relative;
-  z-index: 2;
-
-  width: 100%;
-
-  overflow: hidden;
-
-  background:
-    rgba(255, 255, 255, 0.98);
-
-  border: 1px solid
-    var(--queue-border);
-  border-radius: 22px;
-
-  box-shadow:
-    0 13px 35px
-      rgba(29, 77, 110, 0.08);
-}
-
-/* --------------------------------------------------------
-   Scroller heading
--------------------------------------------------------- */
-
-.queue-scroller-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-
-  min-height: 72px;
-
-  padding: 14px 20px;
-
-  background:
-    linear-gradient(
-      90deg,
-      #f5faff,
-      #f4fcf9
-    );
-
-  border-bottom: 1px solid
-    var(--queue-border);
-}
-
-.queue-scroller-heading {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  min-width: 0;
-}
-
-.queue-scroller-heading-icon {
-  display: flex;
   flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
 
-  width: 43px;
-  height: 43px;
-
-  color: #ffffff;
-
-  font-size: 20px;
-
-  background:
-    linear-gradient(
-      145deg,
-      #118cff,
-      #006bdd
-    );
-
-  border-radius: 13px;
+  padding: 0 0 18px;
 }
-
-.queue-scroller-title.ant-typography {
-  display: block;
-
-  color: var(--queue-heading);
-
-  font-size: 16px;
-  font-weight: 900;
-
-  line-height: 1.2;
-
-  letter-spacing: 1.4px;
-}
-
-.queue-scroller-description.ant-typography {
-  display: block;
-
-  margin-top: 3px;
-
-  color: var(--queue-secondary);
-
-  font-size: 14px;
-  font-weight: 500;
-
-  line-height: 1.3;
-}
-
-.queue-scroller-count {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: baseline;
-  gap: 6px;
-
-  padding: 8px 14px;
-
-  color: var(--queue-blue-dark);
-
-  background:
-    var(--queue-blue-soft);
-
-  border: 1px solid
-    var(--queue-blue-border);
-  border-radius: 999px;
-}
-
-.queue-scroller-count strong {
-  font-size: 19px;
-  font-weight: 950;
-}
-
-.queue-scroller-count span {
-  font-size: 14px;
-  font-weight: 700;
-}
-
-/* --------------------------------------------------------
-   Scroller viewport
--------------------------------------------------------- */
 
 .queue-scroller-viewport {
   width: 100%;
-  min-height: 112px;
 
   overflow: hidden;
+
+  padding: 14px 0;
+
+  border-top:
+    1px solid
+    rgba(148, 163, 184, 0.22);
+
+  border-bottom:
+    1px solid
+    rgba(148, 163, 184, 0.22);
+
+  background:
+    rgba(255, 255, 255, 0.88);
+
+  box-shadow:
+    0 -8px 28px
+    rgba(15, 23, 42, 0.06);
+
+  backdrop-filter: blur(14px);
 }
 
 .queue-scroller-track {
-  display: flex;
-  align-items: stretch;
-
   width: max-content;
-  min-width: 100%;
-  min-height: 112px;
+
+  display: flex;
 
   animation:
-    queueScrollerMovement
-    var(--queue-scroll-duration, 3s)
+    queue-horizontal-scroll
+    var(
+      --queue-scroll-duration,
+      30s
+    )
     linear infinite;
 
   will-change: transform;
 }
 
-.queue-scroller-track:hover {
-  animation-play-state: paused;
-}
-
 .queue-scroller-set {
   display: flex;
-  flex: 0 0 auto;
+  align-items: stretch;
+
+  gap: 15px;
+
+  padding-right: 15px;
+}
+
+.queue-scroller-item {
+  position: relative;
+
+  min-width: 118px;
+  min-height: 92px;
+
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 14px;
+  justify-content: center;
 
-  min-width: max-content;
+  gap: 5px;
 
-  padding: 14px 7px;
+  padding: 12px 14px;
+
+  overflow: hidden;
+
+  border:
+    2px solid #dbe7f3;
+
+  border-radius: 20px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 8px 22px
+    rgba(15, 23, 42, 0.08);
 }
 
-.queue-scroller-set:first-child {
-  padding-left: 14px;
+.queue-scroller-status.ant-typography {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 0.06em;
+
+  text-transform: uppercase;
 }
 
-.queue-scroller-set:last-child {
-  padding-right: 14px;
+.queue-scroller-status
+  .anticon {
+  font-size: 12px;
 }
 
-@keyframes queueScrollerMovement {
+.queue-scroller-number {
+  color: #0f172a;
+
+  font-size: 34px;
+  font-weight: 900;
+  line-height: 1;
+
+  font-variant-numeric:
+    tabular-nums;
+}
+
+/* ========================================================
+   Ticker status colors
+======================================================== */
+
+.queue-scroller-item-pending {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.queue-scroller-item-pending
+  .queue-scroller-status {
+  color: #64748b;
+}
+
+.queue-scroller-item-checked-in {
+  border-color: #7dd3fc;
+  background: #f0f9ff;
+}
+
+.queue-scroller-item-checked-in
+  .queue-scroller-status {
+  color: #0369a1;
+}
+
+.queue-scroller-item-in-treatment {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.queue-scroller-item-in-treatment
+  .queue-scroller-status {
+  color: #1d4ed8;
+}
+
+.queue-scroller-item-treatment-done {
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.queue-scroller-item-treatment-done
+  .queue-scroller-status {
+  color: #15803d;
+}
+
+.queue-scroller-item-cancelled {
+  border-color: #fda4af;
+  background: #fff1f2;
+}
+
+.queue-scroller-item-cancelled
+  .queue-scroller-status {
+  color: #be123c;
+}
+
+/* ========================================================
+   Highlighted ticker items
+======================================================== */
+
+.queue-scroller-item-highlighted {
+  min-width: 142px;
+
+  padding-top: 28px;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 28px
+    rgba(15, 23, 42, 0.16);
+}
+
+.queue-scroller-item-current-treatment {
+  border-color: #1677ff;
+
+  background:
+    linear-gradient(
+      145deg,
+      #eff6ff,
+      #dbeafe
+    );
+}
+
+.queue-scroller-item-ready-patient {
+  border-color: #f59e0b;
+
+  background:
+    linear-gradient(
+      145deg,
+      #fffbeb,
+      #fef3c7
+    );
+}
+
+.queue-scroller-highlight-badge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  min-height: 23px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 4px 7px;
+
+  color: #ffffff;
+
+  font-size: 9px;
+  font-weight: 900;
+
+  letter-spacing: 0.08em;
+}
+
+.queue-scroller-treatment-badge {
+  background:
+    linear-gradient(
+      90deg,
+      #0958d9,
+      #1677ff
+    );
+}
+
+.queue-scroller-ready-badge {
+  background:
+    linear-gradient(
+      90deg,
+      #b45309,
+      #f59e0b
+    );
+}
+
+.queue-scroller-item-current-treatment
+  .queue-scroller-number {
+  color: #0958d9;
+}
+
+.queue-scroller-item-ready-patient
+  .queue-scroller-number {
+  color: #b45309;
+}
+
+/* ========================================================
+   Empty ticker
+======================================================== */
+
+.queue-scroller-empty {
+  min-height: 82px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  color: #64748b;
+}
+
+.queue-scroller-empty
+  .anticon {
+  font-size: 22px;
+}
+
+.queue-scroller-empty
+  .ant-typography {
+  color: #64748b;
+
+  font-size: 15px;
+  font-weight: 650;
+}
+
+/* ========================================================
+   Animations
+======================================================== */
+
+@keyframes queue-live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.68;
+    transform: scale(0.84);
+  }
+}
+
+@keyframes queue-horizontal-scroll {
   from {
     transform: translateX(0);
   }
@@ -1129,974 +1112,333 @@
   }
 }
 
-
-
-
-/* --------------------------------------------------------
-   Empty scroller
--------------------------------------------------------- */
-
-.queue-scroller-empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 11px;
-
-  width: 100%;
-  min-height: 112px;
-
-  padding: 20px;
-
-  color: var(--queue-secondary);
-}
-
-.queue-scroller-empty
-  > .anticon {
-  font-size: 22px;
-}
-
-.queue-scroller-empty
-  .ant-typography {
-  color: inherit;
-
-  font-size: 17px;
-  font-weight: 700;
-}
-
 /* ========================================================
-   Embedded mode adjustments
+   Large screens
 ======================================================== */
 
-.queue-display-page-embedded
+@media (min-width: 1600px) {
   .queue-display-header {
-  min-height: 130px;
+    min-height: 148px;
 
-  padding: 20px 23px;
+    padding:
+      28px 54px;
+  }
 
-  border-radius: 20px;
-}
-
-.queue-display-page-embedded
-  .queue-display-brand-icon {
-  width: 60px;
-  height: 60px;
-
-  font-size: 28px;
-
-  border-radius: 18px;
-}
-
-.queue-display-page-embedded
-  .queue-display-eyebrow.ant-typography {
-  font-size: 13px;
-}
-
-.queue-display-page-embedded
-  .queue-display-title.ant-typography {
-  font-size: clamp(
-    30px,
-    2.5vw,
-    42px
-  );
-}
-
-.queue-display-page-embedded
-  .queue-display-subtitle.ant-typography {
-  font-size: 16px;
-}
-
-.queue-display-page-embedded
-  .queue-display-time {
-  font-size: clamp(
-    29px,
-    2.7vw,
-    39px
-  );
-}
-
-.queue-display-page-embedded
   .queue-display-main {
-  min-height: 470px;
-}
+    gap: 28px;
 
-.queue-display-page-embedded
+    padding:
+      32px 46px 28px;
+  }
+
   .queue-patient-panel {
-  min-height: 470px;
+    min-height: 440px;
+  }
 
-  border-radius: 22px;
-}
-
-.queue-display-page-embedded
   .queue-patient-panel-header {
-  min-height: 125px;
+    min-height: 108px;
 
-  padding: 21px 25px;
-}
+    padding: 22px 26px;
+  }
 
-.queue-display-page-embedded
   .queue-panel-icon {
-  width: 50px;
-  height: 50px;
+    width: 66px;
+    height: 66px;
 
-  font-size: 23px;
+    flex-basis: 66px;
 
-  border-radius: 15px;
-}
+    font-size: 31px;
+  }
 
-.queue-display-page-embedded
-  .queue-panel-title.ant-typography,
-.queue-display-page-embedded
-  .queue-panel-subtitle.ant-typography {
-  font-size: clamp(
-    23px,
-    2vw,
-    32px
-  );
-}
-
-.queue-display-page-embedded
   .queue-patient-panel-body {
-  min-height: 340px;
+    padding: 28px;
+  }
 
-  padding: 25px;
+  .queue-scroller-item {
+    min-width: 132px;
+    min-height: 100px;
+  }
 }
 
-.queue-display-page-embedded
+/* ========================================================
+   Medium screens
+======================================================== */
+
+@media (max-width: 1200px) {
+  .queue-display-header {
+    padding: 22px 28px;
+  }
+
+  .queue-display-main {
+    gap: 16px;
+
+    padding:
+      20px 22px;
+  }
+
+  .queue-patient-panel {
+    min-height: 360px;
+  }
+
+  .queue-patient-panel-header {
+    min-height: 86px;
+
+    padding: 16px 17px;
+  }
+
+  .queue-panel-icon {
+    width: 50px;
+    height: 50px;
+
+    flex-basis: 50px;
+
+    border-radius: 15px;
+
+    font-size: 23px;
+  }
+
+  .queue-patient-panel-body {
+    padding: 18px 15px;
+  }
+
   .queue-number-circle {
-  width: clamp(
-    180px,
-    15vw,
-    230px
-  );
-
-  height: clamp(
-    180px,
-    15vw,
-    230px
-  );
+    width: 132px;
+    height: 132px;
+  }
 }
-
-.queue-display-page-embedded
-  .queue-number-circle span {
-  font-size: clamp(
-    80px,
-    8vw,
-    125px
-  );
-}
-
 /* ========================================================
-   Large desktop screens
+   Waiting ticker item
 ======================================================== */
 
-@media (min-width: 1700px) {
-  .queue-display-page-fullscreen {
-    gap: 23px;
-
-    padding: 20px;
-  }
-
-  .queue-display-header {
-    min-height: 168px;
-
-    padding: 28px 34px;
-  }
-
-  .queue-display-brand-icon {
-    width: 78px;
-    height: 78px;
-
-    font-size: 37px;
-  }
-
-  .queue-display-main {
-    min-height: 555px;
-  }
-
-  .queue-patient-panel {
-    min-height: 555px;
-  }
-
-  .queue-patient-panel-header {
-    min-height: 155px;
-  }
+.queue-scroller-item-waiting {
+  border-color: #ef4444;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(239, 68, 68, 0.22),
+      transparent 42%
+    ),
+    linear-gradient(
+      145deg,
+      #fff1f2,
+      #ffffff
+    );
+  box-shadow:
+    0 10px 24px rgba(239, 68, 68, 0.18),
+    inset 4px 0 0 #ef4444;
 }
 
-/* ========================================================
-   Medium desktop and laptop
-======================================================== */
-
-@media (max-width: 1250px) {
-  .queue-display-header {
-    gap: 20px;
-  }
-
-  .queue-display-title.ant-typography {
-    font-size: clamp(
-      32px,
-      3vw,
-      43px
-    );
-  }
-
-  .queue-display-main {
-    min-height: 490px;
-  }
-
-  .queue-patient-panel {
-    min-height: 490px;
-  }
-
-  .queue-patient-panel-header {
-    min-height: 130px;
-  }
-
-  .queue-panel-title.ant-typography,
-  .queue-panel-subtitle.ant-typography {
-    font-size: clamp(
-      24px,
-      2.4vw,
-      33px
-    );
-  }
+.queue-scroller-item-waiting
+  .queue-scroller-number {
+  
+  color: #d80808;
+  box-shadow: 0 8px 18px rgba(239, 68, 68, 0.28);
 }
 
+.queue-scroller-waiting-content {
+  display: flex;
+  min-width: 100px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+}
+
+.queue-scroller-waiting-status {
+  color: #dc2626 !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.05em;
+}
+
+.queue-scroller-waiting-time {
+  color: #991b1b !important;
+  font-size: 10px;
+  font-weight: 750;
+  white-space: nowrap;
+}
 /* ========================================================
    Tablet
 ======================================================== */
 
-@media (max-width: 991px) {
+@media (max-width: 980px) {
+  .queue-display-page {
+    overflow-y: auto;
+  }
+
   .queue-display-page-fullscreen {
-    padding: 14px;
+    position: fixed;
+
+    overflow-y: auto;
   }
 
   .queue-display-header {
     align-items: flex-start;
-    flex-direction: column;
 
-    min-height: auto;
-
-    padding: 22px;
+    padding: 20px 22px;
   }
 
-  .queue-display-brand {
-    width: 100%;
+  .queue-display-brand-icon {
+    width: 62px;
+    height: 62px;
+
+    flex-basis: 62px;
+
+    border-radius: 19px;
+
+    font-size: 30px;
+  }
+
+  .queue-display-main {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .queue-completed-panel {
+    grid-column: 1 / -1;
+  }
+
+  .queue-completed-panel
+    .queue-patient-panel-body {
+    min-height: 280px;
+  }
+}
+
+/* ========================================================
+   Mobile
+======================================================== */
+
+@media (max-width: 700px) {
+  .queue-display-header {
+    flex-direction: column;
+
+    gap: 17px;
   }
 
   .queue-display-date-time {
-    display: grid;
-    grid-template-columns:
-      1fr auto;
-    align-items: center;
-
     width: 100%;
+
+    align-items: flex-start;
+
+    text-align: left;
   }
 
   .queue-display-date {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .queue-display-time {
-    grid-column: 1;
-    grid-row: 2;
-
-    font-size: 34px;
+    justify-content: flex-start;
   }
 
   .queue-display-live-status {
-    grid-column: 2;
-    grid-row:
-      1 / span 2;
-
-    margin-top: 0;
+    align-self: flex-start;
   }
 
   .queue-display-main {
     grid-template-columns: 1fr;
 
-    min-height: auto;
+    padding: 16px;
   }
 
-  .queue-patient-panel,
-  .queue-display-page-embedded
-    .queue-patient-panel {
-    min-height: 500px;
+  .queue-completed-panel {
+    grid-column: auto;
   }
 
-  .queue-patient-panel-header {
-    min-height: 132px;
+  .queue-patient-panel {
+    min-height: 365px;
   }
 
-  .queue-scroller-header {
-    align-items: flex-start;
+  .queue-bottom-scroller {
+    padding-bottom: 10px;
   }
 
-  .queue-scroller-description.ant-typography {
-    display: none;
-  }
-}
-
-/* --------------------------------------------------------
-   Individual scrolling appointment
--------------------------------------------------------- */
-
-.queue-scroller-item {
-  display: flex;
-  flex: 0 0 auto;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-
-  min-width: 185px;
-  min-height: 92px;
-
-  padding: 12px 22px;
-
-  text-align: center;
-
-  border: 1px solid transparent;
-  border-radius: 17px;
-
-  box-shadow:
-    0 6px 16px
-      rgba(15, 23, 42, 0.06);
-}
-
-/* --------------------------------------------------------
-   Status
--------------------------------------------------------- */
-
-.queue-scroller-status.ant-typography {
-  display: block;
-
-  margin: 0;
-
-  color: inherit;
-
-  font-size: 15px;
-  font-weight: 900;
-  line-height: 1.2;
-
-  letter-spacing: 1px;
-  text-transform: uppercase;
-
-  white-space: nowrap;
-}
-
-/* --------------------------------------------------------
-   Appointment number
--------------------------------------------------------- */
-
-.queue-scroller-number {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  min-width: 70px;
-
-  color: inherit;
-
-  font-size: 42px;
-  font-weight: 950;
-  line-height: 1;
-
-  letter-spacing: -1.5px;
-
-  white-space: nowrap;
-}
-
-/* --------------------------------------------------------
-   Pending
--------------------------------------------------------- */
-
-.queue-scroller-item-pending {
-  color: var(--queue-pending);
-
-  background:
-    var(--queue-pending-soft);
-
-  border-color:
-    var(--queue-pending-border);
-}
-
-/* --------------------------------------------------------
-   Checked in
--------------------------------------------------------- */
-
-.queue-scroller-item-checked-in {
-  color: var(--queue-checked-in);
-
-  background:
-    var(--queue-checked-in-soft);
-
-  border-color:
-    var(--queue-checked-in-border);
-}
-
-/* --------------------------------------------------------
-   In treatment
--------------------------------------------------------- */
-
-.queue-scroller-item-in-treatment {
-  color: var(--queue-treatment);
-
-  background:
-    var(--queue-treatment-soft);
-
-  border-color:
-    var(--queue-treatment-border);
-}
-
-/* --------------------------------------------------------
-   Treatment done
--------------------------------------------------------- */
-
-.queue-scroller-item-treatment-done {
-  color: var(--queue-completed);
-
-  background:
-    var(--queue-completed-soft);
-
-  border-color:
-    var(--queue-completed-border);
-}
-
-/* --------------------------------------------------------
-   Cancelled
--------------------------------------------------------- */
-
-.queue-scroller-item-cancelled {
-  color: var(--queue-cancelled);
-
-  background:
-    var(--queue-cancelled-soft);
-
-  border-color:
-    var(--queue-cancelled-border);
-}
-
-/* --------------------------------------------------------
-   Embedded clinic mode
--------------------------------------------------------- */
-
-.queue-display-page-embedded
   .queue-scroller-item {
-  min-width: 170px;
-  min-height: 86px;
-
-  padding: 11px 18px;
-}
-
-.queue-display-page-embedded
-  .queue-scroller-status.ant-typography {
-  font-size: 14px;
-}
-
-.queue-display-page-embedded
-  .queue-scroller-number {
-  font-size: 38px;
-}
-
-/* --------------------------------------------------------
-   Mobile
--------------------------------------------------------- */
-
-@media (max-width: 767px) {
-  .queue-scroller-item {
-    min-width: 155px;
-    min-height: 82px;
-
-    gap: 6px;
-
-    padding: 10px 15px;
-
-    border-radius: 15px;
+    min-width: 105px;
   }
 
-  .queue-scroller-status.ant-typography {
-    font-size: 13px;
-
-    letter-spacing: 0.7px;
-  }
-
-  .queue-scroller-number {
-    font-size: 35px;
-  }
-
-  .queue-display-page-embedded
-    .queue-scroller-item {
-    min-width: 150px;
-    min-height: 80px;
-  }
-
-  .queue-display-page-embedded
-    .queue-scroller-number {
-    font-size: 34px;
+  .queue-scroller-item-highlighted {
+    min-width: 130px;
   }
 }
 
 /* ========================================================
-   Very small screens
+   Very small mobile
 ======================================================== */
 
-@media (max-width: 420px) {
-  .queue-display-header,
-  .queue-display-page-embedded
-    .queue-display-header {
-    padding: 14px;
+@media (max-width: 430px) {
+  .queue-display-header {
+    padding: 17px 15px;
   }
 
-  .queue-display-title.ant-typography,
-  .queue-display-page-embedded
-    .queue-display-title.ant-typography {
-    font-size: 23px;
+  .queue-display-brand {
+    gap: 12px;
+  }
+
+  .queue-display-brand-icon {
+    width: 52px;
+    height: 52px;
+
+    flex-basis: 52px;
+
+    border-radius: 16px;
+
+    font-size: 25px;
+  }
+
+  .queue-display-eyebrow.ant-typography {
+    font-size: 10px;
+  }
+
+  .queue-display-title.ant-typography {
+    font-size: 25px;
   }
 
   .queue-display-subtitle.ant-typography {
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .queue-display-time {
-    font-size: 28px;
+    font-size: 32px;
   }
 
-  .queue-panel-title.ant-typography {
-    font-size: 19px;
+  .queue-display-main {
+    padding: 12px;
+
+    gap: 13px;
   }
 
-  .queue-panel-subtitle.ant-typography {
-    font-size: 21px;
+  .queue-patient-panel {
+    min-height: 345px;
+
+    border-radius: 21px;
   }
 
-  .queue-number-circle,
-  .queue-display-page-embedded
-    .queue-number-circle {
-    width: 170px;
-    height: 170px;
-  }
-
-  .queue-number-circle span,
-  .queue-display-page-embedded
-    .queue-number-circle span {
-    font-size: 80px;
-  }
-}
-
-/* ========================================================
-   Accessibility: reduced motion
-======================================================== */
-
-@media (
-  prefers-reduced-motion:
-    reduce
-) {
-  .queue-display-live-dot::after {
-    display: none;
-  }
-
-  .queue-scroller-track {
-    width: 100%;
-
-    overflow-x: auto;
-
-    animation: none;
-  }
-
-  .queue-scroller-set[aria-hidden="true"] {
-    display: none;
-  }
-}
-
-/* ========================================================
-   Print mode
-======================================================== */
-
-@media print {
-  .queue-display-page {
-    min-height: auto;
-
-    padding: 0;
-
-    background: #ffffff;
-  }
-
-  .queue-display-header,
-  .queue-patient-panel,
-  .queue-bottom-scroller {
-    box-shadow: none;
-  }
-
-  .queue-scroller-track {
-    animation: none;
-  }
-
-  .queue-scroller-set[aria-hidden="true"] {
-    display: none;
-  }
-}
-
-/* ========================================================
-   Highlight both important queue appointments
-======================================================== */
-
-.queue-scroller-item {
-  position: relative;
-}
-
-/* --------------------------------------------------------
-   Shared highlighted style
--------------------------------------------------------- */
-
-.queue-scroller-item-highlighted {
-  z-index: 3;
-
-  border-width: 3px;
-
-  transform: scale(1.05);
-
-  animation:
-    queueScrollerHighlightPulse
-    1.8s ease-in-out infinite;
-}
-
-.queue-scroller-item-highlighted
-  .queue-scroller-number {
-  font-size: 48px;
-}
-
-.queue-scroller-item-highlighted
-  .queue-scroller-status.ant-typography {
-  font-weight: 950;
-}
-
-/* --------------------------------------------------------
-   Current treatment highlight
--------------------------------------------------------- */
-
-.queue-scroller-item-current-treatment {
-  border-color: #087df5;
-
-  box-shadow:
-    0 0 0 5px
-      rgba(255, 255, 255, 0.94),
-    0 0 0 10px
-      rgba(8, 125, 245, 0.22),
-    0 14px 32px
-      rgba(8, 125, 245, 0.3);
-}
-
-/* --------------------------------------------------------
-   Ready patient highlight
--------------------------------------------------------- */
-
-.queue-scroller-item-ready-patient {
-  border-color: #00aa76;
-
-  box-shadow:
-    0 0 0 5px
-      rgba(255, 255, 255, 0.94),
-    0 0 0 10px
-      rgba(0, 170, 118, 0.22),
-    0 14px 32px
-      rgba(0, 135, 94, 0.3);
-}
-
-/* --------------------------------------------------------
-   Highlight badges
--------------------------------------------------------- */
-
-.queue-scroller-highlight-badge {
-  position: absolute;
-  top: -13px;
-  left: 50%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  min-height: 25px;
-  padding: 4px 12px;
-
-  color: #ffffff;
-
-  font-size: 10px;
-  font-weight: 950;
-  line-height: 1;
-
-  letter-spacing: 1px;
-
-  white-space: nowrap;
-
-  border: 2px solid #ffffff;
-  border-radius: 999px;
-
-  transform: translateX(-50%);
-}
-
-.queue-scroller-treatment-badge {
-  background:
-    linear-gradient(
-      135deg,
-      #118cff,
-      #006bdd
-    );
-
-  box-shadow:
-    0 5px 14px
-      rgba(8, 125, 245, 0.32);
-}
-
-.queue-scroller-ready-badge {
-  background:
-    linear-gradient(
-      135deg,
-      #00b67d,
-      #00875e
-    );
-
-  box-shadow:
-    0 5px 14px
-      rgba(0, 135, 94, 0.32);
-}
-
-/* --------------------------------------------------------
-   Pulse animation
--------------------------------------------------------- */
-
-@keyframes queueScrollerHighlightPulse {
-  0%,
-  100% {
-    transform: scale(1.04);
-  }
-
-  50% {
-    transform: scale(1.08);
-  }
-}
-
-/* --------------------------------------------------------
-   Mobile
--------------------------------------------------------- */
-
-@media (max-width: 767px) {
-  .queue-scroller-item-highlighted {
-    transform: scale(1.03);
-  }
-
-  .queue-scroller-item-highlighted
-    .queue-scroller-number {
-    font-size: 40px;
-  }
-
-  .queue-scroller-highlight-badge {
-    top: -11px;
-
-    min-height: 21px;
-    padding: 3px 9px;
-
-    font-size: 8px;
-  }
-
-  @keyframes queueScrollerHighlightPulse {
-    0%,
-    100% {
-      transform: scale(1.02);
-    }
-
-    50% {
-      transform: scale(1.05);
-    }
-  }
-}
-/* ========================================================
-   Next Patient — Orange Theme
-   Add this at the bottom of QueueDisplay.css
-======================================================== */
-
-.queue-display-page {
-  --queue-ready: #f59e0b;
-  --queue-ready-dark: #b45309;
-  --queue-ready-deep: #92400e;
-  --queue-ready-soft: #fff7e6;
-  --queue-ready-soft-light: #fffaf2;
-  --queue-ready-border: #ffd591;
-}
-
-/* --------------------------------------------------------
-   Next patient panel border
--------------------------------------------------------- */
-
-.queue-ready-panel {
-  border-color:
-    var(--queue-ready-border);
-}
-
-/* --------------------------------------------------------
-   Next patient panel header
--------------------------------------------------------- */
-
-.queue-ready-panel
-  .queue-patient-panel-header {
-  background:
-    linear-gradient(
-      180deg,
-      #fff1d6 0%,
-      #fffaf0 100%
-    );
-
-  border-bottom-color:
-    var(--queue-ready-border);
-}
-
-/* --------------------------------------------------------
-   Next patient header icon
--------------------------------------------------------- */
-
-.queue-ready-panel
-  .queue-panel-icon {
-  background:
-    linear-gradient(
-      145deg,
-      #ffb020,
-      #f28c00
-    );
-
-  box-shadow:
-    0 10px 20px
-      rgba(245, 158, 11, 0.28);
-}
-
-/* --------------------------------------------------------
-   Next patient queue number outer circle
--------------------------------------------------------- */
-
-.queue-ready-panel
-  .queue-number-circle-wrapper {
-  background:
-    rgba(245, 158, 11, 0.12);
-
-  box-shadow:
-    0 0 0 12px
-      rgba(245, 158, 11, 0.07);
-}
-
-/* --------------------------------------------------------
-   Next patient queue number circle
--------------------------------------------------------- */
-
-.queue-ready-panel
   .queue-number-circle {
-  background:
-    linear-gradient(
-      145deg,
-      #ffb020,
-      #ef8700
-    );
+    width: 128px;
+    height: 128px;
 
-  box-shadow:
-    0 20px 42px
-      rgba(180, 83, 9, 0.22);
+    border-width: 7px;
+  }
+
+  .queue-number-circle span {
+    font-size: 58px;
+  }
 }
 
-/* --------------------------------------------------------
-   Please be ready status pill
--------------------------------------------------------- */
-
-.queue-ready-panel
-  .queue-number-status {
-  color:
-    var(--queue-ready-deep);
-
-  background:
-    var(--queue-ready-soft);
-
-  border: 1px solid
-    var(--queue-ready-border);
-}
-
-/* --------------------------------------------------------
-   Next patient empty-state icon
--------------------------------------------------------- */
-
-.queue-ready-panel
-  .queue-panel-empty-icon {
-  color:
-    var(--queue-ready-dark);
-
-  background:
-    var(--queue-ready-soft);
-}
-
-/* --------------------------------------------------------
-   Next patient highlighted scroller item
--------------------------------------------------------- */
-
-.queue-scroller-item-ready-patient {
-  color:
-    var(--queue-ready-dark);
-
-  background:
-    var(--queue-ready-soft);
-
-  border-color:
-    var(--queue-ready);
-
-  box-shadow:
-    0 0 0 5px
-      rgba(255, 255, 255, 0.94),
-    0 0 0 10px
-      rgba(245, 158, 11, 0.23),
-    0 14px 32px
-      rgba(180, 83, 9, 0.3);
-}
-
-/* --------------------------------------------------------
-   Next patient badge
--------------------------------------------------------- */
-
-.queue-scroller-ready-badge {
-  background:
-    linear-gradient(
-      135deg,
-      #ffb020,
-      #e98000
-    );
-
-  box-shadow:
-    0 5px 14px
-      rgba(180, 83, 9, 0.35);
-}
-
-/* --------------------------------------------------------
-   Extra emphasis for the next patient number
--------------------------------------------------------- */
-
-.queue-scroller-item-ready-patient
-  .queue-scroller-number {
-  color:
-    var(--queue-ready-deep);
-
-  text-shadow:
-    0 3px 10px
-      rgba(245, 158, 11, 0.18);
-}
-
-.queue-scroller-item-ready-patient
-  .queue-scroller-status.ant-typography {
-  color:
-    var(--queue-ready-dark);
-}
-/* --------------------------------------------------------
+/* ========================================================
    Reduced motion
--------------------------------------------------------- */
+======================================================== */
 
 @media (
   prefers-reduced-motion:
     reduce
 ) {
-  .queue-scroller-item-highlighted {
+  .queue-display-live-dot,
+  .queue-scroller-track {
     animation: none;
+  }
+
+  .queue-scroller-track {
+    transform: none;
+  }
+
+  .queue-scroller-viewport {
+    overflow-x: auto;
   }
 }

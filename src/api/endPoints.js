@@ -381,3 +381,187 @@ export const deleteCommonTreatment = (id) => {
 export const getCommonTreatmentStatistics = () => {
   return axiosInstance.get("/common-treatments/statistics");
 };
+
+
+/* ========================================================
+   Drugs
+======================================================== */
+
+/**
+ * Get all drugs.
+ *
+ * GET /drugs
+ *
+ * Optional params:
+ * {
+ *   search: "amoxicillin",
+ *   sort: "asc"
+ * }
+ */
+export const getDrugs = (params = {}) => {
+  return axiosInstance.get("/drugs", {
+    params,
+  });
+};
+
+/**
+ * Search drugs.
+ *
+ * GET /drugs/search?query=amoxicillin
+ */
+export const searchDrugs = (searchText = "") => {
+  return axiosInstance.get("/drugs/search", {
+    params: {
+      query: String(searchText ?? "").trim(),
+    },
+  });
+};
+
+/**
+ * Get one drug by ID.
+ *
+ * GET /drugs/:id
+ */
+export const getDrugById = (id) => {
+  return axiosInstance.get(
+    `/drugs/${encodeURIComponent(id)}`,
+  );
+};
+
+/**
+ * Create a new drug.
+ *
+ * POST /drugs
+ *
+ * Payload:
+ * {
+ *   name: "Amoxicillin 500 mg Capsule"
+ * }
+ */
+export const createDrug = (data) => {
+  return axiosInstance.post("/drugs", data);
+};
+
+/**
+ * Create multiple drugs.
+ *
+ * POST /drugs/bulk
+ *
+ * Payload:
+ * {
+ *   drugs: [
+ *     {
+ *       name: "Amoxicillin 500 mg Capsule"
+ *     },
+ *     {
+ *       name: "Paracetamol 500 mg Tablet"
+ *     }
+ *   ]
+ * }
+ */
+export const createDrugsBulk = (drugs) => {
+  return axiosInstance.post("/drugs/bulk", {
+    drugs,
+  });
+};
+
+/**
+ * Fully update a drug.
+ *
+ * PUT /drugs/:id
+ *
+ * Payload:
+ * {
+ *   name: "Amoxicillin 250 mg Capsule"
+ * }
+ */
+export const updateDrug = (id, data) => {
+  return axiosInstance.put(
+    `/drugs/${encodeURIComponent(id)}`,
+    data,
+  );
+};
+
+/**
+ * Partially update a drug.
+ *
+ * PATCH /drugs/:id
+ *
+ * Payload:
+ * {
+ *   name: "Amoxicillin 500 mg Capsule"
+ * }
+ */
+export const patchDrug = (id, data) => {
+  return axiosInstance.patch(
+    `/drugs/${encodeURIComponent(id)}`,
+    data,
+  );
+};
+
+/**
+ * Delete a drug.
+ *
+ * DELETE /drugs/:id
+ */
+export const deleteDrug = (id) => {
+  return axiosInstance.delete(
+    `/drugs/${encodeURIComponent(id)}`,
+  );
+};
+
+export const startAppointmentWaiting = (appointmentId) => {
+  return axiosInstance.post(
+    `/in-waiting/start/${encodeURIComponent(appointmentId)}`,
+  );
+};
+
+export const endAppointmentWaiting = (appointmentId) => {
+  return axiosInstance.patch(
+    `/in-waiting/end/${encodeURIComponent(appointmentId)}`,
+  );
+};
+
+export const getAllWaitingRecords = () => {
+  return axiosInstance.get("/in-waiting");
+};
+
+export const getActiveWaitingRecords = () => {
+  return axiosInstance.get("/in-waiting/active");
+};
+
+export const getWaitingByAppointmentId = (appointmentId) => {
+  return axiosInstance.get(
+    `/in-waiting/appointment/${encodeURIComponent(appointmentId)}`,
+  );
+};
+export const getLocations = () => {
+  return axiosInstance.get(
+    "/locations",
+  );
+};
+
+export const createLocation = (payload) => {
+  return axiosInstance.post(
+    "/locations",
+    payload,
+  );
+};
+
+export const updateLocation = (
+  locationId,
+  payload,
+) => {
+  return axiosInstance.put(
+    `/locations/${encodeURIComponent(locationId)}`,
+    payload,
+  );
+};
+
+export const deleteLocation = (
+  locationId,
+) => {
+  return axiosInstance.delete(
+    `/locations/${encodeURIComponent(locationId)}`,
+  );
+};

@@ -23,6 +23,9 @@ import UserRegistration from "./pages/UserRegistration";
 import QueueDisplay from "./pages/QueueDisplay";
 import PaymentDashboard from "./pages/PaymentDashboard";
 import CommonTreatments from "./pages/CommonTreatments";
+import Drugs from "./pages/Drugs";
+import SimpleAppointmentMaintenance from "./pages/SimpleAppointmentMaintenance";
+import Locations from "./pages/Locations";
 /* --------------------------------------------------------
    Layout wrapper
 -------------------------------------------------------- */
@@ -197,11 +200,51 @@ const App = () => {
         }
       />
       <Route
+        path="/simple-appointment-maintenance"
+        element={
+          <RoleRoute allowedRoles={["Admin"]}>
+            <LayoutPage>
+              <SimpleAppointmentMaintenance />
+            </LayoutPage>
+          </RoleRoute>
+        }
+      />
+      <Route
         path="/common-treatments"
         element={
           <RoleRoute allowedRoles={["Admin"]}>
             <LayoutPage>
               <CommonTreatments />
+            </LayoutPage>
+          </RoleRoute>
+        }
+      />
+      <Route
+        path="/drugs"
+        element={
+          <RoleRoute allowedRoles={["Admin"]}>
+            <LayoutPage>
+              <Drugs />
+            </LayoutPage>
+          </RoleRoute>
+        }
+      />
+  <Route
+        path="/locations"
+        element={
+          <RoleRoute allowedRoles={["Admin"]}>
+            <LayoutPage>
+              <Locations />
+            </LayoutPage>
+          </RoleRoute>
+        }
+      />
+      <Route
+        path="/drugs"
+        element={
+          <RoleRoute allowedRoles={["Admin"]}>
+            <LayoutPage>
+              <Drugs />
             </LayoutPage>
           </RoleRoute>
         }

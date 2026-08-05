@@ -1,230 +1,230 @@
-/* --------------------------------------------------------
-   Summary cards
--------------------------------------------------------- */
+/* ========================================================
+   Page summary
+======================================================== */
 
 .cashier-summary-row {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .cashier-summary-card {
-  position: relative;
   height: 100%;
   overflow: hidden;
-  border: 1px solid #edf1f7;
-  border-radius: 18px;
-  box-shadow:
-    0 8px 24px rgba(15, 23, 42, 0.05);
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+  border: 1px solid #e2e8f0;
+  border-radius: 17px;
+  background: #ffffff;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
 }
 
-.cashier-summary-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(
-    37,
-    99,
-    235,
-    0.22
-  );
-  box-shadow:
-    0 14px 30px rgba(15, 23, 42, 0.09);
-}
-
-.cashier-summary-card::before {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 5px;
-  height: 100%;
-  content: "";
-}
-
-.cashier-summary-card--blue::before {
-  background: #2563eb;
-}
-
-.cashier-summary-card--purple::before {
-  background: #7c3aed;
-}
-
-.cashier-summary-card--orange::before {
-  background: #f59e0b;
-}
-
-.cashier-summary-card--green::before {
-  background: #16a34a;
-}
-
-.cashier-summary-card
-  .ant-card-body {
-  padding: 20px;
+.cashier-summary-card .ant-card-body {
+  padding: 18px;
 }
 
 .cashier-summary-card__content {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 13px;
+  gap: 16px;
 }
 
 .cashier-summary-card__title {
   display: block;
-  margin-bottom: 7px;
   color: #64748b;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .cashier-summary-card__value {
-  color: #172033;
-  font-size: 27px;
-  font-weight: 750;
-  line-height: 1.2;
+  margin-top: 5px;
+  color: #0f172a;
+  font-size: 23px;
+  font-weight: 850;
 }
 
 .cashier-summary-card__helper {
   display: block;
-  margin-top: 5px;
+  margin-top: 3px;
   color: #94a3b8;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .cashier-summary-card__icon {
   display: flex;
-  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 47px;
-  height: 47px;
   border-radius: 14px;
   font-size: 21px;
 }
 
-.cashier-summary-card--blue
-  .cashier-summary-card__icon {
-  color: #2563eb;
-  background: #eff6ff;
+.cashier-summary-card--blue {
+  border-top: 4px solid #1677ff;
 }
 
-.cashier-summary-card--purple
-  .cashier-summary-card__icon {
+.cashier-summary-card--blue .cashier-summary-card__icon {
+  background: #e6f4ff;
+  color: #1677ff;
+}
+
+.cashier-summary-card--purple {
+  border-top: 4px solid #8b5cf6;
+}
+
+.cashier-summary-card--purple .cashier-summary-card__icon {
+  background: #f3e8ff;
   color: #7c3aed;
-  background: #f5f3ff;
 }
 
-.cashier-summary-card--orange
-  .cashier-summary-card__icon {
+.cashier-summary-card--orange {
+  border-top: 4px solid #f59e0b;
+}
+
+.cashier-summary-card--orange .cashier-summary-card__icon {
+  background: #fff7ed;
   color: #d97706;
-  background: #fffbeb;
 }
 
-.cashier-summary-card--green
-  .cashier-summary-card__icon {
+.cashier-summary-card--green {
+  border-top: 4px solid #22c55e;
+}
+
+.cashier-summary-card--green .cashier-summary-card__icon {
+  background: #ecfdf5;
   color: #16a34a;
-  background: #f0fdf4;
 }
 
-/* --------------------------------------------------------
-   Search card
--------------------------------------------------------- */
+/* ========================================================
+   Search section
+======================================================== */
 
 .cashier-search-card {
   margin-bottom: 18px;
-  border: 1px solid #e8edf5;
-  border-radius: 18px;
-  box-shadow:
-    0 8px 24px rgba(15, 23, 42, 0.045);
-}
-
-.cashier-search-card
-  > .ant-card-body {
-  padding: 21px;
+  border: 1px solid #e2e8f0;
+  border-radius: 17px;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
 }
 
 .cashier-search-card__header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 15px;
-  margin-bottom: 18px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
-.cashier-search-card__header
-  .ant-typography {
-  margin-top: 0;
-  margin-bottom: 2px;
+.cashier-search-card__header h4 {
+  margin: 0 0 3px !important;
 }
 
 .cashier-result-count {
-  margin-inline-end: 0;
-  padding: 4px 11px;
-  font-weight: 600;
+  margin: 0;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-weight: 700;
 }
 
 .cashier-search-toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 14px;
-  border: 1px solid #edf1f7;
-  border-radius: 14px;
-  background: #f8fafc;
+  gap: 12px;
 }
 
 .cashier-search-input {
-  width: 100%;
-  max-width: 540px;
+  min-width: 260px;
+  flex: 1;
+  border-radius: 11px;
 }
 
 .cashier-payment-filter {
-  flex: 0 0 auto;
+  flex-shrink: 0;
+  border-radius: 11px;
 }
 
-/* --------------------------------------------------------
-   Patient payment cards
--------------------------------------------------------- */
+.cashier-payment-filter .ant-segmented-item {
+  border-radius: 9px;
+}
+
+/* ========================================================
+   Payment patient card
+======================================================== */
 
 .cashier-patient-card {
   position: relative;
   height: 100%;
   overflow: hidden;
-  border: 1px solid #e5eaf2;
-  border-top: 4px solid #7c3aed;
-  border-radius: 17px;
-  box-shadow:
-    0 8px 24px rgba(15, 23, 42, 0.055);
+  border: 1px solid #dbe3ee;
+  border-radius: 19px;
+  outline: none;
+  cursor: pointer;
+  box-shadow: 0 7px 21px rgba(15, 23, 42, 0.06);
   transition:
     transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .cashier-patient-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-3px);
+  border-color: #93c5fd;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.11);
+}
+
+.cashier-patient-card:focus-visible {
+  border-color: #1677ff;
   box-shadow:
-    0 16px 34px rgba(15, 23, 42, 0.1);
+    0 0 0 3px rgba(22, 119, 255, 0.14),
+    0 14px 30px rgba(15, 23, 42, 0.11);
+}
+
+.cashier-patient-card .ant-card-body {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  padding: 17px;
+}
+
+.cashier-card-view-hint {
+  position: absolute;
+  top: 9px;
+  right: 11px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #94a3b8;
+  font-size: 9px;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.cashier-patient-card:hover .cashier-card-view-hint {
+  opacity: 1;
 }
 
 .cashier-patient-card--partial {
-  border-top-color: #f59e0b;
+  border-color: #fdba74;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(245, 158, 11, 0.1),
+      transparent 40%
+    ),
+    #ffffff;
 }
 
 .cashier-patient-card--allergy {
-  border-right-color: #fecaca;
-  border-bottom-color: #fecaca;
-  border-left-color: #fecaca;
-}
-
-.cashier-patient-card
-  .ant-card-body {
-  display: flex;
-  height: 100%;
-  min-height: 450px;
-  padding: 18px;
-  flex-direction: column;
+  border: 2px solid #ef4444;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(239, 68, 68, 0.12),
+      transparent 42%
+    ),
+    linear-gradient(145deg, #fff1f2, #ffffff);
+  box-shadow:
+    0 8px 22px rgba(239, 68, 68, 0.13),
+    inset 5px 0 0 #ef4444;
 }
 
 .cashier-patient-card__header {
@@ -232,7 +232,6 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 13px;
 }
 
 .cashier-patient-card__identity {
@@ -243,94 +242,82 @@
 }
 
 .cashier-patient-avatar {
-  flex: 0 0 auto;
-  color: #2563eb;
-  background:
-    linear-gradient(
-      135deg,
-      #eff6ff,
-      #dbeafe
-    );
+  flex-shrink: 0;
+  background: #e0f2fe;
+  color: #0284c7;
 }
 
 .cashier-patient-avatar--allergy {
+  background: #fee2e2;
   color: #dc2626;
-  background:
-    linear-gradient(
-      135deg,
-      #fef2f2,
-      #fee2e2
-    );
 }
 
 .cashier-patient-card__patient {
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 3px;
 }
 
-.cashier-patient-card__patient
-  > .ant-typography:first-child {
-  max-width: 145px;
-  font-size: 16px;
+.cashier-patient-card__patient .ant-typography:first-child {
+  max-width: 150px;
+  color: #0f172a;
 }
 
-.cashier-patient-card__patient
-  .ant-typography-secondary {
-  font-size: 12px;
+.cashier-patient-card__patient .ant-typography:last-child {
+  margin-top: 2px;
+  font-size: 11px;
 }
 
 .cashier-payment-state {
-  margin-inline-end: 0;
-  font-weight: 650;
+  flex-shrink: 0;
+  margin: 0;
+  border-radius: 999px;
+  font-weight: 700;
 }
 
 .cashier-patient-card__identifiers {
   display: flex;
-  align-items: flex-start;
-  margin-bottom: 14px;
   flex-direction: column;
   gap: 5px;
+  margin-top: 14px;
+  padding: 10px 11px;
+  border-radius: 11px;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 10px;
 }
 
-.cashier-patient-card__identifiers
-  span {
-  display: inline-flex;
+.cashier-patient-card__identifiers span {
+  display: flex;
   align-items: center;
-  max-width: 100%;
   gap: 6px;
   overflow: hidden;
-  color: #64748b;
-  font-size: 11px;
-  white-space: nowrap;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.cashier-allergy-alert {
-  margin-bottom: 14px;
+.cashier-allergy-alert,
+.cashier-not-ready-alert {
+  margin-top: 12px;
   border-radius: 11px;
 }
 
-.cashier-allergy-alert
-  .ant-alert-message {
-  font-size: 12px;
+.cashier-allergy-alert .ant-alert-message,
+.cashier-not-ready-alert .ant-alert-message {
+  font-size: 11px;
   font-weight: 700;
 }
 
-.cashier-allergy-alert
-  .ant-alert-description {
-  font-size: 11px;
+.cashier-allergy-alert .ant-alert-description,
+.cashier-not-ready-alert .ant-alert-description {
+  font-size: 10px;
 }
 
-/* --------------------------------------------------------
-   Payment values
--------------------------------------------------------- */
-
 .cashier-payment-values {
-  padding: 12px 0;
-  border-top: 1px solid #edf1f7;
-  border-bottom: 1px solid #edf1f7;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
 }
 
 .cashier-payment-value-row {
@@ -340,208 +327,356 @@
   gap: 10px;
 }
 
-.cashier-payment-value-row
-  + .cashier-payment-value-row {
-  margin-top: 8px;
+.cashier-payment-value-row .ant-typography {
+  font-size: 11px;
 }
 
 .cashier-paid-value {
-  color: #15803d;
-  font-weight: 700;
+  color: #16a34a;
+  font-weight: 750;
 }
 
-/* --------------------------------------------------------
-   Payment progress
--------------------------------------------------------- */
-
 .cashier-payment-progress {
-  margin-top: 14px;
+  margin-top: 13px;
 }
 
 .cashier-payment-progress__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
   margin-bottom: 5px;
 }
 
-.cashier-payment-progress__header
-  .ant-typography {
-  font-size: 12px;
+.cashier-payment-progress__header .ant-typography {
+  font-size: 10px;
 }
-
-/* --------------------------------------------------------
-   Amount due
--------------------------------------------------------- */
 
 .cashier-amount-due {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 15px 0;
+  margin-top: 14px;
   padding: 14px;
-  border: 1px solid #fed7aa;
-  border-radius: 13px;
-  background:
-    linear-gradient(
-      135deg,
-      #fffaf0,
-      #fff7e6
-    );
+  border: 1px solid #bfdbfe;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #eff6ff, #ffffff);
 }
 
 .cashier-amount-due__icon {
   display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
   width: 43px;
   height: 43px;
-  border-radius: 12px;
-  color: #d97706;
-  font-size: 19px;
-  background: #ffffff;
-}
-
-.cashier-amount-due
-  > div:last-child {
-  min-width: 0;
-}
-
-.cashier-amount-due
-  > div:last-child
-  > .ant-typography:first-child {
-  display: block;
-  color: #92400e;
-  font-size: 11px;
-  font-weight: 650;
-}
-
-.cashier-amount-due
-  h3.ant-typography {
-  margin: 1px 0 0;
-  color: #c2410c;
-  font-size: 21px;
-  font-weight: 750;
-}
-
-.cashier-not-ready-alert {
-  margin-bottom: 14px;
-  border-radius: 10px;
-}
-
-/* --------------------------------------------------------
-   Payment button
--------------------------------------------------------- */
-
-.cashier-pay-button {
-  min-height: 46px;
-  margin-top: auto;
-  border-color: #7c3aed;
-  border-radius: 11px;
-  font-weight: 700;
-  background:
-    linear-gradient(
-      135deg,
-      #7c3aed,
-      #6d28d9
-    );
-  box-shadow:
-    0 8px 18px rgba(124, 58, 237, 0.2);
-}
-
-.cashier-pay-button:hover {
-  border-color: #6d28d9 !important;
-  background:
-    linear-gradient(
-      135deg,
-      #6d28d9,
-      #5b21b6
-    ) !important;
-}
-
-/* --------------------------------------------------------
-   Empty state
--------------------------------------------------------- */
-
-.cashier-empty-card {
-  min-height: 340px;
-  border: 1px solid #e8edf5;
-  border-radius: 18px;
-  box-shadow:
-    0 8px 24px rgba(15, 23, 42, 0.045);
-}
-
-.cashier-empty-card
-  .ant-card-body {
-  display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  min-height: 340px;
+  border-radius: 12px;
+  background: #1677ff;
+  color: #ffffff;
+  font-size: 18px;
+}
+
+.cashier-amount-due .ant-typography {
+  display: block;
+}
+
+.cashier-amount-due h3 {
+  margin: 1px 0 0 !important;
+  color: #0f172a !important;
+  font-size: 20px !important;
+}
+
+.cashier-pay-button {
+  min-height: 44px;
+  margin-top: auto;
+  padding-top: 0;
+  border-radius: 11px;
+  font-weight: 800;
+}
+
+/* ========================================================
+   Empty state
+======================================================== */
+
+.cashier-empty-card {
+  border: 1px dashed #cbd5e1;
+  border-radius: 17px;
+  background: #f8fafc;
+}
+
+.cashier-empty-card .ant-card-body {
+  display: flex;
+  min-height: 290px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .cashier-empty-content {
-  max-width: 520px;
   text-align: center;
 }
 
-.cashier-empty-content
-  .ant-typography {
-  margin-top: 0;
-  margin-bottom: 4px;
+.cashier-empty-content h4 {
+  margin-bottom: 4px !important;
 }
 
-/* --------------------------------------------------------
-   Responsive
--------------------------------------------------------- */
+/* ========================================================
+   Drawer
+======================================================== */
 
-@media (max-width: 1000px) {
+.cashier-details-drawer .ant-drawer-header {
+  border-bottom: 1px solid #e2e8f0;
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+}
+
+.cashier-details-drawer .ant-drawer-body {
+  padding: 20px;
+  background: #f8fafc;
+}
+
+.cashier-drawer-title {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.cashier-drawer-title__icon {
+  display: flex;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #e6f4ff;
+  color: #1677ff;
+  font-size: 18px;
+}
+
+.cashier-drawer-title__eyebrow {
+  display: block;
+  color: #1677ff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.cashier-drawer-title__text {
+  margin: 1px 0 0 !important;
+}
+
+.cashier-drawer-content {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+}
+
+.cashier-drawer-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid #bfdbfe;
+  border-radius: 17px;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(22, 119, 255, 0.12),
+      transparent 40%
+    ),
+    linear-gradient(145deg, #eff6ff, #ffffff);
+}
+
+.cashier-drawer-hero--allergy {
+  border-color: #fca5a5;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(239, 68, 68, 0.14),
+      transparent 40%
+    ),
+    linear-gradient(145deg, #fff1f2, #ffffff);
+}
+
+.cashier-drawer-avatar {
+  flex-shrink: 0;
+  background: #1677ff;
+  color: #ffffff;
+}
+
+.cashier-drawer-avatar--allergy {
+  background: #ef4444;
+}
+
+.cashier-drawer-patient {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.cashier-drawer-patient__name {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  color: #0f172a;
+  font-size: 18px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cashier-drawer-patient__phone {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.cashier-drawer-status {
+  margin: 8px 0 0;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.cashier-drawer-allergy {
+  border-radius: 13px;
+}
+
+.cashier-drawer-descriptions {
+  overflow: hidden;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.cashier-drawer-descriptions .ant-descriptions-item-label {
+  width: 165px;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.cashier-drawer-descriptions .ant-descriptions-item-content {
+  color: #0f172a;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.cashier-drawer-payment-card {
+  padding: 17px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 7px 20px rgba(15, 23, 42, 0.05);
+}
+
+.cashier-drawer-payment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+}
+
+.cashier-drawer-paid {
+  color: #16a34a;
+  font-weight: 800;
+}
+
+.cashier-drawer-progress {
+  margin-top: 12px;
+}
+
+.cashier-drawer-progress__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.cashier-drawer-amount {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-top: 15px;
+  padding: 15px;
+  border: 1px solid #bfdbfe;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #eff6ff, #ffffff);
+}
+
+.cashier-drawer-amount__icon {
+  display: flex;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #1677ff, #4096ff);
+  color: #ffffff;
+  font-size: 20px;
+}
+
+.cashier-drawer-amount h3 {
+  margin: 1px 0 0 !important;
+  color: #0f172a !important;
+}
+
+.cashier-drawer-pay-button {
+  min-height: 47px;
+  border-radius: 11px;
+  font-weight: 800;
+}
+
+/* ========================================================
+   Responsive
+======================================================== */
+
+@media (max-width: 900px) {
   .cashier-search-toolbar {
     align-items: stretch;
     flex-direction: column;
   }
 
   .cashier-search-input {
-    max-width: none;
+    width: 100%;
   }
 
   .cashier-payment-filter {
     width: 100%;
-    overflow-x: auto;
   }
 }
 
-@media (max-width: 768px) {
-  .cashier-search-card
-    > .ant-card-body {
-    padding: 17px;
+@media (max-width: 575px) {
+  .cashier-search-card__header {
+    flex-direction: column;
   }
 
-  .cashier-search-card__header {
+  .cashier-result-count {
+    align-self: flex-start;
+  }
+
+  .cashier-payment-filter {
+    overflow-x: auto;
+  }
+
+  .cashier-details-drawer .ant-drawer-content-wrapper {
+    width: 100% !important;
+  }
+
+  .cashier-details-drawer .ant-drawer-body {
+    padding: 14px;
+  }
+
+  .cashier-drawer-hero {
     align-items: flex-start;
     flex-direction: column;
   }
 
-  .cashier-patient-card
-    .ant-card-body {
-    min-height: 0;
-  }
-}
-
-@media (max-width: 520px) {
-  .cashier-summary-card__value {
-    font-size: 23px;
-  }
-
-  .cashier-payment-filter
-    .ant-segmented-item-label {
-    padding-inline: 8px;
-    font-size: 12px;
-  }
-
-  .cashier-patient-card__patient
-    > .ant-typography:first-child {
-    max-width: 175px;
+  .cashier-drawer-descriptions .ant-descriptions-item-label {
+    width: 130px;
   }
 }

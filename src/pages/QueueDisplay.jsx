@@ -11,7 +11,7 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 
-import { getAppointmentsByDate } from "../api/endPoints";
+import { getAllWaitingRecords, getAppointmentsByDate } from "../api/endPoints";
 
 import "./css/QueueDisplay.css";
 
@@ -56,7 +56,7 @@ const normalizeIdentifier = (value) => {
     return null;
   }
 
-  return String(value);
+  return String(value).trim();
 };
 
 const getAppointmentId = (appointment) => {
@@ -118,6 +118,65 @@ const formatDisplayTime = (date) => {
   }).format(date);
 };
 
+const formatWaitingDuration = (startTime, currentTime = new Date()) => {
+  if (!startTime) {
+    return "00:00";
+  }
+
+  const normalizedValue = String(startTime).trim();
+
+  let parsedStartTime = null;
+
+  const timeOnlyMatch = normalizedValue.match(
+    /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?$/i,
+  );
+
+  if (timeOnlyMatch) {
+    let hours = Number(timeOnlyMatch[1]);
+
+    const minutes = Number(timeOnlyMatch[2]);
+
+    const seconds = Number(timeOnlyMatch[3] || 0);
+
+    const meridiem = String(timeOnlyMatch[4] || "").toUpperCase();
+
+    if (meridiem === "AM" && hours === 12) {
+      hours = 0;
+    }
+
+    if (meridiem === "PM" && hours < 12) {
+      hours += 12;
+    }
+
+    parsedStartTime = new Date(currentTime);
+
+    parsedStartTime.setHours(hours, minutes, seconds, 0);
+  } else {
+    const parsedDate = new Date(normalizedValue);
+
+    if (!Number.isNaN(parsedDate.getTime())) {
+      parsedStartTime = parsedDate;
+    }
+  }
+
+  if (!parsedStartTime) {
+    return "00:00";
+  }
+
+  const elapsedMilliseconds = currentTime.getTime() - parsedStartTime.getTime();
+
+  const elapsedSeconds = Math.max(0, Math.floor(elapsedMilliseconds / 1000));
+
+  const minutes = Math.floor(elapsedSeconds / 60);
+
+  const seconds = elapsedSeconds % 60;
+
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
+    2,
+    "0",
+  )}`;
+};
+
 const getAppointmentTimeValue = (appointment) => {
   return appointment?.appointment_time || "";
 };
@@ -131,17 +190,6 @@ const getCheckedInTimeValue = (appointment) => {
   );
 };
 
-/*
- * Converts different time values into a
- * comparable numeric value.
- *
- * Supported examples:
- *
- * 08:30
- * 08:30:00
- * 8:30 AM
- * 2026-07-28T08:30:00
- */
 const getComparableTimeValue = (value) => {
   const normalizedValue = String(value || "").trim();
 
@@ -180,6 +228,44 @@ const getComparableTimeValue = (value) => {
   }
 
   return Number.MAX_SAFE_INTEGER;
+};
+
+/* ========================================================
+   Waiting helpers
+======================================================== */
+
+const extractWaitingRecords = (response) => {
+  const responseData = response?.data ?? response;
+
+  if (Array.isArray(responseData)) {
+    return responseData;
+  }
+
+  if (Array.isArray(responseData?.records)) {
+    return responseData.records;
+  }
+
+  if (Array.isArray(responseData?.data)) {
+    return responseData.data;
+  }
+
+  return [];
+};
+
+const getWaitingAppointmentId = (waitingRecord) => {
+  return normalizeIdentifier(
+    waitingRecord?.id ?? waitingRecord?.appointment_id,
+  );
+};
+
+const isActiveWaitingRecord = (waitingRecord) => {
+  const appointmentId = getWaitingAppointmentId(waitingRecord);
+
+  const startTime = String(waitingRecord?.start_time ?? "").trim();
+
+  const endTime = String(waitingRecord?.end_time ?? "").trim();
+
+  return Boolean(appointmentId && startTime && !endTime);
 };
 
 /* ========================================================
@@ -222,11 +308,30 @@ const sortByAppointmentNumber = (firstAppointment, secondAppointment) => {
   );
 };
 
+const sortByHighestAppointmentNumber = (
+  firstAppointment,
+  secondAppointment,
+) => {
+  return (
+    getNumericAppointmentNumber(secondAppointment) -
+    getNumericAppointmentNumber(firstAppointment)
+  );
+};
+
 /* ========================================================
    Status display helpers
 ======================================================== */
 
-const getDisplayStatus = (appointment) => {
+const getDisplayStatus = (appointment, waitingRecord) => {
+  if (waitingRecord) {
+    return {
+      key: "waiting",
+      label: "Waiting",
+      IconComponent: ClockCircleOutlined,
+      waitingStartTime: waitingRecord.start_time || "",
+    };
+  }
+
   const normalizedStatus = normalizeStatus(appointment?.status);
 
   if (TREATMENT_COMPLETED_STATUSES.includes(normalizedStatus)) {
@@ -234,6 +339,7 @@ const getDisplayStatus = (appointment) => {
       key: "treatment-done",
       label: "Done",
       IconComponent: CheckCircleOutlined,
+      waitingStartTime: "",
     };
   }
 
@@ -242,6 +348,7 @@ const getDisplayStatus = (appointment) => {
       key: "cancelled",
       label: "Cancelled",
       IconComponent: CloseCircleOutlined,
+      waitingStartTime: "",
     };
   }
 
@@ -250,6 +357,7 @@ const getDisplayStatus = (appointment) => {
       key: "in-treatment",
       label: "In Treatment",
       IconComponent: MedicineBoxOutlined,
+      waitingStartTime: "",
     };
   }
 
@@ -258,6 +366,7 @@ const getDisplayStatus = (appointment) => {
       key: "checked-in",
       label: "Checked In",
       IconComponent: UserOutlined,
+      waitingStartTime: "",
     };
   }
 
@@ -265,17 +374,11 @@ const getDisplayStatus = (appointment) => {
     key: "pending",
     label: "Pending",
     IconComponent: ClockCircleOutlined,
+    waitingStartTime: "",
   };
 };
 
-/*
- * Creates one separate scrolling item for every
- * appointment.
- *
- * Appointments are not merged when they have the
- * same status.
- */
-const createTickerItems = (appointmentRecords) => {
+const createTickerItems = (appointmentRecords, waitingRecordMap) => {
   const uniqueAppointments = new Map();
 
   appointmentRecords.forEach((appointment, index) => {
@@ -294,16 +397,24 @@ const createTickerItems = (appointmentRecords) => {
 
   return Array.from(uniqueAppointments.values())
     .map((appointment) => {
-      const displayStatus = getDisplayStatus(appointment);
+      const appointmentId = getAppointmentId(appointment);
+
+      const waitingRecord = appointmentId
+        ? waitingRecordMap.get(appointmentId)
+        : null;
+
+      const displayStatus = getDisplayStatus(appointment, waitingRecord);
 
       return {
-        appointmentId: getAppointmentId(appointment),
+        appointmentId,
 
         appointmentNumber: getNumericAppointmentNumber(appointment),
 
         statusKey: displayStatus.key,
 
         statusLabel: displayStatus.label,
+
+        waitingStartTime: displayStatus.waitingStartTime,
 
         IconComponent: displayStatus.IconComponent,
       };
@@ -350,9 +461,7 @@ const QueuePatientPanel = ({ type, appointment }) => {
 
   const numberStatus = isTreatment ? "NOW BEING TREATED" : "PLEASE BE READY";
 
-  const patientMessage = isTreatment
-    ? "Your treatment is currently in progress."
-    : "Please remain close to the waiting area.";
+  const patientMessage = "";
 
   const emptyTitle = isTreatment
     ? "No Patient Being Treated"
@@ -362,7 +471,7 @@ const QueuePatientPanel = ({ type, appointment }) => {
     ? "The next patient will be called shortly."
     : "Please wait for the next appointment update.";
 
-  const PanelIcon = isTreatment ? UserOutlined : ClockCircleOutlined;
+  const PanelIcon = isTreatment ? MedicineBoxOutlined : ClockCircleOutlined;
 
   return (
     <section
@@ -395,7 +504,7 @@ const QueuePatientPanel = ({ type, appointment }) => {
       <div className="queue-patient-panel-body">
         {appointment ? (
           <div className="queue-number-content">
-            <Text className="queue-number-caption">QUEUE NUMBER</Text>
+            <Text className="queue-number-caption" />
 
             <div className="queue-number-circle-wrapper" aria-live="polite">
               <div className="queue-number-circle">
@@ -426,10 +535,79 @@ const QueuePatientPanel = ({ type, appointment }) => {
 };
 
 /* ========================================================
+   Highest completed queue panel
+======================================================== */
+
+const CompletedQueuePanel = ({ appointment }) => {
+  return (
+    <section
+      className={[
+        "queue-patient-panel",
+        "queue-completed-panel",
+        appointment
+          ? "queue-patient-panel-active"
+          : "queue-patient-panel-empty",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      <div className="queue-patient-panel-header">
+        <div className="queue-panel-header-content">
+          <div className="queue-panel-icon">
+            <CheckCircleOutlined />
+          </div>
+
+          <div className="queue-panel-heading">
+            <Text className="queue-panel-title">COMPLETED</Text>
+
+            <Title level={2} className="queue-panel-subtitle">
+              Last Completed
+            </Title>
+          </div>
+        </div>
+      </div>
+
+      <div className="queue-patient-panel-body">
+        {appointment ? (
+          <div className="queue-number-content">
+            <Text className="queue-number-caption" />
+
+            <div className="queue-number-circle-wrapper" aria-live="polite">
+              <div className="queue-number-circle">
+                <span>{getAppointmentNumber(appointment)}</span>
+              </div>
+            </div>
+
+            <div className="queue-number-status">TREATMENT COMPLETED</div>
+          </div>
+        ) : (
+          <div className="queue-panel-empty-content">
+            <div className="queue-panel-empty-icon">
+              <CheckCircleOutlined />
+            </div>
+
+            <Text className="queue-panel-empty-title">
+              No Completed Treatments
+            </Text>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
+
+/* ========================================================
    Bottom scrolling queue item
 ======================================================== */
 
-const QueueScrollerItem = ({ item, currentTreatmentPatient, readyPatient }) => {
+const QueueScrollerItem = ({
+  item,
+  currentTreatmentPatient,
+  readyPatient,
+  currentDateTime,
+}) => {
+  const ItemIcon = item?.IconComponent || ClockCircleOutlined;
+
   const itemAppointmentNumber = String(item?.appointmentNumber ?? "").trim();
 
   const treatmentAppointmentNumber = String(
@@ -450,6 +628,8 @@ const QueueScrollerItem = ({ item, currentTreatmentPatient, readyPatient }) => {
     readyAppointmentNumber !== "-" &&
     readyAppointmentNumber === itemAppointmentNumber;
 
+  const isWaiting = item?.statusKey === "waiting";
+
   const isHighlighted = isCurrentTreatment || isReadyPatient;
 
   return (
@@ -460,6 +640,7 @@ const QueueScrollerItem = ({ item, currentTreatmentPatient, readyPatient }) => {
         isHighlighted ? "queue-scroller-item-highlighted" : "",
         isCurrentTreatment ? "queue-scroller-item-current-treatment" : "",
         isReadyPatient ? "queue-scroller-item-ready-patient" : "",
+        isWaiting ? "queue-scroller-item-waiting" : "",
       ]
         .filter(Boolean)
         .join(" ")}
@@ -475,21 +656,43 @@ const QueueScrollerItem = ({ item, currentTreatmentPatient, readyPatient }) => {
           NEXT PATIENT
         </div>
       )}
-{!isReadyPatient  && !isCurrentTreatment && (
-          <Text className="queue-scroller-status">{item.statusLabel}</Text>
+
+      {isWaiting && (
+        <div className="queue-scroller-waiting-content">
+          <Text className="queue-scroller-status queue-scroller-waiting-status">
+            <ItemIcon />
+
+            <span>WAITING</span>
+          </Text>
+
+          <Text className="queue-scroller-waiting-time">
+            Waiting{" "}
+            {formatWaitingDuration(item.waitingStartTime, currentDateTime)}
+          </Text>
+        </div>
       )}
-    
+
+      {!isWaiting && !isReadyPatient && !isCurrentTreatment && (
+        <Text className="queue-scroller-status">
+          <ItemIcon />
+
+          <span>{item.statusLabel}</span>
+        </Text>
+      )}
 
       <div className="queue-scroller-number">{item.appointmentNumber}</div>
     </div>
   );
 };
+
 /* ========================================================
    QueueDisplay component
 ======================================================== */
 
 const QueueDisplay = ({ embedded = false }) => {
   const [appointments, setAppointments] = useState([]);
+
+  const [waitingRecords, setWaitingRecords] = useState([]);
 
   const [loading, setLoading] = useState(true);
 
@@ -562,10 +765,7 @@ const QueueDisplay = ({ embedded = false }) => {
         window.localStorage.removeItem(readyPatientStorageKey);
       }
     } catch {
-      /*
-       * Continue normally when local storage
-       * is unavailable.
-       */
+      // Continue when local storage is unavailable.
     }
   }, [
     lockedReadyPatientId,
@@ -575,18 +775,25 @@ const QueueDisplay = ({ embedded = false }) => {
   ]);
 
   /* ------------------------------------------------------
-     Load appointments
+     Load appointments and waiting records
   ------------------------------------------------------ */
 
   const loadAppointments = useCallback(async () => {
     try {
       setLoadError("");
 
-      const response = await getAppointmentsByDate(selectedDate);
+      const [appointmentsResponse, waitingResponse] = await Promise.all([
+        getAppointmentsByDate(selectedDate),
+        getAllWaitingRecords(),
+      ]);
 
-      const appointmentRecords = extractAppointments(response);
+      const appointmentRecords = extractAppointments(appointmentsResponse);
+
+      const waitingList = extractWaitingRecords(waitingResponse);
 
       setAppointments(appointmentRecords);
+
+      setWaitingRecords(waitingList);
     } catch (error) {
       console.error("Error loading queue appointments:", error);
 
@@ -595,12 +802,14 @@ const QueueDisplay = ({ embedded = false }) => {
       );
     } finally {
       setLoading(false);
+
       setHasLoadedAppointments(true);
     }
   }, [selectedDate]);
 
   useEffect(() => {
     setLoading(true);
+
     setHasLoadedAppointments(false);
 
     loadAppointments();
@@ -629,6 +838,32 @@ const QueueDisplay = ({ embedded = false }) => {
   }, [loadAppointments]);
 
   /* ------------------------------------------------------
+     Active waiting data
+  ------------------------------------------------------ */
+
+  const activeWaitingRecords = useMemo(() => {
+    return waitingRecords.filter(isActiveWaitingRecord);
+  }, [waitingRecords]);
+
+  const waitingRecordMap = useMemo(() => {
+    return new Map(
+      activeWaitingRecords.map((waitingRecord) => [
+        getWaitingAppointmentId(waitingRecord),
+        waitingRecord,
+      ]),
+    );
+  }, [activeWaitingRecords]);
+
+  const isAppointmentWaiting = useCallback(
+    (appointment) => {
+      const appointmentId = getAppointmentId(appointment);
+
+      return Boolean(appointmentId && waitingRecordMap.has(appointmentId));
+    },
+    [waitingRecordMap],
+  );
+
+  /* ------------------------------------------------------
      Visible appointments
   ------------------------------------------------------ */
 
@@ -655,16 +890,36 @@ const QueueDisplay = ({ embedded = false }) => {
   const currentTreatmentPatient = inTreatmentPatients[0] || null;
 
   /* ------------------------------------------------------
+     Highest completed treatment number
+  ------------------------------------------------------ */
+
+  const completedTreatmentPatients = useMemo(() => {
+    return visibleAppointments
+      .filter((appointment) => {
+        const normalizedStatus = normalizeStatus(appointment?.status);
+
+        return TREATMENT_COMPLETED_STATUSES.includes(normalizedStatus);
+      })
+      .sort(sortByHighestAppointmentNumber);
+  }, [visibleAppointments]);
+
+  const highestCompletedTreatmentPatient =
+    completedTreatmentPatients[0] || null;
+
+  /* ------------------------------------------------------
      Checked-in patients
   ------------------------------------------------------ */
 
   const checkedInPatients = useMemo(() => {
     return visibleAppointments
       .filter((appointment) => {
-        return normalizeStatus(appointment?.status) === "checked in";
+        return (
+          normalizeStatus(appointment?.status) === "checked in" &&
+          !isAppointmentWaiting(appointment)
+        );
       })
       .sort(sortCheckedInPatients);
-  }, [visibleAppointments]);
+  }, [visibleAppointments, isAppointmentWaiting]);
 
   /* ------------------------------------------------------
      Keep the ready patient locked
@@ -727,8 +982,8 @@ const QueueDisplay = ({ embedded = false }) => {
   ------------------------------------------------------ */
 
   const tickerItems = useMemo(() => {
-    return createTickerItems(visibleAppointments);
-  }, [visibleAppointments]);
+    return createTickerItems(visibleAppointments, waitingRecordMap);
+  }, [visibleAppointments, waitingRecordMap]);
 
   const tickerDuration = useMemo(() => {
     const calculatedDuration = tickerItems.length * 6;
@@ -821,6 +1076,10 @@ const QueueDisplay = ({ embedded = false }) => {
             />
 
             <QueuePatientPanel type="ready" appointment={readyPatient} />
+
+            <CompletedQueuePanel
+              appointment={highestCompletedTreatmentPatient}
+            />
           </main>
 
           <section className="queue-bottom-scroller">
@@ -841,6 +1100,7 @@ const QueueDisplay = ({ embedded = false }) => {
                         item={item}
                         currentTreatmentPatient={currentTreatmentPatient}
                         readyPatient={readyPatient}
+                        currentDateTime={currentDateTime}
                       />
                     ))}
                   </div>
@@ -854,6 +1114,7 @@ const QueueDisplay = ({ embedded = false }) => {
                         item={item}
                         currentTreatmentPatient={currentTreatmentPatient}
                         readyPatient={readyPatient}
+                        currentDateTime={currentDateTime}
                       />
                     ))}
                   </div>

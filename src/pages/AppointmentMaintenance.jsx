@@ -30,6 +30,7 @@ import {
 } from "@ant-design/icons";
 
 import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 
 import ClinicPage from "../components/ClinicPage";
 import PaymentModal from "../components/PaymentModal";
@@ -43,6 +44,8 @@ import {
   updateAppointmentStatus,
 } from "../api/endPoints";
 
+dayjs.extend(customParseFormat);
+
 const { Text, Title } = Typography;
 
 /* --------------------------------------------------------
@@ -50,6 +53,15 @@ const { Text, Title } = Typography;
 -------------------------------------------------------- */
 
 const getTodayDate = () => dayjs().format("YYYY-MM-DD");
+
+/*
+ * This is the same key used by QueueDisplay.
+ * Therefore, both screens can share the same locked next patient.
+ */
+const READY_PATIENT_STORAGE_PREFIX = "queue-display-ready-patient";
+
+const getReadyPatientStorageKey = (date) =>
+  `${READY_PATIENT_STORAGE_PREFIX}:${date}`;
 
 const statusColors = {
   Pending: "default",
@@ -84,9 +96,21 @@ const formatTime = (value) => {
     return "-";
   }
 
-  const parsedTime = dayjs(value, ["HH:mm", "HH:mm:ss", "h:mm A", "hh:mm A"]);
+  const parsedTime = dayjs(
+    String(value).trim(),
+    ["HH:mm", "HH:mm:ss", "h:mm A", "hh:mm A"],
+    true,
+  );
 
-  return parsedTime.isValid() ? parsedTime.format("hh:mm A") : value;
+  if (parsedTime.isValid()) {
+    return parsedTime.format("hh:mm A");
+  }
+
+  const parsedDateTime = dayjs(value);
+
+  return parsedDateTime.isValid()
+    ? parsedDateTime.format("hh:mm A")
+    : String(value);
 };
 
 const formatDateTime = (value) => {
@@ -94,9 +118,70 @@ const formatDateTime = (value) => {
     return "-";
   }
 
-  const parsedDate = dayjs(value);
+  const parsedDateTime = dayjs(value);
 
-  return parsedDate.isValid() ? parsedDate.format("hh:mm A") : value;
+  if (parsedDateTime.isValid()) {
+    return parsedDateTime.format("hh:mm A");
+  }
+
+  return formatTime(value);
+};
+
+const getQueueDateTimeValue = (value, appointmentDate) => {
+  if (!value) {
+    return Number.MAX_SAFE_INTEGER;
+  }
+
+  const textValue = String(value).trim();
+
+  /*
+   * First try a complete date-time value.
+   */
+  if (
+    textValue.includes("-") ||
+    textValue.includes("/") ||
+    textValue.includes("T")
+  ) {
+    const completeDateTime = dayjs(textValue);
+
+    if (completeDateTime.isValid()) {
+      return completeDateTime.valueOf();
+    }
+  }
+
+  /*
+   * Then try a time-only value.
+   */
+  const timeOnly = dayjs(
+    textValue,
+    ["HH:mm", "HH:mm:ss", "h:mm A", "hh:mm A"],
+    true,
+  );
+
+  if (timeOnly.isValid()) {
+    const baseDate = dayjs(
+      appointmentDate || getTodayDate(),
+      "YYYY-MM-DD",
+      true,
+    );
+
+    if (baseDate.isValid()) {
+      return baseDate
+        .hour(timeOnly.hour())
+        .minute(timeOnly.minute())
+        .second(timeOnly.second())
+        .millisecond(0)
+        .valueOf();
+    }
+
+    return (
+      timeOnly.hour() * 60 * 60 * 1000 +
+      timeOnly.minute() * 60 * 1000 +
+      timeOnly.second() * 1000
+    );
+  }
+
+  return Number.MAX_SAFE_INTEGER;
 };
 
 /* --------------------------------------------------------
@@ -110,16 +195,14 @@ const AppointmentMaintenance = () => {
   const [loading, setLoading] = useState(false);
   const [updatingId, setUpdatingId] = useState(null);
 
+  const [lockedNextPatientId, setLockedNextPatientId] = useState(null);
+
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
-
   const [paymentAppointment, setPaymentAppointment] = useState(null);
-
   const [paymentLoading, setPaymentLoading] = useState(false);
 
   const [treatmentModalOpen, setTreatmentModalOpen] = useState(false);
-
   const [treatmentAppointment, setTreatmentAppointment] = useState(null);
-
   const [treatmentLoading, setTreatmentLoading] = useState(false);
 
   /* --------------------------------------------------------
@@ -208,28 +291,222 @@ const AppointmentMaintenance = () => {
     );
   }, [appointments]);
 
-  const checkedInQueue = useMemo(() => {
+  /*
+   * Checked-in patients are ordered by:
+   *
+   * 1. Checked-in time
+   * 2. Appointment time
+   * 3. Updated time
+   * 4. Appointment number
+   */
+  const checkedInAppointments = useMemo(() => {
     return appointments
+      .filter((appointment) => appointment.status === "Checked In")
+      .sort((a, b) => {
+        const checkedInDifference =
+          getQueueDateTimeValue(
+            a.checked_in_time,
+            a.appointment_date || selectedDate,
+          ) -
+          getQueueDateTimeValue(
+            b.checked_in_time,
+            b.appointment_date || selectedDate,
+          );
+
+        if (checkedInDifference !== 0) {
+          return checkedInDifference;
+        }
+
+        const appointmentTimeDifference =
+          getQueueDateTimeValue(
+            a.appointment_time,
+            a.appointment_date || selectedDate,
+          ) -
+          getQueueDateTimeValue(
+            b.appointment_time,
+            b.appointment_date || selectedDate,
+          );
+
+        if (appointmentTimeDifference !== 0) {
+          return appointmentTimeDifference;
+        }
+
+        const updatedTimeDifference =
+          getQueueDateTimeValue(
+            a.updated_at,
+            a.appointment_date || selectedDate,
+          ) -
+          getQueueDateTimeValue(
+            b.updated_at,
+            b.appointment_date || selectedDate,
+          );
+
+        if (updatedTimeDifference !== 0) {
+          return updatedTimeDifference;
+        }
+
+        return (
+          Number(a.appointment_number || 0) - Number(b.appointment_number || 0)
+        );
+      });
+  }, [appointments, selectedDate]);
+
+  /*
+   * Select the effective next patient immediately.
+   *
+   * When the stored patient still has Checked In status,
+   * that patient stays locked as NEXT.
+   */
+  const nextCheckedInAppointmentId = useMemo(() => {
+    if (checkedInAppointments.length === 0) {
+      return null;
+    }
+
+    const lockedPatientStillWaiting = checkedInAppointments.some(
+      (appointment) => appointment.appointment_id === lockedNextPatientId,
+    );
+
+    if (lockedPatientStillWaiting) {
+      return lockedNextPatientId;
+    }
+
+    return checkedInAppointments[0]?.appointment_id || null;
+  }, [checkedInAppointments, lockedNextPatientId]);
+
+  const nextCheckedInPatient = useMemo(() => {
+    if (!nextCheckedInAppointmentId) {
+      return null;
+    }
+
+    return checkedInAppointments.find(
+      (appointment) =>
+        appointment.appointment_id === nextCheckedInAppointmentId,
+    );
+  }, [checkedInAppointments, nextCheckedInAppointmentId]);
+
+  const remainingCheckedInQueue = useMemo(() => {
+    return checkedInAppointments
       .filter(
         (appointment) =>
-          appointment.status === "Checked In" && appointment.checked_in_time,
+          appointment.appointment_id !== nextCheckedInAppointmentId,
       )
-      .sort((a, b) => {
-        return (
-          dayjs(a.appointment_time).valueOf() -
-          dayjs(b.appointment_time).valueOf()
-        );
-      })
       .map((appointment, index) => ({
         ...appointment,
-        live_queue_no: index + 1,
+        live_queue_no: index + 2,
       }));
-  }, [appointments]);
+  }, [checkedInAppointments, nextCheckedInAppointmentId]);
+
+  const checkedInQueuePositionMap = useMemo(() => {
+    const positionMap = new Map();
+
+    if (nextCheckedInAppointmentId) {
+      positionMap.set(nextCheckedInAppointmentId, 1);
+    }
+
+    remainingCheckedInQueue.forEach((appointment, index) => {
+      positionMap.set(appointment.appointment_id, index + 2);
+    });
+
+    return positionMap;
+  }, [nextCheckedInAppointmentId, remainingCheckedInQueue]);
+
+  /*
+   * Keep the next patient locked in localStorage.
+   *
+   * The lock is changed only when:
+   * - The locked patient starts treatment
+   * - The appointment is cancelled
+   * - The patient is no longer Checked In
+   * - There are no checked-in patients
+   */
+  useEffect(() => {
+    const storageKey = getReadyPatientStorageKey(selectedDate);
+
+    if (checkedInAppointments.length === 0) {
+      setLockedNextPatientId(null);
+
+      if (typeof window !== "undefined") {
+        window.localStorage.removeItem(storageKey);
+      }
+
+      return;
+    }
+
+    const currentLockedPatientIsValid = checkedInAppointments.some(
+      (appointment) => appointment.appointment_id === lockedNextPatientId,
+    );
+
+    let storedPatientId = null;
+
+    if (typeof window !== "undefined") {
+      storedPatientId = window.localStorage.getItem(storageKey);
+    }
+
+    const storedPatientIsValid = checkedInAppointments.some(
+      (appointment) => appointment.appointment_id === storedPatientId,
+    );
+
+    let nextPatientId = null;
+
+    if (currentLockedPatientIsValid) {
+      nextPatientId = lockedNextPatientId;
+    } else if (storedPatientIsValid) {
+      nextPatientId = storedPatientId;
+    } else {
+      nextPatientId = checkedInAppointments[0]?.appointment_id || null;
+    }
+
+    if (nextPatientId !== lockedNextPatientId) {
+      setLockedNextPatientId(nextPatientId);
+    }
+
+    if (typeof window !== "undefined" && nextPatientId) {
+      window.localStorage.setItem(storageKey, nextPatientId);
+    }
+  }, [selectedDate, checkedInAppointments, lockedNextPatientId]);
+
+  /*
+   * Synchronize the locked patient when QueueDisplay is
+   * open in another browser tab.
+   */
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const storageKey = getReadyPatientStorageKey(selectedDate);
+
+    const handleStorageChange = (event) => {
+      if (event.key !== storageKey) {
+        return;
+      }
+
+      const newPatientId = event.newValue;
+
+      if (!newPatientId) {
+        setLockedNextPatientId(null);
+        return;
+      }
+
+      const patientStillWaiting = checkedInAppointments.some(
+        (appointment) => appointment.appointment_id === newPatientId,
+      );
+
+      if (patientStillWaiting) {
+        setLockedNextPatientId(newPatientId);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [selectedDate, checkedInAppointments]);
 
   const sortedAppointments = useMemo(() => {
     return [...appointments].sort((a, b) => {
       const aIsInTreatment = a.status === "In Treatment";
-
       const bIsInTreatment = b.status === "In Treatment";
 
       if (aIsInTreatment && !bIsInTreatment) {
@@ -240,11 +517,39 @@ const AppointmentMaintenance = () => {
         return 1;
       }
 
+      const aIsNext = a.appointment_id === nextCheckedInAppointmentId;
+
+      const bIsNext = b.appointment_id === nextCheckedInAppointmentId;
+
+      if (aIsNext && !bIsNext) {
+        return -1;
+      }
+
+      if (!aIsNext && bIsNext) {
+        return 1;
+      }
+
+      const aQueuePosition = checkedInQueuePositionMap.get(a.appointment_id);
+
+      const bQueuePosition = checkedInQueuePositionMap.get(b.appointment_id);
+
+      if (aQueuePosition !== undefined && bQueuePosition !== undefined) {
+        return aQueuePosition - bQueuePosition;
+      }
+
+      if (aQueuePosition !== undefined) {
+        return -1;
+      }
+
+      if (bQueuePosition !== undefined) {
+        return 1;
+      }
+
       return String(a.appointment_time || "").localeCompare(
         String(b.appointment_time || ""),
       );
     });
-  }, [appointments]);
+  }, [appointments, nextCheckedInAppointmentId, checkedInQueuePositionMap]);
 
   const appointmentSummary = useMemo(() => {
     const total = appointments.length;
@@ -269,8 +574,6 @@ const AppointmentMaintenance = () => {
     };
   }, [appointments]);
 
-  const nextCheckedInAppointmentId = checkedInQueue[0]?.appointment_id;
-
   /* --------------------------------------------------------
      Modal handlers
   -------------------------------------------------------- */
@@ -278,6 +581,11 @@ const AppointmentMaintenance = () => {
   const openPaymentModal = (appointment) => {
     setPaymentAppointment(appointment);
     setPaymentModalOpen(true);
+  };
+
+  const openTreatmentModal = (appointment) => {
+    setTreatmentAppointment(appointment);
+    setTreatmentModalOpen(true);
   };
 
   const handleTreatmentSubmit = async (treatmentData) => {
@@ -359,6 +667,26 @@ const AppointmentMaintenance = () => {
       return false;
     }
 
+    /*
+     * Prevent another waiting patient from moving ahead
+     * of the locked next patient.
+     */
+    if (
+      status === "In Treatment" &&
+      selectedAppointment.status === "Checked In" &&
+      nextCheckedInAppointmentId &&
+      appointmentId !== nextCheckedInAppointmentId
+    ) {
+      const nextPatientName =
+        nextCheckedInPatient?.patient_name || "The next patient";
+
+      message.warning(
+        `${nextPatientName} is currently locked as the next patient`,
+      );
+
+      return false;
+    }
+
     try {
       setUpdatingId(appointmentId);
 
@@ -406,12 +734,19 @@ const AppointmentMaintenance = () => {
 
     const canCheckIn = ["Pending", "Confirmed"].includes(status);
 
+    const isLockedNextPatient =
+      record.appointment_id === nextCheckedInAppointmentId;
+
     const anotherPatientInTreatment =
       currentTreatmentPatient &&
       currentTreatmentPatient.appointment_id !== record.appointment_id;
 
     const canStartTreatment =
-      status === "Checked In" && !anotherPatientInTreatment;
+      status === "Checked In" &&
+      isLockedNextPatient &&
+      !anotherPatientInTreatment;
+
+    const isWaitingInQueue = status === "Checked In" && !isLockedNextPatient;
 
     const canFinishTreatment = status === "In Treatment";
 
@@ -427,28 +762,39 @@ const AppointmentMaintenance = () => {
       canFinishTreatment,
       canAddPayment,
       canComplete,
+      isLockedNextPatient,
+      isWaitingInQueue,
       anotherPatientInTreatment,
     };
   };
 
   /* --------------------------------------------------------
-     Queue action
+     Queue actions
   -------------------------------------------------------- */
 
-  const renderQueueNextStep = (record, index) => {
+  const renderQueueNextStep = (record, isNextPatient, queuePosition) => {
     const isUpdating = updatingId === record.appointment_id;
 
-    const isNextPatient = index === 0;
+    if (!isNextPatient) {
+      return (
+        <Tooltip title="This patient will stay in the waiting queue until their turn">
+          <Button
+            block
+            disabled
+            className="side-queue-action-button waiting-queue-button"
+            icon={<ClockCircleOutlined />}
+          >
+            Waiting in Queue #{queuePosition}
+          </Button>
+        </Tooltip>
+      );
+    }
 
-    const anotherPatientInTreatment =
-      currentTreatmentPatient &&
-      currentTreatmentPatient.appointment_id !== record.appointment_id;
-
-    if (anotherPatientInTreatment) {
+    if (currentTreatmentPatient) {
       return (
         <Tooltip
           title={`${
-            currentTreatmentPatient?.patient_name || "Another patient"
+            currentTreatmentPatient.patient_name || "Another patient"
           } is currently in treatment`}
         >
           <Button
@@ -457,7 +803,7 @@ const AppointmentMaintenance = () => {
             className="side-queue-action-button"
             icon={<ClockCircleOutlined />}
           >
-            Treatment Room Occupied
+            Treatment
           </Button>
         </Tooltip>
       );
@@ -477,6 +823,65 @@ const AppointmentMaintenance = () => {
       </Button>
     );
   };
+
+const renderCheckedInPatientCard = (
+  record,
+  { isNextPatient = false, queuePosition = 1 } = {},
+) => {
+  const appointmentNumber =
+    record.appointment_number !== null &&
+    record.appointment_number !== undefined
+      ? String(record.appointment_number).padStart(2, "0")
+      : "--";
+
+  return (
+    <div
+      className={[
+        "simple-checked-in-card",
+        isNextPatient ? "simple-next-patient-card" : "",
+        record.is_allergies ? "simple-allergy-patient-card" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      <div className="simple-queue-number-section">
+        <Text className="simple-queue-position">
+          {isNextPatient ? "NEXT PATIENT" : `QUEUE #${queuePosition}`}
+        </Text>
+
+        <div className="simple-appointment-number">
+          {appointmentNumber}
+        </div>
+
+        {record.is_allergies && (
+          <Tooltip
+            title={
+              record.allergies
+                ? `Allergies: ${record.allergies}`
+                : "This patient has allergies"
+            }
+          >
+            <Tag
+              icon={<ExclamationCircleFilled />}
+              color="error"
+              className="simple-allergy-tag"
+            >
+              Allergy Alert
+            </Tag>
+          </Tooltip>
+        )}
+      </div>
+
+      <div className="simple-treatment-action">
+        {renderQueueNextStep(
+          record,
+          isNextPatient,
+          queuePosition,
+        )}
+      </div>
+    </div>
+  );
+};
 
   /* --------------------------------------------------------
      Table columns
@@ -591,12 +996,16 @@ const AppointmentMaintenance = () => {
     {
       title: "Next Step",
       key: "next_step",
-      width: 220,
+      width: 230,
 
       render: (_, record) => {
         const rules = getActionRules(record);
 
         const isUpdating = updatingId === record.appointment_id;
+
+        const queuePosition = checkedInQueuePositionMap.get(
+          record.appointment_id,
+        );
 
         if (rules.isCompleted) {
           return (
@@ -670,6 +1079,22 @@ const AppointmentMaintenance = () => {
           );
         }
 
+        if (rules.isWaitingInQueue) {
+          return (
+            <Tooltip title="The locked next patient must start treatment first">
+              <Button
+                block
+                disabled
+                className="step-button waiting-queue-button"
+                icon={<ClockCircleOutlined />}
+              >
+                Waiting in Queue
+                {queuePosition ? ` #${queuePosition}` : ""}
+              </Button>
+            </Tooltip>
+          );
+        }
+
         if (rules.canFinishTreatment) {
           return (
             <Button
@@ -677,7 +1102,7 @@ const AppointmentMaintenance = () => {
               className="step-button treatment-done-button"
               icon={<MedicineBoxOutlined />}
               loading={treatmentLoading}
-              disabled={true}
+              disabled
               onClick={() => openTreatmentModal(record)}
             >
               In Treatment Room
@@ -871,189 +1296,117 @@ const AppointmentMaintenance = () => {
           </Card>
         )}
 
-        {/* Main content */}
+        {/* Checked-in queue */}
 
         <Row gutter={[16, 16]} align="top">
-          {/* Top row - Checked-in queue */}
-
           <Col xs={24}>
             <Card
               className="checked-in-side-card checked-in-top-card"
-              title={
-                <Space>
-                  <div className="card-title-icon cyan-icon">
-                    <TeamOutlined />
-                  </div>
-
-                  <div>
-                    <Text strong className="side-queue-title">
-                      Checked-In Queue
-                    </Text>
-
-                    <Text type="secondary" className="side-queue-description">
-                      Patients are ordered by arrival time
-                    </Text>
-                  </div>
-                </Space>
-              }
-              extra={
-                <Tag color="cyan" className="side-queue-count">
-                  {checkedInQueue.length}
-                </Tag>
-              }
+            
             >
-              {checkedInQueue.length === 0 ? (
-                <Empty
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description={
-                    <Space direction="vertical" size={2}>
-                      <Text strong>No patients waiting</Text>
+{checkedInAppointments.length === 0 ? (
+  <Empty
+    image={Empty.PRESENTED_IMAGE_SIMPLE}
+    description={
+      <Space direction="vertical" size={2}>
+        <Text strong>No patients waiting</Text>
 
-                      <Text type="secondary" className="small-text">
-                        Checked-in patients will appear here
-                      </Text>
-                    </Space>
-                  }
-                />
-              ) : (
-                <Row gutter={[16, 16]} className="checked-in-queue-row">
-                  {checkedInQueue.map((record, index) => (
-                    <Col
-                      key={record.appointment_id}
-                      xs={24}
-                      sm={12}
-                      md={8}
-                      lg={6}
-                      xl={6}
-                      xxl={4}
-                      className="checked-in-queue-column"
-                    >
-                      <div
-                        className={[
-                          "side-queue-item",
-                          index === 0 ? "next-side-queue-item" : "",
-                          record.is_allergies ? "side-queue-allergy-item" : "",
-                        ]
-                          .filter(Boolean)
-                          .join(" ")}
-                      >
-                        <div className="side-queue-item-header">
-                          <div className="side-queue-number-group">
-                            <div
-                              className={[
-                                "side-queue-position",
-                                index === 0 ? "next-side-queue-position" : "",
-                              ]
-                                .filter(Boolean)
-                                .join(" ")}
-                            >
-                              {index === 0 ? "NEXT" : `#${index + 1}`}
-                            </div>
+        <Text type="secondary" className="small-text">
+          Checked-in patients will appear here
+        </Text>
+      </Space>
+    }
+  />
+) : (
+  <div className="checked-in-horizontal-layout">
+    {/* Locked next patient */}
 
-                            <Text
-                              strong
-                              className="side-appointment-number-value"
-                            >
-                              {record.appointment_number !== null &&
-                              record.appointment_number !== undefined
-                                ? String(record.appointment_number).padStart(
-                                    2,
-                                    "0",
-                                  )
-                                : "--"}
-                            </Text>
-                          </div>
+    {nextCheckedInPatient && (
+      <section className="next-patient-section queue-column-section">
+        <div className="queue-section-heading">
+          <div>
+            <Text className="queue-section-eyebrow">
+              Treatment Queue
+            </Text>
 
-                          {record.is_allergies && (
-                            <Tooltip
-                              title={
-                                record.allergies
-                                  ? `Allergies: ${record.allergies}`
-                                  : "This patient has allergies"
-                              }
-                            >
-                              <Tag
-                                icon={<ExclamationCircleFilled />}
-                                color="error"
-                                className="side-allergy-tag"
-                              >
-                                Allergy
-                              </Tag>
-                            </Tooltip>
-                          )}
-                        </div>
+            <Title level={5} className="queue-section-title">
+              Locked Next Patient
+            </Title>
 
-                        <div className="side-queue-patient">
-                          <div className="side-queue-avatar">
-                            <UserOutlined />
-                          </div>
+            <Text
+              type="secondary"
+              className="queue-section-description"
+            >
+              New check-ins will not replace this patient
+            </Text>
+          </div>
 
-                          <div className="side-queue-patient-details">
-                            <Text strong className="side-queue-patient-name">
-                              {record.patient_name || "Unknown Patient"}
-                            </Text>
+          <Tag
+            color="green"
+            icon={<CheckCircleOutlined />}
+            className="queue-lock-tag"
+          >
+            Locked
+          </Tag>
+        </div>
 
-                            {record.phone && (
-                              <Text
-                                type="secondary"
-                                className="side-queue-phone"
-                              >
-                                {record.phone}
-                              </Text>
-                            )}
-                          </div>
-                        </div>
+        <div className="next-patient-card-container">
+          {renderCheckedInPatientCard(nextCheckedInPatient, {
+            isNextPatient: true,
+            queuePosition: 1,
+          })}
+        </div>
+      </section>
+    )}
 
-                        <Row gutter={[8, 8]} className="side-queue-time-box">
-                          <Col span={12}>
-                            <Text type="secondary" className="side-time-label">
-                              Checked In
-                            </Text>
+    {/* Remaining checked-in patients */}
 
-                            <Space size={6}>
-                              <ClockCircleOutlined />
+    <section className="remaining-queue-section queue-column-section">
+      <div className="queue-section-heading">
+        <div>
+          <Text className="queue-section-eyebrow">
+            Waiting List
+          </Text>
 
-                              <Text strong>
-                                {formatDateTime(record.checked_in_time)}
-                              </Text>
-                            </Space>
-                          </Col>
+          <Title level={5} className="queue-section-title">
+            Remaining Checked-In Patients
+          </Title>
+        </div>
 
-                          <Col span={12}>
-                            <Text type="secondary" className="side-time-label">
-                              Appointment
-                            </Text>
+        <Tag className="remaining-count-tag">
+          {remainingCheckedInQueue.length} waiting
+        </Tag>
+      </div>
 
-                            <Text strong>
-                              {formatTime(record.appointment_time)}
-                            </Text>
-                          </Col>
-                        </Row>
-
-                        {record.reason_for_visit && (
-                          <div className="side-reason-box">
-                            <Text type="secondary" className="side-time-label">
-                              Reason
-                            </Text>
-
-                            <Text className="side-reason-text">
-                              {record.reason_for_visit}
-                            </Text>
-                          </div>
-                        )}
-
-                        <div className="side-queue-action">
-                          {renderQueueNextStep(record, index)}
-                        </div>
-                      </div>
-                    </Col>
-                  ))}
-                </Row>
-              )}
+      {remainingCheckedInQueue.length === 0 ? (
+        <div className="remaining-queue-empty">
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description="No additional patients are waiting"
+          />
+        </div>
+      ) : (
+        <div className="remaining-patients-horizontal-list">
+          {remainingCheckedInQueue.map((record) => (
+            <div
+              key={record.appointment_id}
+              className="remaining-patient-card-wrapper"
+            >
+              {renderCheckedInPatientCard(record, {
+                isNextPatient: false,
+                queuePosition: record.live_queue_no,
+              })}
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  </div>
+)}
             </Card>
           </Col>
 
-          {/* Bottom row - Appointment Workflow */}
+          {/* Appointment workflow */}
 
           <Col xs={24}>
             <Card
@@ -1137,6 +1490,17 @@ const AppointmentMaintenance = () => {
             setPaymentAppointment(null);
           }}
           onSubmit={handlePaymentSubmit}
+        />
+
+        <TreatmentModal
+          open={treatmentModalOpen}
+          loading={treatmentLoading}
+          appointment={treatmentAppointment}
+          onCancel={() => {
+            setTreatmentModalOpen(false);
+            setTreatmentAppointment(null);
+          }}
+          onSubmit={handleTreatmentSubmit}
         />
 
         <style>{`
@@ -1259,7 +1623,7 @@ const AppointmentMaintenance = () => {
           }
 
           /* --------------------------------------------------
-             Current treatment card
+             Current treatment
           -------------------------------------------------- */
 
           .current-treatment-card {
@@ -1356,7 +1720,6 @@ const AppointmentMaintenance = () => {
             height: 9px;
             border-radius: 50%;
             background: #1677ff;
-            box-shadow: 0 0 0 rgba(22, 119, 255, 0.45);
             animation: treatmentPulse 1.7s infinite;
           }
 
@@ -1409,6 +1772,10 @@ const AppointmentMaintenance = () => {
             padding: 0;
           }
 
+          .checked-in-side-card .ant-card-body {
+            padding: 20px;
+          }
+
           .card-title-icon {
             display: flex;
             width: 38px;
@@ -1449,6 +1816,334 @@ const AppointmentMaintenance = () => {
             padding: 4px 10px;
             border-radius: 20px;
             font-weight: 700;
+          }
+
+          /* --------------------------------------------------
+             Separate queue sections
+          -------------------------------------------------- */
+
+          .checked-in-queue-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+          }
+
+          .next-patient-section {
+            padding: 20px;
+            border: 1px solid #bbf7d0;
+            border-radius: 18px;
+            background:
+              radial-gradient(
+                circle at top right,
+                rgba(34, 197, 94, 0.12),
+                transparent 38%
+              ),
+              linear-gradient(
+                145deg,
+                #f0fdf4 0%,
+                #ffffff 100%
+              );
+          }
+
+          .remaining-queue-section {
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+          }
+
+          .queue-section-heading {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 16px;
+          }
+
+          .queue-section-eyebrow {
+            display: block;
+            margin-bottom: 2px;
+            color: #0284c7;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+          }
+
+          .next-patient-section .queue-section-eyebrow {
+            color: #15803d;
+          }
+
+          .queue-section-title {
+            margin: 0 !important;
+            color: #0f172a !important;
+          }
+
+          .queue-section-description {
+            display: block;
+            margin-top: 3px;
+            font-size: 12px;
+          }
+
+          .queue-lock-tag,
+          .remaining-count-tag {
+            flex-shrink: 0;
+            margin: 0;
+            padding: 5px 11px;
+            border-radius: 20px;
+            font-weight: 700;
+          }
+
+          .next-patient-card-container {
+            width: 100%;
+            max-width: 520px;
+          }
+
+          .remaining-queue-empty {
+            display: flex;
+            min-height: 150px;
+            align-items: center;
+            justify-content: center;
+            border: 1px dashed #cbd5e1;
+            border-radius: 14px;
+            background: #f8fafc;
+          }
+
+          .checked-in-top-card {
+            width: 100%;
+          }
+
+          .checked-in-queue-row {
+            width: 100%;
+          }
+
+          .checked-in-queue-column {
+            display: flex;
+          }
+
+          /* --------------------------------------------------
+             Queue patient cards
+          -------------------------------------------------- */
+
+          .side-queue-item {
+            display: flex;
+            width: 100%;
+            min-height: 100%;
+            flex-direction: column;
+            padding: 18px;
+            border: 1px solid #dbeafe;
+            border-radius: 18px;
+            background: #ffffff;
+            box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+            transition:
+              transform 0.2s ease,
+              box-shadow 0.2s ease,
+              border-color 0.2s ease;
+          }
+
+          .side-queue-item:hover {
+            transform: translateY(-3px);
+            border-color: #93c5fd;
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.1);
+          }
+
+          .next-side-queue-item {
+            min-height: 320px;
+            border: 2px solid #22c55e;
+            background: linear-gradient(
+              145deg,
+              rgba(240, 253, 244, 0.98),
+              rgba(255, 255, 255, 1)
+            );
+            box-shadow: 0 12px 30px rgba(34, 197, 94, 0.15);
+          }
+
+          .side-queue-allergy-item {
+            border-color: #fca5a5;
+            background: linear-gradient(
+              145deg,
+              rgba(254, 242, 242, 0.95),
+              rgba(255, 255, 255, 1)
+            );
+          }
+
+          .next-side-queue-item.side-queue-allergy-item {
+            border-color: #ef4444;
+          }
+
+          .side-queue-item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 16px;
+          }
+
+          .side-queue-number-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          }
+
+          .side-queue-position {
+            min-width: 46px;
+            padding: 5px 11px;
+            border-radius: 999px;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 12px;
+            font-weight: 800;
+            text-align: center;
+          }
+
+          .next-side-queue-position {
+            background: linear-gradient(
+              135deg,
+              #16a34a 0%,
+              #22c55e 100%
+            );
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(34, 197, 94, 0.24);
+          }
+
+          .side-appointment-number-value {
+            display: inline-flex;
+            min-width: 32px;
+            height: 29px;
+            align-items: center;
+            justify-content: center;
+            padding: 0 8px;
+            border-radius: 9px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1;
+          }
+
+          .next-side-queue-item
+            .side-appointment-number-value {
+            background: #2563eb;
+            color: #ffffff;
+          }
+
+          .side-queue-allergy-item
+            .side-appointment-number-value {
+            background: #fee2e2;
+            color: #dc2626;
+          }
+
+          .side-allergy-tag {
+            margin: 0;
+            border-radius: 20px;
+            font-weight: 700;
+          }
+
+          .side-queue-patient {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+          }
+
+          .side-queue-avatar {
+            display: flex;
+            width: 46px;
+            height: 46px;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            background: linear-gradient(
+              135deg,
+              #dbeafe,
+              #cffafe
+            );
+            color: #0284c7;
+            font-size: 21px;
+          }
+
+          .next-side-queue-item .side-queue-avatar {
+            background: linear-gradient(
+              135deg,
+              #16a34a,
+              #4ade80
+            );
+            color: #ffffff;
+          }
+
+          .side-queue-patient-details {
+            display: flex;
+            min-width: 0;
+            flex-direction: column;
+          }
+
+          .side-queue-patient-name {
+            display: block;
+            overflow: hidden;
+            color: #0f172a;
+            font-size: 15px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          .next-side-queue-item
+            .side-queue-patient-name {
+            font-size: 17px;
+          }
+
+          .side-queue-phone {
+            display: block;
+            margin-top: 2px;
+            font-size: 12px;
+          }
+
+          .side-queue-time-box {
+            margin-bottom: 14px;
+            padding: 12px 8px;
+            border-radius: 12px;
+            background: #f8fafc;
+          }
+
+          .side-time-label {
+            display: block;
+            margin-bottom: 4px;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 650;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+          }
+
+          .side-reason-box {
+            margin-bottom: 14px;
+            padding: 11px 12px;
+            border-radius: 12px;
+            background: #f8fafc;
+          }
+
+          .side-reason-text {
+            display: -webkit-box;
+            overflow: hidden;
+            color: #334155;
+            font-size: 13px;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+          }
+
+          .side-queue-action {
+            margin-top: auto;
+            padding-top: 8px;
+          }
+
+          .side-queue-action-button {
+            min-height: 41px;
+            border-radius: 10px;
+            font-weight: 700;
+          }
+
+          .waiting-queue-button {
+            border-color: #cbd5e1 !important;
+            background: #f8fafc !important;
+            color: #64748b !important;
           }
 
           /* --------------------------------------------------
@@ -1535,6 +2230,89 @@ const AppointmentMaintenance = () => {
           }
 
           /* --------------------------------------------------
+             Appointment number
+          -------------------------------------------------- */
+
+          .appointment-number-cell {
+            display: flex;
+            min-width: 72px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+          }
+
+          .appointment-number-badge {
+            display: inline-flex;
+            width: 48px;
+            height: 48px;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #bfdbfe;
+            border-radius: 14px;
+            background: linear-gradient(
+              135deg,
+              #eff6ff 0%,
+              #dbeafe 100%
+            );
+            color: #1d4ed8;
+            font-size: 18px;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: 0.5px;
+            box-shadow:
+              0 5px 14px rgba(37, 99, 235, 0.12),
+              inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            transition:
+              transform 0.2s ease,
+              box-shadow 0.2s ease,
+              border-color 0.2s ease;
+          }
+
+          .ant-table-tbody
+            > tr:hover
+            .appointment-number-badge {
+            transform: translateY(-1px);
+            border-color: #93c5fd;
+            box-shadow:
+              0 8px 18px rgba(37, 99, 235, 0.18),
+              inset 0 1px 0 rgba(255, 255, 255, 0.9);
+          }
+
+          .appointment-number-cell-active
+            .appointment-number-badge {
+            border-color: #86efac;
+            background: linear-gradient(
+              135deg,
+              #f0fdf4 0%,
+              #dcfce7 100%
+            );
+            color: #15803d;
+          }
+
+          .appointment-number-cell-allergy
+            .appointment-number-badge {
+            border-color: #fecaca;
+            background: linear-gradient(
+              135deg,
+              #fff7f7 0%,
+              #fee2e2 100%
+            );
+            color: #dc2626;
+          }
+
+          .appointment-number-cell-active.appointment-number-cell-allergy
+            .appointment-number-badge {
+            border-color: #fca5a5;
+            background: linear-gradient(
+              135deg,
+              #fff1f2 0%,
+              #ffe4e6 100%
+            );
+            color: #be123c;
+          }
+
+          /* --------------------------------------------------
              Step buttons
           -------------------------------------------------- */
 
@@ -1572,22 +2350,10 @@ const AppointmentMaintenance = () => {
             color: #722ed1;
           }
 
-          .treatment-done-button:not(:disabled):hover {
-            border-color: #9254de !important;
-            background: #efdbff !important;
-            color: #531dab !important;
-          }
-
           .payment-button:not(:disabled) {
             border-color: #ffc069;
             background: #fff7e6;
             color: #d46b08;
-          }
-
-          .payment-button:not(:disabled):hover {
-            border-color: #ffa940 !important;
-            background: #ffe7ba !important;
-            color: #ad4e00 !important;
           }
 
           .complete-button:not(:disabled) {
@@ -1597,7 +2363,6 @@ const AppointmentMaintenance = () => {
               #389e0d 0%,
               #52c41a 100%
             );
-            box-shadow: 0 4px 10px rgba(56, 158, 13, 0.18);
           }
 
           /* --------------------------------------------------
@@ -1620,19 +2385,9 @@ const AppointmentMaintenance = () => {
             border-left: 4px solid #1677ff;
           }
 
-          .in-treatment-row:hover > td,
-          .in-treatment-row > td.ant-table-cell-row-hover {
-            background: #bae0ff !important;
-          }
-
           .completed-row > td {
             background: #f6ffed !important;
             opacity: 0.82;
-          }
-
-          .completed-row:hover > td,
-          .completed-row > td.ant-table-cell-row-hover {
-            background: #d9f7be !important;
           }
 
           .allergy-alert-row > td {
@@ -1645,7 +2400,8 @@ const AppointmentMaintenance = () => {
           }
 
           .allergy-alert-row:hover > td,
-          .allergy-alert-row > td.ant-table-cell-row-hover {
+          .allergy-alert-row
+            > td.ant-table-cell-row-hover {
             background: #ffccc7 !important;
           }
 
@@ -1655,599 +2411,327 @@ const AppointmentMaintenance = () => {
             background: #fff1f0 !important;
             opacity: 1 !important;
           }
+/* --------------------------------------------------
+   Simplified checked-in patient card
+-------------------------------------------------- */
 
-          /* --------------------------------------------------
-             Side queue
-          -------------------------------------------------- */
-
-          .checked-in-side-card {
-            position: sticky;
-            top: 16px;
-          }
-
-          .checked-in-side-card .ant-card-body {
-            padding: 14px;
-          }
-
-          .side-queue-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-          }
-
-          .side-queue-item {
-            padding: 14px;
-            border: 1px solid #e2e8f0;
-            border-radius: 13px;
-            background: #ffffff;
-            transition:
-              border-color 0.2s ease,
-              box-shadow 0.2s ease,
-              transform 0.2s ease;
-          }
-
-          .side-queue-item:hover {
-            border-color: #91caff;
-            box-shadow: 0 7px 18px rgba(15, 23, 42, 0.08);
-            transform: translateY(-1px);
-          }
-
-          .next-side-queue-item {
-            border: 2px solid #52c41a;
-            background:
-              radial-gradient(
-                circle at top right,
-                rgba(82, 196, 26, 0.12),
-                transparent 42%
-              ),
-              #f6ffed;
-          }
-
-          .side-queue-allergy-item {
-            border-left: 5px solid #ff4d4f;
-            background: #fff1f0;
-          }
-
-          .next-side-queue-item.side-queue-allergy-item {
-            border-top-color: #ff4d4f;
-            border-right-color: #ff4d4f;
-            border-bottom-color: #ff4d4f;
-          }
-
-          .side-queue-item-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            margin-bottom: 12px;
-          }
-
-          .side-queue-position {
-            display: inline-flex;
-            min-width: 48px;
-            align-items: center;
-            justify-content: center;
-            padding: 5px 10px;
-            border-radius: 20px;
-            background: #e6f4ff;
-            color: #1677ff;
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 0.04em;
-          }
-
-          .next-side-queue-position {
-            background: linear-gradient(
-              135deg,
-              #389e0d 0%,
-              #52c41a 100%
-            );
-            color: #ffffff;
-            box-shadow: 0 4px 10px rgba(56, 158, 13, 0.2);
-          }
-
-          .side-allergy-tag {
-            margin: 0;
-            border-radius: 20px;
-            font-weight: 700;
-          }
-
-          .side-queue-patient {
-            display: flex;
-            min-width: 0;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-          }
-
-          .side-queue-avatar {
-            display: flex;
-            width: 41px;
-            height: 41px;
-            flex-shrink: 0;
-            align-items: center;
-            justify-content: center;
-            border-radius: 11px;
-            background: linear-gradient(
-              135deg,
-              #1677ff 0%,
-              #4096ff 100%
-            );
-            color: #ffffff;
-            font-size: 17px;
-          }
-
-          .side-queue-patient-details {
-            display: flex;
-            min-width: 0;
-            flex: 1;
-            flex-direction: column;
-          }
-
-          .side-queue-patient-name {
-            overflow: hidden;
-            color: #0f172a;
-            font-size: 15px;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          }
-
-          .side-queue-phone {
-            font-size: 12px;
-          }
-
-          .side-queue-time-box {
-            margin-bottom: 10px;
-            padding: 10px;
-            border: 1px solid #eef2f7;
-            border-radius: 10px;
-            background: #f8fafc;
-          }
-
-          .side-time-label {
-            display: block;
-            margin-bottom: 3px;
-            color: #64748b;
-            font-size: 10px;
-            font-weight: 650;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
-          }
-
-          .side-reason-box {
-            margin-bottom: 11px;
-            padding: 9px 10px;
-            border-radius: 9px;
-            background: rgba(22, 119, 255, 0.06);
-          }
-
-          .side-reason-text {
-            display: block;
-            overflow: hidden;
-            color: #334155;
-            font-size: 12px;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          }
-
-          .side-queue-action-button {
-            min-height: 39px;
-            border-radius: 9px;
-            font-weight: 650;
-          }
-            /* --------------------------------------------------------
-   Side Queue Appointment Number
--------------------------------------------------------- */
-
-.side-queue-number-group {
+.simple-checked-in-card {
   display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.side-appointment-number {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-
-  min-height: 32px;
-  padding: 5px 10px;
-
-  border: 1px solid #dbeafe;
-  border-radius: 10px;
-
-  background: linear-gradient(
-    135deg,
-    #f8fbff 0%,
-    #eff6ff 100%
-  );
-}
-
-.side-appointment-number-label {
-  font-size: 10px;
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: 0.2px;
-  white-space: nowrap;
-}
-
-.side-appointment-number-value {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  min-width: 25px;
-  height: 23px;
-  padding: 0 6px;
-
-  border-radius: 7px;
-  background: #dbeafe;
-
-  color: #1d4ed8;
-  font-size: 13px;
-  font-weight: 800;
-  line-height: 1;
-}
-
-/* First patient */
-
-.next-side-queue-item .side-appointment-number {
-  border-color: #bfdbfe;
-  background: linear-gradient(
-    135deg,
-    #eff6ff 0%,
-    #dbeafe 100%
-  );
-}
-
-.next-side-queue-item .side-appointment-number-value {
-  background: #2563eb;
-  color: #ffffff;
-}
-
-/* Allergy patient */
-
-.side-queue-allergy-item .side-appointment-number {
-  border-color: #fecaca;
-  background: linear-gradient(
-    135deg,
-    #fff7f7 0%,
-    #fef2f2 100%
-  );
-}
-
-.side-queue-allergy-item .side-appointment-number-value {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
-@media (max-width: 576px) {
-  .side-queue-item-header {
-    align-items: flex-start;
-  }
-
-  .side-queue-number-group {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .side-appointment-number {
-    padding: 4px 8px;
-  }
-
-  .side-appointment-number-label {
-    font-size: 9px;
-  }
-}
-.checked-in-top-card {
   width: 100%;
-}
-
-.checked-in-queue-row {
-  width: 100%;
-}
-
-.checked-in-queue-column {
-  display: flex;
-}
-
-.side-queue-item {
-  width: 100%;
-  min-height: 100%;
-  padding: 18px;
-  display: flex;
+  min-height: 190px;
   flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px;
   border: 1px solid #dbeafe;
   border-radius: 18px;
   background: #ffffff;
-  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.07);
 }
 
-.side-queue-item:hover {
-  transform: translateY(-3px);
-  border-color: #93c5fd;
-  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.1);
-}
-
-.next-side-queue-item {
+.simple-next-patient-card {
   border: 2px solid #22c55e;
-  background: linear-gradient(
-    145deg,
-    rgba(240, 253, 244, 0.98),
-    rgba(255, 255, 255, 1)
-  );
-  box-shadow: 0 10px 28px rgba(34, 197, 94, 0.14);
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(34, 197, 94, 0.14),
+      transparent 42%
+    ),
+    linear-gradient(
+      145deg,
+      #f0fdf4 0%,
+      #ffffff 100%
+    );
+  box-shadow: 0 12px 28px rgba(34, 197, 94, 0.15);
 }
 
-.side-queue-allergy-item {
-  border-color: #fca5a5;
-  background: linear-gradient(
-    145deg,
-    rgba(254, 242, 242, 0.95),
-    rgba(255, 255, 255, 1)
-  );
+.simple-allergy-patient-card {
+  border-color: #ef4444;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(239, 68, 68, 0.12),
+      transparent 42%
+    ),
+    #fffafa;
 }
 
-.side-queue-item-header {
+.simple-queue-number-section {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
   gap: 10px;
-  margin-bottom: 16px;
-}
-
-.side-queue-position {
-  min-width: 46px;
-  padding: 5px 11px;
-  border-radius: 999px;
-  background: #e0f2fe;
-  color: #0369a1;
-  font-size: 12px;
-  font-weight: 800;
   text-align: center;
 }
 
-.next-side-queue-position {
-  background: #22c55e;
-  color: #ffffff;
-}
-
-.side-queue-patient {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.side-queue-avatar {
-  width: 46px;
-  height: 46px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #dbeafe, #cffafe);
-  color: #0284c7;
-  font-size: 21px;
-}
-
-.side-queue-patient-details {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.side-queue-patient-name {
-  display: block;
-  overflow: hidden;
-  color: #0f172a;
-  font-size: 15px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.side-queue-phone {
-  display: block;
-  margin-top: 2px;
+.simple-queue-position {
+  color: #64748b;
   font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.side-queue-time-box {
-  margin-bottom: 14px;
-  padding: 12px 8px;
-  border-radius: 12px;
-  background: #f8fafc;
+.simple-next-patient-card .simple-queue-position {
+  color: #15803d;
 }
 
-.side-time-label {
-  display: block;
-  margin-bottom: 4px;
-  font-size: 11px;
-}
-
-.side-reason-box {
-  margin-bottom: 14px;
-  padding: 11px 12px;
-  border-radius: 12px;
-  background: #f8fafc;
-}
-
-.side-reason-text {
-  display: -webkit-box;
-  overflow: hidden;
-  font-size: 13px;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-.side-queue-action {
-  margin-top: auto;
-  padding-top: 8px;
-}
-
-@media (max-width: 575px) {
-  .side-queue-item {
-    padding: 15px;
-  }
-
-  .side-queue-time-box > .ant-col {
-    flex: 0 0 100%;
-    max-width: 100%;
-  }
-}
-
-/* --------------------------------------------------------
-   Appointment Number Column
--------------------------------------------------------- */
-
-.appointment-number-cell {
+.simple-appointment-number {
   display: flex;
-  flex-direction: column;
+  width: 82px;
+  height: 82px;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  min-width: 72px;
-}
-
-.appointment-number-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 48px;
-  height: 48px;
-
-  border: 1px solid #bfdbfe;
-  border-radius: 14px;
-
+  border: 2px solid #bfdbfe;
+  border-radius: 24px;
   background: linear-gradient(
     135deg,
     #eff6ff 0%,
     #dbeafe 100%
   );
-
   color: #1d4ed8;
-  font-size: 18px;
-  font-weight: 800;
+  font-size: 34px;
+  font-weight: 900;
   line-height: 1;
-  letter-spacing: 0.5px;
-
   box-shadow:
-    0 5px 14px rgba(37, 99, 235, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
-}
-
-.appointment-number-label {
-  margin: 0;
-  font-size: 10px;
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-/* Hover effect */
-
-.ant-table-tbody > tr:hover .appointment-number-badge {
-  transform: translateY(-1px);
-  border-color: #93c5fd;
-
-  box-shadow:
-    0 8px 18px rgba(37, 99, 235, 0.18),
+    0 8px 20px rgba(37, 99, 235, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
-/* Patient currently in treatment */
-
-.appointment-number-cell-active .appointment-number-badge {
+.simple-next-patient-card .simple-appointment-number {
   border-color: #86efac;
-
   background: linear-gradient(
     135deg,
-    #f0fdf4 0%,
-    #dcfce7 100%
+    #22c55e 0%,
+    #16a34a 100%
   );
-
-  color: #15803d;
-
-  box-shadow:
-    0 5px 14px rgba(22, 163, 74, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  color: #ffffff;
+  box-shadow: 0 9px 22px rgba(34, 197, 94, 0.24);
 }
 
-/* Allergy warning */
-
-.appointment-number-cell-allergy .appointment-number-badge {
-  border-color: #fecaca;
-
-  background: linear-gradient(
-    135deg,
-    #fff7f7 0%,
-    #fee2e2 100%
-  );
-
-  color: #dc2626;
-
-  box-shadow:
-    0 5px 14px rgba(220, 38, 38, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
-}
-
-/* Allergy takes priority when also in treatment */
-
-.appointment-number-cell-active.appointment-number-cell-allergy
-  .appointment-number-badge {
+.simple-allergy-patient-card .simple-appointment-number {
   border-color: #fca5a5;
-
   background: linear-gradient(
     135deg,
     #fff1f2 0%,
-    #ffe4e6 100%
+    #fee2e2 100%
   );
-
-  color: #be123c;
+  color: #dc2626;
 }
 
-/* Responsive */
+.simple-allergy-tag {
+  margin: 0;
+  border-radius: 20px;
+  font-weight: 700;
+}
 
-@media (max-width: 768px) {
-  .appointment-number-cell {
-    min-width: 60px;
+.simple-treatment-action {
+  width: 100%;
+}
+
+.simple-treatment-action .ant-btn {
+  min-height: 44px;
+  border-radius: 11px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+@media (max-width: 575px) {
+  .simple-checked-in-card {
+    min-height: 175px;
+    padding: 18px;
   }
 
-  .appointment-number-badge {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    font-size: 16px;
-  }
-
-  .appointment-number-label {
-    font-size: 9px;
+  .simple-appointment-number {
+    width: 72px;
+    height: 72px;
+    border-radius: 20px;
+    font-size: 30px;
   }
 }
-          /* --------------------------------------------------
-             Responsive
-          -------------------------------------------------- */
+        
+/* --------------------------------------------------
+   Checked-in queue horizontal layout
+-------------------------------------------------- */
 
-          @media (max-width: 991px) {
-            .checked-in-side-card {
-              position: static;
-            }
-          }
+.checked-in-horizontal-layout {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+  gap: 16px;
+}
 
+.queue-column-section {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  padding: 18px;
+  border-radius: 18px;
+}
+
+.next-patient-section {
+  width: 280px;
+  min-width: 280px;
+  flex-shrink: 0;
+  border: 1px solid #86efac;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(34, 197, 94, 0.14),
+      transparent 42%
+    ),
+    linear-gradient(
+      145deg,
+      #f0fdf4 0%,
+      #ffffff 100%
+    );
+}
+
+.remaining-queue-section {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.queue-section-heading {
+  display: flex;
+  min-height: 74px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.queue-section-eyebrow {
+  display: block;
+  margin-bottom: 2px;
+  color: #0284c7;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.next-patient-section .queue-section-eyebrow {
+  color: #15803d;
+}
+
+.queue-section-title {
+  margin: 0 !important;
+  color: #0f172a !important;
+}
+
+.queue-section-description {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+}
+
+.queue-lock-tag,
+.remaining-count-tag {
+  flex-shrink: 0;
+  margin: 0;
+  border-radius: 20px;
+  font-weight: 700;
+}
+
+.next-patient-card-container {
+  display: flex;
+  width: 100%;
+  flex: 1;
+}
+
+.next-patient-card-container > * {
+  width: 100%;
+}
+
+.remaining-patients-horizontal-list {
+  display: flex;
+  width: 100%;
+  gap: 14px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 2px 10px;
+  scroll-behavior: smooth;
+}
+
+.remaining-patient-card-wrapper {
+  display: flex;
+  width: 210px;
+  min-width: 210px;
+  flex-shrink: 0;
+}
+
+.remaining-patient-card-wrapper > * {
+  width: 100%;
+}
+
+.remaining-patients-horizontal-list::-webkit-scrollbar {
+  height: 7px;
+}
+
+.remaining-patients-horizontal-list::-webkit-scrollbar-track {
+  border-radius: 20px;
+  background: #e2e8f0;
+}
+
+.remaining-patients-horizontal-list::-webkit-scrollbar-thumb {
+  border-radius: 20px;
+  background: #94a3b8;
+}
+
+.remaining-queue-empty {
+  display: flex;
+  min-height: 180px;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #cbd5e1;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+/* Tablet and mobile */
+
+@media (max-width: 991px) {
+  .checked-in-horizontal-layout {
+    flex-direction: column;
+  }
+
+  .next-patient-section {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .remaining-patient-card-wrapper {
+    width: 220px;
+    min-width: 220px;
+  }
+}
+
+@media (max-width: 575px) {
+  .queue-column-section {
+    padding: 14px;
+  }
+
+  .queue-section-heading {
+    min-height: auto;
+    flex-direction: column;
+  }
+
+  .queue-lock-tag,
+  .remaining-count-tag {
+    align-self: flex-start;
+  }
+
+  .remaining-patient-card-wrapper {
+    width: 190px;
+    min-width: 190px;
+  }
+}
           @media (max-width: 768px) {
             .header-controls {
               width: 100%;
@@ -2278,7 +2762,8 @@ const AppointmentMaintenance = () => {
               display: none;
             }
 
-            .header-refresh-button span:not(.anticon) {
+            .header-refresh-button
+              span:not(.anticon) {
               display: none;
             }
 

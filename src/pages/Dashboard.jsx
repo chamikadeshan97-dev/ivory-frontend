@@ -1372,7 +1372,6 @@ const Dashboard = () => {
                     >
                       <div className="dashboard-detail-box">
                         <Text type="secondary">
-                          Queue Number
                         </Text>
 
                         <Title level={4}>

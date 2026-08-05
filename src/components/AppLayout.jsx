@@ -105,11 +105,17 @@ const allMenuItems = [
         roles: [ROLES.ADMIN],
         label: <Link to="/dentists">Dentists</Link>,
       },
+      // {
+      //   key: "/patient-history",
+      //   icon: <HistoryOutlined />,
+      //   roles: ALL_ROLES,
+      //   label: <Link to="/patient-history">Patient History</Link>,
+      // },
       {
-        key: "/patient-history",
-        icon: <HistoryOutlined />,
-        roles: ALL_ROLES,
-        label: <Link to="/patient-history">Patient History</Link>,
+        key: "/follow-up-patients",
+        icon: <PhoneOutlined />,
+        roles: CLINIC_ROLES,
+        label: <Link to="/follow-up-patients">Follow-up Patients</Link>,
       },
     ],
   },
@@ -131,12 +137,22 @@ const allMenuItems = [
         label: <Link to="/appointment-history">Appointment History</Link>,
       },
 
+      // {
+      //   key: "/appointment-maintenance", //simple-appointment-maintenance
+      //   icon: <SolutionOutlined />,
+      //   roles: CLINIC_ROLES,
+      //   label: (
+      //     <Link to="/appointment-maintenance">Appointment Maintenance</Link>
+      //   ),
+      // },
       {
-        key: "/appointment-maintenance",
+        key: "/simple-appointment-maintenance", //simple-appointment-maintenance
         icon: <SolutionOutlined />,
         roles: CLINIC_ROLES,
         label: (
-          <Link to="/appointment-maintenance">Appointment Maintenance</Link>
+          <Link to="/simple-appointment-maintenance">
+            Appointment Maintenance
+          </Link>
         ),
       },
     ],
@@ -175,19 +191,6 @@ const allMenuItems = [
 
   {
     type: "group",
-    label: "Follow-ups",
-    children: [
-      {
-        key: "/follow-up-patients",
-        icon: <PhoneOutlined />,
-        roles: CLINIC_ROLES,
-        label: <Link to="/follow-up-patients">Follow-up Patients</Link>,
-      },
-    ],
-  },
-
-  {
-    type: "group",
     label: "System Administration",
     children: [
       {
@@ -196,21 +199,26 @@ const allMenuItems = [
         roles: [ROLES.ADMIN],
         label: <Link to="/user-registration">Register User</Link>,
       },
-    ],
-  },
-  {
-    type: "group",
-    label: "System Administration",
-    children: [
       {
         key: "/common-treatments",
         icon: <MedicineBoxOutlined />,
         roles: [ROLES.ADMIN],
         label: <Link to="/common-treatments">Common Treatments</Link>,
       },
+      {
+        key: "/drugs",
+        icon: <MedicineBoxOutlined />,
+        roles: [ROLES.ADMIN],
+        label: <Link to="/drugs">Drugs</Link>,
+      },
+      {
+        key: "/locations",
+        icon: <MedicineBoxOutlined />,
+        roles: [ROLES.ADMIN],
+        label: <Link to="/locations">Locations</Link>,
+      },
     ],
   },
-  
 ];
 
 /* --------------------------------------------------------

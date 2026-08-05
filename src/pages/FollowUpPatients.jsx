@@ -2,6 +2,7 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -14,6 +15,7 @@ import {
   DatePicker,
   Empty,
   Input,
+  Modal,
   Row,
   Segmented,
   Space,
@@ -30,9 +32,11 @@ import {
   ClockCircleOutlined,
   CopyOutlined,
   IdcardOutlined,
+  LeftOutlined,
   MedicineBoxOutlined,
   PhoneOutlined,
   ReloadOutlined,
+  RightOutlined,
   SearchOutlined,
   UserOutlined,
   WarningOutlined,
@@ -40,37 +44,24 @@ import {
 
 import dayjs from "dayjs";
 
-import {
-  getFollowUpPatients,
-} from "../api/endPoints";
+import { getFollowUpPatients } from "../api/endPoints";
 
 import ClinicPage from "../components/ClinicPage";
 
 import "./css/FollowUpPatients.css";
 
-const {
-  Title,
-  Text,
-  Paragraph,
-} = Typography;
+const { Title, Text, Paragraph } = Typography;
 
 /* --------------------------------------------------------
    Helpers
 -------------------------------------------------------- */
 
 const convertToBoolean = (value) => {
-  if (
-    value === true ||
-    value === 1
-  ) {
+  if (value === true || value === 1) {
     return true;
   }
 
-  return [
-    "true",
-    "yes",
-    "1",
-  ].includes(
+  return ["true", "yes", "1"].includes(
     String(value ?? "")
       .trim()
       .toLowerCase(),
@@ -101,14 +92,25 @@ const cleanPhoneNumber = (value) => {
     .trim();
 };
 
-const extractFollowUpData = (
-  response,
-) => {
-  return (
+const extractFollowUpList = (response) => {
+  const result =
     response?.data?.data ??
     response?.data ??
-    {}
-  );
+    {};
+
+  if (Array.isArray(result)) {
+    return result;
+  }
+
+  const followUpList =
+    result?.follow_ups ??
+    result?.followUps ??
+    result?.records ??
+    [];
+
+  return Array.isArray(followUpList)
+    ? followUpList
+    : [];
 };
 
 const getPatientName = (record) => {
@@ -136,9 +138,7 @@ const getPatientPhone = (record) => {
   );
 };
 
-const hasPatientAllergy = (
-  record,
-) => {
+const hasPatientAllergy = (record) => {
   return convertToBoolean(
     record?.has_allergies ??
       record?.is_allergies ??
@@ -146,9 +146,7 @@ const hasPatientAllergy = (
   );
 };
 
-const getAllergyDetails = (
-  record,
-) => {
+const getAllergyDetails = (record) => {
   return (
     record?.allergy_details ||
     record?.allergies ||
@@ -157,9 +155,7 @@ const getAllergyDetails = (
   );
 };
 
-const getTreatmentName = (
-  record,
-) => {
+const getTreatmentName = (record) => {
   return (
     record?.treatment_performed ||
     record?.treatment_name ||
@@ -168,14 +164,41 @@ const getTreatmentName = (
   );
 };
 
-const getTreatmentDate = (
-  record,
-) => {
+const getTreatmentDate = (record) => {
   return (
     record?.previous_treatment_date ||
     record?.treatment_date ||
     record?.created_at
   );
+};
+
+const calculateFollowUpSummary = (
+  records = [],
+) => {
+  const safeRecords = Array.isArray(records)
+    ? records
+    : [];
+
+  const contactable = safeRecords.filter(
+    (record) =>
+      Boolean(
+        cleanPhoneNumber(
+          getPatientPhone(record),
+        ),
+      ),
+  ).length;
+
+  const allergies = safeRecords.filter(
+    hasPatientAllergy,
+  ).length;
+
+  return {
+    total: safeRecords.length,
+    contactable,
+    missingPhone:
+      safeRecords.length - contactable,
+    allergies,
+  };
 };
 
 /* --------------------------------------------------------
@@ -222,110 +245,276 @@ const FollowUpSummaryCard = ({
 -------------------------------------------------------- */
 
 const FollowUpPatients = () => {
+  const requestSequenceRef = useRef(0);
+
+  const [weekStart, setWeekStart] =
+    useState(dayjs().startOf("day"));
+
+  const [
+    weeklyFollowUps,
+    setWeeklyFollowUps,
+  ] = useState({});
+
+  const [loading, setLoading] =
+    useState(false);
+
   const [
     selectedDate,
     setSelectedDate,
-  ] = useState(dayjs());
+  ] = useState(null);
 
   const [
-    followUps,
-    setFollowUps,
-  ] = useState([]);
-
-  const [
-    loading,
-    setLoading,
+    isModalOpen,
+    setIsModalOpen,
   ] = useState(false);
 
-  const [
-    search,
-    setSearch,
-  ] = useState("");
+  const [search, setSearch] =
+    useState("");
 
   const [
     contactFilter,
     setContactFilter,
   ] = useState("all");
 
-  const selectedDateString =
-    useMemo(() => {
-      return selectedDate.format(
-        "YYYY-MM-DD",
-      );
-    }, [selectedDate]);
-
-  const formattedSelectedDate =
-    useMemo(() => {
-      return selectedDate.format(
-        "DD MMMM YYYY",
-      );
-    }, [selectedDate]);
-
-  const isSelectedDateToday =
-    selectedDate.isSame(
-      dayjs(),
-      "day",
-    );
-
-  const isSelectedDateTomorrow =
-    selectedDate.isSame(
-      dayjs().add(1, "day"),
-      "day",
-    );
-
   /* ------------------------------------------------------
-     Load follow-up patients
+     Seven-day date range
   ------------------------------------------------------ */
 
-  const loadFollowUps =
+  const weekDates = useMemo(() => {
+    return Array.from(
+      { length: 7 },
+      (_, index) =>
+        weekStart
+          .add(index, "day")
+          .startOf("day"),
+    );
+  }, [weekStart]);
+
+  const weekDateStrings = useMemo(() => {
+    return weekDates.map((date) =>
+      date.format("YYYY-MM-DD"),
+    );
+  }, [weekDates]);
+
+  const weekEnd = useMemo(() => {
+    return weekStart.add(6, "day");
+  }, [weekStart]);
+
+  const weekRangeLabel = useMemo(() => {
+    const sameMonth = weekStart.isSame(
+      weekEnd,
+      "month",
+    );
+
+    const sameYear = weekStart.isSame(
+      weekEnd,
+      "year",
+    );
+
+    if (sameMonth) {
+      return `${weekStart.format(
+        "DD",
+      )} – ${weekEnd.format(
+        "DD MMMM YYYY",
+      )}`;
+    }
+
+    if (sameYear) {
+      return `${weekStart.format(
+        "DD MMM",
+      )} – ${weekEnd.format(
+        "DD MMM YYYY",
+      )}`;
+    }
+
+    return `${weekStart.format(
+      "DD MMM YYYY",
+    )} – ${weekEnd.format(
+      "DD MMM YYYY",
+    )}`;
+  }, [weekStart, weekEnd]);
+
+  /* ------------------------------------------------------
+     Load follow-ups for all seven days
+  ------------------------------------------------------ */
+
+  const loadWeekFollowUps =
     useCallback(async () => {
+      const requestSequence =
+        requestSequenceRef.current + 1;
+
+      requestSequenceRef.current =
+        requestSequence;
+
       setLoading(true);
 
       try {
-        const response =
-          await getFollowUpPatients(
-            selectedDateString,
+        const responses =
+          await Promise.allSettled(
+            weekDateStrings.map(
+              (dateString) =>
+                getFollowUpPatients(
+                  dateString,
+                ),
+            ),
           );
 
-        const result =
-          extractFollowUpData(
-            response,
-          );
+        if (
+          requestSequence !==
+          requestSequenceRef.current
+        ) {
+          return;
+        }
 
-        const followUpList =
-          result?.follow_ups ??
-          result?.followUps ??
-          [];
+        const nextWeeklyData = {};
 
-        setFollowUps(
-          Array.isArray(
-            followUpList,
-          )
-            ? followUpList
-            : [],
+        let failedRequestCount = 0;
+
+        responses.forEach(
+          (result, index) => {
+            const dateString =
+              weekDateStrings[index];
+
+            if (
+              result.status ===
+              "fulfilled"
+            ) {
+              nextWeeklyData[
+                dateString
+              ] =
+                extractFollowUpList(
+                  result.value,
+                );
+            } else {
+              failedRequestCount += 1;
+
+              nextWeeklyData[
+                dateString
+              ] = [];
+
+              console.error(
+                `Failed to load follow-ups for ${dateString}:`,
+                result.reason,
+              );
+            }
+          },
         );
+
+        setWeeklyFollowUps(
+          nextWeeklyData,
+        );
+
+        if (
+          failedRequestCount > 0
+        ) {
+          message.warning(
+            `${failedRequestCount} day${
+              failedRequestCount === 1
+                ? ""
+                : "s"
+            } could not be loaded.`,
+          );
+        }
       } catch (error) {
         console.error(
-          "Failed to load follow-up patients:",
+          "Failed to load the follow-up calendar:",
           error,
         );
 
-        setFollowUps([]);
+        if (
+          requestSequence ===
+          requestSequenceRef.current
+        ) {
+          setWeeklyFollowUps({});
 
-        message.error(
-          error?.response?.data
-            ?.message ||
-            error?.message ||
-            "Unable to load follow-up patients.",
-        );
+          message.error(
+            error?.response?.data
+              ?.message ||
+              error?.message ||
+              "Unable to load the follow-up calendar.",
+          );
+        }
       } finally {
-        setLoading(false);
+        if (
+          requestSequence ===
+          requestSequenceRef.current
+        ) {
+          setLoading(false);
+        }
       }
-    }, [selectedDateString]);
+    }, [weekDateStrings]);
 
   useEffect(() => {
-    loadFollowUps();
-  }, [loadFollowUps]);
+    loadWeekFollowUps();
+  }, [loadWeekFollowUps]);
+
+  /* ------------------------------------------------------
+     Weekly summary
+  ------------------------------------------------------ */
+
+  const allWeekFollowUps =
+    useMemo(() => {
+      return weekDateStrings.flatMap(
+        (dateString) => {
+          const records =
+            weeklyFollowUps[
+              dateString
+            ];
+
+          return Array.isArray(records)
+            ? records
+            : [];
+        },
+      );
+    }, [
+      weeklyFollowUps,
+      weekDateStrings,
+    ]);
+
+  const weekSummary = useMemo(() => {
+    return calculateFollowUpSummary(
+      allWeekFollowUps,
+    );
+  }, [allWeekFollowUps]);
+
+  /* ------------------------------------------------------
+     Selected date data
+  ------------------------------------------------------ */
+
+  const selectedDateString =
+    useMemo(() => {
+      return selectedDate
+        ? selectedDate.format(
+            "YYYY-MM-DD",
+          )
+        : null;
+    }, [selectedDate]);
+
+  const selectedDateFollowUps =
+    useMemo(() => {
+      if (!selectedDateString) {
+        return [];
+      }
+
+      const records =
+        weeklyFollowUps[
+          selectedDateString
+        ];
+
+      return Array.isArray(records)
+        ? records
+        : [];
+    }, [
+      selectedDateString,
+      weeklyFollowUps,
+    ]);
+
+  const selectedDateSummary =
+    useMemo(() => {
+      return calculateFollowUpSummary(
+        selectedDateFollowUps,
+      );
+    }, [selectedDateFollowUps]);
 
   /* ------------------------------------------------------
      Contact actions
@@ -409,65 +598,67 @@ const FollowUpPatients = () => {
     }
   };
 
-  const handleToday = () => {
-    setSelectedDate(dayjs());
+  /* ------------------------------------------------------
+     Calendar navigation
+  ------------------------------------------------------ */
+
+  const closeDetailsModal = () => {
+    setIsModalOpen(false);
+    setSearch("");
+    setContactFilter("all");
   };
 
-  const handleTomorrow = () => {
-    setSelectedDate(
-      dayjs().add(1, "day"),
+  const updateWeekStart = (
+    newStartDate,
+  ) => {
+    if (!newStartDate) {
+      return;
+    }
+
+    closeDetailsModal();
+    setSelectedDate(null);
+
+    setWeekStart(
+      newStartDate.startOf("day"),
     );
   };
 
-  /* ------------------------------------------------------
-     Summary
-  ------------------------------------------------------ */
-
-  const summary = useMemo(() => {
-    const allergyPatients =
-      followUps.filter(
-        hasPatientAllergy,
-      ).length;
-
-    const contactablePatients =
-      followUps.filter(
-        (record) =>
-          Boolean(
-            cleanPhoneNumber(
-              getPatientPhone(
-                record,
-              ),
-            ),
-          ),
-      ).length;
-
-    const missingPhone =
-      followUps.length -
-      contactablePatients;
-
-    return {
-      total: followUps.length,
-
-      contactable:
-        contactablePatients,
-
-      missingPhone,
-
-      allergies:
-        allergyPatients,
+  const handlePreviousSevenDays =
+    () => {
+      updateWeekStart(
+        weekStart.subtract(7, "day"),
+      );
     };
-  }, [followUps]);
+
+  const handleNextSevenDays = () => {
+    updateWeekStart(
+      weekStart.add(7, "day"),
+    );
+  };
+
+  const handleToday = () => {
+    updateWeekStart(
+      dayjs().startOf("day"),
+    );
+  };
+
+  const handleOpenDate = (date) => {
+    setSelectedDate(date);
+    setSearch("");
+    setContactFilter("all");
+    setIsModalOpen(true);
+  };
 
   /* ------------------------------------------------------
-     Search and filtering
+     Modal search and filtering
   ------------------------------------------------------ */
 
-  const filteredFollowUps =
+  const filteredSelectedFollowUps =
     useMemo(() => {
       const keyword =
         normalizeValue(search);
 
-      return followUps.filter(
+      return selectedDateFollowUps.filter(
         (record) => {
           const hasAllergies =
             hasPatientAllergy(
@@ -532,7 +723,7 @@ const FollowUpPatients = () => {
         },
       );
     }, [
-      followUps,
+      selectedDateFollowUps,
       search,
       contactFilter,
     ]);
@@ -680,6 +871,7 @@ const FollowUpPatients = () => {
               <Tooltip title="Copy phone number">
                 <Button
                   size="small"
+                  aria-label="Copy phone number"
                   icon={
                     <CopyOutlined />
                   }
@@ -797,11 +989,11 @@ const FollowUpPatients = () => {
   return (
     <ClinicPage
       title="Patient Follow-ups"
-      subtitle={`Patients advised by the doctor to return on ${formattedSelectedDate}.`}
+      subtitle="Review upcoming patient follow-ups using the seven-day calendar."
       icon={<CalendarOutlined />}
       actions={[
         <div
-          key="date"
+          key="start-date"
           className="follow-up-date-control"
         >
           <div className="follow-up-date-control__icon">
@@ -809,12 +1001,12 @@ const FollowUpPatients = () => {
           </div>
 
           <DatePicker
-            value={selectedDate}
+            value={weekStart}
             format="DD MMM YYYY"
             allowClear={false}
             onChange={(date) => {
               if (date) {
-                setSelectedDate(
+                updateWeekStart(
                   date,
                 );
               }
@@ -824,14 +1016,27 @@ const FollowUpPatients = () => {
         </div>,
 
         <Button
-          key="today"
-          icon={
-            <CalendarOutlined />
+          key="previous"
+          icon={<LeftOutlined />}
+          onClick={
+            handlePreviousSevenDays
           }
+        >
+          Previous 7 Days
+        </Button>,
+
+        <Button
+          key="today"
           type={
-            isSelectedDateToday
+            weekStart.isSame(
+              dayjs(),
+              "day",
+            )
               ? "primary"
               : "default"
+          }
+          icon={
+            <CalendarOutlined />
           }
           onClick={handleToday}
         >
@@ -839,18 +1044,13 @@ const FollowUpPatients = () => {
         </Button>,
 
         <Button
-          key="tomorrow"
-          icon={
-            <CalendarOutlined />
+          key="next"
+          icon={<RightOutlined />}
+          onClick={
+            handleNextSevenDays
           }
-          type={
-            isSelectedDateTomorrow
-              ? "primary"
-              : "default"
-          }
-          onClick={handleTomorrow}
         >
-          Tomorrow
+          Next 7 Days
         </Button>,
 
         <Button
@@ -859,7 +1059,9 @@ const FollowUpPatients = () => {
             <ReloadOutlined />
           }
           loading={loading}
-          onClick={loadFollowUps}
+          onClick={
+            loadWeekFollowUps
+          }
         >
           Refresh
         </Button>,
@@ -870,12 +1072,12 @@ const FollowUpPatients = () => {
       <Alert
         type="info"
         showIcon
-        message="Contact reminder list"
-        description="These patients were advised to return on the selected date. Contact them to remind them and arrange an appointment when required."
+        message="Seven-day follow-up calendar"
+        description="Each date displays the number of patients advised to return. Select a date to view patient, treatment and contact details."
         className="follow-up-reminder-alert"
       />
 
-      {/* Summary cards */}
+      {/* Weekly summary */}
 
       <Row
         gutter={[16, 16]}
@@ -887,9 +1089,11 @@ const FollowUpPatients = () => {
           xl={6}
         >
           <FollowUpSummaryCard
-            title="Patients to Contact"
-            value={summary.total}
-            helper={formattedSelectedDate}
+            title="Total Follow-ups"
+            value={
+              weekSummary.total
+            }
+            helper={weekRangeLabel}
             tone="blue"
             icon={
               <UserOutlined />
@@ -905,7 +1109,7 @@ const FollowUpPatients = () => {
           <FollowUpSummaryCard
             title="Phone Available"
             value={
-              summary.contactable
+              weekSummary.contactable
             }
             helper="Patients ready to contact"
             tone="green"
@@ -923,7 +1127,7 @@ const FollowUpPatients = () => {
           <FollowUpSummaryCard
             title="Missing Phone"
             value={
-              summary.missingPhone
+              weekSummary.missingPhone
             }
             helper="Contact details required"
             tone="orange"
@@ -941,7 +1145,7 @@ const FollowUpPatients = () => {
           <FollowUpSummaryCard
             title="Allergy Patients"
             value={
-              summary.allergies
+              weekSummary.allergies
             }
             helper="Review before booking"
             tone="red"
@@ -952,58 +1156,310 @@ const FollowUpPatients = () => {
         </Col>
       </Row>
 
-      {/* Follow-up directory */}
+      {/* Seven-day calendar */}
 
       <Card
         bordered={false}
-        className="follow-up-directory-card"
+        className="follow-up-calendar-card"
       >
-        <div className="follow-up-directory-header">
+        <div className="follow-up-calendar-header">
           <div>
             <Title level={4}>
-              Follow-up Schedule
+              Follow-up Calendar
             </Title>
 
             <Text type="secondary">
-              Review previous treatment
-              details and contact patients
-              due to return.
+              Select any date to view
+              the patients expected to
+              return.
             </Text>
           </div>
 
-          <div className="follow-up-directory-header__meta">
-            <Tag color="blue">
-              {
-                filteredFollowUps.length
-              }{" "}
-              patient
-              {filteredFollowUps.length ===
-              1
-                ? ""
-                : "s"}
+          <div className="follow-up-calendar-header__meta">
+            <Tag
+              color="blue"
+              icon={
+                <CalendarOutlined />
+              }
+            >
+              {weekRangeLabel}
             </Tag>
 
-            {isSelectedDateToday && (
-              <Tag
-                color="green"
-                icon={
-                  <CheckCircleOutlined />
-                }
-              >
-                Today
-              </Tag>
-            )}
+            <Tag>
+              7-day window
+            </Tag>
+          </div>
+        </div>
 
-            {isSelectedDateTomorrow && (
-              <Tag
-                color="blue"
-                icon={
-                  <CalendarOutlined />
+        <div
+          className={
+            loading
+              ? "follow-up-calendar-grid follow-up-calendar-grid--loading"
+              : "follow-up-calendar-grid"
+          }
+        >
+          {weekDates.map((date) => {
+            const dateString =
+              date.format(
+                "YYYY-MM-DD",
+              );
+
+            const records =
+              weeklyFollowUps[
+                dateString
+              ] ?? [];
+
+            const daySummary =
+              calculateFollowUpSummary(
+                records,
+              );
+
+            const isToday =
+              date.isSame(
+                dayjs(),
+                "day",
+              );
+
+            const isTomorrow =
+              date.isSame(
+                dayjs().add(
+                  1,
+                  "day",
+                ),
+                "day",
+              );
+
+            const hasPatients =
+              daySummary.total > 0;
+
+            const hasAllergies =
+              daySummary.allergies > 0;
+
+            const dayCardClasses = [
+              "follow-up-day-card",
+
+              isToday
+                ? "follow-up-day-card--today"
+                : "",
+
+              hasPatients
+                ? "follow-up-day-card--has-patients"
+                : "",
+
+              hasAllergies
+                ? "follow-up-day-card--allergy"
+                : "",
+            ]
+              .filter(Boolean)
+              .join(" ");
+
+            return (
+              <button
+                type="button"
+                key={dateString}
+                className={
+                  dayCardClasses
                 }
+                onClick={() =>
+                  handleOpenDate(
+                    date,
+                  )
+                }
+                aria-label={`View ${daySummary.total} follow-up patient${
+                  daySummary.total ===
+                  1
+                    ? ""
+                    : "s"
+                } for ${date.format(
+                  "DD MMMM YYYY",
+                )}`}
               >
-                Tomorrow
-              </Tag>
-            )}
+                <div className="follow-up-day-card__top">
+                  <div>
+                    <Text className="follow-up-day-card__weekday">
+                      {date.format(
+                        "dddd",
+                      )}
+                    </Text>
+
+                    <Text className="follow-up-day-card__full-date">
+                      {date.format(
+                        "DD MMM YYYY",
+                      )}
+                    </Text>
+                  </div>
+
+                  {isToday && (
+                    <Tag
+                      color="green"
+                      icon={
+                        <CheckCircleOutlined />
+                      }
+                      className="follow-up-day-card__status"
+                    >
+                      Today
+                    </Tag>
+                  )}
+
+                  {isTomorrow &&
+                    !isToday && (
+                      <Tag
+                        color="blue"
+                        className="follow-up-day-card__status"
+                      >
+                        Tomorrow
+                      </Tag>
+                    )}
+                </div>
+
+                <div className="follow-up-day-card__date-section">
+                  <div className="follow-up-day-card__date-number">
+                    {date.format(
+                      "DD",
+                    )}
+                  </div>
+
+                  <div className="follow-up-day-card__month">
+                    {date.format(
+                      "MMMM",
+                    )}
+                  </div>
+                </div>
+
+                <div className="follow-up-day-card__count-section">
+                  <div className="follow-up-day-card__count">
+                    {
+                      daySummary.total
+                    }
+                  </div>
+
+                  <Text className="follow-up-day-card__count-label">
+                    Follow-up
+                    {daySummary.total ===
+                    1
+                      ? ""
+                      : "s"}
+                  </Text>
+                </div>
+
+                <div className="follow-up-day-card__details">
+                  <div>
+                    <PhoneOutlined />
+
+                    <span>
+                      {
+                        daySummary.contactable
+                      }{" "}
+                      contactable
+                    </span>
+                  </div>
+
+                  <div>
+                    <WarningOutlined />
+
+                    <span>
+                      {
+                        daySummary.allergies
+                      }{" "}
+                      allerg
+                      {daySummary.allergies ===
+                      1
+                        ? "y"
+                        : "ies"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="follow-up-day-card__footer">
+                  {loading
+                    ? "Loading records..."
+                    : hasPatients
+                      ? "Click to view patients"
+                      : "No follow-ups scheduled"}
+
+                  <RightOutlined />
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </Card>
+
+      {/* Selected date modal */}
+
+      <Modal
+        open={isModalOpen}
+        onCancel={
+          closeDetailsModal
+        }
+        footer={null}
+        width={1420}
+        destroyOnClose
+        className="follow-up-details-modal"
+        title={
+          <div className="follow-up-modal-title">
+            <div className="follow-up-modal-title__icon">
+              <CalendarOutlined />
+            </div>
+
+            <div>
+              <Title level={4}>
+                Follow-ups for{" "}
+                {selectedDate
+                  ? selectedDate.format(
+                      "DD MMMM YYYY",
+                    )
+                  : ""}
+              </Title>
+
+              <Text type="secondary">
+                Review treatment
+                details and contact the
+                relevant patients.
+              </Text>
+            </div>
+          </div>
+        }
+      >
+        <div className="follow-up-modal-summary">
+          <div className="follow-up-modal-summary__item">
+            <Text>Total Patients</Text>
+
+            <strong>
+              {
+                selectedDateSummary.total
+              }
+            </strong>
+          </div>
+
+          <div className="follow-up-modal-summary__item follow-up-modal-summary__item--green">
+            <Text>Phone Available</Text>
+
+            <strong>
+              {
+                selectedDateSummary.contactable
+              }
+            </strong>
+          </div>
+
+          <div className="follow-up-modal-summary__item follow-up-modal-summary__item--orange">
+            <Text>Missing Phone</Text>
+
+            <strong>
+              {
+                selectedDateSummary.missingPhone
+              }
+            </strong>
+          </div>
+
+          <div className="follow-up-modal-summary__item follow-up-modal-summary__item--red">
+            <Text>Allergy Patients</Text>
+
+            <strong>
+              {
+                selectedDateSummary.allergies
+              }
+            </strong>
           </div>
         </div>
 
@@ -1031,21 +1487,21 @@ const FollowUpPatients = () => {
             className="follow-up-filter"
             options={[
               {
-                label: `All (${summary.total})`,
+                label: `All (${selectedDateSummary.total})`,
                 value: "all",
               },
               {
-                label: `Contactable (${summary.contactable})`,
+                label: `Contactable (${selectedDateSummary.contactable})`,
                 value:
                   "contactable",
               },
               {
-                label: `Allergies (${summary.allergies})`,
+                label: `Allergies (${selectedDateSummary.allergies})`,
                 value:
                   "allergies",
               },
               {
-                label: `No Phone (${summary.missingPhone})`,
+                label: `No Phone (${selectedDateSummary.missingPhone})`,
                 value:
                   "no-phone",
               },
@@ -1059,6 +1515,7 @@ const FollowUpPatients = () => {
             index,
           ) =>
             record?.treatment_id ||
+            record?.appointment_id ||
             `${getPatientId(
               record,
             )}-${
@@ -1068,7 +1525,7 @@ const FollowUpPatients = () => {
           }
           columns={columns}
           dataSource={
-            filteredFollowUps
+            filteredSelectedFollowUps
           }
           loading={loading}
           scroll={{
@@ -1127,9 +1584,13 @@ const FollowUpPatients = () => {
                       contactFilter !==
                         "all"
                         ? "Try changing the search or contact filter."
-                        : `No patients were advised to return on ${selectedDate.format(
-                            "DD MMM YYYY",
-                          )}.`}
+                        : `No patients were advised to return on ${
+                            selectedDate
+                              ? selectedDate.format(
+                                  "DD MMM YYYY",
+                                )
+                              : "this date"
+                          }.`}
                     </Text>
                   </div>
                 }
@@ -1137,7 +1598,7 @@ const FollowUpPatients = () => {
             ),
           }}
         />
-      </Card>
+      </Modal>
     </ClinicPage>
   );
 };

@@ -1,0 +1,250 @@
+.drugs-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* --------------------------------------------------------
+   Statistics
+-------------------------------------------------------- */
+
+.drug-statistics-row {
+  margin-bottom: 2px;
+}
+
+.drug-stat-card {
+  height: 100%;
+  border-radius: 16px;
+  border: 1px solid #e8eef7;
+  box-shadow: 0 8px 24px rgba(15, 65, 110, 0.06);
+}
+
+.drug-stat-card .ant-statistic-title {
+  margin-bottom: 8px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.drug-stat-card .ant-statistic-content {
+  color: #123c69;
+  font-weight: 700;
+}
+
+.drug-statistic-prefix-icon {
+  margin-right: 8px;
+  color: #1677ff;
+}
+
+/* --------------------------------------------------------
+   Table card
+-------------------------------------------------------- */
+
+.drugs-table-card {
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid #e8eef7;
+  box-shadow: 0 10px 30px rgba(15, 65, 110, 0.07);
+}
+
+.drugs-table-card .ant-card-body {
+  padding: 0;
+}
+
+.drugs-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 24px;
+  border-bottom: 1px solid #edf2f7;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(22, 119, 255, 0.04),
+      rgba(19, 194, 194, 0.04)
+    );
+}
+
+.drugs-table-title {
+  display: block;
+  color: #17324d;
+  font-size: 17px;
+}
+
+.drugs-table-description {
+  display: block;
+  max-width: 650px;
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+.drug-search {
+  width: 390px;
+  max-width: 100%;
+}
+
+.drugs-table-card .ant-table-wrapper {
+  padding: 0 24px 24px;
+}
+
+.drugs-table-card .ant-table-thead > tr > th {
+  color: #334155;
+  font-weight: 600;
+  background: #f8fafc;
+}
+
+.drugs-table-card .ant-table-tbody > tr > td {
+  vertical-align: middle;
+}
+
+/* --------------------------------------------------------
+   Drug cells
+-------------------------------------------------------- */
+
+.drug-id-tag {
+  margin: 0;
+  padding: 4px 10px;
+  color: #0958d9;
+  font-weight: 600;
+  background: #e6f4ff;
+  border-color: #91caff;
+  border-radius: 999px;
+}
+
+.drug-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.drug-table-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  color: #1677ff;
+  font-size: 18px;
+  background:
+    linear-gradient(
+      135deg,
+      #e6f4ff,
+      #e6fffb
+    );
+  border: 1px solid #bae0ff;
+  border-radius: 11px;
+}
+
+.drug-name-description {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+}
+
+.drug-edit-button {
+  color: #1677ff;
+}
+
+.drug-edit-button:hover {
+  color: #0958d9 !important;
+  background: #e6f4ff !important;
+}
+
+.drug-delete-button:hover {
+  background: #fff1f0 !important;
+}
+
+/* --------------------------------------------------------
+   Modal
+-------------------------------------------------------- */
+
+.drug-modal .ant-modal-content {
+  overflow: hidden;
+  padding: 0;
+  border-radius: 18px;
+}
+
+.drug-modal .ant-modal-header {
+  margin: 0;
+  padding: 22px 24px;
+  background:
+    linear-gradient(
+      135deg,
+      #f0f8ff,
+      #f0fffc
+    );
+  border-bottom: 1px solid #e5edf5;
+}
+
+.drug-modal .ant-modal-body {
+  padding: 24px;
+}
+
+.drug-modal .ant-modal-footer {
+  margin: 0;
+  padding: 16px 24px 20px;
+  border-top: 1px solid #edf2f7;
+}
+
+.drug-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.drug-modal-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  color: #ffffff;
+  font-size: 18px;
+  background:
+    linear-gradient(
+      135deg,
+      #1677ff,
+      #13c2c2
+    );
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(22, 119, 255, 0.24);
+}
+
+.drug-modal-subtitle {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+}
+
+/* --------------------------------------------------------
+   Responsive
+-------------------------------------------------------- */
+
+@media (max-width: 768px) {
+  .drugs-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 18px;
+  }
+
+  .drug-search {
+    width: 100%;
+  }
+
+  .drugs-table-card .ant-table-wrapper {
+    padding: 0 14px 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .drug-name-description {
+    display: none;
+  }
+
+  .drug-table-icon {
+    width: 34px;
+    height: 34px;
+  }
+}

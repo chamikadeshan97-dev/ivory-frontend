@@ -620,7 +620,171 @@
   .ant-descriptions-item-content {
   background: #ffffff;
 }
+/* ========================================================
+   Prescription section
+======================================================== */
 
+.current-treatment-prescription-card {
+  margin-bottom: 20px;
+  border: 1px solid #d9e8f7;
+  border-radius: 16px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(22, 119, 255, 0.035),
+      rgba(19, 194, 194, 0.025)
+    );
+}
+
+.current-treatment-prescription-card .ant-card-body {
+  padding: 22px;
+}
+
+.current-treatment-prescription-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.current-treatment-prescription-heading .ant-typography {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.current-treatment-prescription-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  color: #1677ff;
+  font-size: 19px;
+  background: #e6f4ff;
+  border: 1px solid #91caff;
+  border-radius: 12px;
+}
+.current-treatment-prescription-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 22px 0 10px;
+}
+
+.current-treatment-prescription-table-description {
+  display: inline-block;
+  margin-top: 3px;
+  font-size: 13px;
+}
+
+.current-treatment-prescription-table {
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.current-treatment-prescription-table .ant-table {
+  border-radius: 12px;
+}
+
+.current-treatment-prescription-table
+  .ant-table-thead
+  > tr
+  > th {
+  padding: 12px;
+  background: #f4f8ff;
+  color: #284663;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.current-treatment-prescription-table
+  .ant-table-tbody
+  > tr
+  > td {
+  padding: 10px;
+  vertical-align: middle;
+}
+
+.current-treatment-prescription-table .ant-select,
+.current-treatment-prescription-table .ant-input,
+.current-treatment-prescription-table .ant-input-number {
+  min-height: 38px;
+  border-radius: 8px;
+}
+
+.current-treatment-add-drug-row-button {
+  height: 42px;
+  margin-top: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .current-treatment-prescription-table-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+.current-treatment-drug-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 22px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #e7edf5;
+  border-radius: 13px;
+}
+
+.current-treatment-drug-button {
+  height: auto;
+  min-height: 38px;
+  padding: 7px 14px;
+  white-space: normal;
+  text-align: left;
+  border-radius: 999px;
+}
+
+.current-treatment-drug-button:hover {
+  color: #0958d9;
+  border-color: #69b1ff;
+  background: #e6f4ff;
+}
+
+.current-treatment-drug-button--selected {
+  box-shadow: 0 5px 13px rgba(22, 119, 255, 0.18);
+}
+
+.current-treatment-prescription-input {
+  border-radius: 11px;
+  resize: vertical;
+}
+
+@media (max-width: 768px) {
+  .current-treatment-prescription-heading {
+    flex-direction: column;
+  }
+
+  .current-treatment-prescription-heading > button {
+    align-self: flex-end;
+  }
+
+  .current-treatment-prescription-card .ant-card-body {
+    padding: 17px;
+  }
+
+  .current-treatment-drug-list {
+    padding: 12px;
+  }
+
+  .current-treatment-drug-button {
+    width: 100%;
+    border-radius: 10px;
+  }
+}
 /* --------------------------------------------------------
    Responsive
 -------------------------------------------------------- */

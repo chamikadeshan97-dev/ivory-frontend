@@ -11,6 +11,8 @@ import {
   Button,
   Card,
   Col,
+  Descriptions,
+  Drawer,
   Empty,
   Input,
   Progress,
@@ -25,9 +27,12 @@ import {
 } from "antd";
 
 import {
+  CalendarOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
+  CloseOutlined,
   DollarOutlined,
+  EyeOutlined,
   IdcardOutlined,
   MedicineBoxOutlined,
   PhoneOutlined,
@@ -37,6 +42,9 @@ import {
   WalletOutlined,
   WarningOutlined,
 } from "@ant-design/icons";
+
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 
 import PaymentModal from "../components/PaymentModal";
 import ClinicPage from "../components/ClinicPage";
@@ -50,23 +58,32 @@ import {
 
 import "./css/CashierPayment.css";
 
+dayjs.extend(customParseFormat);
+
 const {
   Title,
   Text,
 } = Typography;
 
-/* --------------------------------------------------------
+/* ========================================================
    Constants
--------------------------------------------------------- */
+======================================================== */
 
 const PAYMENT_QUEUE_STATUSES = [
   "Treatment Done",
   "Payment Pending",
 ];
 
-/* --------------------------------------------------------
+const PAYMENT_STATUS_COLORS = {
+  "Treatment Done": "purple",
+  "Payment Pending": "orange",
+  Paid: "green",
+  Completed: "success",
+};
+
+/* ========================================================
    General helpers
--------------------------------------------------------- */
+======================================================== */
 
 const extractArray = (response) => {
   const data =
@@ -250,9 +267,50 @@ const getPaymentPercentage = (
   );
 };
 
-/* --------------------------------------------------------
+const formatDate = (value) => {
+  if (!value) {
+    return "-";
+  }
+
+  const date = dayjs(value);
+
+  return date.isValid()
+    ? date.format("DD MMMM YYYY")
+    : String(value);
+};
+
+const formatTime = (value) => {
+  if (!value) {
+    return "-";
+  }
+
+  const parsedTime = dayjs(
+    String(value).trim(),
+    [
+      "HH:mm",
+      "HH:mm:ss",
+      "h:mm A",
+      "hh:mm A",
+    ],
+    true,
+  );
+
+  if (parsedTime.isValid()) {
+    return parsedTime.format(
+      "hh:mm A",
+    );
+  }
+
+  const parsedDate = dayjs(value);
+
+  return parsedDate.isValid()
+    ? parsedDate.format("hh:mm A")
+    : String(value);
+};
+
+/* ========================================================
    Summary card
--------------------------------------------------------- */
+======================================================== */
 
 const CashierSummaryCard = ({
   title,
@@ -292,24 +350,30 @@ const CashierSummaryCard = ({
   );
 };
 
-/* --------------------------------------------------------
+/* ========================================================
    Cashier page
--------------------------------------------------------- */
+======================================================== */
 
 const CashierPayment = () => {
-  const [loading, setLoading] =
-    useState(false);
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
 
-  const [saving, setSaving] =
-    useState(false);
+  const [
+    saving,
+    setSaving,
+  ] = useState(false);
 
   const [
     appointments,
     setAppointments,
   ] = useState([]);
 
-  const [search, setSearch] =
-    useState("");
+  const [
+    search,
+    setSearch,
+  ] = useState("");
 
   const [
     paymentFilter,
@@ -326,9 +390,14 @@ const CashierPayment = () => {
     setPaymentModalOpen,
   ] = useState(false);
 
-  /* ------------------------------------------------------
-     Load patients waiting for payment
-  ------------------------------------------------------ */
+  const [
+    detailsDrawerOpen,
+    setDetailsDrawerOpen,
+  ] = useState(false);
+
+  /* ========================================================
+     Load payment patients
+  ======================================================== */
 
   const loadPaymentPatients =
     useCallback(async () => {
@@ -409,6 +478,24 @@ const CashierPayment = () => {
                       patient,
                     ),
 
+                  patient_age:
+                    appointment
+                      ?.patient_age ??
+                    patient?.age ??
+                    "",
+
+                  patient_gender:
+                    appointment
+                      ?.patient_gender ||
+                    patient?.gender ||
+                    "",
+
+                  patient_address:
+                    appointment
+                      ?.patient_address ||
+                    patient?.address ||
+                    "",
+
                   patient_has_allergies:
                     convertToBoolean(
                       allergyValue,
@@ -446,9 +533,11 @@ const CashierPayment = () => {
 
                 return (
                   waitingForPayment &&
-                  (remainingAmount >
-                    0 ||
-                    treatmentMissing)
+                  (
+                    remainingAmount >
+                      0 ||
+                    treatmentMissing
+                  )
                 );
               },
             )
@@ -518,6 +607,26 @@ const CashierPayment = () => {
         setAppointments(
           paymentPatients,
         );
+
+        setSelectedAppointment(
+          (current) => {
+            if (!current) {
+              return null;
+            }
+
+            return (
+              paymentPatients.find(
+                (appointment) =>
+                  getAppointmentId(
+                    appointment,
+                  ) ===
+                  getAppointmentId(
+                    current,
+                  ),
+              ) || null
+            );
+          },
+        );
       } catch (error) {
         console.error(
           "Could not load payment patients:",
@@ -539,9 +648,9 @@ const CashierPayment = () => {
     loadPaymentPatients();
   }, [loadPaymentPatients]);
 
-  /* ------------------------------------------------------
+  /* ========================================================
      Summary
-  ------------------------------------------------------ */
+  ======================================================== */
 
   const cashierSummary =
     useMemo(() => {
@@ -596,9 +705,9 @@ const CashierPayment = () => {
       };
     }, [appointments]);
 
-  /* ------------------------------------------------------
-     Search and payment filter
-  ------------------------------------------------------ */
+  /* ========================================================
+     Search and filters
+  ======================================================== */
 
   const filteredAppointments =
     useMemo(() => {
@@ -630,6 +739,8 @@ const CashierPayment = () => {
               appointment
                 ?.treatment_id,
               appointment?.status,
+              appointment
+                ?.reason_for_visit,
             ].some((value) =>
               normalizeValue(
                 value,
@@ -639,20 +750,28 @@ const CashierPayment = () => {
           const matchesFilter =
             paymentFilter ===
               "all" ||
-            (paymentFilter ===
-              "new" &&
+            (
+              paymentFilter ===
+                "new" &&
               appointment?.status ===
                 "Treatment Done" &&
-              totalPaid <= 0) ||
-            (paymentFilter ===
-              "partial" &&
-              (appointment
-                ?.status ===
-                "Payment Pending" ||
-                totalPaid > 0)) ||
-            (paymentFilter ===
-              "not-ready" &&
-              treatmentMissing);
+              totalPaid <= 0
+            ) ||
+            (
+              paymentFilter ===
+                "partial" &&
+              (
+                appointment
+                  ?.status ===
+                  "Payment Pending" ||
+                totalPaid > 0
+              )
+            ) ||
+            (
+              paymentFilter ===
+                "not-ready" &&
+              treatmentMissing
+            );
 
           return (
             matchesSearch &&
@@ -666,9 +785,27 @@ const CashierPayment = () => {
       paymentFilter,
     ]);
 
-  /* ------------------------------------------------------
+  /* ========================================================
+     Details drawer
+  ======================================================== */
+
+  const openDetailsDrawer = (
+    appointment,
+  ) => {
+    setSelectedAppointment(
+      appointment,
+    );
+
+    setDetailsDrawerOpen(true);
+  };
+
+  const closeDetailsDrawer = () => {
+    setDetailsDrawerOpen(false);
+  };
+
+  /* ========================================================
      Payment modal
-  ------------------------------------------------------ */
+  ======================================================== */
 
   const openPaymentModal = (
     appointment,
@@ -687,14 +824,16 @@ const CashierPayment = () => {
 
     setPaymentModalOpen(false);
 
-    setSelectedAppointment(
-      null,
-    );
+    if (!detailsDrawerOpen) {
+      setSelectedAppointment(
+        null,
+      );
+    }
   };
 
-  /* ------------------------------------------------------
+  /* ========================================================
      Save payment
-  ------------------------------------------------------ */
+  ======================================================== */
 
   const handlePaymentSubmit =
     async (paymentData) => {
@@ -762,6 +901,10 @@ const CashierPayment = () => {
           false,
         );
 
+        setDetailsDrawerOpen(
+          false,
+        );
+
         setSelectedAppointment(
           null,
         );
@@ -786,9 +929,9 @@ const CashierPayment = () => {
       }
     };
 
-  /* ------------------------------------------------------
-     Render payment card
-  ------------------------------------------------------ */
+  /* ========================================================
+     Payment card
+  ======================================================== */
 
   const renderPaymentCard = (
     appointment,
@@ -842,20 +985,44 @@ const CashierPayment = () => {
       >
         <Card
           bordered={false}
-          className={
+          role="button"
+          tabIndex={0}
+          className={[
+            "cashier-patient-card",
+
             hasAllergies
-              ? `cashier-patient-card cashier-patient-card--allergy ${
-                  isPartial
-                    ? "cashier-patient-card--partial"
-                    : ""
-                }`
-              : `cashier-patient-card ${
-                  isPartial
-                    ? "cashier-patient-card--partial"
-                    : ""
-                }`
+              ? "cashier-patient-card--allergy"
+              : "",
+
+            isPartial
+              ? "cashier-patient-card--partial"
+              : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+          onClick={() =>
+            openDetailsDrawer(
+              appointment,
+            )
           }
+          onKeyDown={(event) => {
+            if (
+              event.key === "Enter" ||
+              event.key === " "
+            ) {
+              event.preventDefault();
+
+              openDetailsDrawer(
+                appointment,
+              );
+            }
+          }}
         >
+          <div className="cashier-card-view-hint">
+            <EyeOutlined />
+            View
+          </div>
+
           {/* Patient information */}
 
           <div className="cashier-patient-card__header">
@@ -1044,12 +1211,14 @@ const CashierPayment = () => {
               treatmentCharge <= 0 ||
               remainingAmount <= 0
             }
-            onClick={() =>
+            className="cashier-pay-button"
+            onClick={(event) => {
+              event.stopPropagation();
+
               openPaymentModal(
                 appointment,
-              )
-            }
-            className="cashier-pay-button"
+              );
+            }}
           >
             Pay Now
           </Button>
@@ -1057,6 +1226,54 @@ const CashierPayment = () => {
       </Col>
     );
   };
+
+  /* ========================================================
+     Selected drawer values
+  ======================================================== */
+
+  const selectedTreatmentCharge =
+    selectedAppointment
+      ? getTreatmentCharge(
+          selectedAppointment,
+        )
+      : 0;
+
+  const selectedTotalPaid =
+    selectedAppointment
+      ? getTotalPaid(
+          selectedAppointment,
+        )
+      : 0;
+
+  const selectedRemainingAmount =
+    selectedAppointment
+      ? getRemainingAmount(
+          selectedAppointment,
+        )
+      : 0;
+
+  const selectedPercentage =
+    selectedAppointment
+      ? getPaymentPercentage(
+          selectedAppointment,
+        )
+      : 0;
+
+  const selectedTreatmentMissing =
+    selectedAppointment
+      ? !selectedAppointment
+          ?.treatment_id
+      : false;
+
+  const selectedCanPay =
+    selectedAppointment &&
+    !selectedTreatmentMissing &&
+    selectedTreatmentCharge > 0 &&
+    selectedRemainingAmount > 0;
+
+  /* ========================================================
+     Render
+  ======================================================== */
 
   return (
     <ClinicPage
@@ -1196,13 +1413,13 @@ const CashierPayment = () => {
             size="large"
             prefix={<SearchOutlined />}
             value={search}
+            placeholder="Search patient, phone, appointment or treatment ID"
+            className="cashier-search-input"
             onChange={(event) =>
               setSearch(
                 event.target.value,
               )
             }
-            placeholder="Search patient, phone, appointment or treatment ID"
-            className="cashier-search-input"
           />
 
           <Segmented
@@ -1265,6 +1482,22 @@ const CashierPayment = () => {
                 </div>
               }
             />
+
+            {(search ||
+              paymentFilter !==
+                "all") && (
+              <Button
+                type="link"
+                onClick={() => {
+                  setSearch("");
+                  setPaymentFilter(
+                    "all",
+                  );
+                }}
+              >
+                Clear filters
+              </Button>
+            )}
           </Card>
         ) : (
           <Row gutter={[18, 18]}>
@@ -1274,6 +1507,310 @@ const CashierPayment = () => {
           </Row>
         )}
       </Spin>
+
+      {/* Details drawer */}
+
+      <Drawer
+        open={detailsDrawerOpen}
+        width={480}
+        placement="right"
+        destroyOnClose
+        closeIcon={
+          <CloseOutlined />
+        }
+        className="cashier-details-drawer"
+        title={
+          <div className="cashier-drawer-title">
+            <div className="cashier-drawer-title__icon">
+              <WalletOutlined />
+            </div>
+
+            <div>
+              <Text className="cashier-drawer-title__eyebrow">
+                Payment Details
+              </Text>
+
+              <Title
+                level={5}
+                className="cashier-drawer-title__text"
+              >
+                {selectedAppointment
+                  ?.patient_name ||
+                  "Patient Payment"}
+              </Title>
+            </div>
+          </div>
+        }
+        onClose={
+          closeDetailsDrawer
+        }
+      >
+        {selectedAppointment && (
+          <div className="cashier-drawer-content">
+            <div
+              className={[
+                "cashier-drawer-hero",
+
+                selectedAppointment
+                  ?.patient_has_allergies
+                  ? "cashier-drawer-hero--allergy"
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
+              <Avatar
+                size={64}
+                icon={
+                  <UserOutlined />
+                }
+                className={
+                  selectedAppointment
+                    ?.patient_has_allergies
+                    ? "cashier-drawer-avatar cashier-drawer-avatar--allergy"
+                    : "cashier-drawer-avatar"
+                }
+              />
+
+              <div className="cashier-drawer-patient">
+                <Text className="cashier-drawer-patient__name">
+                  {selectedAppointment
+                    ?.patient_name ||
+                    "Unknown Patient"}
+                </Text>
+
+                <Text className="cashier-drawer-patient__phone">
+                  <PhoneOutlined />
+                  {selectedAppointment
+                    ?.phone || "-"}
+                </Text>
+
+                <Tag
+                  color={
+                    PAYMENT_STATUS_COLORS[
+                      selectedAppointment
+                        ?.status
+                    ] || "default"
+                  }
+                  className="cashier-drawer-status"
+                >
+                  {selectedAppointment
+                    ?.status ||
+                    "Treatment Done"}
+                </Tag>
+              </div>
+            </div>
+
+            {selectedAppointment
+              ?.patient_has_allergies && (
+              <Alert
+                type="error"
+                showIcon
+                icon={
+                  <WarningOutlined />
+                }
+                message="Allergy Warning"
+                description={
+                  selectedAppointment
+                    ?.patient_allergy_details ||
+                  "Review the patient's allergy information before proceeding."
+                }
+                className="cashier-drawer-allergy"
+              />
+            )}
+
+            <Descriptions
+              bordered
+              size="small"
+              column={1}
+              className="cashier-drawer-descriptions"
+            >
+              <Descriptions.Item
+                label={
+                  <Space size={6}>
+                    <IdcardOutlined />
+                    Patient ID
+                  </Space>
+                }
+              >
+                {selectedAppointment
+                  ?.patient_id || "-"}
+              </Descriptions.Item>
+
+              <Descriptions.Item
+                label={
+                  <Space size={6}>
+                    <CalendarOutlined />
+                    Appointment ID
+                  </Space>
+                }
+              >
+                {getAppointmentId(
+                  selectedAppointment,
+                ) || "-"}
+              </Descriptions.Item>
+
+              <Descriptions.Item
+                label={
+                  <Space size={6}>
+                    <MedicineBoxOutlined />
+                    Treatment ID
+                  </Space>
+                }
+              >
+                {selectedAppointment
+                  ?.treatment_id ||
+                  "Treatment pending"}
+              </Descriptions.Item>
+
+              <Descriptions.Item
+                label="Age"
+              >
+                {selectedAppointment
+                  ?.patient_age || "-"}
+              </Descriptions.Item>
+
+              <Descriptions.Item
+                label="Gender"
+              >
+                {selectedAppointment
+                  ?.patient_gender || "-"}
+              </Descriptions.Item>
+
+              <Descriptions.Item
+                label="Address"
+              >
+                {selectedAppointment
+                  ?.patient_address || "-"}
+              </Descriptions.Item>
+
+              <Descriptions.Item
+                label="Appointment Date"
+              >
+                {formatDate(
+                  selectedAppointment
+                    ?.appointment_date,
+                )}
+              </Descriptions.Item>
+
+              <Descriptions.Item
+                label="Appointment Time"
+              >
+                {formatTime(
+                  selectedAppointment
+                    ?.appointment_time,
+                )}
+              </Descriptions.Item>
+
+              <Descriptions.Item
+                label="Reason"
+              >
+                {selectedAppointment
+                  ?.reason_for_visit ||
+                  "General consultation"}
+              </Descriptions.Item>
+            </Descriptions>
+
+            <div className="cashier-drawer-payment-card">
+              <div className="cashier-drawer-payment-row">
+                <Text type="secondary">
+                  Treatment Fee
+                </Text>
+
+                <Text strong>
+                  {formatCurrency(
+                    selectedTreatmentCharge,
+                  )}
+                </Text>
+              </div>
+
+              <div className="cashier-drawer-payment-row">
+                <Text type="secondary">
+                  Already Paid
+                </Text>
+
+                <Text className="cashier-drawer-paid">
+                  {formatCurrency(
+                    selectedTotalPaid,
+                  )}
+                </Text>
+              </div>
+
+              <div className="cashier-drawer-progress">
+                <div className="cashier-drawer-progress__header">
+                  <Text type="secondary">
+                    Payment Progress
+                  </Text>
+
+                  <Text strong>
+                    {selectedPercentage}%
+                  </Text>
+                </div>
+
+                <Progress
+                  percent={
+                    selectedPercentage
+                  }
+                  showInfo={false}
+                  status={
+                    selectedPercentage >=
+                    100
+                      ? "success"
+                      : "active"
+                  }
+                />
+              </div>
+
+              <div className="cashier-drawer-amount">
+                <div className="cashier-drawer-amount__icon">
+                  <WalletOutlined />
+                </div>
+
+                <div>
+                  <Text>
+                    Remaining Balance
+                  </Text>
+
+                  <Title level={3}>
+                    {formatCurrency(
+                      selectedRemainingAmount,
+                    )}
+                  </Title>
+                </div>
+              </div>
+            </div>
+
+            {selectedTreatmentMissing && (
+              <Alert
+                type="warning"
+                showIcon
+                message="Payment is not ready"
+                description="Treatment information has not been linked to this appointment."
+              />
+            )}
+
+            <Button
+              block
+              type="primary"
+              size="large"
+              icon={
+                <DollarOutlined />
+              }
+              disabled={
+                !selectedCanPay
+              }
+              className="cashier-drawer-pay-button"
+              onClick={() =>
+                openPaymentModal(
+                  selectedAppointment,
+                )
+              }
+            >
+              Pay Now
+            </Button>
+          </div>
+        )}
+      </Drawer>
 
       <PaymentModal
         open={paymentModalOpen}

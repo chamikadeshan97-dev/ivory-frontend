@@ -13,7 +13,89 @@
   box-shadow:
     0 5px 15px rgba(15, 23, 42, 0.04);
 }
+/* ========================================================
+   Appointment time selection
+======================================================== */
 
+.booking-time-selection {
+  margin-bottom: 24px;
+}
+
+.booking-time-selection__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.booking-time-selection__description {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+}
+
+.booking-time-selection__current {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+  padding: 7px 12px;
+  color: #0958d9;
+  font-weight: 700;
+  background: #e6f4ff;
+  border: 1px solid #91caff;
+  border-radius: 999px;
+}
+
+.booking-time-mode {
+  margin-bottom: 14px;
+}
+
+.booking-time-adjustment {
+  margin-top: 14px;
+  padding: 14px;
+  background: #f8fbff;
+  border: 1px solid #d9e8f7;
+  border-radius: 12px;
+}
+
+.booking-time-adjustment__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+.booking-time-adjustment__groups {
+  display: grid;
+  grid-template-columns: repeat(
+    2,
+    minmax(0, 1fr)
+  );
+  gap: 14px;
+}
+
+.booking-time-adjustment__group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.booking-time-adjustment__group
+  .ant-btn {
+  border-radius: 8px;
+}
+
+@media (max-width: 767px) {
+  .booking-time-selection__header {
+    flex-direction: column;
+  }
+
+  .booking-time-adjustment__groups {
+    grid-template-columns: 1fr;
+  }
+}
 .booking-date-filter__icon {
   display: flex;
   flex: 0 0 auto;
@@ -703,12 +785,308 @@
 /* --------------------------------------------------------
    Workflow alert
 -------------------------------------------------------- */
+/* ========================================================
+   Appointment time adjustment
+======================================================== */
 
+.booking-time-adjustment {
+  padding: 18px;
+  margin-bottom: 20px;
+  background:
+    linear-gradient(
+      145deg,
+      #f8fbff 0%,
+      #ffffff 100%
+    );
+  border: 1px solid #d9e8f7;
+  border-radius: 14px;
+  box-shadow:
+    0 8px 24px
+    rgba(8, 125, 245, 0.06);
+}
+
+.booking-time-adjustment__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.booking-time-adjustment__title {
+  display: block;
+  color: #17324d;
+  font-size: 15px;
+}
+
+.booking-time-adjustment__description {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.booking-time-adjustment__selected {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+  padding: 7px 12px;
+  color: #0958d9;
+  font-size: 13px;
+  font-weight: 700;
+  background: #e6f4ff;
+  border: 1px solid #91caff;
+  border-radius: 999px;
+}
+
+.booking-time-adjustment__picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.booking-time-adjustment__time-picker {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.booking-time-adjustment__time-picker.ant-picker {
+  min-height: 42px;
+}
+
+.booking-time-adjustment__divider {
+  height: 1px;
+  margin: 18px 0;
+  background: #e7eef5;
+}
+
+.booking-time-adjustment__groups {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.booking-time-adjustment__group {
+  padding: 14px;
+  background: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+}
+
+.booking-time-adjustment__group--later {
+  background: #f0f7ff;
+  border-color: #bae0ff;
+}
+
+.booking-time-adjustment__group-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 11px;
+}
+
+.booking-time-adjustment__group-heading
+  .ant-typography:last-child {
+  font-size: 12px;
+}
+
+.booking-time-adjustment__buttons {
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.booking-time-adjustment
 .booking-workflow-alert {
   margin-top: 4px;
   border-radius: 11px;
 }
+.booking-date-time-row {
+  align-items: flex-end;
+}
 
+.booking-date-time-field {
+  margin-bottom: 0;
+}
+
+.booking-appointment-date-picker {
+  width: 100%;
+  height: 52px;
+}
+
+.booking-time-selection {
+  display: flex;
+  flex-direction: column;
+}
+
+.booking-time-label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.booking-selected-time-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #e6f4ff, #f0fffc);
+  border: 1px solid #91caff;
+  border-radius: 10px;
+}
+
+.booking-selected-time-card__icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  color: #ffffff;
+  font-size: 17px;
+  background: linear-gradient(135deg, #1677ff, #13c2c2);
+  border-radius: 9px;
+}
+
+.booking-selected-time-card__content {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.booking-selected-time-card__caption {
+  font-size: 11px;
+  line-height: 1.1;
+}
+
+.booking-selected-time-card__value {
+  color: #123c69;
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.booking-selected-time-card__edit {
+  flex: 0 0 auto;
+  color: #1677ff;
+  font-weight: 600;
+}
+
+.booking-select-time-button {
+  height: 52px;
+  border-style: dashed;
+}
+
+@media (max-width: 767px) {
+  .booking-date-time-row {
+    align-items: stretch;
+  }
+}
+
+.booking-date-adjustment {
+  margin-bottom: 18px;
+  padding: 18px;
+  background: linear-gradient(
+    135deg,
+    rgba(22, 119, 255, 0.04),
+    rgba(19, 194, 194, 0.04)
+  );
+  border: 1px solid #d8e8f8;
+  border-radius: 14px;
+}
+
+.booking-date-adjustment__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.booking-date-adjustment__title {
+  color: #17324d;
+  font-size: 15px;
+}
+
+.booking-date-adjustment__picker {
+  display: flex;
+  justify-content: center;
+}
+
+.booking-date-adjustment__date-picker {
+  width: 100%;
+  max-width: 320px;
+}
+
+.booking-date-adjustment__divider {
+  height: 1px;
+  margin: 18px 0;
+  background: #dfe8f2;
+}
+
+.booking-date-adjustment__groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.booking-date-adjustment__group {
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid #e4ebf3;
+  border-radius: 12px;
+}
+
+.booking-date-adjustment__group--later {
+  background: #f7fbff;
+  border-color: #cfe4ff;
+}
+
+.booking-date-adjustment__group-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+.booking-date-adjustment__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.booking-date-adjustment__buttons .ant-btn {
+  flex: 1;
+  min-width: 88px;
+}
+
+.booking-selected-date-card__edit {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  color: #1677ff;
+  border-radius: 9px;
+}
+
+.booking-selected-date-card__edit:hover {
+  color: #0958d9 !important;
+  background: rgba(22, 119, 255, 0.1) !important;
+}
+
+@media (max-width: 767px) {
+  .booking-date-adjustment__groups {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-date-adjustment__buttons .ant-btn {
+    min-width: calc(50% - 4px);
+  }
+}
 /* --------------------------------------------------------
    Responsive
 -------------------------------------------------------- */
@@ -728,7 +1106,76 @@
     overflow-x: auto;
   }
 }
+.booking-patient-option__content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
 
+.booking-patient-option__content .ant-typography {
+  margin: 0;
+}
+
+.booking-selected-patient-location {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  margin-top: -8px;
+  margin-bottom: 16px;
+  border: 1px solid #bae0ff;
+  border-radius: 12px;
+  background: linear-gradient(
+    135deg,
+    rgba(230, 244, 255, 0.9),
+    rgba(246, 255, 237, 0.75)
+  );
+}
+
+.booking-selected-patient-location__icon {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  color: #1677ff;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(22, 119, 255, 0.12);
+  font-size: 18px;
+}
+
+.booking-selected-patient-location__content {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.booking-selected-patient-location__content .ant-typography {
+  margin: 0;
+}
+
+.booking-selected-patient-location__tag {
+  flex-shrink: 0;
+  margin-inline-end: 0;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+@media (max-width: 575px) {
+  .booking-selected-patient-location {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .booking-selected-patient-location__tag {
+    margin-left: 50px;
+  }
+}
 @media (max-width: 768px) {
   .booking-date-filter {
     width: 100%;

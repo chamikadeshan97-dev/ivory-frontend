@@ -1,0 +1,354 @@
+/* ========================================================
+   Locations page
+======================================================== */
+
+.locations-page {
+  width: 100%;
+}
+
+.location-statistics-row {
+  margin-bottom: 18px;
+}
+
+/* ========================================================
+   Statistics
+======================================================== */
+
+.location-stat-card {
+  height: 100%;
+  border: 1px solid #e6edf7;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.location-stat-card .ant-statistic-title {
+  margin-bottom: 8px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.location-stat-card .ant-statistic-content {
+  color: #0f172a;
+  font-size: 27px;
+  font-weight: 700;
+}
+
+.location-statistic-prefix-icon {
+  color: #1677ff;
+}
+
+/* ========================================================
+   Table card
+======================================================== */
+
+.locations-table-card {
+  overflow: hidden;
+  border: 1px solid #e6edf7;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.locations-table-card .ant-card-body {
+  padding: 0;
+}
+
+.locations-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 22px;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.locations-table-title {
+  display: block;
+  color: #0f172a;
+  font-size: 16px;
+}
+
+.locations-table-description {
+  display: block;
+  max-width: 570px;
+  margin-top: 3px;
+  font-size: 13px;
+}
+
+.location-search {
+  width: min(420px, 100%);
+}
+
+.location-search .ant-input-affix-wrapper {
+  min-height: 40px;
+}
+
+.location-search .ant-btn {
+  min-height: 40px;
+}
+
+/* ========================================================
+   Table
+======================================================== */
+
+.locations-table-card .ant-table-wrapper {
+  padding: 0 22px 22px;
+}
+
+.locations-table-card .ant-table-thead > tr > th {
+  background: #f8fafc;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.locations-table-card .ant-table-tbody > tr > td {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.location-id-tag {
+  margin: 0;
+  padding: 4px 10px;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.location-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.location-table-icon {
+  display: flex;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: linear-gradient(
+    135deg,
+    #dbeafe,
+    #cffafe
+  );
+  color: #1677ff;
+  font-size: 18px;
+}
+
+.location-name-description {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+}
+
+.location-distance-cell {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.location-distance-cell strong {
+  font-size: 14px;
+}
+
+.location-distance-cell span {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ========================================================
+   Distance zones
+======================================================== */
+
+.location-zone-tag {
+  min-width: 92px;
+  margin: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.location-zone-tag--nearby {
+  border-color: #a7f3d0;
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.location-zone-tag--medium {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.location-zone-tag--far {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.location-zone-tag--long-distance {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+/* ========================================================
+   Action buttons
+======================================================== */
+
+.location-edit-button,
+.location-delete-button {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+}
+
+.location-edit-button {
+  color: #1677ff;
+}
+
+.location-edit-button:hover {
+  background: #eff6ff !important;
+  color: #0958d9 !important;
+}
+
+.location-delete-button:hover {
+  background: #fff1f0 !important;
+}
+
+/* ========================================================
+   Modal
+======================================================== */
+
+.location-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.location-modal-icon {
+  display: flex;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  background: linear-gradient(
+    135deg,
+    #1677ff,
+    #22c1dc
+  );
+  color: #ffffff;
+  font-size: 18px;
+  box-shadow: 0 8px 18px
+    rgba(22, 119, 255, 0.22);
+}
+
+.location-modal-subtitle {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.location-modal .ant-modal-content {
+  overflow: hidden;
+  border-radius: 18px;
+}
+
+.location-modal .ant-modal-header {
+  margin: -20px -24px 22px;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e8eef6;
+  background: linear-gradient(
+    135deg,
+    #f8fbff,
+    #f0fdfa
+  );
+}
+
+.location-modal .ant-modal-footer {
+  margin: 22px -24px -20px;
+  padding: 15px 24px;
+  border-top: 1px solid #e8eef6;
+  background: #f8fafc;
+}
+
+.location-modal .ant-form-item-label > label {
+  color: #334155;
+  font-weight: 600;
+}
+
+.location-distance-input {
+  width: 100%;
+}
+
+.location-distance-input
+  .ant-input-number-input {
+  height: 38px;
+}
+
+/* ========================================================
+   Responsive
+======================================================== */
+
+@media (max-width: 767px) {
+  .locations-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .location-search {
+    width: 100%;
+  }
+
+  .locations-table-card
+    .ant-table-wrapper {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .locations-toolbar {
+    padding: 17px;
+  }
+
+  .location-search {
+    display: flex;
+  }
+
+  .location-search
+    .ant-input-affix-wrapper {
+    min-width: 0;
+  }
+
+  .location-modal
+    .ant-modal-content {
+    border-radius: 14px;
+  }
+}
