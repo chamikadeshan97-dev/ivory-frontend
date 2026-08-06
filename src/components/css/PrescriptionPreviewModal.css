@@ -1,0 +1,359 @@
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&display=swap");
+
+/* ========================================================
+   Prescription Preview Modal
+======================================================== */
+
+.ivory-prescription-preview-modal .ant-modal-content {
+  padding: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.ivory-prescription-preview-modal .ant-modal-header {
+  margin: 0;
+  padding: 17px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.ivory-prescription-preview-modal .ant-modal-title {
+  color: #17324d;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.ivory-prescription-preview-modal .ant-modal-body {
+  max-height: 72vh;
+  padding: 20px;
+  overflow: auto;
+  background: #eef2f7;
+}
+
+.ivory-prescription-preview-modal .ant-modal-footer {
+  margin: 0;
+  padding: 14px 20px;
+  border-top: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+/* ========================================================
+   Empty State
+======================================================== */
+
+.ivory-prescription-empty {
+  padding: 42px 20px;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* ========================================================
+   A6 Prescription Sheet
+
+   A6 size:
+   Width: 105mm
+   Height: 148mm
+
+   Top 37mm is reserved for the printed paper header.
+======================================================== */
+
+.ivory-prescription-sheet {
+  position: relative;
+  width: 105mm;
+  height: 148mm;
+  margin: 0 auto;
+  overflow: hidden;
+  box-sizing: border-box;
+  color: #111827;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  box-shadow:
+    0 16px 40px rgba(15, 23, 42, 0.14),
+    0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.ivory-prescription-content {
+  position: absolute;
+  top: 37mm;
+  right: 7mm;
+  bottom: 8mm;
+  left: 7mm;
+
+  display: flex;
+  flex-direction: column;
+
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* ========================================================
+   Patient Name and Date
+======================================================== */
+
+.ivory-prescription-meta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  width: 100%;
+  gap: 5mm;
+
+  box-sizing: border-box;
+  padding-bottom: 2.5mm;
+
+  border-bottom: 0.25mm solid #9ca3af;
+}
+
+.ivory-prescription-patient-line {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ivory-prescription-patient-line strong {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+
+  color: #111827;
+  font-family: "Caveat", cursive;
+  font-size: 5mm;
+  font-weight: 700;
+  line-height: 1.1;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ivory-prescription-date {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  min-width: 32mm;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.ivory-prescription-date strong {
+  color: #111827;
+  font-family: "Caveat", cursive;
+  font-size: 4.4mm;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* ========================================================
+   Allergy Warning
+======================================================== */
+
+.ivory-prescription-allergy {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  gap: 2mm;
+
+  box-sizing: border-box;
+  margin-top: 2.5mm;
+  padding: 1.8mm 2.3mm;
+
+  color: #991b1b;
+  border: 0.3mm solid #dc2626;
+  border-radius: 1.5mm;
+}
+
+.ivory-prescription-allergy > .anticon {
+  flex-shrink: 0;
+  margin-top: 0.4mm;
+  font-size: 3.5mm;
+}
+
+.ivory-prescription-allergy div {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  gap: 0.5mm;
+}
+
+.ivory-prescription-allergy strong {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 2.4mm;
+  font-weight: 800;
+}
+
+.ivory-prescription-allergy span {
+  font-family: "Caveat", cursive;
+  font-size: 3.8mm;
+  font-weight: 600;
+  line-height: 1.2;
+
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+/* ========================================================
+   Prescription Body
+======================================================== */
+
+.ivory-prescription-body {
+  display: block;
+  flex: 1;
+
+  width: 100%;
+  min-height: 0;
+  padding: 5mm 0 3mm;
+
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.ivory-prescription-rx {
+  display: none;
+}
+
+/* ========================================================
+   Medicine Lines
+======================================================== */
+
+.ivory-prescription-medicines {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 2.5mm;
+
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.ivory-prescription-medicine-row {
+  display: block;
+  width: 100%;
+  min-height: 7mm;
+
+  box-sizing: border-box;
+  padding: 0 2mm 1.5mm;
+
+  color: #111827;
+  font-family: "Caveat", cursive;
+  font-size: 5.2mm;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.12mm;
+
+  /*
+    Keeps the spaces inside each medicine line
+    and wraps long lines correctly.
+  */
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: normal;
+
+  border-bottom: 0.25mm solid
+    rgba(107, 114, 128, 0.4);
+}
+
+/* ========================================================
+   Responsive Preview
+======================================================== */
+
+@media screen and (max-width: 650px) {
+  .ivory-prescription-preview-modal {
+    max-width: calc(100vw - 20px);
+  }
+
+  .ivory-prescription-preview-modal .ant-modal-body {
+    padding: 10px;
+  }
+
+  .ivory-prescription-sheet {
+    width: 100%;
+    height: auto;
+    min-height: 148mm;
+  }
+
+  .ivory-prescription-content {
+    top: 37mm;
+    right: 16px;
+    bottom: 20px;
+    left: 16px;
+  }
+
+  .ivory-prescription-meta {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+  }
+
+  .ivory-prescription-patient-line strong {
+    font-size: 20px;
+  }
+
+  .ivory-prescription-date {
+    min-width: auto;
+  }
+
+  .ivory-prescription-date strong {
+    font-size: 17px;
+  }
+
+  .ivory-prescription-medicine-row {
+    font-size: 20px;
+  }
+}
+
+/* ========================================================
+   A6 Printing
+======================================================== */
+
+@media print {
+  @page {
+    size: A6 portrait;
+    margin: 0;
+  }
+
+  html,
+  body {
+    width: 105mm;
+    height: 148mm;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  .ivory-prescription-sheet {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 105mm;
+    height: 148mm;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+
+    background: transparent;
+    border: none;
+    box-shadow: none;
+
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .ivory-prescription-content {
+    top: 37mm;
+    right: 7mm;
+    bottom: 8mm;
+    left: 7mm;
+  }
+
+  .ivory-prescription-meta,
+  .ivory-prescription-allergy,
+  .ivory-prescription-medicine-row {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

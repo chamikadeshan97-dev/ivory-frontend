@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import {
   Alert,
@@ -39,6 +45,7 @@ import {
   MedicineBoxOutlined,
   PhoneOutlined,
   PlusOutlined,
+  PrinterOutlined,
   ReloadOutlined,
   SaveOutlined,
   UserOutlined,
@@ -48,12 +55,14 @@ import {
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 
+import { useReactToPrint } from "react-to-print";
+
 import {
   createTreatment,
   getAppointmentsByDate,
   getCommonTreatments,
-  getPatients,
   getDrugs,
+  getPatients,
   updateAppointmentStatus,
 } from "../api/endPoints";
 
@@ -70,6 +79,26 @@ const { TextArea } = Input;
 /* --------------------------------------------------------
    Constants
 -------------------------------------------------------- */
+
+const CLINIC_INFORMATION = {
+  name: "IVORY DENTAL",
+  subtitle: "Aesthetic & Cosmetic Dental Surgery",
+
+  dentistName: "Dr. U.H.P.K.J. Bandu Ukwatta",
+  qualificationOne: "Diploma in Orthodontics (POS)",
+  qualificationTwo: "BDS, DHDP - Colombo",
+  designation: "Dental Surgeon",
+  registrationNumber: "S.L.M.C.Ref.No.2142",
+
+  addressLineOne: "No.50 D,",
+  addressLineTwo: "Rahula Junction,",
+  addressLineThree: "Matara.",
+  hotline: "071 144 99 99",
+
+  stampPhone: "071 24 50 779",
+
+  footerText: "Happy Smile For a Happy Life",
+};
 
 const STEP_ITEMS = [
   {
@@ -261,6 +290,8 @@ const createPrescriptionRow = () => {
 const CurrentTreatment = () => {
   const [form] = Form.useForm();
 
+  const prescriptionPrintRef = useRef(null);
+
   const [currentStep, setCurrentStep] = useState(0);
 
   const [loading, setLoading] = useState(false);
@@ -286,6 +317,10 @@ const CurrentTreatment = () => {
   const [prescriptionRows, setPrescriptionRows] = useState([
     createPrescriptionRow(),
   ]);
+
+  const [prescriptionPreviewOpen, setPrescriptionPreviewOpen] = useState(false);
+
+  const [printPrescriptionData, setPrintPrescriptionData] = useState(null);
 
   const treatmentCharge = Number(Form.useWatch("treatment_charge", form) || 0);
 
@@ -608,7 +643,7 @@ const CurrentTreatment = () => {
     form.setFieldValue("treatment_charge", amount);
 
     form.validateFields(["treatment_charge"]).catch(() => {
-      // Ant Design displays the error.
+      // Ant Design displays the validation error.
     });
   };
 
@@ -768,13 +803,108 @@ const CurrentTreatment = () => {
         }
 
         if (Number.isFinite(days) && days > 0) {
-          parts.push(`Duration: ${days} ${days === 1 ? "day" : "days"}`);
+          parts.push(`${days} ${days === 1 ? "day" : "days"}`);
         }
 
         return parts.join(" | ");
       })
       .join("\n");
   };
+
+  const buildPrintPrescriptionData = ({
+    treatment,
+    prescriptionText,
+    treatmentValues,
+  }) => {
+    return {
+      clinic: CLINIC_INFORMATION,
+
+      patient: {
+        id: patientInformation.id,
+        name: patientInformation.name,
+        phone: patientInformation.phone,
+        age: patientInformation.age,
+        gender: patientInformation.gender,
+        address: patientInformation.address,
+        has_allergies: patientInformation.hasAllergies,
+        allergy_details: patientInformation.allergyDetails,
+      },
+
+      dentist: {
+        id: selectedAppointment?.dentist_id || "",
+        name:
+          selectedAppointment?.dentist_name ||
+          selectedAppointment?.doctor_name ||
+          selectedAppointment?.dentist?.name ||
+          "Dental Surgeon",
+        specialization:
+          selectedAppointment?.dentist_specialization ||
+          selectedAppointment?.specialization ||
+          selectedAppointment?.dentist?.specialization ||
+          "Dental Surgeon",
+      },
+
+      appointment: {
+        id: getAppointmentId(selectedAppointment),
+        date:
+          selectedAppointment?.appointment_date ||
+          selectedAppointment?.date ||
+          today,
+        time:
+          selectedAppointment?.appointment_time ||
+          selectedAppointment?.time ||
+          "",
+      },
+
+      treatment: {
+        id: treatment?.treatment_id || treatment?.id || "",
+
+        treatment_date: treatment?.treatment_date || today,
+
+        treatment_name:
+          treatment?.treatment_name || treatmentValues?.treatment_name || "",
+
+        tooth_number:
+          treatment?.tooth_number || treatmentValues?.tooth_number || "",
+
+        diagnosis: treatment?.diagnosis || treatmentValues?.diagnosis || "",
+
+        treatment_details:
+          treatment?.treatment_details ||
+          treatmentValues?.treatment_details ||
+          "",
+
+        prescription: treatment?.prescription || prescriptionText || "",
+
+        doctor_notes:
+          treatment?.doctor_notes || treatmentValues?.doctor_notes || "",
+
+        next_appointment_date:
+          treatment?.next_appointment_date ||
+          (treatmentValues?.next_appointment_date
+            ? dayjs(treatmentValues.next_appointment_date).format("YYYY-MM-DD")
+            : ""),
+      },
+    };
+  };
+
+  const handlePrintPrescription = useReactToPrint({
+    contentRef: prescriptionPrintRef,
+
+    documentTitle: `Prescription-${
+      printPrescriptionData?.patient?.name || "Patient"
+    }-${printPrescriptionData?.treatment?.treatment_date || today}`,
+
+    onAfterPrint: () => {
+      message.success("Prescription printing completed");
+    },
+
+    onPrintError: (_, error) => {
+      console.error("Could not print prescription:", error);
+
+      message.error("Could not print the prescription");
+    },
+  });
 
   const prescriptionColumns = [
     {
@@ -926,6 +1056,8 @@ const CurrentTreatment = () => {
 
       const charge = Number(values?.treatment_charge || 0);
 
+      const prescriptionText = buildPrescriptionText();
+
       const treatmentData = {
         appointment_id: appointmentId,
 
@@ -943,7 +1075,7 @@ const CurrentTreatment = () => {
 
         diagnosis: values?.diagnosis?.trim() || "",
 
-        prescription: buildPrescriptionText(),
+        prescription: prescriptionText,
 
         doctor_notes: values?.doctor_notes?.trim() || "",
 
@@ -956,9 +1088,25 @@ const CurrentTreatment = () => {
         treatment_fee: charge,
       };
 
-      await createTreatment(treatmentData);
+      const treatmentResponse = await createTreatment(treatmentData);
+
+      const savedTreatment =
+        treatmentResponse?.data?.data ||
+        treatmentResponse?.data?.treatment ||
+        treatmentResponse?.data ||
+        treatmentData;
+
+      const prescriptionData = buildPrintPrescriptionData({
+        treatment: savedTreatment,
+        prescriptionText,
+        treatmentValues: values,
+      });
 
       await updateAppointmentStatus(appointmentId, "Treatment Done");
+
+      setPrintPrescriptionData(prescriptionData);
+
+      setPrescriptionPreviewOpen(true);
 
       message.success("Treatment saved successfully");
 
@@ -1221,6 +1369,13 @@ const CurrentTreatment = () => {
         <Form.Item
           label={<Text strong>What treatment was performed?</Text>}
           name="treatment_details"
+          rules={[
+            {
+              required: true,
+              whitespace: true,
+              message: "Please enter the treatment details",
+            },
+          ]}
           extra="Enter a clear clinical note describing what was completed."
         >
           <TextArea
@@ -1770,6 +1925,8 @@ const CurrentTreatment = () => {
         )}
       </Spin>
 
+      {/* Patient details modal */}
+
       <Modal
         title={null}
         open={patientDetailsOpen}
@@ -1899,6 +2056,221 @@ const CurrentTreatment = () => {
           </Descriptions>
         </div>
       </Modal>
+
+      {/* Prescription preview modal */}
+
+     <Modal
+  title={
+    <Space size={10}>
+      <PrinterOutlined />
+
+      <span>Prescription Preview</span>
+    </Space>
+  }
+  open={prescriptionPreviewOpen}
+  onCancel={() => setPrescriptionPreviewOpen(false)}
+  width={560}
+  centered
+  destroyOnHidden={false}
+  className="ivory-prescription-preview-modal"
+  footer={[
+    <Button
+      key="close"
+      onClick={() => setPrescriptionPreviewOpen(false)}
+    >
+      Close
+    </Button>,
+
+    <Button
+      key="print"
+      type="primary"
+      icon={<PrinterOutlined />}
+      disabled={!printPrescriptionData}
+      onClick={handlePrintPrescription}
+    >
+      Print Prescription
+    </Button>,
+  ]}
+>
+  {printPrescriptionData && (
+    <div
+      ref={prescriptionPrintRef}
+      className="ivory-prescription-sheet"
+    >
+      {/* Top clinic heading */}
+
+      <header className="ivory-prescription-header">
+        <div className="ivory-prescription-brand">
+          <div className="ivory-prescription-logo">
+            <div className="ivory-prescription-logo-circle">
+              <MedicineBoxOutlined />
+            </div>
+          </div>
+
+          <div className="ivory-prescription-brand-text">
+            <h1>{CLINIC_INFORMATION.name}</h1>
+
+            <div className="ivory-prescription-subtitle">
+              {CLINIC_INFORMATION.subtitle}
+            </div>
+          </div>
+        </div>
+
+        <div className="ivory-prescription-contact-grid">
+          <div className="ivory-prescription-doctor-details">
+           
+           
+          </div>
+
+          <div className="ivory-prescription-clinic-address">
+            <span>{CLINIC_INFORMATION.addressLineOne}</span>
+
+            <span>{CLINIC_INFORMATION.addressLineTwo}</span>
+
+            <span>{CLINIC_INFORMATION.addressLineThree}</span>
+
+            <strong>
+              Hot Line : {CLINIC_INFORMATION.hotline}
+            </strong>
+          </div>
+        </div>
+      </header>
+
+      <div className="ivory-prescription-header-line" />
+
+      {/* Date and patient information */}
+
+      <section className="ivory-prescription-meta">
+        <div className="ivory-prescription-patient-line">
+          <span className="ivory-prescription-label">
+            Patient:
+          </span>
+
+          <strong>
+            {printPrescriptionData.patient.name}
+          </strong>
+
+          <span className="ivory-prescription-patient-id">
+            ID: {printPrescriptionData.patient.id}
+          </span>
+        </div>
+
+        <div className="ivory-prescription-date">
+          <span>Date :</span>
+
+          <strong>
+            {dayjs(
+              printPrescriptionData.treatment.treatment_date,
+            ).format("DD / MM / YYYY")}
+          </strong>
+        </div>
+      </section>
+
+      {/* Allergy warning */}
+
+      {printPrescriptionData.patient.has_allergies && (
+        <div className="ivory-prescription-allergy">
+          <WarningOutlined />
+
+          <div>
+            <strong>ALLERGY WARNING</strong>
+
+            <span>
+              {printPrescriptionData.patient.allergy_details}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Main prescription area */}
+
+      <main className="ivory-prescription-body">
+
+        <div className="ivory-prescription-medicines">
+          {printPrescriptionData.treatment.prescription ? (
+            printPrescriptionData.treatment.prescription
+              .split("\n")
+              .filter(Boolean)
+              .map((line, index) => (
+                <div
+                  key={`${line}-${index}`}
+                  className="ivory-prescription-medicine-row"
+                >
+                  {line}
+                </div>
+              ))
+          ) : (
+            <div className="ivory-prescription-empty">
+              No medicines prescribed.
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* Optional notes */}
+
+      {printPrescriptionData.treatment.doctor_notes && (
+        <section className="ivory-prescription-instructions">
+          <strong>Instructions:</strong>
+
+          <span>
+            {printPrescriptionData.treatment.doctor_notes}
+          </span>
+        </section>
+      )}
+
+      {/* Follow-up */}
+
+      {printPrescriptionData.treatment
+        .next_appointment_date && (
+        <section className="ivory-prescription-follow-up">
+          <CalendarOutlined />
+
+          <span>
+            Follow-up:{" "}
+            <strong>
+              {dayjs(
+                printPrescriptionData.treatment
+                  .next_appointment_date,
+              ).format("DD / MM / YYYY")}
+            </strong>
+          </span>
+        </section>
+      )}
+
+      {/* Bottom stamp and signature */}
+
+      <footer className="ivory-prescription-footer">
+        <div className="ivory-prescription-stamp">
+          <strong>{CLINIC_INFORMATION.dentistName}</strong>
+
+          <span>
+            {CLINIC_INFORMATION.designation},{" "}
+            {CLINIC_INFORMATION.qualificationTwo}
+          </span>
+
+          <span>{CLINIC_INFORMATION.qualificationOne}</span>
+
+          <span>{CLINIC_INFORMATION.registrationNumber}</span>
+
+          <span>
+            Tel: {CLINIC_INFORMATION.stampPhone}
+          </span>
+        </div>
+
+        <div className="ivory-prescription-signature">
+          <div className="ivory-prescription-signature-line" />
+
+          <span>Signature</span>
+        </div>
+      </footer>
+
+      <div className="ivory-prescription-footer-text">
+        {CLINIC_INFORMATION.footerText}
+      </div>
+    </div>
+  )}
+</Modal>
     </ClinicPage>
   );
 };

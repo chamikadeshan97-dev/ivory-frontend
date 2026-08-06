@@ -1,6 +1,7 @@
 import React, {
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -35,6 +36,7 @@ import {
   IdcardOutlined,
   MedicineBoxOutlined,
   PhoneOutlined,
+  PrinterOutlined,
   UserOutlined,
   WalletOutlined,
   WarningOutlined,
@@ -42,12 +44,14 @@ import {
 
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { useReactToPrint } from "react-to-print";
 
 import {
   getAppointmentFullDetails,
 } from "../api/endPoints";
 
 import "./css/AppointmentDetailsModal.css";
+import PrescriptionPreviewModal from "./PrescriptionPreviewModal";
 
 dayjs.extend(customParseFormat);
 
@@ -55,6 +59,29 @@ const {
   Text,
   Title,
 } = Typography;
+
+/* --------------------------------------------------------
+   Clinic print information
+-------------------------------------------------------- */
+
+const CLINIC_INFORMATION = {
+  name: "IVORY DENTAL",
+  subtitle: "Aesthetic & Cosmetic Dental Surgery",
+
+  dentistName: "Dr. U.H.P.K.J. Bandu Ukwatta",
+  qualificationOne: "Diploma in Orthodontics (POS)",
+  qualificationTwo: "BDS, DHDP - Colombo",
+  designation: "Dental Surgeon",
+  registrationNumber: "S.L.M.C.Ref.No.2142",
+
+  addressLineOne: "No.50 D,",
+  addressLineTwo: "Rahula Junction,",
+  addressLineThree: "Matara.",
+  hotline: "071 144 99 99",
+
+  stampPhone: "071 24 50 779",
+  footerText: "Happy Smile For a Happy Life",
+};
 
 /* --------------------------------------------------------
    Constants
@@ -76,18 +103,11 @@ const APPOINTMENT_FLOW = [
 -------------------------------------------------------- */
 
 const convertToBoolean = (value) => {
-  if (
-    value === true ||
-    value === 1
-  ) {
+  if (value === true || value === 1) {
     return true;
   }
 
-  return [
-    "true",
-    "yes",
-    "1",
-  ].includes(
+  return ["true", "yes", "1"].includes(
     String(value ?? "")
       .trim()
       .toLowerCase(),
@@ -95,19 +115,13 @@ const convertToBoolean = (value) => {
 };
 
 const toSafeNumber = (value) => {
-  const number = Number(
-    value || 0,
-  );
+  const number = Number(value || 0);
 
-  return Number.isNaN(number)
-    ? 0
-    : number;
+  return Number.isNaN(number) ? 0 : number;
 };
 
 const toArray = (value) => {
-  return Array.isArray(value)
-    ? value
-    : [];
+  return Array.isArray(value) ? value : [];
 };
 
 const normalizeStatus = (value) => {
@@ -136,9 +150,7 @@ const formatDateTime = (value) => {
   const date = dayjs(value);
 
   return date.isValid()
-    ? date.format(
-        "DD MMM YYYY, h:mm A",
-      )
+    ? date.format("DD MMM YYYY, h:mm A")
     : value;
 };
 
@@ -164,9 +176,7 @@ const formatTime = (value) => {
 };
 
 const formatCurrency = (value) => {
-  return `Rs. ${toSafeNumber(
-    value,
-  ).toLocaleString("en-LK", {
+  return `Rs. ${toSafeNumber(value).toLocaleString("en-LK", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
@@ -200,9 +210,7 @@ const getPaymentId = (record) => {
   );
 };
 
-const getTreatmentCharge = (
-  record,
-) => {
+const getTreatmentCharge = (record) => {
   return toSafeNumber(
     record?.treatment_fee ??
       record?.treatment_charge ??
@@ -211,13 +219,29 @@ const getTreatmentCharge = (
   );
 };
 
-const getPaymentAmount = (
-  record,
-) => {
+const getPaymentAmount = (record) => {
   return toSafeNumber(
     record?.payment_amount ??
       record?.amount ??
       0,
+  );
+};
+
+const getTreatmentName = (record) => {
+  return (
+    record?.treatment_name ||
+    record?.treatment_performed ||
+    record?.procedure ||
+    "-"
+  );
+};
+
+const getTreatmentDetails = (record) => {
+  return (
+    record?.treatment_details ||
+    record?.treatment_performed ||
+    record?.procedure_details ||
+    "-"
   );
 };
 
@@ -239,6 +263,13 @@ const getStatusColor = (status) => {
   return colors[status] || "default";
 };
 
+const splitPrescriptionLines = (value) => {
+  return String(value || "")
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+};
+
 /* --------------------------------------------------------
    Summary card
 -------------------------------------------------------- */
@@ -258,21 +289,9 @@ const AppointmentFinanceCard = ({
       <div className="appointment-finance-card__content">
         <Statistic
           title={title}
-          value={
-            currency
-              ? toSafeNumber(value)
-              : value
-          }
-          prefix={
-            currency
-              ? "Rs."
-              : undefined
-          }
-          precision={
-            currency
-              ? 2
-              : undefined
-          }
+          value={currency ? toSafeNumber(value) : value}
+          prefix={currency ? "Rs." : undefined}
+          precision={currency ? 2 : undefined}
         />
 
         <div className="appointment-finance-card__icon">
@@ -292,11 +311,11 @@ const AppointmentDetailsModal = ({
   appointmentId,
   onClose,
 }) => {
-  const [loading, setLoading] =
-    useState(false);
+  const prescriptionPrintRef = useRef(null);
 
-  const [details, setDetails] =
-    useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const [details, setDetails] = useState(null);
 
   const [
     treatmentModalOpen,
@@ -308,6 +327,16 @@ const AppointmentDetailsModal = ({
     setPaymentModalOpen,
   ] = useState(false);
 
+  const [
+    prescriptionModalOpen,
+    setPrescriptionModalOpen,
+  ] = useState(false);
+
+  const [
+    selectedTreatmentForPrint,
+    setSelectedTreatmentForPrint,
+  ] = useState(null);
+
   /* ------------------------------------------------------
      Load appointment
   ------------------------------------------------------ */
@@ -315,56 +344,50 @@ const AppointmentDetailsModal = ({
   useEffect(() => {
     let isActive = true;
 
-    const loadAppointmentDetails =
-      async () => {
-        if (
-          !open ||
-          !appointmentId
-        ) {
-          return;
+    const loadAppointmentDetails = async () => {
+      if (!open || !appointmentId) {
+        return;
+      }
+
+      setLoading(true);
+      setDetails(null);
+      setTreatmentModalOpen(false);
+      setPaymentModalOpen(false);
+      setPrescriptionModalOpen(false);
+      setSelectedTreatmentForPrint(null);
+
+      try {
+        const response = await getAppointmentFullDetails(
+          appointmentId,
+        );
+
+        const responseData =
+          response?.data?.data ??
+          response?.data ??
+          null;
+
+        if (isActive) {
+          setDetails(responseData);
         }
+      } catch (error) {
+        console.error(
+          "Failed to load appointment details:",
+          error,
+        );
 
-        setLoading(true);
-        setDetails(null);
-        setTreatmentModalOpen(false);
-        setPaymentModalOpen(false);
-
-        try {
-          const response =
-            await getAppointmentFullDetails(
-              appointmentId,
-            );
-
-          const responseData =
-            response?.data?.data ??
-            response?.data ??
-            null;
-
-          if (isActive) {
-            setDetails(
-              responseData,
-            );
-          }
-        } catch (error) {
-          console.error(
-            "Failed to load appointment details:",
-            error,
+        if (isActive) {
+          message.error(
+            error?.response?.data?.message ||
+              error?.message ||
+              "Failed to load appointment details",
           );
-
-          if (isActive) {
-            message.error(
-              error?.response?.data
-                ?.message ||
-                error?.message ||
-                "Failed to load appointment details",
-            );
-          }
-        } finally {
-          if (isActive) {
-            setLoading(false);
-          }
         }
-      };
+      } finally {
+        if (isActive) {
+          setLoading(false);
+        }
+      }
+    };
 
     loadAppointmentDetails();
 
@@ -436,7 +459,7 @@ const AppointmentDetailsModal = ({
     dentist?.name ||
     dentist?.dentist_name ||
     appointment?.dentist_name ||
-    "-";
+    CLINIC_INFORMATION.dentistName;
 
   const dentistId =
     dentist?.dentist_id ||
@@ -476,22 +499,18 @@ const AppointmentDetailsModal = ({
   ------------------------------------------------------ */
 
   const uniqueTreatments = useMemo(() => {
-    const treatmentMap =
-      new Map();
+    const treatmentMap = new Map();
 
     treatments.forEach(
       (treatment, index) => {
-        const treatmentId =
-          String(
-            treatment?.treatment_id ||
-              treatment?.id ||
-              `treatment-${index}`,
-          ).trim();
+        const treatmentId = String(
+          treatment?.treatment_id ||
+            treatment?.id ||
+            `treatment-${index}`,
+        ).trim();
 
         const existing =
-          treatmentMap.get(
-            treatmentId,
-          );
+          treatmentMap.get(treatmentId);
 
         if (!existing) {
           treatmentMap.set(
@@ -503,12 +522,8 @@ const AppointmentDetailsModal = ({
         }
 
         if (
-          getTreatmentCharge(
-            treatment,
-          ) >
-          getTreatmentCharge(
-            existing,
-          )
+          getTreatmentCharge(treatment) >
+          getTreatmentCharge(existing)
         ) {
           treatmentMap.set(
             treatmentId,
@@ -559,165 +574,139 @@ const AppointmentDetailsModal = ({
      Treatment charge map
   ------------------------------------------------------ */
 
-  const treatmentChargeMap =
-    useMemo(() => {
-      const chargeMap =
-        new Map();
+  const treatmentChargeMap = useMemo(() => {
+    const chargeMap = new Map();
 
-      uniqueTreatments.forEach(
-        (treatment, index) => {
-          const treatmentId =
-            String(
-              treatment?.treatment_id ||
-                treatment?.id ||
-                `treatment-${index}`,
-            ).trim();
+    uniqueTreatments.forEach(
+      (treatment, index) => {
+        const treatmentId = String(
+          treatment?.treatment_id ||
+            treatment?.id ||
+            `treatment-${index}`,
+        ).trim();
 
-          const charge =
-            getTreatmentCharge(
-              treatment,
-            );
+        const charge =
+          getTreatmentCharge(treatment);
 
-          if (charge > 0) {
-            chargeMap.set(
-              treatmentId,
-              charge,
-            );
-          }
-        },
-      );
+        if (charge > 0) {
+          chargeMap.set(
+            treatmentId,
+            charge,
+          );
+        }
+      },
+    );
 
-      payments.forEach(
-        (payment) => {
-          const treatmentId =
-            String(
-              payment?.treatment_id ||
-                "single-treatment",
-            ).trim();
+    payments.forEach((payment) => {
+      const treatmentId = String(
+        payment?.treatment_id ||
+          "single-treatment",
+      ).trim();
 
-          const charge =
-            getTreatmentCharge(
-              payment,
-            );
+      const charge =
+        getTreatmentCharge(payment);
 
-          const existingCharge =
-            chargeMap.get(
-              treatmentId,
-            ) || 0;
+      const existingCharge =
+        chargeMap.get(treatmentId) || 0;
 
-          if (
-            charge >
-            existingCharge
-          ) {
-            chargeMap.set(
-              treatmentId,
-              charge,
-            );
-          }
-        },
-      );
+      if (charge > existingCharge) {
+        chargeMap.set(
+          treatmentId,
+          charge,
+        );
+      }
+    });
 
-      return chargeMap;
-    }, [
-      uniqueTreatments,
-      payments,
-    ]);
+    return chargeMap;
+  }, [
+    uniqueTreatments,
+    payments,
+  ]);
 
   /* ------------------------------------------------------
      Financial summary
   ------------------------------------------------------ */
 
-  const calculatedSummary =
-    useMemo(() => {
-      const calculatedCharge =
-        Array.from(
-          treatmentChargeMap.values(),
-        ).reduce(
-          (total, charge) =>
-            total +
-            toSafeNumber(charge),
-          0,
-        );
-
-      const backendCharge =
-        toSafeNumber(
-          paymentSummary?.treatment_charge ??
-            paymentSummary?.total_treatment_charge ??
-            paymentSummary?.total_charge ??
-            0,
-        );
-
-      const totalCharge =
-        calculatedCharge > 0
-          ? calculatedCharge
-          : backendCharge;
-
-      const totalPaid =
-        sortedPayments.reduce(
-          (total, payment) =>
-            total +
-            getPaymentAmount(
-              payment,
-            ),
-          0,
-        );
-
-      const balance = Math.max(
-        totalCharge - totalPaid,
+  const calculatedSummary = useMemo(() => {
+    const calculatedCharge =
+      Array.from(
+        treatmentChargeMap.values(),
+      ).reduce(
+        (total, charge) =>
+          total + toSafeNumber(charge),
         0,
       );
 
-      const status =
-        totalPaid <= 0
-          ? "Unpaid"
-          : balance > 0
-            ? "Partial"
-            : "Paid";
+    const backendCharge =
+      toSafeNumber(
+        paymentSummary?.treatment_charge ??
+          paymentSummary?.total_treatment_charge ??
+          paymentSummary?.total_charge ??
+          0,
+      );
 
-      return {
-        totalCharge,
-        totalPaid,
-        balance,
-        status,
-        installmentCount:
-          sortedPayments.length,
-      };
-    }, [
-      treatmentChargeMap,
-      paymentSummary,
-      sortedPayments,
-    ]);
+    const totalCharge =
+      calculatedCharge > 0
+        ? calculatedCharge
+        : backendCharge;
+
+    const totalPaid =
+      sortedPayments.reduce(
+        (total, payment) =>
+          total + getPaymentAmount(payment),
+        0,
+      );
+
+    const balance = Math.max(
+      totalCharge - totalPaid,
+      0,
+    );
+
+    const status =
+      totalPaid <= 0
+        ? "Unpaid"
+        : balance > 0
+          ? "Partial"
+          : "Paid";
+
+    return {
+      totalCharge,
+      totalPaid,
+      balance,
+      status,
+      installmentCount:
+        sortedPayments.length,
+    };
+  }, [
+    treatmentChargeMap,
+    paymentSummary,
+    sortedPayments,
+  ]);
 
   /* ------------------------------------------------------
      Next appointment
   ------------------------------------------------------ */
 
-  const nextAppointmentDate =
-    useMemo(() => {
-      const nextDates =
-        uniqueTreatments
-          .map(
-            (treatment) =>
-              treatment
-                ?.next_appointment_date,
-          )
-          .filter(Boolean)
-          .map((value) =>
-            dayjs(value),
-          )
-          .filter((date) =>
-            date.isValid(),
-          )
-          .sort(
-            (first, second) =>
-              first.valueOf() -
-              second.valueOf(),
-          );
+  const nextAppointmentDate = useMemo(() => {
+    const nextDates =
+      uniqueTreatments
+        .map(
+          (treatment) =>
+            treatment?.next_appointment_date,
+        )
+        .filter(Boolean)
+        .map((value) => dayjs(value))
+        .filter((date) => date.isValid())
+        .sort(
+          (first, second) =>
+            first.valueOf() -
+            second.valueOf(),
+        );
 
-      return nextDates.length > 0
-        ? nextDates[0]
-        : null;
-    }, [uniqueTreatments]);
+    return nextDates.length > 0
+      ? nextDates[0]
+      : null;
+  }, [uniqueTreatments]);
 
   /* ------------------------------------------------------
      Progress
@@ -744,11 +733,10 @@ const AppointmentDetailsModal = ({
     const currentPayment =
       getPaymentAmount(record);
 
-    const treatmentId =
-      String(
-        record?.treatment_id ||
-          "single-treatment",
-      ).trim();
+    const treatmentId = String(
+      record?.treatment_id ||
+        "single-treatment",
+    ).trim();
 
     const previousPayments =
       sortedPayments
@@ -758,25 +746,19 @@ const AppointmentDetailsModal = ({
             String(
               payment?.treatment_id ||
                 "single-treatment",
-            ).trim() ===
-            treatmentId,
+            ).trim() === treatmentId,
         );
 
     const calculatedPreviouslyPaid =
       previousPayments.reduce(
         (total, payment) =>
-          total +
-          getPaymentAmount(
-            payment,
-          ),
+          total + getPaymentAmount(payment),
         0,
       );
 
     const previouslyPaid =
-      record?.previously_paid !==
-        undefined &&
-      record?.previously_paid !==
-        null &&
+      record?.previously_paid !== undefined &&
+      record?.previously_paid !== null &&
       record?.previously_paid !== ""
         ? toSafeNumber(
             record.previously_paid,
@@ -788,36 +770,26 @@ const AppointmentDetailsModal = ({
       currentPayment;
 
     const totalPaid =
-      record?.total_paid !==
-        undefined &&
+      record?.total_paid !== undefined &&
       record?.total_paid !== null &&
       record?.total_paid !== ""
-        ? toSafeNumber(
-            record.total_paid,
-          )
+        ? toSafeNumber(record.total_paid)
         : calculatedTotalPaid;
 
     const treatmentCharge =
-      treatmentChargeMap.get(
-        treatmentId,
-      ) ||
-      getTreatmentCharge(
-        record,
-      ) ||
+      treatmentChargeMap.get(treatmentId) ||
+      getTreatmentCharge(record) ||
       calculatedSummary.totalCharge;
 
     const calculatedRemaining =
       Math.max(
-        treatmentCharge -
-          totalPaid,
+        treatmentCharge - totalPaid,
         0,
       );
 
     const remainingAmount =
-      record?.remaining_amount !==
-        undefined &&
-      record?.remaining_amount !==
-        null &&
+      record?.remaining_amount !== undefined &&
+      record?.remaining_amount !== null &&
       record?.remaining_amount !== ""
         ? toSafeNumber(
             record.remaining_amount,
@@ -833,6 +805,79 @@ const AppointmentDetailsModal = ({
   };
 
   /* ------------------------------------------------------
+     Prescription printing
+  ------------------------------------------------------ */
+
+  const selectedPrescriptionLines =
+    useMemo(() => {
+      return splitPrescriptionLines(
+        selectedTreatmentForPrint?.prescription,
+      );
+    }, [selectedTreatmentForPrint]);
+
+  const openPrescriptionPreview = (
+    treatment,
+  ) => {
+    setSelectedTreatmentForPrint(
+      treatment,
+    );
+
+    setPrescriptionModalOpen(true);
+  };
+
+  const closePrescriptionPreview = () => {
+    setPrescriptionModalOpen(false);
+  };
+
+  const handlePrintPrescription =
+    useReactToPrint({
+      contentRef: prescriptionPrintRef,
+
+      documentTitle: `Prescription-${patientName}-${dayjs(
+        selectedTreatmentForPrint?.treatment_date ||
+          appointmentDate ||
+          new Date(),
+      ).format("YYYY-MM-DD")}`,
+
+      pageStyle: `
+        @page {
+          size: A6 portrait;
+          margin: 0;
+        }
+
+        html,
+        body {
+          width: 105mm;
+          height: 148mm;
+          margin: 0 !important;
+          padding: 0 !important;
+          background: #ffffff !important;
+        }
+      `,
+
+      onAfterPrint: () => {
+        message.success(
+          "Prescription printing completed",
+        );
+      },
+
+      onPrintError: (
+        errorLocation,
+        error,
+      ) => {
+        console.error(
+          "Prescription print error:",
+          errorLocation,
+          error,
+        );
+
+        message.error(
+          "Could not print the prescription",
+        );
+      },
+    });
+
+  /* ------------------------------------------------------
      Treatment columns
   ------------------------------------------------------ */
 
@@ -846,9 +891,7 @@ const AppointmentDetailsModal = ({
       render: (_, record) => (
         <div className="appointment-detail-id appointment-detail-id--purple">
           <Text copyable>
-            {getTreatmentId(
-              record,
-            )}
+            {getTreatmentId(record)}
           </Text>
         </div>
       ),
@@ -873,27 +916,28 @@ const AppointmentDetailsModal = ({
 
       render: (value) => (
         <Tooltip title={value || ""}>
-          <Text>
-            {value || "-"}
-          </Text>
+          <Text>{value || "-"}</Text>
         </Tooltip>
       ),
     },
     {
       title: "Treatment",
-      dataIndex:
-        "treatment_performed",
       key: "treatment",
       width: 225,
       ellipsis: true,
 
-      render: (value) => (
-        <Tooltip title={value || ""}>
-          <Text strong>
-            {value || "-"}
-          </Text>
-        </Tooltip>
-      ),
+      render: (_, record) => {
+        const value =
+          getTreatmentName(record);
+
+        return (
+          <Tooltip title={value || ""}>
+            <Text strong>
+              {value || "-"}
+            </Text>
+          </Tooltip>
+        );
+      },
     },
     {
       title: "Fee",
@@ -904,9 +948,7 @@ const AppointmentDetailsModal = ({
       render: (_, record) => (
         <Text strong>
           {formatCurrency(
-            getTreatmentCharge(
-              record,
-            ),
+            getTreatmentCharge(record),
           )}
         </Text>
       ),
@@ -915,7 +957,7 @@ const AppointmentDetailsModal = ({
       title: "Prescription",
       dataIndex: "prescription",
       key: "prescription",
-      width: 210,
+      width: 230,
       ellipsis: true,
 
       render: (value) => (
@@ -948,15 +990,12 @@ const AppointmentDetailsModal = ({
 
       render: (_, record) => {
         const date =
-          record
-            ?.next_appointment_date;
+          record?.next_appointment_date;
 
         return date ? (
           <Tag
             color="blue"
-            icon={
-              <CalendarOutlined />
-            }
+            icon={<CalendarOutlined />}
           >
             {formatDate(date)}
           </Tag>
@@ -964,6 +1003,44 @@ const AppointmentDetailsModal = ({
           <Text type="secondary">
             Not scheduled
           </Text>
+        );
+      },
+    },
+    {
+      title: "Print",
+      key: "print",
+      width: 150,
+      fixed: "right",
+      align: "center",
+
+      render: (_, record) => {
+        const hasPrescription =
+          splitPrescriptionLines(
+            record?.prescription,
+          ).length > 0;
+
+        return (
+          <Tooltip
+            title={
+              hasPrescription
+                ? "Preview and print prescription"
+                : "No prescription recorded"
+            }
+          >
+            <Button
+              type="primary"
+              ghost
+              icon={<PrinterOutlined />}
+              disabled={!hasPrescription}
+              onClick={() =>
+                openPrescriptionPreview(
+                  record,
+                )
+              }
+            >
+              Print
+            </Button>
+          </Tooltip>
         );
       },
     },
@@ -987,8 +1064,7 @@ const AppointmentDetailsModal = ({
         index,
       ) => (
         <div className="payment-installment-number">
-          {record
-            ?.installment_number ||
+          {record?.installment_number ||
             index + 1}
         </div>
       ),
@@ -1001,9 +1077,7 @@ const AppointmentDetailsModal = ({
       render: (_, record) => (
         <div className="appointment-detail-id appointment-detail-id--green">
           <Text copyable>
-            {getPaymentId(
-              record,
-            )}
+            {getPaymentId(record)}
           </Text>
         </div>
       ),
@@ -1015,8 +1089,7 @@ const AppointmentDetailsModal = ({
 
       render: (_, record) => (
         <Text copyable>
-          {record?.treatment_id ||
-            "-"}
+          {record?.treatment_id || "-"}
         </Text>
       ),
     },
@@ -1039,9 +1112,7 @@ const AppointmentDetailsModal = ({
 
       render: (value) =>
         value ? (
-          <Text copyable>
-            {value}
-          </Text>
+          <Text copyable>{value}</Text>
         ) : (
           "-"
         ),
@@ -1136,9 +1207,7 @@ const AppointmentDetailsModal = ({
                 : "payment-value payment-value--paid"
             }
           >
-            {formatCurrency(
-              remaining,
-            )}
+            {formatCurrency(remaining)}
           </Text>
         );
       },
@@ -1198,6 +1267,8 @@ const AppointmentDetailsModal = ({
   const handleClose = () => {
     setTreatmentModalOpen(false);
     setPaymentModalOpen(false);
+    setPrescriptionModalOpen(false);
+    setSelectedTreatmentForPrint(null);
     setDetails(null);
 
     onClose();
@@ -1249,8 +1320,7 @@ const AppointmentDetailsModal = ({
             <Spin size="large" />
 
             <Text type="secondary">
-              Loading appointment
-              details...
+              Loading appointment details...
             </Text>
           </div>
         ) : !details ? (
@@ -1259,8 +1329,6 @@ const AppointmentDetailsModal = ({
           </div>
         ) : (
           <>
-            {/* Header */}
-
             <div className="appointment-details-header">
               <div className="appointment-details-header__patient">
                 <Avatar
@@ -1274,10 +1342,7 @@ const AppointmentDetailsModal = ({
                     Appointment Overview
                   </Text>
 
-                  <Space
-                    wrap
-                    size={8}
-                  >
+                  <Space wrap size={8}>
                     <Title level={3}>
                       {patientName}
                     </Title>
@@ -1295,13 +1360,11 @@ const AppointmentDetailsModal = ({
                   <div className="appointment-details-header__meta">
                     <span>
                       <IdcardOutlined />
-
                       {appointmentNumber}
                     </span>
 
                     <span>
                       <CalendarOutlined />
-
                       {formatDate(
                         appointmentDate,
                       )}
@@ -1309,7 +1372,6 @@ const AppointmentDetailsModal = ({
 
                     <span>
                       <ClockCircleOutlined />
-
                       {formatTime(
                         appointmentTime,
                       )}
@@ -1333,8 +1395,7 @@ const AppointmentDetailsModal = ({
                   </Title>
 
                   <Text>
-                    {dentist
-                      ?.specialization ||
+                    {dentist?.specialization ||
                       "General Dentistry"}
                   </Text>
                 </div>
@@ -1342,32 +1403,22 @@ const AppointmentDetailsModal = ({
             </div>
 
             <div className="appointment-details-content">
-              {/* Allergy warning */}
-
               {hasAllergies && (
                 <Alert
                   type="error"
                   showIcon
-                  icon={
-                    <WarningOutlined />
-                  }
+                  icon={<WarningOutlined />}
                   message="Patient Allergy Warning"
-                  description={
-                    allergyDetails
-                  }
+                  description={allergyDetails}
                   className="appointment-allergy-alert"
                 />
               )}
-
-              {/* Appointment progress */}
 
               {isCancelled ? (
                 <Alert
                   type="error"
                   showIcon
-                  icon={
-                    <CloseCircleOutlined />
-                  }
+                  icon={<CloseCircleOutlined />}
                   message="Appointment Cancelled"
                   description="This appointment is no longer active."
                   className="appointment-cancelled-alert"
@@ -1384,8 +1435,7 @@ const AppointmentDetailsModal = ({
                       </Title>
 
                       <Text type="secondary">
-                        Current stage of the
-                        patient visit.
+                        Current stage of the patient visit.
                       </Text>
                     </div>
 
@@ -1401,9 +1451,7 @@ const AppointmentDetailsModal = ({
                   <div className="appointment-progress-scroll">
                     <Steps
                       size="small"
-                      current={
-                        progressCurrent
-                      }
+                      current={progressCurrent}
                       items={APPOINTMENT_FLOW.map(
                         (status) => ({
                           title: status,
@@ -1414,13 +1462,8 @@ const AppointmentDetailsModal = ({
                 </Card>
               )}
 
-              {/* Patient and dentist information */}
-
               <Row gutter={[16, 16]}>
-                <Col
-                  xs={24}
-                  xl={14}
-                >
+                <Col xs={24} xl={14}>
                   <Card
                     bordered={false}
                     className="appointment-information-card"
@@ -1428,13 +1471,11 @@ const AppointmentDetailsModal = ({
                     <div className="appointment-section-heading">
                       <div>
                         <Title level={4}>
-                          Patient and
-                          Appointment
+                          Patient and Appointment
                         </Title>
 
                         <Text type="secondary">
-                          Patient contact and
-                          booking information.
+                          Patient contact and booking information.
                         </Text>
                       </div>
 
@@ -1467,7 +1508,6 @@ const AppointmentDetailsModal = ({
                       <Descriptions.Item label="Phone">
                         <Space size={7}>
                           <PhoneOutlined />
-
                           <Text>
                             {patientPhone}
                           </Text>
@@ -1475,11 +1515,8 @@ const AppointmentDetailsModal = ({
                       </Descriptions.Item>
 
                       <Descriptions.Item label="Age / Gender">
-                        {patient?.age ||
-                          "-"}{" "}
-                        /{" "}
-                        {patient?.gender ||
-                          "-"}
+                        {patient?.age || "-"} /{" "}
+                        {patient?.gender || "-"}
                       </Descriptions.Item>
 
                       <Descriptions.Item label="Appointment ID">
@@ -1502,18 +1539,15 @@ const AppointmentDetailsModal = ({
                         label="Reason"
                         span={2}
                       >
-                        {appointment
-                          ?.reason_for_visit ||
+                        {appointment?.reason_for_visit ||
                           "-"}
                       </Descriptions.Item>
 
                       <Descriptions.Item label="Queue Number">
                         <Tag color="blue">
                           #
-                          {appointment
-                            ?.appointment_number ||
-                            appointment
-                              ?.queue_number ||
+                          {appointment?.appointment_number ||
+                            appointment?.queue_number ||
                             "-"}
                         </Tag>
                       </Descriptions.Item>
@@ -1531,10 +1565,7 @@ const AppointmentDetailsModal = ({
                   </Card>
                 </Col>
 
-                <Col
-                  xs={24}
-                  xl={10}
-                >
+                <Col xs={24} xl={10}>
                   <Card
                     bordered={false}
                     className="appointment-information-card"
@@ -1546,8 +1577,7 @@ const AppointmentDetailsModal = ({
                         </Title>
 
                         <Text type="secondary">
-                          Assigned dental
-                          professional.
+                          Assigned dental professional.
                         </Text>
                       </div>
 
@@ -1577,7 +1607,6 @@ const AppointmentDetailsModal = ({
                       <Descriptions.Item label="Phone">
                         <Space size={7}>
                           <PhoneOutlined />
-
                           <Text>
                             {dentistPhone}
                           </Text>
@@ -1587,12 +1616,9 @@ const AppointmentDetailsModal = ({
                       <Descriptions.Item label="Specialization">
                         <Tag
                           color="purple"
-                          icon={
-                            <MedicineBoxOutlined />
-                          }
+                          icon={<MedicineBoxOutlined />}
                         >
-                          {dentist
-                            ?.specialization ||
+                          {dentist?.specialization ||
                             "General Dentistry"}
                         </Tag>
                       </Descriptions.Item>
@@ -1601,9 +1627,7 @@ const AppointmentDetailsModal = ({
                         {nextAppointmentDate ? (
                           <Tag
                             color="blue"
-                            icon={
-                              <CalendarOutlined />
-                            }
+                            icon={<CalendarOutlined />}
                           >
                             {formatDate(
                               nextAppointmentDate,
@@ -1620,8 +1644,6 @@ const AppointmentDetailsModal = ({
                 </Col>
               </Row>
 
-              {/* Payment summary */}
-
               <div className="appointment-section-heading appointment-section-heading--finance">
                 <div>
                   <Title level={4}>
@@ -1629,9 +1651,7 @@ const AppointmentDetailsModal = ({
                   </Title>
 
                   <Text type="secondary">
-                    Treatment charges,
-                    installments and
-                    remaining balance.
+                    Treatment charges, installments and remaining balance.
                   </Text>
                 </div>
 
@@ -1641,139 +1661,90 @@ const AppointmentDetailsModal = ({
                   )}
                   className="appointment-finance-status"
                 >
-                  {
-                    calculatedSummary.status
-                  }
+                  {calculatedSummary.status}
                 </Tag>
               </div>
 
               <Row gutter={[14, 14]}>
-                <Col
-                  xs={24}
-                  sm={12}
-                  xl={6}
-                >
+                <Col xs={24} sm={12} xl={6}>
                   <AppointmentFinanceCard
                     title="Treatment Charge"
                     value={
-                      calculatedSummary
-                        .totalCharge
+                      calculatedSummary.totalCharge
                     }
                     tone="blue"
-                    icon={
-                      <MedicineBoxOutlined />
-                    }
+                    icon={<MedicineBoxOutlined />}
                   />
                 </Col>
 
-                <Col
-                  xs={24}
-                  sm={12}
-                  xl={6}
-                >
+                <Col xs={24} sm={12} xl={6}>
                   <AppointmentFinanceCard
                     title="Total Paid"
                     value={
-                      calculatedSummary
-                        .totalPaid
+                      calculatedSummary.totalPaid
                     }
                     tone="green"
-                    icon={
-                      <CheckCircleOutlined />
-                    }
+                    icon={<CheckCircleOutlined />}
                   />
                 </Col>
 
-                <Col
-                  xs={24}
-                  sm={12}
-                  xl={6}
-                >
+                <Col xs={24} sm={12} xl={6}>
                   <AppointmentFinanceCard
                     title="Balance"
                     value={
-                      calculatedSummary
-                        .balance
+                      calculatedSummary.balance
                     }
                     tone={
-                      calculatedSummary
-                        .balance > 0
+                      calculatedSummary.balance > 0
                         ? "red"
                         : "green"
                     }
-                    icon={
-                      <DollarOutlined />
-                    }
+                    icon={<DollarOutlined />}
                   />
                 </Col>
 
-                <Col
-                  xs={24}
-                  sm={12}
-                  xl={6}
-                >
+                <Col xs={24} sm={12} xl={6}>
                   <AppointmentFinanceCard
                     title="Installments"
                     value={
-                      calculatedSummary
-                        .installmentCount
+                      calculatedSummary.installmentCount
                     }
                     currency={false}
                     tone="orange"
-                    icon={
-                      <WalletOutlined />
-                    }
+                    icon={<WalletOutlined />}
                   />
                 </Col>
               </Row>
-
-              {/* Detail buttons */}
 
               <Row
                 gutter={[14, 14]}
                 className="appointment-detail-actions"
               >
-                <Col
-                  xs={24}
-                  md={12}
-                >
+                <Col xs={24} md={12}>
                   <Button
                     block
                     size="large"
-                    icon={
-                      <MedicineBoxOutlined />
-                    }
+                    icon={<MedicineBoxOutlined />}
                     onClick={() =>
-                      setTreatmentModalOpen(
-                        true,
-                      )
+                      setTreatmentModalOpen(true)
                     }
                     className="appointment-detail-action appointment-detail-action--treatment"
                   >
                     View Treatment Details
 
                     <Tag color="purple">
-                      {
-                        uniqueTreatments.length
-                      }
+                      {uniqueTreatments.length}
                     </Tag>
                   </Button>
                 </Col>
 
-                <Col
-                  xs={24}
-                  md={12}
-                >
+                <Col xs={24} md={12}>
                   <Button
                     block
                     size="large"
-                    icon={
-                      <HistoryOutlined />
-                    }
+                    icon={<HistoryOutlined />}
                     onClick={() =>
-                      setPaymentModalOpen(
-                        true,
-                      )
+                      setPaymentModalOpen(true)
                     }
                     className="appointment-detail-action appointment-detail-action--payment"
                   >
@@ -1781,8 +1752,7 @@ const AppointmentDetailsModal = ({
 
                     <Tag color="green">
                       {
-                        calculatedSummary
-                          .installmentCount
+                        calculatedSummary.installmentCount
                       }
                     </Tag>
                   </Button>
@@ -1802,7 +1772,7 @@ const AppointmentDetailsModal = ({
           setTreatmentModalOpen(false)
         }
         centered
-        width={1120}
+        width={1220}
         destroyOnHidden
         className="appointment-sub-modal"
         footer={[
@@ -1810,9 +1780,7 @@ const AppointmentDetailsModal = ({
             key="close"
             type="primary"
             onClick={() =>
-              setTreatmentModalOpen(
-                false,
-              )
+              setTreatmentModalOpen(false)
             }
           >
             Close
@@ -1830,9 +1798,7 @@ const AppointmentDetailsModal = ({
             </Title>
 
             <Text>
-              Diagnoses, procedures,
-              prescriptions and follow-up
-              dates.
+              Diagnoses, procedures, prescriptions and follow-up dates.
             </Text>
           </div>
         </div>
@@ -1842,10 +1808,7 @@ const AppointmentDetailsModal = ({
             gutter={[12, 12]}
             className="appointment-sub-summary"
           >
-            <Col
-              xs={24}
-              md={8}
-            >
+            <Col xs={24} md={8}>
               <div className="appointment-sub-summary__item">
                 <Text type="secondary">
                   Patient
@@ -1857,10 +1820,7 @@ const AppointmentDetailsModal = ({
               </div>
             </Col>
 
-            <Col
-              xs={24}
-              md={8}
-            >
+            <Col xs={24} md={8}>
               <div className="appointment-sub-summary__item">
                 <Text type="secondary">
                   Appointment
@@ -1872,19 +1832,14 @@ const AppointmentDetailsModal = ({
               </div>
             </Col>
 
-            <Col
-              xs={24}
-              md={8}
-            >
+            <Col xs={24} md={8}>
               <div className="appointment-sub-summary__item">
                 <Text type="secondary">
                   Treatments
                 </Text>
 
                 <Text strong>
-                  {
-                    uniqueTreatments.length
-                  }
+                  {uniqueTreatments.length}
                 </Text>
               </div>
             </Col>
@@ -1899,15 +1854,11 @@ const AppointmentDetailsModal = ({
               record?.id ||
               `treatment-${index}`
             }
-            columns={
-              treatmentColumns
-            }
-            dataSource={
-              uniqueTreatments
-            }
+            columns={treatmentColumns}
+            dataSource={uniqueTreatments}
             pagination={false}
             scroll={{
-              x: 1450,
+              x: 1710,
               y: 390,
             }}
             className="appointment-detail-table"
@@ -1937,9 +1888,7 @@ const AppointmentDetailsModal = ({
             key="close"
             type="primary"
             onClick={() =>
-              setPaymentModalOpen(
-                false,
-              )
+              setPaymentModalOpen(false)
             }
           >
             Close
@@ -1957,8 +1906,7 @@ const AppointmentDetailsModal = ({
             </Title>
 
             <Text>
-              Complete payment history
-              and remaining balance.
+              Complete payment history and remaining balance.
             </Text>
           </div>
         </div>
@@ -1968,59 +1916,40 @@ const AppointmentDetailsModal = ({
             gutter={[14, 14]}
             className="appointment-payment-summary"
           >
-            <Col
-              xs={24}
-              sm={8}
-            >
+            <Col xs={24} sm={8}>
               <AppointmentFinanceCard
                 title="Treatment Charge"
                 value={
-                  calculatedSummary
-                    .totalCharge
+                  calculatedSummary.totalCharge
                 }
                 tone="blue"
-                icon={
-                  <MedicineBoxOutlined />
-                }
+                icon={<MedicineBoxOutlined />}
               />
             </Col>
 
-            <Col
-              xs={24}
-              sm={8}
-            >
+            <Col xs={24} sm={8}>
               <AppointmentFinanceCard
                 title="Total Paid"
                 value={
-                  calculatedSummary
-                    .totalPaid
+                  calculatedSummary.totalPaid
                 }
                 tone="green"
-                icon={
-                  <CheckCircleOutlined />
-                }
+                icon={<CheckCircleOutlined />}
               />
             </Col>
 
-            <Col
-              xs={24}
-              sm={8}
-            >
+            <Col xs={24} sm={8}>
               <AppointmentFinanceCard
                 title="Remaining"
                 value={
-                  calculatedSummary
-                    .balance
+                  calculatedSummary.balance
                 }
                 tone={
-                  calculatedSummary
-                    .balance > 0
+                  calculatedSummary.balance > 0
                     ? "red"
                     : "green"
                 }
-                icon={
-                  <DollarOutlined />
-                }
+                icon={<DollarOutlined />}
               />
             </Col>
           </Row>
@@ -2036,12 +1965,8 @@ const AppointmentDetailsModal = ({
                 record?.receipt_number ||
                 `payment-${index}`
               }
-              columns={
-                paymentColumns
-              }
-              dataSource={
-                sortedPayments
-              }
+              columns={paymentColumns}
+              dataSource={sortedPayments}
               pagination={false}
               scroll={{
                 x: 1600,
@@ -2059,6 +1984,23 @@ const AppointmentDetailsModal = ({
           )}
         </div>
       </Modal>
+
+      {/* A6 prescription preview */}
+
+      
+       <PrescriptionPreviewModal
+        ref={prescriptionPrintRef}
+        open={prescriptionModalOpen}
+        onClose={closePrescriptionPreview}
+        onPrint={handlePrintPrescription}
+        treatment={selectedTreatmentForPrint}
+        patient={patient}
+        appointmentDate={appointmentDate}
+        clinicInformation={CLINIC_INFORMATION}
+        prescriptionLines={
+          selectedPrescriptionLines
+        }
+      />
     </>
   );
 };

@@ -799,3 +799,384 @@
     font-size: 20px;
   }
 }
+
+
+/* ========================================================
+   A6 Ivory Dental prescription preview and print
+   Add this entire section to AppointmentDetailsModal.css
+======================================================== */
+
+.ivory-prescription-preview-modal .ant-modal-content {
+  overflow: hidden;
+  border-radius: 18px;
+}
+
+.ivory-prescription-preview-modal .ant-modal-body {
+  max-height: 72vh;
+  padding: 20px;
+  overflow-y: auto;
+  background: #e9efeb;
+}
+
+.ivory-prescription-sheet {
+  position: relative;
+  width: 105mm;
+  min-height: 148mm;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 5mm 6mm 4mm;
+  overflow: hidden;
+  color: #26332c;
+  background:
+    linear-gradient(
+      rgba(249, 250, 245, 0.96),
+      rgba(249, 250, 245, 0.96)
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(64, 103, 79, 0.025) 3px
+    );
+  border: 1px solid #cbd6cd;
+  box-shadow: 0 15px 36px rgba(32, 62, 45, 0.15);
+  box-sizing: border-box;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.ivory-prescription-header {
+  width: 100%;
+}
+
+.ivory-prescription-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.ivory-prescription-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ivory-prescription-logo-circle {
+  display: flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #2f7254;
+  border-radius: 50%;
+  color: #2f7254;
+}
+
+.ivory-prescription-tooth {
+  display: block;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 25px;
+  line-height: 1;
+  transform: rotate(180deg);
+}
+
+.ivory-prescription-brand-text {
+  text-align: center;
+}
+
+.ivory-prescription-brand-text h1 {
+  margin: 0;
+  color: #2c6c4e;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 1.05;
+}
+
+.ivory-prescription-subtitle {
+  margin-top: 2px;
+  color: #27362e;
+  font-family: "Brush Script MT", "Segoe Script", cursive;
+  font-size: 12px;
+  font-style: italic;
+  line-height: 1.1;
+}
+
+.ivory-prescription-contact-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 9px;
+  margin-top: 8px;
+}
+
+.ivory-prescription-doctor-details,
+.ivory-prescription-clinic-address {
+  display: flex;
+  flex-direction: column;
+  color: #2c332f;
+  font-size: 7.5px;
+  line-height: 1.25;
+}
+
+.ivory-prescription-doctor-details strong,
+.ivory-prescription-clinic-address strong {
+  font-weight: 700;
+}
+
+.ivory-prescription-clinic-address {
+  padding-left: 4px;
+}
+
+.ivory-prescription-header-line {
+  height: 1px;
+  margin-top: 5px;
+  background: #47584e;
+}
+
+.ivory-prescription-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 7px;
+  margin-top: 5px;
+}
+
+.ivory-prescription-patient-line {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+  padding-bottom: 2px;
+  border-bottom: 1px dotted #7b867f;
+  font-size: 7.5px;
+}
+
+.ivory-prescription-label {
+  font-weight: 700;
+}
+
+.ivory-prescription-patient-line strong {
+  max-width: 128px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ivory-prescription-patient-id {
+  margin-left: auto;
+  color: #58635c;
+  font-size: 6.5px;
+}
+
+.ivory-prescription-date {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 3px;
+  min-width: 88px;
+  font-family: "Brush Script MT", "Segoe Script", cursive;
+  font-size: 10px;
+  font-style: italic;
+}
+
+.ivory-prescription-date strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 7.5px;
+  font-style: normal;
+}
+
+.ivory-prescription-allergy {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  margin-top: 5px;
+  padding: 4px 5px;
+  border: 1px solid #b45454;
+  border-radius: 4px;
+  color: #8d2626;
+  background: rgba(255, 237, 237, 0.75);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.ivory-prescription-allergy .anticon {
+  margin-top: 1px;
+  font-size: 8px;
+}
+
+.ivory-prescription-allergy strong,
+.ivory-prescription-allergy span {
+  display: block;
+}
+
+.ivory-prescription-allergy strong {
+  font-size: 6.5px;
+  letter-spacing: 0.04em;
+}
+
+.ivory-prescription-allergy span {
+  margin-top: 1px;
+  font-size: 6.5px;
+}
+
+.ivory-prescription-body {
+  position: relative;
+  display: flex;
+  gap: 7px;
+  min-height: 72mm;
+  padding: 6mm 2px 2mm;
+}
+
+.ivory-prescription-rx {
+  flex: 0 0 auto;
+  color: #2d6048;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.ivory-prescription-medicines {
+  flex: 1;
+  padding-top: 2px;
+}
+
+.ivory-prescription-medicine-row {
+  margin-bottom: 7px;
+  padding-bottom: 4px;
+  border-bottom: 1px dotted rgba(63, 81, 69, 0.4);
+  color: #1f2d25;
+  font-family: "Courier New", monospace;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1.35;
+  white-space: pre-wrap;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.ivory-prescription-medicine-row:last-child {
+  margin-bottom: 0;
+}
+
+.ivory-prescription-instructions {
+  display: flex;
+  gap: 3px;
+  margin-top: 2px;
+  padding: 4px 5px;
+  border-top: 1px dotted #89958d;
+  border-bottom: 1px dotted #89958d;
+  color: #35433a;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 6.5px;
+}
+
+.ivory-prescription-instructions span {
+  white-space: pre-wrap;
+}
+
+.ivory-prescription-follow-up {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 4px;
+  color: #315d46;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 6.5px;
+}
+
+.ivory-prescription-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 5mm;
+  padding: 0 3px;
+}
+
+.ivory-prescription-stamp {
+  display: flex;
+  max-width: 135px;
+  flex-direction: column;
+  color: rgba(74, 116, 91, 0.3);
+  font-size: 6.5px;
+  line-height: 1.15;
+  text-align: center;
+  transform: rotate(-1deg);
+}
+
+.ivory-prescription-stamp strong {
+  font-size: 7.5px;
+}
+
+.ivory-prescription-signature {
+  width: 90px;
+  text-align: center;
+}
+
+.ivory-prescription-signature-line {
+  margin-bottom: 3px;
+  border-top: 1px dotted #3e4a42;
+}
+
+.ivory-prescription-signature span {
+  color: #2f3732;
+  font-family: "Brush Script MT", "Segoe Script", cursive;
+  font-size: 10px;
+  font-style: italic;
+}
+
+.ivory-prescription-footer-text {
+  margin-top: 4px;
+  color: #283b30;
+  font-family: "Brush Script MT", "Segoe Script", cursive;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+@media print {
+  @page {
+    size: A6 portrait;
+    margin: 0;
+  }
+
+  html,
+  body {
+    width: 105mm;
+    height: 148mm;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  .ivory-prescription-sheet {
+    width: 105mm;
+    max-width: none;
+    min-height: 148mm;
+    height: 148mm;
+    margin: 0;
+    padding: 5mm 6mm 4mm;
+    overflow: hidden;
+    border: 0;
+    box-shadow: none;
+    box-sizing: border-box;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
+
+@media (max-width: 560px) {
+  .ivory-prescription-preview-modal {
+    max-width: calc(100vw - 16px);
+  }
+
+  .ivory-prescription-preview-modal .ant-modal-body {
+    padding: 10px;
+  }
+
+  .ivory-prescription-sheet {
+    transform-origin: top center;
+  }
+}

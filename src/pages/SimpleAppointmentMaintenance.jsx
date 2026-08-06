@@ -959,68 +959,75 @@ const AppointmentMaintenance = () => {
     }
   };
 
-  const handleStartTreatment = async (appointment) => {
-    if (isAppointmentWaiting(appointment)) {
-      message.warning(
-        "End the patient's waiting period before starting treatment.",
-      );
+const handleStartTreatment = async (appointment) => {
+  const isWaitingPatient = isAppointmentWaiting(appointment);
 
-      return;
+  if (
+    currentTreatmentPatient &&
+    currentTreatmentPatient.appointment_id !==
+      appointment.appointment_id
+  ) {
+    message.warning(
+      `${
+        currentTreatmentPatient.patient_name || "Another patient"
+      } is currently in treatment`,
+    );
+
+    return;
+  }
+
+  /*
+   * Normal checked-in patients must be the locked next patient.
+   * Waiting patients can start treatment at any time.
+   */
+  if (
+    !isWaitingPatient &&
+    appointment.appointment_id !== nextCheckedInAppointmentId
+  ) {
+    message.warning("This patient is not the locked next patient");
+
+    return;
+  }
+
+  try {
+    setUpdatingId(appointment.appointment_id);
+
+    /*
+     * Close the active waiting record before starting treatment.
+     */
+    if (isWaitingPatient) {
+      await endAppointmentWaiting(appointment.appointment_id);
     }
 
-    if (
-      currentTreatmentPatient &&
-      currentTreatmentPatient.appointment_id !==
-        appointment.appointment_id
-    ) {
-      message.warning(
-        `${
-          currentTreatmentPatient.patient_name || "Another patient"
-        } is currently in treatment`,
-      );
+    await updateAppointmentStatus(
+      appointment.appointment_id,
+      "In Treatment",
+    );
 
-      return;
-    }
+    message.success(
+      `Treatment started for ${
+        appointment.patient_name || "the patient"
+      }`,
+    );
 
-    if (appointment.appointment_id !== nextCheckedInAppointmentId) {
-      message.warning("This patient is not the locked next patient");
+    await fetchAppointments();
 
-      return;
-    }
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  } catch (error) {
+    console.error("Failed to start treatment:", error);
 
-    try {
-      setUpdatingId(appointment.appointment_id);
-
-      await updateAppointmentStatus(
-        appointment.appointment_id,
-        "In Treatment",
-      );
-
-      message.success(
-        `Treatment started for ${
-          appointment.patient_name || "the patient"
-        }`,
-      );
-
-      await fetchAppointments();
-
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
-    } catch (error) {
-      console.error(error);
-
-      message.error(
-        error?.response?.data?.message ||
-          error?.message ||
-          "Failed to start treatment",
-      );
-    } finally {
-      setUpdatingId(null);
-    }
-  };
-
+    message.error(
+      error?.response?.data?.message ||
+        error?.message ||
+        "Failed to start treatment",
+    );
+  } finally {
+    setUpdatingId(null);
+  }
+};
   /* ========================================================
      Drawer
   ======================================================== */
@@ -1073,81 +1080,93 @@ const AppointmentMaintenance = () => {
      Card actions
   ======================================================== */
 
-  const renderCardAction = (
-    appointment,
-    isCurrentPatient,
-    isNextPatient,
-  ) => {
-    const isUpdating = updatingId === appointment.appointment_id;
+ const renderCardAction = (
+  appointment,
+  isCurrentPatient,
+  isNextPatient,
+) => {
+  const isUpdating = updatingId === appointment.appointment_id;
 
-    const isWaitingPatient = isAppointmentWaiting(appointment);
+  const isWaitingPatient = isAppointmentWaiting(appointment);
 
-    if (isCurrentPatient || isWaitingPatient) {
-      return null;
-    }
-
-    if (["Pending", "Confirmed"].includes(appointment.status)) {
-      return (
-        <Button
-          block
-          icon={<CheckCircleOutlined />}
-          loading={isUpdating}
-          disabled={isUpdating}
-          className="appointment-card-action check-in-action"
-          onClick={(event) => {
-            event.stopPropagation();
-
-            handleCheckIn(appointment);
-          }}
-        >
-          Check In Patient
-        </Button>
-      );
-    }
-
-    if (appointment.status === "Checked In" && isNextPatient) {
-      if (currentTreatmentPatient) {
-        return (
-          <Tooltip
-            title={`${
-              currentTreatmentPatient.patient_name || "Another patient"
-            } is currently in treatment`}
-          >
-            <Button
-              block
-              disabled
-              icon={<ClockCircleOutlined />}
-              className="appointment-card-action occupied-action"
-              onClick={(event) => event.stopPropagation()}
-            >
-              Treatment
-            </Button>
-          </Tooltip>
-        );
-      }
-
-      return (
-        <Button
-          block
-          type="primary"
-          icon={<PlayCircleOutlined />}
-          loading={isUpdating}
-          disabled={isUpdating}
-          className="appointment-card-action start-treatment-action"
-          onClick={(event) => {
-            event.stopPropagation();
-
-            handleStartTreatment(appointment);
-          }}
-        >
-          START TREATMENT
-        </Button>
-      );
-    }
-
+  if (isCurrentPatient) {
     return null;
-  };
+  }
 
+  if (
+    ["Pending", "Confirmed"].includes(appointment.status) &&
+    !isWaitingPatient
+  ) {
+    return (
+      <Button
+        block
+        icon={<CheckCircleOutlined />}
+        loading={isUpdating}
+        disabled={isUpdating}
+        className="appointment-card-action check-in-action"
+        onClick={(event) => {
+          event.stopPropagation();
+
+          handleCheckIn(appointment);
+        }}
+      >
+        Check In Patient
+      </Button>
+    );
+  }
+
+  /*
+   * A waiting patient can start treatment at any time.
+   * A normal checked-in patient must be the locked next patient.
+   */
+  const canStartTreatment =
+    appointment.status === "Checked In" &&
+    (isWaitingPatient || isNextPatient);
+
+  if (canStartTreatment) {
+    if (currentTreatmentPatient) {
+      return (
+        <Tooltip
+          title={`${
+            currentTreatmentPatient.patient_name || "Another patient"
+          } is currently in treatment`}
+        >
+          <Button
+            block
+            disabled
+            icon={<ClockCircleOutlined />}
+            className="appointment-card-action occupied-action"
+            onClick={(event) => event.stopPropagation()}
+          >
+            Treatment Room Occupied
+          </Button>
+        </Tooltip>
+      );
+    }
+
+    return (
+      <Button
+        block
+        type="primary"
+        icon={<PlayCircleOutlined />}
+        loading={isUpdating}
+        disabled={isUpdating}
+        className="appointment-card-action start-treatment-action"
+        onClick={(event) => {
+          event.stopPropagation();
+
+          handleStartTreatment(appointment);
+        }}
+      >
+        {isWaitingPatient
+          ? "START TREATMENT NOW"
+          : "START TREATMENT"}
+      </Button>
+    );
+  }
+
+  return null;
+};
   const renderWaitingActionButton = (appointment) => {
     const isUpdating = updatingId === appointment.appointment_id;
 

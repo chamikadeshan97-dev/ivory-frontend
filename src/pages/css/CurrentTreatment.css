@@ -1,7 +1,503 @@
 /* --------------------------------------------------------
    Page and selectors
 -------------------------------------------------------- */
+/* ========================================================
+   Ivory Dental prescription preview
+======================================================== */
 
+.ivory-prescription-preview-modal .ant-modal-content {
+  overflow: hidden;
+  border-radius: 18px;
+}
+
+.ivory-prescription-preview-modal .ant-modal-body {
+  max-height: 74vh;
+  padding: 22px;
+  overflow-y: auto;
+  background: #e8eeea;
+}
+
+/* ========================================================
+   Main prescription sheet
+======================================================== */
+
+.ivory-prescription-sheet {
+  position: relative;
+  width: 100%;
+  max-width: 650px;
+  min-height: 920px;
+  margin: 0 auto;
+  padding: 28px 34px 22px;
+  overflow: hidden;
+  color: #26332c;
+  background:
+    linear-gradient(
+      rgba(248, 250, 244, 0.94),
+      rgba(248, 250, 244, 0.94)
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(64, 103, 79, 0.02) 3px
+    );
+  border: 1px solid #cfd9cf;
+  box-shadow: 0 16px 38px rgba(25, 54, 39, 0.14);
+  box-sizing: border-box;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+/* ========================================================
+   Top brand
+======================================================== */
+
+.ivory-prescription-header {
+  width: 100%;
+}
+
+.ivory-prescription-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.ivory-prescription-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ivory-prescription-logo-circle {
+  display: flex;
+  width: 76px;
+  height: 76px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #2f7254;
+  border-radius: 50%;
+  color: #2f7254;
+  font-size: 40px;
+}
+
+.ivory-prescription-brand-text {
+  text-align: center;
+}
+
+.ivory-prescription-brand-text h1 {
+  margin: 0;
+  color: #2c6c4e;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  line-height: 1.05;
+}
+
+.ivory-prescription-subtitle {
+  margin-top: 6px;
+  color: #27362e;
+  font-family: "Brush Script MT", "Segoe Script", cursive;
+  font-size: 24px;
+  font-style: italic;
+  line-height: 1.1;
+}
+
+/* ========================================================
+   Doctor and address
+======================================================== */
+
+.ivory-prescription-contact-grid {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  gap: 40px;
+  margin-top: 27px;
+}
+
+.ivory-prescription-doctor-details,
+.ivory-prescription-clinic-address {
+  display: flex;
+  flex-direction: column;
+  color: #2c332f;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.ivory-prescription-doctor-details strong,
+.ivory-prescription-clinic-address strong {
+  font-weight: 700;
+}
+
+.ivory-prescription-clinic-address {
+  padding-left: 18px;
+}
+
+.ivory-prescription-header-line {
+  height: 2px;
+  margin-top: 13px;
+  background: #47584e;
+}
+
+/* ========================================================
+   Patient and date
+======================================================== */
+
+.ivory-prescription-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 22px;
+  margin-top: 17px;
+}
+
+.ivory-prescription-patient-line {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding-bottom: 5px;
+  border-bottom: 1px dotted #7b867f;
+  font-size: 14px;
+}
+
+.ivory-prescription-label {
+  font-weight: 700;
+}
+
+.ivory-prescription-patient-line strong {
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ivory-prescription-patient-id {
+  margin-left: auto;
+  color: #58635c;
+  font-size: 11px;
+}
+
+.ivory-prescription-date {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  min-width: 180px;
+  font-family: "Brush Script MT", "Segoe Script", cursive;
+  font-size: 20px;
+  font-style: italic;
+}
+
+.ivory-prescription-date strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  font-style: normal;
+}
+
+/* ========================================================
+   Allergy warning
+======================================================== */
+
+.ivory-prescription-allergy {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 14px;
+  padding: 9px 12px;
+  border: 1px solid #b45454;
+  border-radius: 5px;
+  color: #8d2626;
+  background: rgba(255, 237, 237, 0.72);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.ivory-prescription-allergy .anticon {
+  margin-top: 2px;
+}
+
+.ivory-prescription-allergy strong,
+.ivory-prescription-allergy span {
+  display: block;
+}
+
+.ivory-prescription-allergy strong {
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+.ivory-prescription-allergy span {
+  margin-top: 2px;
+  font-size: 12px;
+}
+
+/* ========================================================
+   Prescription medicines
+======================================================== */
+
+.ivory-prescription-body {
+  position: relative;
+  display: flex;
+  gap: 18px;
+  min-height: 465px;
+  padding: 28px 8px 12px;
+}
+
+.ivory-prescription-rx {
+  flex: 0 0 auto;
+  color: #2d6048;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 46px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.ivory-prescription-medicines {
+  flex: 1;
+  padding-top: 7px;
+}
+
+.ivory-prescription-medicine-row {
+  margin-bottom: 22px;
+  padding: 0 0 12px;
+  border-bottom: 1px dotted rgba(63, 81, 69, 0.4);
+  color: #1f2d25;
+  font-family: "Courier New", monospace;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.75;
+  white-space: pre-wrap;
+}
+
+.ivory-prescription-medicine-row:last-child {
+  margin-bottom: 0;
+}
+
+.ivory-prescription-empty {
+  color: #849088;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* ========================================================
+   Instructions and follow-up
+======================================================== */
+
+.ivory-prescription-instructions {
+  display: flex;
+  gap: 7px;
+  margin-top: 4px;
+  padding: 9px 12px;
+  border-top: 1px dotted #89958d;
+  border-bottom: 1px dotted #89958d;
+  color: #35433a;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+}
+
+.ivory-prescription-instructions span {
+  white-space: pre-wrap;
+}
+
+.ivory-prescription-follow-up {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  color: #315d46;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+}
+
+/* ========================================================
+   Bottom stamp and signature
+======================================================== */
+
+.ivory-prescription-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 34px;
+  margin-top: 34px;
+  padding: 0 12px;
+}
+
+.ivory-prescription-stamp {
+  display: flex;
+  max-width: 270px;
+  flex-direction: column;
+  color: rgba(74, 116, 91, 0.28);
+  font-size: 13px;
+  line-height: 1.25;
+  text-align: center;
+  transform: rotate(-1deg);
+}
+
+.ivory-prescription-stamp strong {
+  font-size: 15px;
+}
+
+.ivory-prescription-signature {
+  width: 185px;
+  text-align: center;
+}
+
+.ivory-prescription-signature-line {
+  margin-bottom: 7px;
+  border-top: 1px dotted #3e4a42;
+}
+
+.ivory-prescription-signature span {
+  color: #2f3732;
+  font-family: "Brush Script MT", "Segoe Script", cursive;
+  font-size: 20px;
+  font-style: italic;
+}
+
+.ivory-prescription-footer-text {
+  margin-top: 17px;
+  color: #283b30;
+  font-family: "Brush Script MT", "Segoe Script", cursive;
+  font-size: 23px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ========================================================
+   Print layout
+======================================================== */
+
+@media print {
+  @page {
+    size: A6 portrait;
+    margin: 0;
+  }
+
+  html,
+  body {
+    width: 148mm;
+    min-height: 210mm;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+  }
+
+  .ivory-prescription-sheet {
+      width: 105mm;
+  min-height: 148mm;
+  max-width: 100%;
+    margin: 0;
+    padding: 8mm 9mm 6mm;
+    border: 0;
+    box-shadow: none;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .ivory-prescription-brand-text h1 {
+    font-size: 28px;
+  }
+
+  .ivory-prescription-subtitle {
+    font-size: 18px;
+  }
+
+  .ivory-prescription-logo-circle {
+    width: 56px;
+    height: 56px;
+    font-size: 29px;
+  }
+
+  .ivory-prescription-contact-grid {
+    gap: 18px;
+    margin-top: 17px;
+  }
+
+  .ivory-prescription-doctor-details,
+  .ivory-prescription-clinic-address {
+    font-size: 11px;
+  }
+
+  .ivory-prescription-date {
+    font-size: 15px;
+  }
+
+  .ivory-prescription-body {
+    min-height: 113mm;
+    padding-top: 9mm;
+  }
+
+  .ivory-prescription-medicine-row {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    font-size: 12px;
+  }
+
+  .ivory-prescription-footer {
+    margin-top: 7mm;
+  }
+
+  .ivory-prescription-footer-text {
+    margin-top: 4mm;
+    font-size: 17px;
+  }
+}
+
+/* ========================================================
+   Responsive preview
+======================================================== */
+
+@media (max-width: 700px) {
+  .ivory-prescription-sheet {
+    min-height: 800px;
+    padding: 22px 18px;
+  }
+
+  .ivory-prescription-brand {
+    align-items: flex-start;
+  }
+
+  .ivory-prescription-brand-text h1 {
+    font-size: 28px;
+  }
+
+  .ivory-prescription-subtitle {
+    font-size: 18px;
+  }
+
+  .ivory-prescription-logo-circle {
+    width: 56px;
+    height: 56px;
+    font-size: 28px;
+  }
+
+  .ivory-prescription-contact-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .ivory-prescription-clinic-address {
+    padding-left: 0;
+  }
+
+  .ivory-prescription-meta {
+    flex-direction: column;
+  }
+
+  .ivory-prescription-date {
+    align-self: flex-end;
+  }
+
+  .ivory-prescription-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ivory-prescription-signature {
+    align-self: flex-end;
+  }
+} 
 .current-treatment-page {
   width: 100%;
   max-width: 1180px;
