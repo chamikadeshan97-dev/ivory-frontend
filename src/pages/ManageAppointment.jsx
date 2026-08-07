@@ -158,7 +158,7 @@ const ManageAppointment = () => {
   useEffect(() => {
     fetchAppointment();
 
-    const interval = setInterval(fetchAppointment, 20000);
+    const interval = setInterval(fetchAppointment, 3000);
     return () => clearInterval(interval);
   }, [id]);
 

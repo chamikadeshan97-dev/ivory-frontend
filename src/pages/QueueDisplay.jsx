@@ -816,7 +816,7 @@ const QueueDisplay = ({ embedded = false }) => {
 
     const refreshInterval = window.setInterval(() => {
       loadAppointments();
-    }, 5000);
+    }, 15000);
 
     return () => {
       window.clearInterval(refreshInterval);
@@ -1018,7 +1018,8 @@ const QueueDisplay = ({ embedded = false }) => {
             <Text className="queue-display-eyebrow">PATIENT QUEUE</Text>
 
             <Title level={1} className="queue-display-title">
-              Dental Clinic Queue
+           Ivory Dental CAD / CAM Laboratory
+
             </Title>
 
             <Text className="queue-display-subtitle">
