@@ -446,8 +446,7 @@ const AppointmentMaintenance = () => {
         return (
           mergedAppointments.find(
             (appointment) =>
-              appointment.appointment_id ===
-              currentAppointment.appointment_id,
+              appointment.appointment_id === currentAppointment.appointment_id,
           ) || currentAppointment
         );
       });
@@ -758,11 +757,9 @@ const AppointmentMaintenance = () => {
         return 1;
       }
 
-      const firstIsNext =
-        first.appointment_id === nextCheckedInAppointmentId;
+      const firstIsNext = first.appointment_id === nextCheckedInAppointmentId;
 
-      const secondIsNext =
-        second.appointment_id === nextCheckedInAppointmentId;
+      const secondIsNext = second.appointment_id === nextCheckedInAppointmentId;
 
       if (firstIsNext && !secondIsNext) {
         return -1;
@@ -849,9 +846,7 @@ const AppointmentMaintenance = () => {
     return sortedAppointments.filter((appointment) => {
       const isWaitingPatient = isAppointmentWaiting(appointment);
 
-      const effectiveStatus = isWaitingPatient
-        ? "Waiting"
-        : appointment.status;
+      const effectiveStatus = isWaitingPatient ? "Waiting" : appointment.status;
 
       const matchesStatus =
         statusFilter === "All" || effectiveStatus === statusFilter;
@@ -884,12 +879,7 @@ const AppointmentMaintenance = () => {
         normalizeSearchValue(value).includes(normalizedSearch),
       );
     });
-  }, [
-    sortedAppointments,
-    statusFilter,
-    searchValue,
-    isAppointmentWaiting,
-  ]);
+  }, [sortedAppointments, statusFilter, searchValue, isAppointmentWaiting]);
 
   const filterCounts = useMemo(() => {
     const counts = {
@@ -936,10 +926,7 @@ const AppointmentMaintenance = () => {
     try {
       setUpdatingId(appointment.appointment_id);
 
-      await updateAppointmentStatus(
-        appointment.appointment_id,
-        "Checked In",
-      );
+      await updateAppointmentStatus(appointment.appointment_id, "Checked In");
 
       message.success(
         `${appointment.patient_name || "Patient"} checked in successfully`,
@@ -959,75 +946,69 @@ const AppointmentMaintenance = () => {
     }
   };
 
-const handleStartTreatment = async (appointment) => {
-  const isWaitingPatient = isAppointmentWaiting(appointment);
+  const handleStartTreatment = async (appointment) => {
+    const isWaitingPatient = isAppointmentWaiting(appointment);
 
-  if (
-    currentTreatmentPatient &&
-    currentTreatmentPatient.appointment_id !==
-      appointment.appointment_id
-  ) {
-    message.warning(
-      `${
-        currentTreatmentPatient.patient_name || "Another patient"
-      } is currently in treatment`,
-    );
+    if (
+      currentTreatmentPatient &&
+      currentTreatmentPatient.appointment_id !== appointment.appointment_id
+    ) {
+      message.warning(
+        `${
+          currentTreatmentPatient.patient_name || "Another patient"
+        } is currently in treatment`,
+      );
 
-    return;
-  }
-
-  /*
-   * Normal checked-in patients must be the locked next patient.
-   * Waiting patients can start treatment at any time.
-   */
-  if (
-    !isWaitingPatient &&
-    appointment.appointment_id !== nextCheckedInAppointmentId
-  ) {
-    message.warning("This patient is not the locked next patient");
-
-    return;
-  }
-
-  try {
-    setUpdatingId(appointment.appointment_id);
-
-    /*
-     * Close the active waiting record before starting treatment.
-     */
-    if (isWaitingPatient) {
-      await endAppointmentWaiting(appointment.appointment_id);
+      return;
     }
 
-    await updateAppointmentStatus(
-      appointment.appointment_id,
-      "In Treatment",
-    );
+    /*
+     * Normal checked-in patients must be the locked next patient.
+     * Waiting patients can start treatment at any time.
+     */
+    if (
+      !isWaitingPatient &&
+      appointment.appointment_id !== nextCheckedInAppointmentId
+    ) {
+      message.warning("This patient is not the locked next patient");
 
-    message.success(
-      `Treatment started for ${
-        appointment.patient_name || "the patient"
-      }`,
-    );
+      return;
+    }
 
-    await fetchAppointments();
+    try {
+      setUpdatingId(appointment.appointment_id);
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  } catch (error) {
-    console.error("Failed to start treatment:", error);
+      /*
+       * Close the active waiting record before starting treatment.
+       */
+      if (isWaitingPatient) {
+        await endAppointmentWaiting(appointment.appointment_id);
+      }
 
-    message.error(
-      error?.response?.data?.message ||
-        error?.message ||
-        "Failed to start treatment",
-    );
-  } finally {
-    setUpdatingId(null);
-  }
-};
+      await updateAppointmentStatus(appointment.appointment_id, "In Treatment");
+
+      message.success(
+        `Treatment started for ${appointment.patient_name || "the patient"}`,
+      );
+
+      await fetchAppointments();
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    } catch (error) {
+      console.error("Failed to start treatment:", error);
+
+      message.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to start treatment",
+      );
+    } finally {
+      setUpdatingId(null);
+    }
+  };
   /* ========================================================
      Drawer
   ======================================================== */
@@ -1054,9 +1035,7 @@ const handleStartTreatment = async (appointment) => {
   ) => {
     let ribbonText = appointment.status || "Pending";
 
-    let ribbonClass = `status-ribbon-${getStatusClassName(
-      appointment.status,
-    )}`;
+    let ribbonClass = `status-ribbon-${getStatusClassName(appointment.status)}`;
 
     if (isWaitingPatient) {
       ribbonText = "WAITING";
@@ -1080,93 +1059,87 @@ const handleStartTreatment = async (appointment) => {
      Card actions
   ======================================================== */
 
- const renderCardAction = (
-  appointment,
-  isCurrentPatient,
-  isNextPatient,
-) => {
-  const isUpdating = updatingId === appointment.appointment_id;
+  const renderCardAction = (appointment, isCurrentPatient, isNextPatient) => {
+    const isUpdating = updatingId === appointment.appointment_id;
 
-  const isWaitingPatient = isAppointmentWaiting(appointment);
+    const isWaitingPatient = isAppointmentWaiting(appointment);
 
-  if (isCurrentPatient) {
-    return null;
-  }
+    if (isCurrentPatient) {
+      return null;
+    }
 
-  if (
-    ["Pending", "Confirmed"].includes(appointment.status) &&
-    !isWaitingPatient
-  ) {
-    return (
-      <Button
-        block
-        icon={<CheckCircleOutlined />}
-        loading={isUpdating}
-        disabled={isUpdating}
-        className="appointment-card-action check-in-action"
-        onClick={(event) => {
-          event.stopPropagation();
-
-          handleCheckIn(appointment);
-        }}
-      >
-        Check In Patient
-      </Button>
-    );
-  }
-
-  /*
-   * A waiting patient can start treatment at any time.
-   * A normal checked-in patient must be the locked next patient.
-   */
-  const canStartTreatment =
-    appointment.status === "Checked In" &&
-    (isWaitingPatient || isNextPatient);
-
-  if (canStartTreatment) {
-    if (currentTreatmentPatient) {
+    if (
+      ["Pending", "Confirmed"].includes(appointment.status) &&
+      !isWaitingPatient
+    ) {
       return (
-        <Tooltip
-          title={`${
-            currentTreatmentPatient.patient_name || "Another patient"
-          } is currently in treatment`}
+        <Button
+          block
+          icon={<CheckCircleOutlined />}
+          loading={isUpdating}
+          disabled={isUpdating}
+          className="appointment-card-action check-in-action"
+          onClick={(event) => {
+            event.stopPropagation();
+
+            handleCheckIn(appointment);
+          }}
         >
-          <Button
-            block
-            disabled
-            icon={<ClockCircleOutlined />}
-            className="appointment-card-action occupied-action"
-            onClick={(event) => event.stopPropagation()}
-          >
-            Treatment Room Occupied
-          </Button>
-        </Tooltip>
+          Check In Patient
+        </Button>
       );
     }
 
-    return (
-      <Button
-        block
-        type="primary"
-        icon={<PlayCircleOutlined />}
-        loading={isUpdating}
-        disabled={isUpdating}
-        className="appointment-card-action start-treatment-action"
-        onClick={(event) => {
-          event.stopPropagation();
+    /*
+     * A waiting patient can start treatment at any time.
+     * A normal checked-in patient must be the locked next patient.
+     */
+    const canStartTreatment =
+      appointment.status === "Checked In" &&
+      (isWaitingPatient || isNextPatient);
 
-          handleStartTreatment(appointment);
-        }}
-      >
-        {isWaitingPatient
-          ? "START TREATMENT NOW"
-          : "START TREATMENT"}
-      </Button>
-    );
-  }
+    if (canStartTreatment) {
+      if (currentTreatmentPatient) {
+        return (
+          <Tooltip
+            title={`${
+              currentTreatmentPatient.patient_name || "Another patient"
+            } is currently in treatment`}
+          >
+            <Button
+              block
+              disabled
+              icon={<ClockCircleOutlined />}
+              className="appointment-card-action occupied-action"
+              onClick={(event) => event.stopPropagation()}
+            >
+              Treatment Room Occupied
+            </Button>
+          </Tooltip>
+        );
+      }
 
-  return null;
-};
+      return (
+        <Button
+          block
+          type="primary"
+          icon={<PlayCircleOutlined />}
+          loading={isUpdating}
+          disabled={isUpdating}
+          className="appointment-card-action start-treatment-action"
+          onClick={(event) => {
+            event.stopPropagation();
+
+            handleStartTreatment(appointment);
+          }}
+        >
+          {isWaitingPatient ? "START TREATMENT NOW" : "START TREATMENT"}
+        </Button>
+      );
+    }
+
+    return null;
+  };
   const renderWaitingActionButton = (appointment) => {
     const isUpdating = updatingId === appointment.appointment_id;
 
@@ -1222,11 +1195,7 @@ const handleStartTreatment = async (appointment) => {
      Completed card
   ======================================================== */
 
-  const renderCompletedCard = (
-    appointment,
-    appointmentNumber,
-    view,
-  ) => {
+  const renderCompletedCard = (appointment, appointmentNumber, view) => {
     const isMinimal = view === "minimal";
 
     return (
@@ -1238,9 +1207,7 @@ const handleStartTreatment = async (appointment) => {
           .filter(Boolean)
           .join(" ")}
       >
-        <div className="completed-number-badge">
-          No. {appointmentNumber}
-        </div>
+        <div className="completed-number-badge">No. {appointmentNumber}</div>
 
         <div className="completed-icon-wrapper">
           <CheckCircleFilled />
@@ -1367,17 +1334,11 @@ const handleStartTreatment = async (appointment) => {
           )}
 
           {isCompleted ? (
-            renderCompletedCard(
-              appointment,
-              appointmentNumber,
-              "minimal",
-            )
+            renderCompletedCard(appointment, appointmentNumber, "minimal")
           ) : (
             <>
               <div className="minimal-number-center">
-                <div className="minimal-number-square">
-                  {appointmentNumber}
-                </div>
+                <div className="minimal-number-square">{appointmentNumber}</div>
               </div>
 
               {isWaitingPatient && (
@@ -1401,10 +1362,7 @@ const handleStartTreatment = async (appointment) => {
                   {appointment.patient_distance_km !== "" &&
                     appointment.patient_distance_km !== null &&
                     appointment.patient_distance_km !== undefined && (
-                      <span>
-                        {" "}
-                        · {appointment.patient_distance_km} km
-                      </span>
+                      <span> · {appointment.patient_distance_km} km</span>
                     )}
                 </Text>
               )}
@@ -1452,11 +1410,7 @@ const handleStartTreatment = async (appointment) => {
           )}
 
           {isCompleted ? (
-            renderCompletedCard(
-              appointment,
-              appointmentNumber,
-              "summary",
-            )
+            renderCompletedCard(appointment, appointmentNumber, "summary")
           ) : (
             <>
               <div className="summary-card-header">
@@ -1467,8 +1421,7 @@ const handleStartTreatment = async (appointment) => {
                 </div>
               </div>
 
-              {isWaitingPatient &&
-                renderWaitingNotice(appointment, true)}
+              {isWaitingPatient && renderWaitingNotice(appointment, true)}
 
               <div className="summary-patient-section">
                 <div className="summary-patient-avatar">
@@ -1477,9 +1430,7 @@ const handleStartTreatment = async (appointment) => {
 
                 <div className="summary-patient-information">
                   <Tooltip
-                    title={
-                      appointment.patient_name || "Unknown Patient"
-                    }
+                    title={appointment.patient_name || "Unknown Patient"}
                   >
                     <Text className="summary-patient-name">
                       {appointment.patient_name || "Unknown Patient"}
@@ -1503,10 +1454,7 @@ const handleStartTreatment = async (appointment) => {
                       {appointment.patient_distance_km !== "" &&
                         appointment.patient_distance_km !== null &&
                         appointment.patient_distance_km !== undefined && (
-                          <span>
-                            {" "}
-                            · {appointment.patient_distance_km} km
-                          </span>
+                          <span> · {appointment.patient_distance_km} km</span>
                         )}
                     </Text>
                   )}
@@ -1555,11 +1503,7 @@ const handleStartTreatment = async (appointment) => {
         )}
 
         {isCompleted ? (
-          renderCompletedCard(
-            appointment,
-            appointmentNumber,
-            "full",
-          )
+          renderCompletedCard(appointment, appointmentNumber, "full")
         ) : (
           <>
             <div className="appointment-card-top">
@@ -1597,10 +1541,7 @@ const handleStartTreatment = async (appointment) => {
                     {appointment.patient_distance_km !== "" &&
                       appointment.patient_distance_km !== null &&
                       appointment.patient_distance_km !== undefined && (
-                        <span>
-                          {" "}
-                          · {appointment.patient_distance_km} km
-                        </span>
+                        <span> · {appointment.patient_distance_km} km</span>
                       )}
                   </Text>
                 )}
@@ -1614,9 +1555,7 @@ const handleStartTreatment = async (appointment) => {
                 <ClockCircleOutlined />
 
                 <div>
-                  <Text className="detail-label">
-                    Appointment Time
-                  </Text>
+                  <Text className="detail-label">Appointment Time</Text>
 
                   <Text className="detail-value">
                     {formatTime(appointment.appointment_time)}
@@ -1631,8 +1570,7 @@ const handleStartTreatment = async (appointment) => {
                   <Text className="detail-label">Reason</Text>
 
                   <Text className="appointment-reason">
-                    {appointment.reason_for_visit ||
-                      "General consultation"}
+                    {appointment.reason_for_visit || "General consultation"}
                   </Text>
                 </div>
               </div>
@@ -1665,8 +1603,7 @@ const handleStartTreatment = async (appointment) => {
     ? getAppointmentNumber(selectedAppointment)
     : "--";
 
-  const selectedIsCurrent =
-    selectedAppointment?.status === "In Treatment";
+  const selectedIsCurrent = selectedAppointment?.status === "In Treatment";
 
   const selectedIsWaiting = selectedAppointment
     ? isAppointmentWaiting(selectedAppointment)
@@ -1674,17 +1611,12 @@ const handleStartTreatment = async (appointment) => {
 
   const selectedIsNext = Boolean(
     selectedAppointment &&
-      !selectedIsWaiting &&
-      selectedAppointment.appointment_id ===
-        nextCheckedInAppointmentId,
+    !selectedIsWaiting &&
+    selectedAppointment.appointment_id === nextCheckedInAppointmentId,
   );
 
   const selectedAction = selectedAppointment
-    ? renderCardAction(
-        selectedAppointment,
-        selectedIsCurrent,
-        selectedIsNext,
-      )
+    ? renderCardAction(selectedAppointment, selectedIsCurrent, selectedIsNext)
     : null;
 
   const selectedWaitingAction = selectedAppointment
@@ -1716,9 +1648,7 @@ const handleStartTreatment = async (appointment) => {
             format="YYYY-MM-DD"
             className="appointment-date-picker"
             onChange={(date) =>
-              setSelectedDate(
-                date ? date.format("YYYY-MM-DD") : getTodayDate(),
-              )
+              setSelectedDate(date ? date.format("YYYY-MM-DD") : getTodayDate())
             }
           />
 
@@ -1749,10 +1679,7 @@ const handleStartTreatment = async (appointment) => {
                 Daily Appointments
               </Text>
 
-              <Title
-                level={4}
-                className="appointment-section-title"
-              >
+              <Title level={4} className="appointment-section-title">
                 Appointment Number Cards
               </Title>
 
@@ -1777,9 +1704,7 @@ const handleStartTreatment = async (appointment) => {
                 prefix={<SearchOutlined />}
                 placeholder="Search number, patient, phone or reason"
                 className="appointment-search-input"
-                onChange={(event) =>
-                  setSearchValue(event.target.value)
-                }
+                onChange={(event) => setSearchValue(event.target.value)}
               />
             </div>
 
@@ -1831,9 +1756,7 @@ const handleStartTreatment = async (appointment) => {
                 )}
               </div>
             ) : (
-              <div
-                className={`appointment-card-layout view-${viewMode}`}
-              >
+              <div className={`appointment-card-layout view-${viewMode}`}>
                 {filteredAppointments.map(renderAppointmentCard)}
               </div>
             )}
@@ -1872,9 +1795,7 @@ const handleStartTreatment = async (appointment) => {
                 className={[
                   "drawer-appointment-hero",
 
-                  selectedAppointment.is_allergies
-                    ? "drawer-allergy-hero"
-                    : "",
+                  selectedAppointment.is_allergies ? "drawer-allergy-hero" : "",
 
                   selectedAppointment.status === "Completed"
                     ? "drawer-completed-hero"
@@ -1891,15 +1812,11 @@ const handleStartTreatment = async (appointment) => {
 
                 <div className="drawer-patient-main">
                   <Text className="drawer-patient-name">
-                    {selectedAppointment.patient_name ||
-                      "Unknown Patient"}
+                    {selectedAppointment.patient_name || "Unknown Patient"}
                   </Text>
 
                   <Tag
-                    color={
-                      STATUS_COLORS[selectedEffectiveStatus] ||
-                      "default"
-                    }
+                    color={STATUS_COLORS[selectedEffectiveStatus] || "default"}
                     className="drawer-status-tag"
                   >
                     {selectedEffectiveStatus || "Pending"}
@@ -1918,9 +1835,7 @@ const handleStartTreatment = async (appointment) => {
 
                     <Text className="drawer-waiting-description">
                       Waiting started at{" "}
-                      {formatTime(
-                        selectedWaitingRecord?.start_time,
-                      )}
+                      {formatTime(selectedWaitingRecord?.start_time)}
                     </Text>
                   </div>
                 </div>
@@ -1979,8 +1894,7 @@ const handleStartTreatment = async (appointment) => {
                 <Descriptions.Item label="Distance">
                   {selectedAppointment.patient_distance_km !== "" &&
                   selectedAppointment.patient_distance_km !== null &&
-                  selectedAppointment.patient_distance_km !==
-                    undefined
+                  selectedAppointment.patient_distance_km !== undefined
                     ? `${selectedAppointment.patient_distance_km} km`
                     : "-"}
                 </Descriptions.Item>
@@ -2006,12 +1920,10 @@ const handleStartTreatment = async (appointment) => {
                   }
                 >
                   {selectedAppointment.appointment_date
-                    ? dayjs(
-                        selectedAppointment.appointment_date,
-                      ).format("DD MMMM YYYY")
-                    : dayjs(selectedDate).format(
+                    ? dayjs(selectedAppointment.appointment_date).format(
                         "DD MMMM YYYY",
-                      )}
+                      )
+                    : dayjs(selectedDate).format("DD MMMM YYYY")}
                 </Descriptions.Item>
 
                 <Descriptions.Item
@@ -2022,9 +1934,7 @@ const handleStartTreatment = async (appointment) => {
                     </Space>
                   }
                 >
-                  {formatTime(
-                    selectedAppointment.appointment_time,
-                  )}
+                  {formatTime(selectedAppointment.appointment_time)}
                 </Descriptions.Item>
 
                 <Descriptions.Item
@@ -2041,17 +1951,13 @@ const handleStartTreatment = async (appointment) => {
 
                 {selectedAppointment.checked_in_time && (
                   <Descriptions.Item label="Checked-In Time">
-                    {formatTime(
-                      selectedAppointment.checked_in_time,
-                    )}
+                    {formatTime(selectedAppointment.checked_in_time)}
                   </Descriptions.Item>
                 )}
 
                 {selectedWaitingRecord?.start_time && (
                   <Descriptions.Item label="Waiting Started">
-                    {formatTime(
-                      selectedWaitingRecord.start_time,
-                    )}
+                    {formatTime(selectedWaitingRecord.start_time)}
                   </Descriptions.Item>
                 )}
               </Descriptions>
@@ -2066,8 +1972,7 @@ const handleStartTreatment = async (appointment) => {
                     </Text>
 
                     <Text className="drawer-completed-description">
-                      This appointment has been successfully
-                      completed.
+                      This appointment has been successfully completed.
                     </Text>
                   </div>
                 </div>
