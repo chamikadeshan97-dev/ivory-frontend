@@ -1230,7 +1230,7 @@ const Appointments = () => {
       dentist_id: dentistOptions?.[0]?.value,
       appointment_date: dayjs(),
       appointment_time: "16:00",
-      reason_for_visit: undefined,
+    reason_for_visit: commonTreatmentOptions?.[0]?.value,
       status: "Pending",
     });
 

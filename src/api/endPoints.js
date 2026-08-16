@@ -565,3 +565,15 @@ export const deleteLocation = (
     `/locations/${encodeURIComponent(locationId)}`,
   );
 };
+
+export const reassignAppointmentNumber = (
+  sourceAppointmentId,
+  targetAppointmentId,
+) => {
+  return axiosInstance.patch(
+    `/appointments/${sourceAppointmentId}/reassign-number`,
+    {
+      target_appointment_id: targetAppointmentId,
+    },
+  );
+};

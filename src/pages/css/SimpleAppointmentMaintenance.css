@@ -166,7 +166,193 @@
   margin-right: 9px;
   color: #1677ff;
 }
+/* ========================================================
+   Separate Waiting Patients Section
+======================================================== */
 
+.waiting-patients-section {
+  width: 100%;
+  margin-bottom: 24px;
+
+  padding: 18px;
+
+  background: linear-gradient(
+    135deg,
+    #fffdf6 0%,
+    #fffaf0 100%
+  );
+
+  border: 1px solid #ffd591;
+  border-radius: 16px;
+
+  box-shadow: 0 4px 14px rgba(250, 173, 20, 0.08);
+}
+
+
+/* ========================================================
+   Waiting Header
+======================================================== */
+
+.waiting-patients-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  margin-bottom: 16px;
+}
+
+.waiting-patients-title-wrapper {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
+
+.waiting-patients-icon {
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 12px;
+
+  background: #fff7e6;
+
+  color: #fa8c16;
+
+  font-size: 21px;
+}
+
+.waiting-patients-title {
+  margin: 0 !important;
+
+  color: #874d00 !important;
+
+  font-size: 17px !important;
+  font-weight: 700 !important;
+}
+
+.waiting-patients-subtitle {
+  display: block;
+
+  margin-top: 2px;
+
+  color: #ad6800;
+
+  font-size: 12px;
+}
+
+
+/* ========================================================
+   Count
+======================================================== */
+
+.waiting-patients-count {
+  min-width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 10px;
+
+  border-radius: 12px;
+
+  background: #fa8c16;
+
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 800;
+}
+
+
+/* ========================================================
+   Waiting Cards Layout
+======================================================== */
+
+.waiting-patients-layout {
+  width: 100%;
+}
+
+
+/* ========================================================
+   Give Waiting Cards Stronger Identity
+======================================================== */
+
+.waiting-patients-section .waiting-patient-card {
+  border-color: #ffd591 !important;
+
+  background: #ffffff !important;
+}
+
+.waiting-patients-section .waiting-patient-card:hover {
+  border-color: #fa8c16 !important;
+
+  box-shadow: 0 5px 18px rgba(250, 140, 22, 0.12);
+}
+
+
+/* ========================================================
+   Row View
+======================================================== */
+
+.waiting-patients-section
+  .appointment-card-layout.view-row {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+
+/* ========================================================
+   Responsive
+======================================================== */
+
+@media (max-width: 650px) {
+  .waiting-patients-section {
+    padding: 12px;
+
+    margin-bottom: 16px;
+
+    border-radius: 12px;
+  }
+
+  .waiting-patients-header {
+    margin-bottom: 12px;
+  }
+
+  .waiting-patients-icon {
+    width: 38px;
+    height: 38px;
+
+    font-size: 18px;
+  }
+
+  .waiting-patients-title {
+    font-size: 15px !important;
+  }
+
+  .waiting-patients-subtitle {
+    font-size: 11px;
+  }
+
+  .waiting-patients-count {
+    min-width: 34px;
+    height: 34px;
+
+    font-size: 14px;
+  }
+}
 .appointment-filter-scroll {
   min-width: 0;
   flex: 1;
@@ -1764,4 +1950,819 @@
   margin-top: 2px;
   color: #b45309;
   font-size: 11px;
+}
+/* ========================================================
+   Row View
+======================================================== */
+
+.row-appointment-card {
+  width: 100%;
+  min-height: 82px;
+
+  display: grid;
+
+  grid-template-columns:
+    70px
+    minmax(220px, 1.8fr)
+    minmax(150px, 1fr)
+    minmax(160px, 1fr)
+    110px
+    130px
+    minmax(170px, auto);
+
+  align-items: center;
+  gap: 14px;
+
+  padding: 12px 16px;
+
+  background: #ffffff;
+
+  border: 1px solid #e8edf3;
+  border-radius: 12px;
+
+  cursor: pointer;
+
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.row-appointment-card:hover {
+  border-color: #91caff;
+
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.07);
+
+  transform: translateY(-1px);
+}
+
+
+/* =========================
+   Queue Number
+========================= */
+
+.row-appointment-number {
+  width: 52px;
+  height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: #e6f4ff;
+
+  color: #1677ff;
+
+  font-size: 22px;
+  font-weight: 800;
+}
+
+
+/* =========================
+   Patient
+========================= */
+
+.row-appointment-patient {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.row-patient-avatar {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #f0f5ff;
+
+  color: #2f54eb;
+
+  font-size: 18px;
+}
+
+.row-patient-info {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.row-patient-name {
+  display: block;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  color: #1f1f1f;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.row-patient-reason {
+  display: block;
+
+  max-width: 100%;
+
+  color: #8c8c8c;
+
+  font-size: 12px;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+
+/* =========================
+   General Info
+========================= */
+
+.row-appointment-info {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  color: #595959;
+}
+
+.row-appointment-info .anticon {
+  flex-shrink: 0;
+
+  color: #8c8c8c;
+}
+
+.row-location > div {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 1px;
+}
+
+.row-distance {
+  display: block;
+
+  font-size: 11px;
+}
+
+
+/* =========================
+   Status
+========================= */
+
+.row-status-section {
+  display: flex;
+  align-items: center;
+}
+
+.row-status-badge {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  min-height: 28px;
+
+  padding: 4px 10px;
+
+  border-radius: 20px;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  background: #f5f5f5;
+
+  color: #595959;
+}
+
+.row-status-badge.treatment {
+  background: #fff1f0;
+
+  color: #cf1322;
+}
+
+.row-status-badge.waiting {
+  background: #fff7e6;
+
+  color: #d46b08;
+}
+
+.row-status-badge.next {
+  background: #e6f4ff;
+
+  color: #0958d9;
+}
+
+.row-status-badge.pending {
+  background: #f5f5f5;
+
+  color: #595959;
+}
+
+.row-status-badge.confirmed {
+  background: #f6ffed;
+
+  color: #389e0d;
+}
+
+.row-status-badge.checked-in {
+  background: #e6fffb;
+
+  color: #08979c;
+}
+
+.row-status-badge.completed {
+  background: #f6ffed;
+
+  color: #389e0d;
+}
+
+.row-status-badge.cancelled,
+.row-status-badge.canceled {
+  background: #fff1f0;
+
+  color: #cf1322;
+}
+
+
+/* =========================
+   Actions
+========================= */
+
+.row-action-section {
+  display: flex;
+
+  align-items: center;
+  justify-content: flex-end;
+
+  min-width: 0;
+}
+
+.row-action-section .ant-btn {
+  margin: 0;
+}
+
+
+/* =========================
+   Existing Important States
+========================= */
+
+.row-appointment-card.current-treatment-card {
+  border-color: #ff7875;
+
+  background: #fffafa;
+}
+
+.row-appointment-card.next-patient-card {
+  border-color: #69b1ff;
+
+  background: #f7fbff;
+}
+
+.row-appointment-card.waiting-patient-card {
+  border-color: #ffc069;
+
+  background: #fffdf7;
+}
+
+.row-appointment-card.allergy-card {
+  box-shadow: inset 4px 0 0 #ff4d4f;
+}
+
+.row-appointment-card.cancelled-card {
+  opacity: 0.65;
+}
+
+
+/* =========================
+   Responsive
+========================= */
+
+@media (max-width: 1200px) {
+  .row-appointment-card {
+    grid-template-columns:
+      60px
+      minmax(190px, 1.5fr)
+      minmax(140px, 1fr)
+      100px
+      120px
+      auto;
+  }
+
+  .row-location {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .row-appointment-card {
+    grid-template-columns:
+      55px
+      minmax(180px, 1fr)
+      95px
+      110px
+      auto;
+
+    gap: 10px;
+  }
+
+  .row-appointment-info:not(.row-location) {
+    font-size: 12px;
+  }
+
+  .row-appointment-info:nth-of-type(3) {
+    display: none;
+  }
+}
+
+@media (max-width: 650px) {
+  .row-appointment-card {
+    grid-template-columns: 48px 1fr auto;
+
+    min-height: 70px;
+
+    padding: 10px;
+  }
+
+  .row-appointment-number {
+    width: 42px;
+    height: 42px;
+
+    font-size: 18px;
+  }
+
+  .row-patient-avatar {
+    display: none;
+  }
+
+  .row-appointment-info,
+  .row-status-section {
+    display: none;
+  }
+
+  .row-action-section {
+    justify-content: flex-end;
+  }
+}
+/* ========================================================
+   Pending Appointment Actions
+======================================================== */
+
+.pending-appointment-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pending-appointment-actions .ant-btn {
+  width: 100%;
+}
+
+.cancel-appointment-action {
+  font-weight: 600;
+}
+
+/* =========================================================
+   Reassign Appointment Number Modal
+========================================================= */
+
+.reassign-number-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding-top: 6px;
+}
+
+/* ---------------------------------------------------------
+   Available cancelled appointment number
+--------------------------------------------------------- */
+
+.reassign-source-number {
+  position: relative;
+  overflow: hidden;
+
+  padding: 24px;
+
+  text-align: center;
+
+  border: 1px solid #d6e4ff;
+  border-radius: 18px;
+
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(24, 144, 255, 0.12),
+      transparent 38%
+    ),
+    linear-gradient(
+      135deg,
+      #f7fbff 0%,
+      #eef6ff 100%
+    );
+
+  box-shadow:
+    0 8px 24px rgba(24, 144, 255, 0.08);
+}
+
+.reassign-source-number::before {
+  content: "";
+
+  position: absolute;
+  top: -35px;
+  right: -35px;
+
+  width: 100px;
+  height: 100px;
+
+  border-radius: 50%;
+
+  background: rgba(24, 144, 255, 0.08);
+}
+
+.reassign-source-number > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------------------------------------------------------
+   Available number label
+--------------------------------------------------------- */
+
+.reassign-source-number .ant-typography:first-child {
+  display: block;
+
+  margin-bottom: 8px;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+
+  color: #5c7fa3;
+}
+
+/* ---------------------------------------------------------
+   Big appointment number
+--------------------------------------------------------- */
+
+.reassign-big-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 92px;
+  height: 92px;
+
+  margin: 8px auto 14px;
+
+  border-radius: 24px;
+
+  background: linear-gradient(
+    135deg,
+    #1677ff,
+    #4096ff
+  );
+
+  color: #ffffff;
+
+  font-size: 38px;
+  font-weight: 800;
+
+  line-height: 1;
+
+  box-shadow:
+    0 12px 28px rgba(22, 119, 255, 0.28);
+
+  transform: rotate(-2deg);
+}
+
+.reassign-big-number::before {
+  content: "#";
+
+  margin-right: 2px;
+
+  font-size: 20px;
+  font-weight: 600;
+
+  opacity: 0.75;
+}
+
+/* ---------------------------------------------------------
+   Previous patient
+--------------------------------------------------------- */
+
+.reassign-source-number .ant-typography:last-child {
+  display: block;
+
+  line-height: 1.6;
+
+  color: #6b7785;
+}
+
+.reassign-source-number strong {
+  color: #1f2937;
+}
+
+/* =========================================================
+   Target appointment section
+========================================================= */
+
+.reassign-target-section {
+  padding: 20px;
+
+  border: 1px solid #edf0f5;
+  border-radius: 16px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 5px 18px rgba(15, 23, 42, 0.045);
+}
+
+.reassign-target-section > .ant-typography:first-child {
+  display: block;
+
+  margin-bottom: 4px;
+
+  font-size: 15px;
+
+  color: #1f2937;
+}
+
+.reassign-appointment-select {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.reassign-appointment-select .ant-select-selector {
+  min-height: 48px !important;
+
+  display: flex;
+  align-items: center;
+
+  padding: 5px 13px !important;
+
+  border-radius: 12px !important;
+
+  border-color: #d9e2ec !important;
+
+  background: #fbfdff !important;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.reassign-appointment-select:hover .ant-select-selector {
+  border-color: #69b1ff !important;
+}
+
+.reassign-appointment-select.ant-select-focused
+  .ant-select-selector {
+  border-color: #1677ff !important;
+
+  background: #ffffff !important;
+
+  box-shadow:
+    0 0 0 3px rgba(22, 119, 255, 0.1) !important;
+}
+
+.reassign-appointment-select
+  .ant-select-selection-placeholder {
+  color: #9aa5b1;
+}
+
+.reassign-appointment-select
+  .ant-select-selection-item {
+  font-weight: 600;
+
+  color: #263238;
+}
+
+/* =========================================================
+   Assignment confirmation warning
+========================================================= */
+
+.reassign-number-warning {
+  position: relative;
+
+  padding: 16px 18px 16px 48px;
+
+  border: 1px solid #b7eb8f;
+  border-radius: 14px;
+
+  background: linear-gradient(
+    135deg,
+    #f6ffed,
+    #fbfff7
+  );
+
+  color: #3f5f29;
+
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.reassign-number-warning::before {
+  content: "✓";
+
+  position: absolute;
+  top: 16px;
+  left: 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 24px;
+  height: 24px;
+
+  border-radius: 50%;
+
+  background: #52c41a;
+
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.reassign-number-warning strong {
+  color: #237804;
+}
+
+/* =========================================================
+   Ant Design modal styling
+========================================================= */
+
+.ant-modal:has(.reassign-number-modal-content)
+  .ant-modal-content {
+  overflow: hidden;
+
+  padding: 0;
+
+  border-radius: 20px;
+
+  box-shadow:
+    0 24px 70px rgba(15, 23, 42, 0.18);
+}
+
+.ant-modal:has(.reassign-number-modal-content)
+  .ant-modal-header {
+  margin: 0;
+
+  padding: 20px 24px;
+
+  border-bottom: 1px solid #edf0f4;
+
+  background: linear-gradient(
+    135deg,
+    #f8fbff,
+    #ffffff
+  );
+}
+
+.ant-modal:has(.reassign-number-modal-content)
+  .ant-modal-title {
+  font-size: 18px;
+  font-weight: 700;
+
+  color: #1f2937;
+}
+
+.ant-modal:has(.reassign-number-modal-content)
+  .ant-modal-body {
+  padding: 24px;
+}
+
+.ant-modal:has(.reassign-number-modal-content)
+  .ant-modal-footer {
+  margin: 0;
+
+  padding: 16px 24px;
+
+  border-top: 1px solid #edf0f4;
+
+  background: #fafcff;
+}
+
+.ant-modal:has(.reassign-number-modal-content)
+  .ant-modal-footer
+  .ant-btn {
+  min-width: 110px;
+  height: 40px;
+
+  border-radius: 10px;
+
+  font-weight: 600;
+}
+
+.ant-modal:has(.reassign-number-modal-content)
+  .ant-modal-footer
+  .ant-btn-primary {
+  border: none;
+
+  background: linear-gradient(
+    135deg,
+    #1677ff,
+    #4096ff
+  );
+
+  box-shadow:
+    0 6px 16px rgba(22, 119, 255, 0.2);
+}
+
+.ant-modal:has(.reassign-number-modal-content)
+  .ant-modal-footer
+  .ant-btn-primary:hover {
+  background: linear-gradient(
+    135deg,
+    #0958d9,
+    #1677ff
+  );
+}
+
+/* =========================================================
+   Empty state alert
+========================================================= */
+
+.reassign-target-section .ant-alert {
+  border-radius: 12px;
+
+  border-color: #bae0ff;
+
+  background: #f0f8ff;
+}
+
+/* =========================================================
+   Mobile
+========================================================= */
+
+@media (max-width: 576px) {
+  .ant-modal:has(.reassign-number-modal-content)
+    .ant-modal-body {
+    padding: 18px;
+  }
+
+  .ant-modal:has(.reassign-number-modal-content)
+    .ant-modal-header {
+    padding: 18px;
+  }
+
+  .ant-modal:has(.reassign-number-modal-content)
+    .ant-modal-footer {
+    padding: 14px 18px;
+  }
+
+  .reassign-source-number {
+    padding: 20px 16px;
+  }
+
+  .reassign-big-number {
+    width: 78px;
+    height: 78px;
+
+    border-radius: 20px;
+
+    font-size: 32px;
+  }
+
+  .reassign-target-section {
+    padding: 16px;
+  }
+
+  .reassign-number-warning {
+    padding:
+      14px
+      14px
+      14px
+      46px;
+  }
 }

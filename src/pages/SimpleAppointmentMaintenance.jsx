@@ -10,11 +10,13 @@ import {
   Segmented,
   Select,
   Space,
+  Modal,
   Spin,
   Tag,
   Tooltip,
   Typography,
   message,
+  Alert,
 } from "antd";
 
 import {
@@ -41,10 +43,12 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import ClinicPage from "../components/ClinicPage";
 
 import {
+  checkInAppointmentToQueue,
   endAppointmentWaiting,
   getAllWaitingRecords,
   getAppointmentsByDate,
   getPatients,
+  reassignAppointmentNumber,
   startAppointmentWaiting,
   updateAppointmentStatus,
 } from "../api/endPoints";
@@ -65,6 +69,7 @@ const READY_PATIENT_STORAGE_PREFIX = "queue-display-ready-patient";
 
 const getReadyPatientStorageKey = (date) =>
   `${READY_PATIENT_STORAGE_PREFIX}:${date}`;
+const LOCKED_PATIENT_COUNT = 2;
 
 const VIEW_OPTIONS = [
   {
@@ -93,6 +98,10 @@ const VIEW_OPTIONS = [
       </Space>
     ),
     value: "minimal",
+  },
+  {
+    label: "Rows",
+    value: "row",
   },
 ];
 
@@ -140,18 +149,7 @@ const FILTER_OPTIONS = [
     label: "Treatment Done",
     value: "Treatment Done",
   },
-  {
-    label: "Payment Pending",
-    value: "Payment Pending",
-  },
-  {
-    label: "Paid",
-    value: "Paid",
-  },
-  {
-    label: "Completed",
-    value: "Completed",
-  },
+
   {
     label: "Cancelled",
     value: "Cancelled",
@@ -336,12 +334,28 @@ const isWaitingRecordActive = (record) => {
 
   return Boolean(appointmentId && !endTime);
 };
-
+const normalizeStatus = (value) => {
+  return String(value || "")
+    .trim()
+    .toLowerCase();
+};
 /* ========================================================
    Component
 ======================================================== */
-
+const getAppointmentId = (appointment) => {
+  return appointment?.appointment_id || appointment?.id || "";
+};
 const AppointmentMaintenance = () => {
+  const [reassignModalOpen, setReassignModalOpen] = useState(false);
+
+  const [reassignSourceAppointment, setReassignSourceAppointment] =
+    useState(null);
+
+  const [reassignTargetAppointmentId, setReassignTargetAppointmentId] =
+    useState(null);
+
+  const [reassigningNumber, setReassigningNumber] = useState(false);
+
   const [selectedDate, setSelectedDate] = useState(getTodayDate());
 
   const [waitingRecords, setWaitingRecords] = useState([]);
@@ -352,7 +366,7 @@ const AppointmentMaintenance = () => {
 
   const [updatingId, setUpdatingId] = useState(null);
 
-  const [viewMode, setViewMode] = useState("summary");
+  const [viewMode, setViewMode] = useState("minimal");
 
   const [distanceSort, setDistanceSort] = useState("default");
 
@@ -360,12 +374,16 @@ const AppointmentMaintenance = () => {
 
   const [searchValue, setSearchValue] = useState("");
 
-  const [lockedNextPatientId, setLockedNextPatientId] = useState(null);
+  const [lockedNextPatientIds, setLockedNextPatientIds] = useState([]);
 
   const [detailsDrawerOpen, setDetailsDrawerOpen] = useState(false);
 
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const selectedDatePickerValue = useMemo(() => {
+    const parsedDate = dayjs(selectedDate, "YYYY-MM-DD", true);
 
+    return parsedDate.isValid() ? parsedDate : dayjs();
+  }, [selectedDate]);
   /* ========================================================
      Load data
   ======================================================== */
@@ -519,7 +537,62 @@ const AppointmentMaintenance = () => {
   /* ========================================================
      Queue data
   ======================================================== */
+  const handleCheckInCancelledAppointment = async (appointment) => {
+    const appointmentId = getAppointmentId(appointment);
 
+    if (!appointmentId) {
+      message.error("Appointment ID is missing");
+      return;
+    }
+
+    try {
+      setUpdatingId(appointmentId);
+
+      await updateAppointmentStatus(appointmentId, "Checked In");
+
+      message.success(
+        `${appointment.patient_name || "Patient"} checked in again as No. ${getAppointmentNumber(
+          appointment,
+        )}`,
+      );
+
+      await fetchAppointments();
+    } catch (error) {
+      console.error("Failed to check in cancelled appointment:", error);
+
+      message.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to check in appointment",
+      );
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+  const handleOpenReassignNumber = (appointment) => {
+    setReassignSourceAppointment(appointment);
+    setReassignTargetAppointmentId(null);
+    setReassignModalOpen(true);
+  };
+  const reassignableAppointments = useMemo(() => {
+    if (!reassignSourceAppointment) {
+      return [];
+    }
+
+    const sourceId = String(getAppointmentId(reassignSourceAppointment));
+
+    return appointments.filter((appointment) => {
+      const appointmentId = String(getAppointmentId(appointment));
+
+      if (!appointmentId || appointmentId === sourceId) {
+        return false;
+      }
+
+      return ["Pending", "Confirmed", "Checked In"].includes(
+        appointment.status,
+      );
+    });
+  }, [appointments, reassignSourceAppointment]);
   const currentTreatmentPatient = useMemo(() => {
     return (
       appointments.find(
@@ -570,32 +643,83 @@ const AppointmentMaintenance = () => {
         );
       });
   }, [appointments, selectedDate, isAppointmentWaiting]);
-
-  const nextCheckedInAppointmentId = useMemo(() => {
-    if (checkedInAppointments.length === 0) {
-      return null;
-    }
-
-    const lockedPatientStillAvailable = checkedInAppointments.some(
-      (appointment) => appointment.appointment_id === lockedNextPatientId,
+  const lockedCheckedInAppointmentIds = useMemo(() => {
+    const availableIds = new Set(
+      checkedInAppointments.map((appointment) =>
+        String(appointment.appointment_id),
+      ),
     );
 
-    if (lockedPatientStillAvailable) {
-      return lockedNextPatientId;
+    const validLockedIds = lockedNextPatientIds.filter((appointmentId) =>
+      availableIds.has(String(appointmentId)),
+    );
+
+    const remainingIds = checkedInAppointments
+      .map((appointment) => String(appointment.appointment_id))
+      .filter((appointmentId) => !validLockedIds.includes(appointmentId));
+
+    return [...validLockedIds, ...remainingIds].slice(0, LOCKED_PATIENT_COUNT);
+  }, [checkedInAppointments, lockedNextPatientIds]);
+
+  const firstLockedAppointmentId = lockedCheckedInAppointmentIds[0] || null;
+
+  const handleReassignAppointmentNumber = async () => {
+    if (!reassignSourceAppointment) {
+      message.error("Cancelled appointment is missing");
+      return;
     }
 
-    return checkedInAppointments[0]?.appointment_id || null;
-  }, [checkedInAppointments, lockedNextPatientId]);
+    if (!reassignTargetAppointmentId) {
+      message.warning("Please select another appointment");
+      return;
+    }
 
-  /* ========================================================
-     Lock next patient
-  ======================================================== */
+    const sourceId = getAppointmentId(reassignSourceAppointment);
+
+    try {
+      setReassigningNumber(true);
+
+      await reassignAppointmentNumber(sourceId, reassignTargetAppointmentId);
+
+      message.success(
+        `Appointment No. ${getAppointmentNumber(
+          reassignSourceAppointment,
+        )} reassigned successfully`,
+      );
+
+      setReassignModalOpen(false);
+      setReassignSourceAppointment(null);
+      setReassignTargetAppointmentId(null);
+
+      await fetchAppointments();
+    } catch (error) {
+      console.error("Failed to reassign appointment number:", error);
+
+      message.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to reassign appointment number",
+      );
+    } finally {
+      setReassigningNumber(false);
+    }
+  };
 
   useEffect(() => {
     const storageKey = getReadyPatientStorageKey(selectedDate);
 
-    if (checkedInAppointments.length === 0) {
-      setLockedNextPatientId(null);
+    const availableIds = checkedInAppointments
+      .map((appointment) => String(appointment.appointment_id || ""))
+      .filter(Boolean);
+
+    if (availableIds.length === 0) {
+      setLockedNextPatientIds((currentIds) => {
+        if (currentIds.length === 0) {
+          return currentIds;
+        }
+
+        return [];
+      });
 
       if (typeof window !== "undefined") {
         window.localStorage.removeItem(storageKey);
@@ -604,39 +728,72 @@ const AppointmentMaintenance = () => {
       return;
     }
 
-    const stateLockIsValid = checkedInAppointments.some(
-      (appointment) => appointment.appointment_id === lockedNextPatientId,
-    );
-
-    let storedPatientId = null;
+    let storedIds = [];
 
     if (typeof window !== "undefined") {
-      storedPatientId = window.localStorage.getItem(storageKey);
+      try {
+        const storedValue = window.localStorage.getItem(storageKey);
+
+        const parsedValue = storedValue ? JSON.parse(storedValue) : [];
+
+        storedIds = Array.isArray(parsedValue) ? parsedValue.map(String) : [];
+      } catch {
+        storedIds = [];
+      }
     }
 
-    const storedLockIsValid = checkedInAppointments.some(
-      (appointment) => appointment.appointment_id === storedPatientId,
+    setLockedNextPatientIds((currentIds) => {
+      const validCurrentIds = currentIds.filter((appointmentId) =>
+        availableIds.includes(String(appointmentId)),
+      );
+
+      const validStoredIds = storedIds.filter((appointmentId) =>
+        availableIds.includes(String(appointmentId)),
+      );
+
+      const preservedIds =
+        validCurrentIds.length > 0 ? validCurrentIds : validStoredIds;
+
+      const additionalIds = availableIds.filter(
+        (appointmentId) => !preservedIds.includes(appointmentId),
+      );
+
+      const nextLockedIds = [...preservedIds, ...additionalIds].slice(
+        0,
+        LOCKED_PATIENT_COUNT,
+      );
+
+      const hasChanged =
+        nextLockedIds.length !== currentIds.length ||
+        nextLockedIds.some(
+          (appointmentId, index) =>
+            String(appointmentId) !== String(currentIds[index]),
+        );
+
+      if (!hasChanged) {
+        return currentIds;
+      }
+
+      return nextLockedIds;
+    });
+  }, [selectedDate, checkedInAppointments]);
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const storageKey = getReadyPatientStorageKey(selectedDate);
+
+    if (lockedNextPatientIds.length === 0) {
+      window.localStorage.removeItem(storageKey);
+      return;
+    }
+
+    window.localStorage.setItem(
+      storageKey,
+      JSON.stringify(lockedNextPatientIds),
     );
-
-    let effectivePatientId = null;
-
-    if (stateLockIsValid) {
-      effectivePatientId = lockedNextPatientId;
-    } else if (storedLockIsValid) {
-      effectivePatientId = storedPatientId;
-    } else {
-      effectivePatientId = checkedInAppointments[0]?.appointment_id || null;
-    }
-
-    if (effectivePatientId !== lockedNextPatientId) {
-      setLockedNextPatientId(effectivePatientId);
-    }
-
-    if (typeof window !== "undefined" && effectivePatientId) {
-      window.localStorage.setItem(storageKey, effectivePatientId);
-    }
-  }, [selectedDate, checkedInAppointments, lockedNextPatientId]);
-
+  }, [selectedDate, lockedNextPatientIds]);
   useEffect(() => {
     if (typeof window === "undefined") {
       return undefined;
@@ -649,20 +806,31 @@ const AppointmentMaintenance = () => {
         return;
       }
 
-      const patientId = event.newValue;
-
-      if (!patientId) {
-        setLockedNextPatientId(null);
-
+      if (!event.newValue) {
+        setLockedNextPatientIds([]);
         return;
       }
 
-      const patientStillAvailable = checkedInAppointments.some(
-        (appointment) => appointment.appointment_id === patientId,
-      );
+      try {
+        const parsedValue = JSON.parse(event.newValue);
 
-      if (patientStillAvailable) {
-        setLockedNextPatientId(patientId);
+        const storedIds = Array.isArray(parsedValue)
+          ? parsedValue.map(String)
+          : [];
+
+        const availableIds = new Set(
+          checkedInAppointments.map((appointment) =>
+            String(appointment.appointment_id),
+          ),
+        );
+
+        const validIds = storedIds
+          .filter((appointmentId) => availableIds.has(appointmentId))
+          .slice(0, LOCKED_PATIENT_COUNT);
+
+        setLockedNextPatientIds(validIds);
+      } catch (error) {
+        console.error("Failed to sync locked queue patients:", error);
       }
     };
 
@@ -672,7 +840,46 @@ const AppointmentMaintenance = () => {
       window.removeEventListener("storage", handleStorageChange);
     };
   }, [selectedDate, checkedInAppointments]);
+  const availableReassignAppointments = useMemo(() => {
+    if (!reassignSourceAppointment) {
+      return [];
+    }
 
+    const sourceNumber = Number(
+      getAppointmentNumber(reassignSourceAppointment),
+    );
+
+    const sourceDate =
+      reassignSourceAppointment?.appointment_date ||
+      reassignSourceAppointment?.date;
+
+    if (!Number.isFinite(sourceNumber)) {
+      return [];
+    }
+
+    return reassignableAppointments
+      .filter((appointment) => {
+        const appointmentNumber = Number(getAppointmentNumber(appointment));
+
+        const appointmentDate =
+          appointment?.appointment_date || appointment?.date;
+
+        const status = normalizeStatus(appointment?.status);
+
+        return (
+          appointmentDate === sourceDate &&
+          Number.isFinite(appointmentNumber) &&
+          appointmentNumber > sourceNumber &&
+          status !== "cancelled" &&
+          status !== "canceled"
+        );
+      })
+      .sort(
+        (first, second) =>
+          Number(getAppointmentNumber(first)) -
+          Number(getAppointmentNumber(second)),
+      );
+  }, [reassignableAppointments, reassignSourceAppointment]);
   /* ========================================================
      Waiting actions
   ======================================================== */
@@ -757,16 +964,27 @@ const AppointmentMaintenance = () => {
         return 1;
       }
 
-      const firstIsNext = first.appointment_id === nextCheckedInAppointmentId;
+      const firstLockedIndex = lockedCheckedInAppointmentIds.indexOf(
+        String(first.appointment_id),
+      );
 
-      const secondIsNext = second.appointment_id === nextCheckedInAppointmentId;
+      const secondLockedIndex = lockedCheckedInAppointmentIds.indexOf(
+        String(second.appointment_id),
+      );
 
-      if (firstIsNext && !secondIsNext) {
+      const firstIsLocked = firstLockedIndex !== -1;
+      const secondIsLocked = secondLockedIndex !== -1;
+
+      if (firstIsLocked && !secondIsLocked) {
         return -1;
       }
 
-      if (!firstIsNext && secondIsNext) {
+      if (!firstIsLocked && secondIsLocked) {
         return 1;
+      }
+
+      if (firstIsLocked && secondIsLocked) {
+        return firstLockedIndex - secondLockedIndex;
       }
 
       const firstIsWaiting = isAppointmentWaiting(first);
@@ -831,11 +1049,10 @@ const AppointmentMaintenance = () => {
   }, [
     appointments,
     selectedDate,
-    nextCheckedInAppointmentId,
+    lockedCheckedInAppointmentIds,
     isAppointmentWaiting,
     distanceSort,
   ]);
-
   /* ========================================================
      Filter and search
   ======================================================== */
@@ -881,6 +1098,25 @@ const AppointmentMaintenance = () => {
     });
   }, [sortedAppointments, statusFilter, searchValue, isAppointmentWaiting]);
 
+  /* ========================================================
+   Separate waiting patients
+======================================================== */
+
+  const waitingAppointments = useMemo(() => {
+    return sortedAppointments.filter((appointment) =>
+      isAppointmentWaiting(appointment),
+    );
+  }, [sortedAppointments, isAppointmentWaiting]);
+
+  /* ========================================================
+   Main appointments without waiting patients
+======================================================== */
+
+  const mainFilteredAppointments = useMemo(() => {
+    return filteredAppointments.filter(
+      (appointment) => !isAppointmentWaiting(appointment),
+    );
+  }, [filteredAppointments, isAppointmentWaiting]);
   const filterCounts = useMemo(() => {
     const counts = {
       All: appointments.length,
@@ -923,18 +1159,33 @@ const AppointmentMaintenance = () => {
   ======================================================== */
 
   const handleCheckIn = async (appointment) => {
-    try {
-      setUpdatingId(appointment.appointment_id);
+    const appointmentId = appointment?.appointment_id || appointment?.id || "";
 
+    if (!appointmentId) {
+      message.error("Appointment ID is missing");
+      return;
+    }
+
+    try {
+      setUpdatingId(appointmentId);
       await updateAppointmentStatus(appointment.appointment_id, "Checked In");
 
       message.success(
         `${appointment.patient_name || "Patient"} checked in successfully`,
       );
 
-      await fetchAppointments();
+      setAppointments((previous) =>
+        previous.map((item) =>
+          String(item?.appointment_id || item?.id) === String(appointmentId)
+            ? {
+                ...item,
+                status: "Checked In",
+              }
+            : item,
+        ),
+      );
     } catch (error) {
-      console.error(error);
+      console.error("Failed to check in patient:", error);
 
       message.error(
         error?.response?.data?.message ||
@@ -945,7 +1196,60 @@ const AppointmentMaintenance = () => {
       setUpdatingId(null);
     }
   };
+  const handleCancelAppointment = async (appointment) => {
+    const appointmentId = getAppointmentId(appointment);
 
+    if (!appointmentId) {
+      message.error("Appointment ID is missing");
+      return;
+    }
+
+    try {
+      setUpdatingId(appointmentId);
+
+      await updateAppointmentStatus(appointmentId, "Cancelled");
+
+      message.success(
+        `${appointment.patient_name || "Patient"} appointment cancelled`,
+      );
+
+      setAppointments((previous) =>
+        previous.map((item) =>
+          String(getAppointmentId(item)) === String(appointmentId)
+            ? {
+                ...item,
+                status: "Cancelled",
+              }
+            : item,
+        ),
+      );
+
+      // Update drawer data too if this appointment is currently open
+      setSelectedAppointment((current) => {
+        if (
+          current &&
+          String(getAppointmentId(current)) === String(appointmentId)
+        ) {
+          return {
+            ...current,
+            status: "Cancelled",
+          };
+        }
+
+        return current;
+      });
+    } catch (error) {
+      console.error("Failed to cancel appointment:", error);
+
+      message.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to cancel appointment",
+      );
+    } finally {
+      setUpdatingId(null);
+    }
+  };
   const handleStartTreatment = async (appointment) => {
     const isWaitingPatient = isAppointmentWaiting(appointment);
 
@@ -968,13 +1272,12 @@ const AppointmentMaintenance = () => {
      */
     if (
       !isWaitingPatient &&
-      appointment.appointment_id !== nextCheckedInAppointmentId
+      String(appointment.appointment_id) !== String(firstLockedAppointmentId)
     ) {
-      message.warning("This patient is not the locked next patient");
+      message.warning("Only the first locked patient can start treatment");
 
       return;
     }
-
     try {
       setUpdatingId(appointment.appointment_id);
 
@@ -1030,7 +1333,7 @@ const AppointmentMaintenance = () => {
   const renderCornerRibbon = (
     appointment,
     isCurrentPatient,
-    isNextPatient,
+    lockedPosition,
     isWaitingPatient,
   ) => {
     let ribbonText = appointment.status || "Pending";
@@ -1043,8 +1346,11 @@ const AppointmentMaintenance = () => {
     } else if (isCurrentPatient) {
       ribbonText = "CURRENT";
       ribbonClass = "current-corner-ribbon";
-    } else if (isNextPatient) {
-      ribbonText = "NEXT";
+    } else if (lockedPosition === 0) {
+      ribbonText = "NEXT 1";
+      ribbonClass = "next-corner-ribbon";
+    } else if (lockedPosition === 1) {
+      ribbonText = "NEXT 2";
       ribbonClass = "next-corner-ribbon";
     }
 
@@ -1059,22 +1365,116 @@ const AppointmentMaintenance = () => {
      Card actions
   ======================================================== */
 
-  const renderCardAction = (appointment, isCurrentPatient, isNextPatient) => {
-    const isUpdating = updatingId === appointment.appointment_id;
+  const renderCardAction = (
+    appointment,
+    isCurrentPatient,
+    isFirstLockedPatient,
+  ) => {
+    const appointmentId = getAppointmentId(appointment);
+
+    const isUpdating = String(updatingId || "") === String(appointmentId || "");
 
     const isWaitingPatient = isAppointmentWaiting(appointment);
 
     if (isCurrentPatient) {
       return null;
     }
+    /*
+     * ======================================================
+     * CANCELLED
+     * Restore or reuse appointment number
+     * ======================================================
+     */
+    if (appointment.status === "Cancelled") {
+      return (
+        <div className="cancelled-appointment-actions">
+          <Button
+            block
+            type="primary"
+            icon={<CheckCircleOutlined />}
+            loading={isUpdating}
+            disabled={isUpdating}
+            className="appointment-card-action check-in-action"
+            onClick={(event) => {
+              event.stopPropagation();
 
-    if (
-      ["Pending", "Confirmed"].includes(appointment.status) &&
-      !isWaitingPatient
-    ) {
+              handleCheckInCancelledAppointment(appointment);
+            }}
+          >
+            Check In Again
+          </Button>
+
+          <Button
+            block
+            icon={<IdcardOutlined />}
+            disabled={isUpdating}
+            className="appointment-card-action reassign-number-action"
+            onClick={(event) => {
+              event.stopPropagation();
+
+              handleOpenReassignNumber(appointment);
+            }}
+          >
+            Assign No. {getAppointmentNumber(appointment)}
+          </Button>
+        </div>
+      );
+    }
+    /*
+     * ======================================================
+     * PENDING
+     * Check In + Cancel Appointment
+     * ======================================================
+     */
+    if (appointment.status === "Pending" && !isWaitingPatient) {
+      return (
+        <div className="pending-appointment-actions">
+          <Button
+            block
+            type="primary"
+            icon={<CheckCircleOutlined />}
+            loading={isUpdating}
+            disabled={isUpdating}
+            className="appointment-card-action check-in-action"
+            onClick={(event) => {
+              event.stopPropagation();
+
+              handleCheckIn(appointment);
+            }}
+          >
+            Check In Patient
+          </Button>
+
+          <Button
+            block
+            danger
+            icon={<CloseOutlined />}
+            loading={isUpdating}
+            disabled={isUpdating}
+            className="appointment-card-action cancel-appointment-action"
+            onClick={(event) => {
+              event.stopPropagation();
+
+              handleCancelAppointment(appointment);
+            }}
+          >
+            Cancel Appointment
+          </Button>
+        </div>
+      );
+    }
+
+    /*
+     * ======================================================
+     * CONFIRMED
+     * Check In only
+     * ======================================================
+     */
+    if (appointment.status === "Confirmed" && !isWaitingPatient) {
       return (
         <Button
           block
+          type="primary"
           icon={<CheckCircleOutlined />}
           loading={isUpdating}
           disabled={isUpdating}
@@ -1091,34 +1491,21 @@ const AppointmentMaintenance = () => {
     }
 
     /*
-     * A waiting patient can start treatment at any time.
-     * A normal checked-in patient must be the locked next patient.
+     * ======================================================
+     * START TREATMENT
+     * ======================================================
+     *
+     * Waiting patient:
+     * Can start treatment at any time.
+     *
+     * Normal checked-in patient:
+     * Must be the first locked patient.
      */
     const canStartTreatment =
       appointment.status === "Checked In" &&
-      (isWaitingPatient || isNextPatient);
+      (isWaitingPatient || isFirstLockedPatient);
 
-    if (canStartTreatment) {
-      if (currentTreatmentPatient) {
-        return (
-          <Tooltip
-            title={`${
-              currentTreatmentPatient.patient_name || "Another patient"
-            } is currently in treatment`}
-          >
-            <Button
-              block
-              disabled
-              icon={<ClockCircleOutlined />}
-              className="appointment-card-action occupied-action"
-              onClick={(event) => event.stopPropagation()}
-            >
-              Treatment Room Occupied
-            </Button>
-          </Tooltip>
-        );
-      }
-
+    if (canStartTreatment && !currentTreatmentPatient) {
       return (
         <Button
           block
@@ -1276,16 +1663,20 @@ const AppointmentMaintenance = () => {
 
     const isWaitingPatient = isAppointmentWaiting(appointment);
 
-    const isNextPatient =
-      !isWaitingPatient &&
-      appointment.appointment_id === nextCheckedInAppointmentId;
+    const lockedPosition = lockedCheckedInAppointmentIds.indexOf(
+      String(appointment.appointment_id),
+    );
+
+    const isLockedPatient = !isWaitingPatient && lockedPosition !== -1;
+
+    const isFirstLockedPatient = isLockedPatient && lockedPosition === 0;
 
     const isCompleted = appointment.status === "Completed";
 
     const actionContent = renderCardAction(
       appointment,
       isCurrentPatient,
-      isNextPatient,
+      isFirstLockedPatient,
     );
 
     const waitingAction = renderWaitingActionButton(appointment);
@@ -1297,8 +1688,7 @@ const AppointmentMaintenance = () => {
 
       isCurrentPatient ? "current-treatment-card" : "",
 
-      isNextPatient ? "next-patient-card" : "",
-
+      isLockedPatient ? "next-patient-card" : "",
       isWaitingPatient ? "waiting-patient-card" : "",
 
       appointment.is_allergies ? "allergy-card" : "",
@@ -1329,7 +1719,7 @@ const AppointmentMaintenance = () => {
           {renderCornerRibbon(
             appointment,
             isCurrentPatient,
-            isNextPatient,
+            lockedPosition,
             isWaitingPatient,
           )}
 
@@ -1405,7 +1795,7 @@ const AppointmentMaintenance = () => {
           {renderCornerRibbon(
             appointment,
             isCurrentPatient,
-            isNextPatient,
+            lockedPosition,
             isWaitingPatient,
           )}
 
@@ -1479,7 +1869,133 @@ const AppointmentMaintenance = () => {
         </article>
       );
     }
+    if (viewMode === "row") {
+      return (
+        <article
+          key={appointment.appointment_id}
+          role="button"
+          tabIndex={0}
+          className={`${cardClasses} row-appointment-card`}
+          onClick={() => openAppointmentDetails(appointment)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              openAppointmentDetails(appointment);
+            }
+          }}
+        >
+          {/* Queue Number */}
+          <div className="row-appointment-number">{appointmentNumber}</div>
 
+          {/* Patient */}
+          <div className="row-appointment-patient">
+            <div className="row-patient-avatar">
+              <UserOutlined />
+            </div>
+
+            <div className="row-patient-info">
+              <Text className="row-patient-name">
+                {appointment.patient_name || "Unknown Patient"}
+              </Text>
+
+              {appointment.reason_for_visit && (
+                <Text className="row-patient-reason">
+                  {appointment.reason_for_visit}
+                </Text>
+              )}
+            </div>
+          </div>
+
+          {/* Phone */}
+          <div className="row-appointment-info">
+            {appointment.phone ? (
+              <>
+                <PhoneOutlined />
+
+                <Text>{appointment.phone}</Text>
+              </>
+            ) : (
+              <Text type="secondary">-</Text>
+            )}
+          </div>
+
+          {/* Location */}
+          <div className="row-appointment-info row-location">
+            {appointment.patient_location ? (
+              <>
+                <EnvironmentOutlined />
+
+                <div>
+                  <Text>{appointment.patient_location}</Text>
+
+                  {appointment.patient_distance_km !== "" &&
+                    appointment.patient_distance_km !== null &&
+                    appointment.patient_distance_km !== undefined && (
+                      <Text type="secondary" className="row-distance">
+                        {appointment.patient_distance_km} km
+                      </Text>
+                    )}
+                </div>
+              </>
+            ) : (
+              <Text type="secondary">-</Text>
+            )}
+          </div>
+
+          {/* Appointment Time */}
+          <div className="row-appointment-info">
+            <ClockCircleOutlined />
+
+            <Text strong>{formatTime(appointment.appointment_time)}</Text>
+          </div>
+
+          {/* Status */}
+          <div className="row-status-section">
+            {isCurrentPatient && (
+              <span className="row-status-badge treatment">In Treatment</span>
+            )}
+
+            {isWaitingPatient && (
+              <span className="row-status-badge waiting">
+                <ClockCircleOutlined />
+                Waiting
+              </span>
+            )}
+
+            {isLockedPatient && !isWaitingPatient && (
+              <span className="row-status-badge next">
+                {lockedPosition === 0 ? "Next 1" : `Next ${lockedPosition + 1}`}
+              </span>
+            )}
+
+            {!isCurrentPatient && !isWaitingPatient && !isLockedPatient && (
+              <span
+                className={`row-status-badge ${String(appointment.status || "")
+                  .toLowerCase()
+                  .replace(/\s+/g, "-")}`}
+              >
+                {appointment.status || "Pending"}
+              </span>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div
+            className="row-action-section"
+            onClick={(event) => event.stopPropagation()}
+          >
+            {hasActions ? (
+              <Space size={6}>
+                {actionContent}
+                {waitingAction}
+              </Space>
+            ) : (
+              <Text type="secondary">-</Text>
+            )}
+          </div>
+        </article>
+      );
+    }
     return (
       <article
         key={appointment.appointment_id}
@@ -1498,7 +2014,7 @@ const AppointmentMaintenance = () => {
         {renderCornerRibbon(
           appointment,
           isCurrentPatient,
-          isNextPatient,
+          lockedPosition,
           isWaitingPatient,
         )}
 
@@ -1609,14 +2125,21 @@ const AppointmentMaintenance = () => {
     ? isAppointmentWaiting(selectedAppointment)
     : false;
 
-  const selectedIsNext = Boolean(
-    selectedAppointment &&
-    !selectedIsWaiting &&
-    selectedAppointment.appointment_id === nextCheckedInAppointmentId,
-  );
+  const selectedLockedPosition = selectedAppointment
+    ? lockedCheckedInAppointmentIds.indexOf(
+        String(selectedAppointment.appointment_id),
+      )
+    : -1;
+
+  const selectedIsFirstLocked =
+    !selectedIsWaiting && selectedLockedPosition === 0;
 
   const selectedAction = selectedAppointment
-    ? renderCardAction(selectedAppointment, selectedIsCurrent, selectedIsNext)
+    ? renderCardAction(
+        selectedAppointment,
+        selectedIsCurrent,
+        selectedIsFirstLocked,
+      )
     : null;
 
   const selectedWaitingAction = selectedAppointment
@@ -1644,12 +2167,20 @@ const AppointmentMaintenance = () => {
         <div className="appointment-header-controls">
           <DatePicker
             allowClear={false}
-            value={dayjs(selectedDate)}
+            value={selectedDatePickerValue}
             format="YYYY-MM-DD"
             className="appointment-date-picker"
-            onChange={(date) =>
-              setSelectedDate(date ? date.format("YYYY-MM-DD") : getTodayDate())
-            }
+            onChange={(date) => {
+              if (!date || !date.isValid()) {
+                return;
+              }
+
+              const nextDate = date.format("YYYY-MM-DD");
+
+              setSelectedDate((currentDate) =>
+                currentDate === nextDate ? currentDate : nextDate,
+              );
+            }}
           />
 
           <Tooltip title="Refresh appointments">
@@ -1673,28 +2204,41 @@ const AppointmentMaintenance = () => {
     >
       <div className="appointment-maintenance-page">
         <section className="appointment-cards-section">
-          <div className="appointment-section-heading">
-            <div>
-              <Text className="appointment-section-eyebrow">
-                Daily Appointments
-              </Text>
+          {/* =====================================================
+      WAITING PATIENTS
+  ====================================================== */}
 
-              <Title level={4} className="appointment-section-title">
-                Appointment Number Cards
-              </Title>
+          {waitingAppointments.length > 0 && (
+            <div className="waiting-patients-section">
+              <div className="waiting-patients-header">
+                <div className="waiting-patients-title-wrapper">
+                  <div className="waiting-patients-icon">
+                    <ClockCircleOutlined />
+                  </div>
 
-              <Text className="appointment-selected-date">
-                {dayjs(selectedDate).format("DD MMMM YYYY")}
-              </Text>
+                  <div>
+                    <Title level={4} className="waiting-patients-title">
+                      Waiting Patients
+                    </Title>
+
+                    <Text className="waiting-patients-subtitle">
+                      Patients currently kept in the waiting queue
+                    </Text>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className={`appointment-card-layout waiting-patients-layout view-${viewMode}`}
+              >
+                {waitingAppointments.map(renderAppointmentCard)}
+              </div>
             </div>
+          )}
 
-            <Tag className="appointment-count-tag">
-              {filteredAppointments.length}
-              {" of "}
-              {appointments.length}
-              {" appointments"}
-            </Tag>
-          </div>
+          {/* =====================================================
+      MAIN TOOLBAR
+  ====================================================== */}
 
           <div className="appointment-toolbar">
             <div className="appointment-search-wrapper">
@@ -1765,7 +2309,7 @@ const AppointmentMaintenance = () => {
 
         <Drawer
           open={detailsDrawerOpen}
-          width={470}
+          size="large"
           placement="right"
           destroyOnClose
           className="appointment-details-drawer"
@@ -1995,6 +2539,166 @@ const AppointmentMaintenance = () => {
           )}
         </Drawer>
       </div>
+ <Modal
+  open={reassignModalOpen}
+  className="reassign-number-modal"
+  width={560}
+  centered
+  title={
+    reassignSourceAppointment
+      ? `Fill Cancelled Appointment No. ${getAppointmentNumber(
+          reassignSourceAppointment,
+        )}`
+      : "Assign Appointment Number"
+  }
+  okText="Assign Number"
+  cancelText="Cancel"
+  confirmLoading={reassigningNumber}
+  okButtonProps={{
+    disabled: !reassignTargetAppointmentId,
+  }}
+  onOk={handleReassignAppointmentNumber}
+  onCancel={() => {
+    if (reassigningNumber) {
+      return;
+    }
+
+    setReassignModalOpen(false);
+    setReassignSourceAppointment(null);
+    setReassignTargetAppointmentId(null);
+  }}
+>
+        <div className="reassign-number-modal-content">
+          {/* =====================================================
+        Cancelled / available number
+    ===================================================== */}
+
+          {reassignSourceAppointment && (
+            <div className="reassign-source-number">
+              <Text type="secondary">Available appointment number</Text>
+
+              <div className="reassign-big-number">
+                {getAppointmentNumber(reassignSourceAppointment)}
+              </div>
+
+              <Text type="secondary">
+                This number became available because{" "}
+                <strong>
+                  {reassignSourceAppointment.patient_name ||
+                    reassignSourceAppointment.patient_id ||
+                    "Unknown Patient"}
+                </strong>{" "}
+                cancelled the appointment.
+              </Text>
+            </div>
+          )}
+
+          {/* =====================================================
+        Target appointment
+    ===================================================== */}
+
+          <div className="reassign-target-section">
+            <Text strong>
+              Select an appointment after No.{" "}
+              {reassignSourceAppointment
+                ? getAppointmentNumber(reassignSourceAppointment)
+                : ""}
+            </Text>
+
+            <Text
+              type="secondary"
+              style={{
+                display: "block",
+                marginTop: 4,
+                marginBottom: 10,
+              }}
+            >
+              Only appointments after the cancelled position are available.
+            </Text>
+
+            <Select
+              showSearch
+              allowClear
+              value={reassignTargetAppointmentId}
+              placeholder={
+                availableReassignAppointments.length > 0
+                  ? "Select appointment"
+                  : "No later appointments available"
+              }
+              className="reassign-appointment-select"
+              optionFilterProp="label"
+              disabled={availableReassignAppointments.length === 0}
+              onChange={setReassignTargetAppointmentId}
+              options={availableReassignAppointments.map((appointment) => ({
+                value: getAppointmentId(appointment),
+
+                label: `No. ${getAppointmentNumber(appointment)} - ${
+                  appointment.patient_name ||
+                  appointment.patient_id ||
+                  "Unknown Patient"
+                } - ${appointment.status || "Pending"}`,
+              }))}
+            />
+
+            {availableReassignAppointments.length === 0 &&
+              reassignSourceAppointment && (
+                <Alert
+                  type="info"
+                  showIcon
+                  style={{
+                    marginTop: 12,
+                  }}
+                  message="No later appointments available"
+                  description={`There are no eligible appointments after appointment No. ${getAppointmentNumber(
+                    reassignSourceAppointment,
+                  )}.`}
+                />
+              )}
+          </div>
+
+          {/* =====================================================
+        Selected target preview
+    ===================================================== */}
+
+          {reassignTargetAppointmentId && (
+            <div className="reassign-number-warning">
+              {(() => {
+                const selectedAppointment = availableReassignAppointments.find(
+                  (appointment) =>
+                    String(getAppointmentId(appointment)) ===
+                    String(reassignTargetAppointmentId),
+                );
+
+                if (!selectedAppointment) {
+                  return null;
+                }
+
+                return (
+                  <>
+                    <strong>
+                      {selectedAppointment.patient_name ||
+                        selectedAppointment.patient_id ||
+                        "Selected Patient"}
+                    </strong>{" "}
+                    currently has appointment No.{" "}
+                    <strong>{getAppointmentNumber(selectedAppointment)}</strong>
+                    .
+                    <br />
+                    <br />
+                    This patient will receive appointment No.{" "}
+                    <strong>
+                      {reassignSourceAppointment
+                        ? getAppointmentNumber(reassignSourceAppointment)
+                        : ""}
+                    </strong>
+                    .
+                  </>
+                );
+              })()}
+            </div>
+          )}
+        </div>
+      </Modal>
     </ClinicPage>
   );
 };
