@@ -216,41 +216,70 @@ const Patients = () => {
   const [saving, setSaving] = useState(false);
 
   const [patients, setPatients] = useState([]);
-const normalizePhoneNumber = (phone) => {
-  let number = String(phone || "").replace(/\D/g, "");
+  const normalizePhoneNumber = (phone) => {
+    let number = String(phone || "").replace(/\D/g, "");
 
-  // 0094 70 427 9279 → 0704279279
-  if (number.startsWith("0094")) {
-    number = `0${number.slice(4)}`;
-  }
+    // 0094 70 427 9279 → 0704279279
+    if (number.startsWith("0094")) {
+      number = `0${number.slice(4)}`;
+    }
 
-  // 94 70 427 9279 → 0704279279
-  else if (number.startsWith("94") && number.length === 11) {
-    number = `0${number.slice(2)}`;
-  }
+    // 94 70 427 9279 → 0704279279
+    else if (number.startsWith("94") && number.length === 11) {
+      number = `0${number.slice(2)}`;
+    }
 
-  // 704279279 → 0704279279
-  else if (number.length === 9) {
-    number = `0${number}`;
-  }
+    // 704279279 → 0704279279
+    else if (number.length === 9) {
+      number = `0${number}`;
+    }
 
-  return number;
-};
+    return number;
+  };
   const [search, setSearch] = useState("");
 
   const [allergyFilter, setAllergyFilter] = useState("all");
+
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const [editingPatient, setEditingPatient] = useState(null);
+
   const locationOptions = useMemo(() => {
     return patientLocations.map((location) => ({
       label: `${location.city} • ${location.distance} km`,
       value: location.city,
     }));
   }, [patientLocations]);
+
+  useEffect(() => {
+    if (!modalOpen || editingPatient) {
+      return;
+    }
+
+    if (locationOptions.length === 0) {
+      return;
+    }
+
+    const currentLocation = form.getFieldValue("location");
+
+    if (currentLocation) {
+      return;
+    }
+
+    const firstLocation = patientLocations[0];
+
+    if (!firstLocation) {
+      return;
+    }
+
+    form.setFieldsValue({
+      location: locationOptions[0].value,
+      distance: firstLocation.distance,
+    });
+  }, [modalOpen, editingPatient, locationOptions, patientLocations, form]);
   useEffect(() => {
     loadPatientLocations();
   }, [loadPatientLocations]);
-  const [modalOpen, setModalOpen] = useState(false);
-
-  const [editingPatient, setEditingPatient] = useState(null);
 
   const [showMoreOptions, setShowMoreOptions] = useState(false);
 
@@ -389,13 +418,17 @@ const normalizePhoneNumber = (phone) => {
 
     form.resetFields();
 
+    const firstLocation = patientLocations[0];
+
     form.setFieldsValue({
       name: "",
       phone: "",
       gender: "Male",
       address: "",
-      location: undefined,
-      distance: undefined,
+
+      location: "New",
+      distance: 0,
+
       status: "Active",
       has_allergies: false,
       allergy_details: "",
@@ -476,144 +509,139 @@ const normalizePhoneNumber = (phone) => {
      Add or update patient
   ------------------------------------------------------ */
 
-const handleSubmit = async () => {
-  try {
-    const values = await form.validateFields();
+  const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields();
 
-    setSaving(true);
+      setSaving(true);
 
-    /* ========================================================
+      /* ========================================================
        Normalize entered phone number
     ======================================================== */
 
-    const normalizedPhone = normalizePhoneNumber(values.phone);
+      const normalizedPhone = normalizePhoneNumber(values.phone);
 
-    /* ========================================================
+      /* ========================================================
        Check duplicate phone number
     ======================================================== */
 
-    const duplicatePatient = patients.find((patient) => {
-      const existingPhone = normalizePhoneNumber(patient.phone);
+      const duplicatePatient = patients.find((patient) => {
+        const existingPhone = normalizePhoneNumber(patient.phone);
 
-      if (!existingPhone || existingPhone !== normalizedPhone) {
-        return false;
-      }
-
-      // Editing patient
-      if (editingPatient) {
-        const currentPatientId = String(
-          getPatientId(editingPatient) || "",
-        ).trim();
-
-        const existingPatientId = String(
-          getPatientId(patient) || "",
-        ).trim();
-
-        // Ignore the patient's own record
-        if (currentPatientId === existingPatientId) {
+        if (!existingPhone || existingPhone !== normalizedPhone) {
           return false;
         }
+
+        // Editing patient
+        if (editingPatient) {
+          const currentPatientId = String(
+            getPatientId(editingPatient) || "",
+          ).trim();
+
+          const existingPatientId = String(getPatientId(patient) || "").trim();
+
+          // Ignore the patient's own record
+          if (currentPatientId === existingPatientId) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+
+      if (duplicatePatient) {
+        message.error(
+          `Phone number ${normalizedPhone} is already registered to ${
+            duplicatePatient.name || "another patient"
+          }`,
+        );
+
+        form.resetFields();
+        return;
       }
 
-      return true;
-    });
-
-    if (duplicatePatient) {
-      message.error(
-        `Phone number ${normalizedPhone} is already registered to ${
-          duplicatePatient.name || "another patient"
-        }`,
-      );
-
-    form.resetFields();
-          return;
-    }
-
-    /* ========================================================
+      /* ========================================================
        Location
     ======================================================== */
 
-    const selectedLocation = patientLocations.find(
-      (location) => location.city === values.location,
-    );
+      const selectedLocation = patientLocations.find(
+        (location) => location.city === values.location,
+      );
 
-    /* ========================================================
+      /* ========================================================
        Allergy
     ======================================================== */
 
-    const hasPatientAllergy = values.has_allergies === true;
+      const hasPatientAllergy = values.has_allergies === true;
 
-    /* ========================================================
+      /* ========================================================
        Payload
     ======================================================== */
 
-    const payload = {
-      name: values.name?.trim() || "",
+      const payload = {
+        name: values.name?.trim() || "",
 
-      // Save standardized number
-      phone: normalizedPhone,
+        // Save standardized number
+        phone: normalizedPhone,
 
-      gender: values.gender || "",
+        gender: values.gender || "",
 
-      address: values.address?.trim() || "",
+        address: values.address?.trim() || "",
 
-      status: values.status || "Active",
+        status: values.status || "Active",
 
-      location: selectedLocation?.city || values.location || "",
+        location: selectedLocation?.city || values.location || "",
 
-      distance:
-        selectedLocation?.distance ??
-        values.distance ??
-        "",
+        distance: selectedLocation?.distance ?? values.distance ?? "",
 
-      has_allergies: hasPatientAllergy,
+        has_allergies: hasPatientAllergy,
 
-      allergy_details: hasPatientAllergy
-        ? values.allergy_details?.trim() || ""
-        : "",
-    };
+        allergy_details: hasPatientAllergy
+          ? values.allergy_details?.trim() || ""
+          : "",
+      };
 
-    console.log("Patient payload:", payload);
+      console.log("Patient payload:", payload);
 
-    /* ========================================================
+      /* ========================================================
        Update / Create Patient
     ======================================================== */
 
-    if (editingPatient) {
-      const patientId = getPatientId(editingPatient);
+      if (editingPatient) {
+        const patientId = getPatientId(editingPatient);
 
-      if (!patientId) {
-        throw new Error("Patient ID is missing");
+        if (!patientId) {
+          throw new Error("Patient ID is missing");
+        }
+
+        await updatePatient(patientId, payload);
+
+        message.success("Patient updated successfully");
+      } else {
+        await createPatient(payload);
+
+        message.success("Patient added successfully");
       }
 
-      await updatePatient(patientId, payload);
+      closeModal();
 
-      message.success("Patient updated successfully");
-    } else {
-      await createPatient(payload);
+      await loadPatients();
+    } catch (error) {
+      if (error?.errorFields) {
+        return;
+      }
 
-      message.success("Patient added successfully");
+      console.error("Failed to save patient:", error);
+
+      message.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to save patient",
+      );
+    } finally {
+      setSaving(false);
     }
-
-    closeModal();
-
-    await loadPatients();
-  } catch (error) {
-    if (error?.errorFields) {
-      return;
-    }
-
-    console.error("Failed to save patient:", error);
-
-    message.error(
-      error?.response?.data?.message ||
-        error?.message ||
-        "Failed to save patient",
-    );
-  } finally {
-    setSaving(false);
-  }
-};
+  };
   /* ------------------------------------------------------
      Delete patient
   ------------------------------------------------------ */
