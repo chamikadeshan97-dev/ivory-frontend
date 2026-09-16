@@ -1,1108 +1,2280 @@
-/* ========================================================
-   Page
-======================================================== */
+/* =========================================================
+   QUEUE DISPLAY
+   Professional Dental Clinic Queue Screen
+========================================================= */
 
 .queue-display-page {
-  --queue-blue: #1677ff;
-  --queue-blue-dark: #0958d9;
-  --queue-cyan: #06b6d4;
-  --queue-green: #16a34a;
-  --queue-green-light: #22c55e;
-  --queue-orange: #f59e0b;
-  --queue-red: #dc2626;
-  --queue-slate: #0f172a;
-  --queue-muted: #64748b;
-  --queue-border: #dbe7f3;
-  --queue-surface: #ffffff;
-  --queue-background: #eef6ff;
+  --queue-bg: #07111f;
+  --queue-bg-soft: #0c1929;
+  --queue-surface: rgba(16, 31, 49, 0.92);
+  --queue-surface-soft: rgba(20, 38, 59, 0.82);
+  --queue-border: rgba(255, 255, 255, 0.08);
+
+  --queue-text: #f8fafc;
+  --queue-text-soft: #c8d2df;
+  --queue-muted: #8190a5;
+
+  --queue-primary: #38bdf8;
+  --queue-primary-soft: rgba(56, 189, 248, 0.14);
+
+  --queue-green: #22c55e;
+  --queue-green-soft: rgba(34, 197, 94, 0.13);
+
+  --queue-yellow: #f5c451;
+  --queue-yellow-soft: rgba(245, 196, 81, 0.13);
+
+  --queue-orange: #fb923c;
+  --queue-orange-soft: rgba(251, 146, 60, 0.12);
+
+  --queue-red: #fb7185;
+  --queue-red-soft: rgba(251, 113, 133, 0.13);
+
+  position: relative;
 
   width: 100%;
+
   min-height: 100vh;
-
-  display: flex;
-  flex-direction: column;
-
-  overflow: hidden;
 
   background:
     radial-gradient(
-      circle at top left,
-      rgba(56, 189, 248, 0.18),
+      circle at 20% 10%,
+      rgba(56, 189, 248, 0.08),
       transparent 30%
     ),
     radial-gradient(
-      circle at top right,
-      rgba(37, 99, 235, 0.15),
-      transparent 34%
+      circle at 85% 30%,
+      rgba(34, 197, 94, 0.04),
+      transparent 30%
     ),
     linear-gradient(
-      180deg,
-      #f8fbff 0%,
-      #eef6ff 100%
+      145deg,
+      #06101d 0%,
+      #091523 48%,
+      #06101d 100%
     );
 
-  color: var(--queue-slate);
+  color: var(--queue-text);
+
+  overflow: hidden;
+
+  box-sizing: border-box;
 
   font-family:
     Inter,
+    ui-sans-serif,
+    system-ui,
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
 }
 
+.queue-display-page *,
+.queue-display-page *::before,
+.queue-display-page *::after {
+  box-sizing: border-box;
+}
+
 .queue-display-page-fullscreen {
-  position: fixed;
-  inset: 0;
-  z-index: 999;
+  height: 100vh;
 }
 
 .queue-display-page-embedded {
-  position: relative;
-  min-height: 720px;
-  border-radius: 24px;
+  min-height: 760px;
+  border-radius: 22px;
 }
 
-/* ========================================================
-   Header
-======================================================== */
+/* =========================================================
+   BACKGROUND EFFECTS
+========================================================= */
+
+.queue-display-bg-glow {
+  position: fixed;
+
+  border-radius: 999px;
+
+  pointer-events: none;
+
+  filter: blur(80px);
+
+  opacity: 0.22;
+
+  z-index: 0;
+}
+
+.queue-display-bg-glow-one {
+  width: 420px;
+  height: 420px;
+
+  left: -190px;
+  top: 30%;
+}
+
+.queue-display-bg-glow-two {
+  width: 320px;
+  height: 320px;
+
+  right: -140px;
+  top: 10%;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
 
 .queue-display-header {
-  min-height: 132px;
+  position: relative;
+
+  z-index: 2;
+
+  min-height: 118px;
+
+  padding:
+    clamp(16px, 1.4vw, 26px)
+    clamp(22px, 2.2vw, 42px);
 
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
 
-  gap: 30px;
+  gap: 24px;
 
-  padding: 24px 42px;
+  border-bottom:
+    1px solid var(--queue-border);
+
+  background:
+    rgba(5, 14, 26, 0.76);
+
+  backdrop-filter: blur(18px);
+}
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.queue-display-brand-section {
+  min-width: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  gap:
+    clamp(14px, 1.3vw, 22px);
+}
+
+.queue-display-logo {
+  flex: 0 0 auto;
+
+  width:
+    clamp(58px, 4.3vw, 78px);
+
+  height:
+    clamp(58px, 4.3vw, 78px);
+
+  display: grid;
+
+  place-items: center;
+
+  border-radius: 22px;
+
+  border:
+    1px solid rgba(
+      56,
+      189,
+      248,
+      0.25
+    );
 
   background:
     linear-gradient(
-      135deg,
-      #063f89 0%,
-      #075dbb 48%,
-      #0891b2 100%
+      145deg,
+      rgba(56, 189, 248, 0.18),
+      rgba(56, 189, 248, 0.06)
     );
 
-  border-bottom:
-    1px solid
-    rgba(255, 255, 255, 0.2);
+  color:
+    var(--queue-primary);
 
-  box-shadow:
-    0 14px 34px
-    rgba(15, 23, 42, 0.18);
-
-  color: #ffffff;
-}
-
-.queue-display-brand {
-  min-width: 0;
-
-  display: flex;
-  align-items: center;
-
-  gap: 20px;
-}
-
-.queue-display-brand-icon {
-  width: 78px;
-  height: 78px;
-
-  flex: 0 0 78px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border:
-    1px solid
-    rgba(255, 255, 255, 0.3);
-
-  border-radius: 24px;
-
-  background:
-    rgba(255, 255, 255, 0.15);
+  font-size:
+    clamp(27px, 2vw, 38px);
 
   box-shadow:
     inset 0 1px 0
-      rgba(255, 255, 255, 0.25),
-    0 16px 36px
-      rgba(0, 0, 0, 0.16);
-
-  backdrop-filter: blur(10px);
-
-  color: #ffffff;
-
-  font-size: 38px;
+      rgba(255, 255, 255, 0.08),
+    0 14px 40px
+      rgba(0, 0, 0, 0.18);
 }
 
-.queue-display-brand-content {
+.queue-display-brand-text {
   min-width: 0;
-
-  display: flex;
-  flex-direction: column;
-
-  gap: 3px;
 }
 
-.queue-display-eyebrow.ant-typography {
-  margin: 0;
+.queue-display-eyebrow {
+  margin-bottom: 4px;
 
   color:
-    rgba(255, 255, 255, 0.76);
+    var(--queue-primary);
 
-  font-size: 13px;
+  font-size:
+    clamp(9px, 0.7vw, 12px);
+
   font-weight: 800;
-  line-height: 1.3;
 
-  letter-spacing: 0.2em;
+  letter-spacing: 0.16em;
 }
 
 .queue-display-title.ant-typography {
   margin: 0 !important;
 
-  color: #ffffff;
+  color: #ffffff !important;
 
   font-size:
-    clamp(28px, 3vw, 44px);
+    clamp(22px, 2vw, 36px) !important;
 
-  font-weight: 850;
-  line-height: 1.1;
+  line-height: 1.08 !important;
+
+  font-weight: 800 !important;
 
   letter-spacing: -0.035em;
 }
 
-.queue-display-subtitle.ant-typography {
-  margin-top: 4px;
+.queue-display-subtitle {
+  display: block;
+
+  margin-top: 6px;
 
   color:
-    rgba(255, 255, 255, 0.82);
+    var(--queue-muted) !important;
 
   font-size:
-    clamp(13px, 1.35vw, 18px);
+    clamp(11px, 0.85vw, 14px);
 
-  line-height: 1.5;
+  font-weight: 500;
 }
 
-.queue-display-date-time {
-  flex: 0 0 auto;
+/* =========================================================
+   HEADER RIGHT
+========================================================= */
 
+.queue-display-header-right {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-
-  gap: 5px;
-
-  text-align: right;
-}
-
-.queue-display-date {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-
-  gap: 9px;
-
-  color:
-    rgba(255, 255, 255, 0.84);
-
-  font-size:
-    clamp(13px, 1.2vw, 17px);
-
-  font-weight: 600;
-}
-
-.queue-display-date .anticon {
-  font-size: 17px;
-}
-
-.queue-display-time {
-  color: #ffffff;
-
-  font-size:
-    clamp(28px, 3.4vw, 48px);
-
-  font-weight: 850;
-  line-height: 1.1;
-
-  letter-spacing: -0.035em;
-
-  font-variant-numeric:
-    tabular-nums;
-}
-
-.queue-display-live-status {
-  display: inline-flex;
-  align-items: center;
-
-  gap: 8px;
-
-  margin-top: 5px;
-  padding: 6px 12px;
-
-  border:
-    1px solid
-    rgba(255, 255, 255, 0.22);
-
-  border-radius: 999px;
-
-  background:
-    rgba(255, 255, 255, 0.12);
-
-  backdrop-filter: blur(10px);
-}
-
-.queue-display-live-status
-  .ant-typography {
-  color: #ffffff;
-
-  font-size: 12px;
-  font-weight: 750;
-}
-
-.queue-display-live-dot {
-  width: 8px;
-  height: 8px;
-
-  border-radius: 50%;
-
-  background: #4ade80;
-
-  box-shadow:
-    0 0 0 5px
-    rgba(74, 222, 128, 0.17);
-
-  animation:
-    queue-live-pulse 1.7s
-    ease-in-out infinite;
-}
-
-.queue-display-live-status-error
-  .queue-display-live-dot {
-  background: #fbbf24;
-
-  box-shadow:
-    0 0 0 5px
-    rgba(251, 191, 36, 0.18);
-}
-
-/* ========================================================
-   Error and loading
-======================================================== */
-
-.queue-display-error {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  gap: 10px;
-
-  padding: 10px 24px;
-
-  background: #fff1f2;
-
-  border-bottom:
-    1px solid #fecdd3;
-
-  color: #be123c;
-}
-
-.queue-display-error
-  .ant-typography {
-  color: #be123c;
-
-  font-weight: 700;
-}
-
-.queue-display-loading {
-  flex: 1;
-
-  min-height: 380px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  gap: 16px;
-}
-
-.queue-display-loading
-  .ant-typography {
-  color: var(--queue-muted);
-
-  font-size: 16px;
-  font-weight: 650;
-}
-
-/* ========================================================
-   Main cards layout
-======================================================== */
-
-.queue-display-main {
-  flex: 1;
-
-  min-height: 0;
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
 
   align-items: stretch;
 
-  gap: 22px;
-
-  padding: 26px 34px 24px;
+  gap: 14px;
 }
 
-/* ========================================================
-   Patient card
-======================================================== */
+/* =========================================================
+   DOCTOR STATUS
+========================================================= */
 
-.queue-patient-panel {
-  min-width: 0;
-  min-height: 390px;
+.queue-doctor-status-card {
+  min-width:
+    clamp(210px, 17vw, 290px);
 
   display: flex;
-  flex-direction: column;
 
-  overflow: hidden;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 13px 16px;
+
+  border-radius: 18px;
 
   border:
-    1px solid
-    rgba(148, 163, 184, 0.26);
+    1px solid var(--queue-border);
 
-  border-radius: 26px;
+  position: relative;
+
+  overflow: hidden;
+}
+
+.queue-doctor-status-card-arrived {
+  border-color:
+    rgba(34, 197, 94, 0.24);
 
   background:
-    rgba(255, 255, 255, 0.96);
-
-  box-shadow:
-    0 20px 50px
-    rgba(15, 23, 42, 0.11);
-
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
+    linear-gradient(
+      145deg,
+      rgba(34, 197, 94, 0.13),
+      rgba(34, 197, 94, 0.04)
+    );
 }
 
-.queue-patient-panel-active {
-  box-shadow:
-    0 22px 56px
-    rgba(15, 23, 42, 0.14);
+.queue-doctor-status-card-waiting {
+  border-color:
+    rgba(245, 196, 81, 0.24);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(245, 196, 81, 0.13),
+      rgba(245, 196, 81, 0.04)
+    );
 }
 
-.queue-patient-panel-header {
-  min-height: 96px;
+.queue-doctor-status-icon {
+  width: 40px;
+  height: 40px;
+
+  flex: 0 0 auto;
+
+  display: grid;
+
+  place-items: center;
+
+  border-radius: 12px;
+
+  font-size: 19px;
+}
+
+.queue-doctor-status-card-arrived
+  .queue-doctor-status-icon {
+  background:
+    var(--queue-green-soft);
+
+  color:
+    var(--queue-green);
+}
+
+.queue-doctor-status-card-waiting
+  .queue-doctor-status-icon {
+  background:
+    var(--queue-yellow-soft);
+
+  color:
+    var(--queue-yellow);
+}
+
+.queue-doctor-status-details {
+  min-width: 0;
 
   display: flex;
-  align-items: center;
 
-  padding: 18px 22px;
+  flex-direction: column;
 
+  gap: 1px;
+}
+
+.queue-doctor-status-caption {
+  color:
+    var(--queue-muted);
+
+  font-size: 9px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.13em;
+}
+
+.queue-doctor-status-text {
   color: #ffffff;
+
+  font-size:
+    clamp(12px, 0.9vw, 15px);
+
+  font-weight: 750;
 }
 
-.queue-treatment-panel
-  .queue-patient-panel-header {
+.queue-doctor-arrival-time {
+  color:
+    var(--queue-text-soft);
+
+  font-size: 10px;
+}
+
+.queue-doctor-status-indicator {
+  position: absolute;
+
+  width: 8px;
+  height: 8px;
+
+  top: 12px;
+  right: 12px;
+
+  border-radius: 50%;
+}
+
+.queue-doctor-status-card-arrived
+  .queue-doctor-status-indicator {
   background:
-    linear-gradient(
-      135deg,
-      #0756b3 0%,
-      #1677ff 56%,
-      #22a8e8 100%
-    );
+    var(--queue-green);
+
+  box-shadow:
+    0 0 0 5px
+      rgba(34, 197, 94, 0.1);
+
+  animation:
+    queueStatusPulse
+    2s infinite;
 }
 
-.queue-ready-panel
-  .queue-patient-panel-header {
+.queue-doctor-status-card-waiting
+  .queue-doctor-status-indicator {
   background:
-    linear-gradient(
-      135deg,
-      #b45309 0%,
-      #f59e0b 55%,
-      #fbbf24 100%
-    );
+    var(--queue-yellow);
 }
 
-.queue-completed-panel
-  .queue-patient-panel-header {
-  background:
-    linear-gradient(
-      135deg,
-      #08783d 0%,
-      #16a34a 52%,
-      #34d399 100%
-    );
-}
+/* =========================================================
+   CLOCK
+========================================================= */
 
-.queue-panel-header-content {
-  width: 100%;
+.queue-header-clock {
+  min-width:
+    clamp(195px, 15vw, 250px);
+
+  padding: 12px 18px;
 
   display: flex;
-  align-items: center;
 
-  gap: 16px;
-}
+  flex-direction: column;
 
-.queue-panel-icon {
-  width: 58px;
-  height: 58px;
+  align-items: flex-end;
 
-  flex: 0 0 58px;
-
-  display: flex;
-  align-items: center;
   justify-content: center;
 
   border:
-    1px solid
-    rgba(255, 255, 255, 0.3);
+    1px solid var(--queue-border);
 
   border-radius: 18px;
 
   background:
-    rgba(255, 255, 255, 0.17);
-
-  box-shadow:
-    inset 0 1px 0
-      rgba(255, 255, 255, 0.22);
-
-  font-size: 28px;
+    rgba(255, 255, 255, 0.025);
 }
 
-.queue-panel-heading {
-  min-width: 0;
-
+.queue-header-date {
   display: flex;
-  flex-direction: column;
 
-  gap: 2px;
-}
+  align-items: center;
 
-.queue-panel-title.ant-typography {
-  margin: 0;
+  gap: 7px;
 
   color:
-    rgba(255, 255, 255, 0.8);
+    var(--queue-muted);
 
-  font-size: 11px;
-  font-weight: 850;
+  font-size:
+    clamp(9px, 0.7vw, 12px);
 
-  letter-spacing: 0.17em;
+  font-weight: 650;
 }
 
-.queue-panel-subtitle.ant-typography {
-  margin: 0 !important;
+.queue-header-date
+  .anticon {
+  color:
+    var(--queue-primary);
+}
+
+.queue-header-time {
+  margin-top: 2px;
 
   color: #ffffff;
 
   font-size:
-    clamp(23px, 2vw, 31px);
+    clamp(22px, 1.8vw, 32px);
 
-  font-weight: 830;
-  line-height: 1.2;
-
-  letter-spacing: -0.025em;
-}
-
-.queue-patient-panel-body {
-  flex: 1;
-
-  min-height: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 22px;
-}
-
-/* ========================================================
-   Queue number content
-======================================================== */
-
-.queue-number-content {
-  width: 100%;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  text-align: center;
-}
-
-.queue-number-caption.ant-typography {
-  margin-bottom: 12px;
-
-  color: #64748b;
-
-  font-size: 11px;
-  font-weight: 850;
-
-  letter-spacing: 0.15em;
-}
-
-.queue-number-circle-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  margin:
-    0 auto 15px;
-}
-
-.queue-number-circle {
-  width:
-    clamp(138px, 12vw, 184px);
-
-  height:
-    clamp(138px, 12vw, 184px);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border: 8px solid;
-
-  border-radius: 50%;
-
-  background:
-    linear-gradient(
-      145deg,
-      #ffffff,
-      #eff6ff
-    );
-
-  box-shadow:
-    0 19px 38px
-    rgba(15, 23, 42, 0.16),
-    inset 0 0 0 7px
-    rgba(255, 255, 255, 0.82);
-}
-
-.queue-treatment-panel
-  .queue-number-circle {
-  border-color: #1677ff;
-
-  box-shadow:
-    0 20px 42px
-    rgba(22, 119, 255, 0.22),
-    inset 0 0 0 7px
-    rgba(255, 255, 255, 0.82);
-}
-
-.queue-ready-panel
-  .queue-number-circle {
-  border-color: #f59e0b;
-
-  background:
-    linear-gradient(
-      145deg,
-      #ffffff,
-      #fffbeb
-    );
-
-  box-shadow:
-    0 20px 42px
-    rgba(245, 158, 11, 0.23),
-    inset 0 0 0 7px
-    rgba(255, 255, 255, 0.82);
-}
-
-.queue-completed-panel
-  .queue-number-circle {
-  border-color: #22c55e;
-
-  background:
-    linear-gradient(
-      145deg,
-      #ffffff,
-      #ecfdf5
-    );
-
-  box-shadow:
-    0 20px 42px
-    rgba(22, 163, 74, 0.22),
-    inset 0 0 0 7px
-    rgba(255, 255, 255, 0.82);
-}
-
-.queue-number-circle span {
-  display: block;
-
-  color: var(--queue-slate);
-
-  font-size:
-    clamp(58px, 6vw, 88px);
-
-  font-weight: 900;
   line-height: 1;
 
-  letter-spacing: -0.06em;
+  font-weight: 800;
+
+  letter-spacing: -0.04em;
 
   font-variant-numeric:
     tabular-nums;
 }
 
-.queue-treatment-panel
-  .queue-number-circle span {
-  color: #0958d9;
-}
+/* =========================================================
+   OVERVIEW BAR
+========================================================= */
 
-.queue-ready-panel
-  .queue-number-circle span {
-  color: #b45309;
-}
+.queue-display-overview {
+  position: relative;
 
-.queue-completed-panel
-  .queue-number-circle span {
-  color: #15803d;
-}
+  z-index: 2;
 
-.queue-number-status {
-  display: inline-flex;
+  min-height: 74px;
+
+  padding:
+    10px
+    clamp(22px, 2.2vw, 42px);
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(180px, 1fr)
+    auto
+    minmax(175px, 1fr);
+
   align-items: center;
-  justify-content: center;
 
-  min-height: 34px;
+  gap: 18px;
 
-  padding: 7px 15px;
+  border-bottom:
+    1px solid var(--queue-border);
 
-  border: 1px solid;
-  border-radius: 999px;
+  background:
+    rgba(255, 255, 255, 0.018);
+}
+
+.queue-mode-indicator {
+  display: flex;
+
+  align-items: center;
+
+  gap: 11px;
+}
+
+.queue-mode-icon {
+  width: 38px;
+  height: 38px;
+
+  display: grid;
+
+  place-items: center;
+
+  border-radius: 12px;
+
+  background:
+    rgba(245, 196, 81, 0.1);
+
+  color:
+    var(--queue-yellow);
+
+  font-size: 16px;
+}
+
+.queue-mode-icon-active {
+  background:
+    rgba(34, 197, 94, 0.1);
+
+  color:
+    var(--queue-green);
+}
+
+.queue-mode-label {
+  display: block;
+
+  color:
+    var(--queue-muted);
+
+  font-size: 8px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.14em;
+}
+
+.queue-mode-value {
+  display: block;
+
+  margin-top: 2px;
+
+  color: #ffffff;
 
   font-size:
-    clamp(10px, 1vw, 13px);
+    clamp(11px, 0.8vw, 14px);
+
+  font-weight: 700;
+}
+
+/* =========================================================
+   STATISTICS
+========================================================= */
+
+.queue-header-statistics {
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+.queue-header-stat {
+  min-width: 112px;
+
+  padding: 8px 11px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  border-radius: 14px;
+
+  border:
+    1px solid var(--queue-border);
+
+  background:
+    rgba(255, 255, 255, 0.025);
+}
+
+.queue-header-stat-icon {
+  width: 31px;
+  height: 31px;
+
+  flex: 0 0 auto;
+
+  display: grid;
+
+  place-items: center;
+
+  border-radius: 9px;
+
+  font-size: 14px;
+
+  background:
+    rgba(255, 255, 255, 0.05);
+}
+
+.queue-header-stat-value {
+  display: block;
+
+  color: #ffffff;
+
+  font-size: 16px;
+
+  line-height: 1;
+
+  font-weight: 800;
+}
+
+.queue-header-stat-label {
+  display: block;
+
+  margin-top: 3px;
+
+  color:
+    var(--queue-muted);
+
+  font-size: 8px;
+
+  font-weight: 750;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.06em;
+}
+
+.queue-header-stat--queue
+  .queue-header-stat-icon {
+  color:
+    var(--queue-primary);
+
+  background:
+    var(--queue-primary-soft);
+}
+
+.queue-header-stat--waiting
+  .queue-header-stat-icon {
+  color:
+    var(--queue-yellow);
+
+  background:
+    var(--queue-yellow-soft);
+}
+
+.queue-header-stat--treatment
+  .queue-header-stat-icon {
+  color:
+    #a78bfa;
+
+  background:
+    rgba(167, 139, 250, 0.12);
+}
+
+.queue-header-stat--completed
+  .queue-header-stat-icon {
+  color:
+    var(--queue-green);
+
+  background:
+    var(--queue-green-soft);
+}
+
+/* =========================================================
+   SYSTEM STATUS
+========================================================= */
+
+.queue-system-status {
+  justify-self: end;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+.queue-system-status-dot {
+  width: 9px;
+  height: 9px;
+
+  border-radius: 50%;
+
+  background:
+    var(--queue-green);
+
+  box-shadow:
+    0 0 0 5px
+      rgba(34, 197, 94, 0.08);
+
+  animation:
+    queueStatusPulse
+    2s infinite;
+}
+
+.queue-system-status-error
+  .queue-system-status-dot {
+  background:
+    var(--queue-red);
+}
+
+.queue-system-status-title {
+  display: block;
+
+  color: #ffffff;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.1em;
+}
+
+.queue-system-status-subtitle {
+  display: block;
+
+  margin-top: 1px;
+
+  color:
+    var(--queue-muted);
+
+  font-size: 8px;
+}
+
+/* =========================================================
+   DOCTOR WAITING BANNER
+========================================================= */
+
+.queue-doctor-waiting-banner {
+  position: relative;
+
+  z-index: 2;
+
+  margin:
+    12px
+    clamp(22px, 2.2vw, 42px)
+    0;
+
+  padding: 9px 16px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  border:
+    1px solid
+      rgba(245, 196, 81, 0.2);
+
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(245, 196, 81, 0.1),
+      rgba(245, 196, 81, 0.025)
+    );
+}
+
+.queue-doctor-waiting-banner-icon {
+  width: 31px;
+  height: 31px;
+
+  flex: 0 0 auto;
+
+  display: grid;
+
+  place-items: center;
+
+  border-radius: 9px;
+
+  background:
+    rgba(245, 196, 81, 0.12);
+
+  color:
+    var(--queue-yellow);
+}
+
+.queue-doctor-waiting-banner-content {
+  display: flex;
+
+  align-items: baseline;
+
+  gap: 10px;
+}
+
+.queue-doctor-waiting-banner-content
+  strong {
+  color:
+    var(--queue-yellow);
+
+  font-size: 11px;
+
+  white-space: nowrap;
+}
+
+.queue-doctor-waiting-banner-content
+  span {
+  color:
+    var(--queue-text-soft);
+
+  font-size: 10px;
+}
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.queue-display-error {
+  position: relative;
+
+  z-index: 4;
+
+  margin:
+    10px
+    clamp(22px, 2.2vw, 42px)
+    0;
+
+  padding: 10px 14px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  border-radius: 12px;
+
+  border:
+    1px solid
+      rgba(251, 113, 133, 0.2);
+
+  background:
+    rgba(251, 113, 133, 0.08);
+
+  color:
+    #fecdd3;
+
+  font-size: 11px;
+}
+
+/* =========================================================
+   MAIN LAYOUT
+========================================================= */
+
+.queue-display-main {
+  position: relative;
+
+  z-index: 2;
+
+  padding:
+    clamp(14px, 1.4vw, 24px)
+    clamp(22px, 2.2vw, 42px);
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(250px, 1fr)
+    minmax(520px, 1.9fr)
+    minmax(250px, 1fr);
+
+  gap:
+    clamp(12px, 1.2vw, 20px);
+
+  min-height: 0;
+}
+
+/* =========================================================
+   GENERIC CARD
+========================================================= */
+
+.queue-card {
+  position: relative;
+
+  min-width: 0;
+
+  min-height:
+    clamp(360px, 45vh, 520px);
+
+  display: flex;
+
+  flex-direction: column;
+
+  border-radius:
+    clamp(18px, 1.5vw, 26px);
+
+  border:
+    1px solid var(--queue-border);
+
+  background:
+    linear-gradient(
+      155deg,
+      rgba(19, 36, 56, 0.96),
+      rgba(11, 23, 38, 0.95)
+    );
+
+  box-shadow:
+    0 24px 60px
+      rgba(0, 0, 0, 0.18);
+
+  overflow: hidden;
+}
+
+.queue-card::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.04),
+      transparent 36%
+    );
+}
+
+.queue-card-accent {
+  position: absolute;
+
+  top: 0;
+  left: 10%;
+  right: 10%;
+
+  height: 2px;
+
+  border-radius: 100%;
+}
+
+.queue-card-now
+  .queue-card-accent {
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      var(--queue-primary),
+      transparent
+    );
+}
+
+.queue-card-next
+  .queue-card-accent {
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      var(--queue-yellow),
+      transparent
+    );
+}
+
+.queue-card-completed
+  .queue-card-accent {
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      var(--queue-green),
+      transparent
+    );
+}
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.queue-card-header {
+  min-height:
+    clamp(74px, 6vw, 95px);
+
+  padding:
+    clamp(15px, 1.25vw, 21px);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 14px;
+
+  border-bottom:
+    1px solid var(--queue-border);
+}
+
+.queue-card-header-left {
+  min-width: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+.queue-card-header-icon {
+  width:
+    clamp(39px, 3vw, 48px);
+
+  height:
+    clamp(39px, 3vw, 48px);
+
+  flex: 0 0 auto;
+
+  display: grid;
+
+  place-items: center;
+
+  border-radius: 14px;
+
+  font-size:
+    clamp(16px, 1.2vw, 21px);
+}
+
+.queue-card-now
+  .queue-card-header-icon {
+  color:
+    var(--queue-primary);
+
+  background:
+    var(--queue-primary-soft);
+}
+
+.queue-card-next
+  .queue-card-header-icon {
+  color:
+    var(--queue-yellow);
+
+  background:
+    var(--queue-yellow-soft);
+}
+
+.queue-card-completed
+  .queue-card-header-icon {
+  color:
+    var(--queue-green);
+
+  background:
+    var(--queue-green-soft);
+}
+
+.queue-card-kicker {
+  display: block;
+
+  color:
+    var(--queue-muted) !important;
+
+  font-size:
+    clamp(8px, 0.65vw, 10px);
+
+  font-weight: 800;
+
+  letter-spacing: 0.14em;
+}
+
+.queue-card-title.ant-typography {
+  margin:
+    2px 0 0 !important;
+
+  color:
+    #ffffff !important;
+
+  font-size:
+    clamp(18px, 1.5vw, 25px) !important;
+
+  font-weight: 750 !important;
+
+  line-height: 1.08 !important;
+
+  letter-spacing: -0.025em;
+}
+
+.queue-card-live-badge {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 6px 9px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(34, 197, 94, 0.09);
+
+  color:
+    var(--queue-green);
+
+  font-size: 8px;
 
   font-weight: 850;
 
   letter-spacing: 0.08em;
 }
 
-.queue-treatment-panel
-  .queue-number-status {
-  border-color: #bfdbfe;
-  background: #dbeafe;
-  color: #0756b3;
+.queue-card-live-badge
+  span {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background:
+    var(--queue-green);
+
+  animation:
+    queueStatusPulse
+    1.8s infinite;
 }
 
-.queue-ready-panel
-  .queue-number-status {
-  border-color: #fde68a;
-  background: #fef3c7;
-  color: #a16207;
+/* =========================================================
+   CARD BODY
+========================================================= */
+
+.queue-card-body {
+  flex: 1;
+
+  min-height: 0;
+
+  position: relative;
 }
 
-.queue-completed-panel
-  .queue-number-status {
-  border-color: #bbf7d0;
-  background: #dcfce7;
-  color: #15803d;
-}
+/* =========================================================
+   NOW SERVING
+========================================================= */
 
-.queue-number-message.ant-typography {
-  max-width: 310px;
-
-  margin-top: 12px;
-
-  color: #64748b;
-
-  font-size:
-    clamp(12px, 1.05vw, 15px);
-
-  line-height: 1.55;
-}
-
-/* ========================================================
-   Empty card state
-======================================================== */
-
-.queue-patient-panel-empty {
-  border-style: dashed;
-
-  box-shadow:
-    0 14px 32px
-    rgba(15, 23, 42, 0.07);
-}
-
-.queue-panel-empty-content {
-  width: 100%;
+.queue-now-body {
+  padding:
+    clamp(18px, 1.8vw, 30px);
 
   display: flex;
+
   flex-direction: column;
+
   align-items: center;
 
-  padding: 20px;
+  justify-content: center;
+}
+
+.queue-now-message {
+  margin-bottom: 17px;
+
+  color:
+    var(--queue-muted);
+
+  font-size:
+    clamp(9px, 0.7vw, 12px);
 
   text-align: center;
 }
 
-.queue-panel-empty-icon {
-  width: 82px;
-  height: 82px;
+.queue-now-number-ring {
+  width:
+    clamp(150px, 13vw, 215px);
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  aspect-ratio: 1;
 
-  margin-bottom: 18px;
+  padding: 7px;
+
+  display: grid;
+
+  place-items: center;
 
   border-radius: 50%;
 
-  background: #eef6ff;
+  background:
+    conic-gradient(
+      from 180deg,
+      #38bdf8,
+      #0284c7,
+      #38bdf8
+    );
 
-  color: #60a5fa;
-
-  font-size: 36px;
+  box-shadow:
+    0 0 0 10px
+      rgba(56, 189, 248, 0.05),
+    0 24px 70px
+      rgba(14, 165, 233, 0.18);
 }
 
-.queue-ready-panel
-  .queue-panel-empty-icon {
-  background: #fffbeb;
-  color: #f59e0b;
-}
-
-.queue-completed-panel
-  .queue-panel-empty-icon {
-  background: #ecfdf5;
-  color: #22c55e;
-}
-
-.queue-panel-empty-title.ant-typography {
-  color: #1e293b;
-
-  font-size: 19px;
-  font-weight: 800;
-}
-
-.queue-panel-empty-description.ant-typography {
-  max-width: 300px;
-
-  margin-top: 7px;
-
-  color: #64748b;
-
-  font-size: 14px;
-  line-height: 1.55;
-}
-
-/* ========================================================
-   Bottom ticker
-======================================================== */
-
-.queue-bottom-scroller {
-  flex: 0 0 auto;
-
-  padding: 0 0 18px;
-}
-
-.queue-scroller-viewport {
+.queue-now-number-inner {
   width: 100%;
+
+  aspect-ratio: 1;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 3px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle at 50% 30%,
+      #17304a,
+      #091522 72%
+    );
+
+  border:
+    1px solid
+      rgba(255, 255, 255, 0.08);
+}
+
+.queue-now-hash {
+  color:
+    rgba(255, 255, 255, 0.34);
+
+  font-size:
+    clamp(19px, 1.8vw, 29px);
+
+  font-weight: 700;
+}
+
+.queue-now-number {
+  color: #ffffff;
+
+  font-size:
+    clamp(59px, 6.2vw, 98px);
+
+  font-weight: 850;
+
+  line-height: 1;
+
+  letter-spacing: -0.065em;
+
+  font-variant-numeric:
+    tabular-nums;
+}
+
+.queue-now-status {
+  margin-top: 20px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 8px 13px;
+
+  border-radius: 999px;
+
+  background:
+    var(--queue-primary-soft);
+
+  color:
+    var(--queue-primary);
+
+  font-size:
+    clamp(8px, 0.7vw, 11px);
+
+  font-weight: 850;
+
+  letter-spacing: 0.07em;
+}
+
+.queue-now-status-dot {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background:
+    var(--queue-primary);
+
+  animation:
+    queueStatusPulse
+    1.8s infinite;
+}
+
+.queue-now-helper {
+  margin-top: 13px;
+
+  color:
+    var(--queue-muted) !important;
+
+  font-size:
+    clamp(9px, 0.7vw, 11px);
+
+  text-align: center;
+}
+
+/* =========================================================
+   NEXT PANEL
+========================================================= */
+
+.queue-next-summary {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+}
+
+.queue-next-summary-ready,
+.queue-next-summary-total {
+  padding: 6px 9px;
+
+  border-radius: 8px;
+
+  font-size: 8px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.05em;
+}
+
+.queue-next-summary-ready {
+  display: flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  background:
+    var(--queue-yellow-soft);
+
+  color:
+    var(--queue-yellow);
+}
+
+.queue-next-summary-ready
+  span {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background:
+    var(--queue-yellow);
+}
+
+.queue-next-summary-total {
+  background:
+    rgba(255, 255, 255, 0.05);
+
+  color:
+    var(--queue-text-soft);
+}
+
+.queue-next-body {
+  padding:
+    clamp(12px, 1.2vw, 19px);
+}
+
+.queue-next-grid {
+  height: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap:
+    clamp(8px, 0.8vw, 13px);
+}
+
+.queue-next-item {
+  min-height:
+    clamp(115px, 15vh, 165px);
+
+  position: relative;
+
+  padding:
+    clamp(10px, 0.9vw, 14px);
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  border-radius:
+    clamp(13px, 1vw, 18px);
+
+  border:
+    1px solid
+      rgba(255, 255, 255, 0.07);
+
+  background:
+    rgba(255, 255, 255, 0.025);
 
   overflow: hidden;
 
-  padding: 14px 0;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
 
-  border-top:
-    1px solid
-    rgba(148, 163, 184, 0.22);
+.queue-next-item::before {
+  content: "";
 
-  border-bottom:
-    1px solid
-    rgba(148, 163, 184, 0.22);
+  position: absolute;
+
+  left: 18%;
+  right: 18%;
+  top: 0;
+
+  height: 2px;
+
+  border-radius: 999px;
 
   background:
-    rgba(255, 255, 255, 0.88);
+    rgba(255, 255, 255, 0.08);
+}
+
+.queue-next-item-first {
+  border-color:
+    rgba(245, 196, 81, 0.42);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(245, 196, 81, 0.14),
+      rgba(245, 196, 81, 0.035)
+    );
 
   box-shadow:
-    0 -8px 28px
-    rgba(15, 23, 42, 0.06);
+    inset 0 0 40px
+      rgba(245, 196, 81, 0.025);
+}
 
-  backdrop-filter: blur(14px);
+.queue-next-item-first::before {
+  background:
+    var(--queue-yellow);
+}
+
+.queue-next-item-second {
+  border-color:
+    rgba(56, 189, 248, 0.26);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(56, 189, 248, 0.095),
+      rgba(56, 189, 248, 0.025)
+    );
+}
+
+.queue-next-item-second::before {
+  background:
+    var(--queue-primary);
+}
+
+.queue-next-item-empty {
+  opacity: 0.43;
+}
+
+.queue-next-item-top {
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 5px;
+}
+
+.queue-next-position {
+  color:
+    var(--queue-muted);
+
+  font-size:
+    clamp(7px, 0.56vw, 9px);
+
+  font-weight: 800;
+
+  letter-spacing: 0.11em;
+}
+
+.queue-ready-pill {
+  padding: 3px 6px;
+
+  border-radius: 999px;
+
+  background:
+    var(--queue-yellow);
+
+  color: #342600;
+
+  font-size: 6px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.07em;
+}
+
+.queue-next-item-second
+  .queue-ready-pill {
+  background:
+    var(--queue-primary);
+
+  color: #03273a;
+}
+
+.queue-next-number {
+  margin: auto 0;
+
+  color: #ffffff;
+
+  font-size:
+    clamp(37px, 3.8vw, 66px);
+
+  font-weight: 850;
+
+  line-height: 1;
+
+  letter-spacing: -0.055em;
+
+  font-variant-numeric:
+    tabular-nums;
+}
+
+.queue-next-item-first
+  .queue-next-number {
+  color:
+    var(--queue-yellow);
+}
+
+.queue-next-item-second
+  .queue-next-number {
+  color:
+    var(--queue-primary);
+}
+
+.queue-next-item-footer {
+  min-height: 18px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 5px;
+
+  color:
+    var(--queue-muted);
+
+  font-size:
+    clamp(6px, 0.53vw, 8px);
+
+  font-weight: 800;
+
+  letter-spacing: 0.055em;
+
+  text-align: center;
+}
+
+.queue-next-item-first
+  .queue-next-item-footer {
+  color:
+    var(--queue-yellow);
+}
+
+.queue-next-item-second
+  .queue-next-item-footer {
+  color:
+    var(--queue-primary);
+}
+
+.queue-ready-dot {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background:
+    currentColor;
+
+  animation:
+    queueStatusPulse
+    1.7s infinite;
+}
+
+/* =========================================================
+   COMPLETED
+========================================================= */
+
+.queue-completed-body {
+  padding:
+    clamp(18px, 1.8vw, 30px);
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+}
+
+.queue-completed-label {
+  margin-bottom: 17px;
+
+  color:
+    var(--queue-muted) !important;
+
+  font-size:
+    clamp(9px, 0.7vw, 12px);
+
+  text-align: center;
+}
+
+.queue-completed-number-ring {
+  width:
+    clamp(132px, 11vw, 185px);
+
+  aspect-ratio: 1;
+
+  display: grid;
+
+  place-items: center;
+
+  border-radius: 50%;
+
+  border:
+    2px solid
+      rgba(34, 197, 94, 0.37);
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(34, 197, 94, 0.11),
+      rgba(34, 197, 94, 0.025)
+    );
+
+  box-shadow:
+    0 0 0 10px
+      rgba(34, 197, 94, 0.035);
+}
+
+.queue-completed-number {
+  color:
+    var(--queue-green);
+
+  font-size:
+    clamp(52px, 5vw, 82px);
+
+  line-height: 1;
+
+  font-weight: 850;
+
+  letter-spacing: -0.06em;
+}
+
+.queue-completed-status {
+  margin-top: 21px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  color:
+    var(--queue-green);
+
+  font-size:
+    clamp(8px, 0.7vw, 11px);
+
+  font-weight: 850;
+
+  letter-spacing: 0.06em;
+}
+
+.queue-completed-helper {
+  margin-top: 10px;
+
+  color:
+    var(--queue-muted) !important;
+
+  font-size:
+    clamp(9px, 0.7vw, 11px);
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.queue-empty-state {
+  width: 100%;
+
+  height: 100%;
+
+  min-height: 230px;
+
+  padding: 26px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+}
+
+.queue-empty-icon {
+  width: 62px;
+  height: 62px;
+
+  margin-bottom: 16px;
+
+  display: grid;
+
+  place-items: center;
+
+  border-radius: 18px;
+
+  background:
+    rgba(255, 255, 255, 0.035);
+
+  border:
+    1px solid
+      var(--queue-border);
+
+  color:
+    var(--queue-muted);
+
+  font-size: 25px;
+}
+
+.queue-empty-title {
+  color:
+    var(--queue-text-soft) !important;
+
+  font-size:
+    clamp(13px, 1vw, 16px);
+
+  font-weight: 700;
+}
+
+.queue-empty-description {
+  max-width: 260px;
+
+  margin-top: 7px;
+
+  color:
+    var(--queue-muted) !important;
+
+  font-size:
+    clamp(9px, 0.7vw, 11px);
+
+  line-height: 1.5;
+}
+
+/* =========================================================
+   BOTTOM SECTION
+========================================================= */
+
+.queue-bottom-section {
+  position: relative;
+
+  z-index: 2;
+
+  margin:
+    0
+    clamp(22px, 2.2vw, 42px);
+
+  min-height: 94px;
+
+  display: grid;
+
+  grid-template-columns:
+    150px
+    minmax(0, 1fr);
+
+  border:
+    1px solid var(--queue-border);
+
+  border-radius: 18px;
+
+  background:
+    rgba(10, 22, 36, 0.88);
+
+  overflow: hidden;
+
+  box-shadow:
+    0 20px 50px
+      rgba(0, 0, 0, 0.13);
+}
+
+.queue-bottom-title {
+  position: relative;
+
+  z-index: 3;
+
+  padding: 14px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  border-right:
+    1px solid var(--queue-border);
+
+  background:
+    rgba(255, 255, 255, 0.025);
+}
+
+.queue-bottom-title-icon {
+  width: 34px;
+  height: 34px;
+
+  flex: 0 0 auto;
+
+  display: grid;
+
+  place-items: center;
+
+  border-radius: 10px;
+
+  background:
+    var(--queue-primary-soft);
+
+  color:
+    var(--queue-primary);
+
+  font-size: 14px;
+}
+
+.queue-bottom-title
+  > div:last-child {
+  min-width: 0;
+}
+
+.queue-bottom-title span {
+  display: block;
+
+  color: #ffffff;
+
+  font-size: 9px;
+
+  font-weight: 850;
+
+  letter-spacing: 0.08em;
+}
+
+.queue-bottom-title small {
+  display: block;
+
+  margin-top: 3px;
+
+  color:
+    var(--queue-muted);
+
+  font-size: 7px;
+
+  line-height: 1.25;
+}
+
+/* =========================================================
+   SCROLLER
+========================================================= */
+
+.queue-scroller-viewport {
+  position: relative;
+
+  min-width: 0;
+
+  overflow: hidden;
 }
 
 .queue-scroller-track {
   width: max-content;
 
+  height: 100%;
+
   display: flex;
 
+  align-items: center;
+
   animation:
-    queue-horizontal-scroll
+    queueScrollerMove
     var(
       --queue-scroll-duration,
       30s
     )
-    linear infinite;
+    linear
+    infinite;
 
   will-change: transform;
 }
 
 .queue-scroller-set {
   display: flex;
-  align-items: stretch;
 
-  gap: 15px;
+  align-items: center;
 
-  padding-right: 15px;
+  gap: 11px;
+
+  padding:
+    10px 5px;
+
+  padding-right: 11px;
 }
+
+.queue-scroller-fade {
+  position: absolute;
+
+  z-index: 5;
+
+  top: 0;
+  bottom: 0;
+
+  width: 42px;
+
+  pointer-events: none;
+}
+
+.queue-scroller-fade-left {
+  left: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      #0b1726,
+      transparent
+    );
+}
+
+.queue-scroller-fade-right {
+  right: 0;
+
+  background:
+    linear-gradient(
+      -90deg,
+      #0b1726,
+      transparent
+    );
+}
+
+/* =========================================================
+   SCROLLER ITEM
+========================================================= */
 
 .queue-scroller-item {
-  position: relative;
+  height: 66px;
 
   min-width: 118px;
-  min-height: 92px;
+
+  padding: 8px 11px;
 
   display: flex;
-  flex-direction: column;
+
   align-items: center;
-  justify-content: center;
 
-  gap: 5px;
-
-  padding: 12px 14px;
-
-  overflow: hidden;
+  gap: 9px;
 
   border:
-    2px solid #dbe7f3;
+    1px solid var(--queue-border);
 
-  border-radius: 20px;
+  border-radius: 13px;
 
-  background: #ffffff;
+  background:
+    rgba(255, 255, 255, 0.025);
 
-  box-shadow:
-    0 8px 22px
-    rgba(15, 23, 42, 0.08);
-}
-
-.queue-scroller-status.ant-typography {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  gap: 5px;
-
-  margin: 0;
-
-  color: #64748b;
-
-  font-size: 10px;
-  font-weight: 800;
-
-  letter-spacing: 0.06em;
-
-  text-transform: uppercase;
-}
-
-.queue-scroller-status
-  .anticon {
-  font-size: 12px;
+  white-space: nowrap;
 }
 
 .queue-scroller-number {
-  color: #0f172a;
+  width: 46px;
 
-  font-size: 34px;
-  font-weight: 900;
+  color: #ffffff;
+
+  font-size: 27px;
+
+  font-weight: 850;
+
   line-height: 1;
+
+  letter-spacing: -0.05em;
 
   font-variant-numeric:
     tabular-nums;
 }
 
-/* ========================================================
-   Ticker status colors
-======================================================== */
-
-.queue-scroller-item-pending {
-  border-color: #cbd5e1;
-  background: #f8fafc;
-}
-
-.queue-scroller-item-pending
-  .queue-scroller-status {
-  color: #64748b;
-}
-
-.queue-scroller-item-checked-in {
-  border-color: #7dd3fc;
-  background: #f0f9ff;
-}
-
-.queue-scroller-item-checked-in
-  .queue-scroller-status {
-  color: #0369a1;
-}
-
-.queue-scroller-item-in-treatment {
-  border-color: #93c5fd;
-  background: #eff6ff;
-}
-
-.queue-scroller-item-in-treatment
-  .queue-scroller-status {
-  color: #1d4ed8;
-}
-
-.queue-scroller-item-treatment-done {
-  border-color: #86efac;
-  background: #f0fdf4;
-}
-
-.queue-scroller-item-treatment-done
-  .queue-scroller-status {
-  color: #15803d;
-}
-
-.queue-scroller-item-cancelled {
-  border-color: #fda4af;
-  background: #fff1f2;
-}
-
-.queue-scroller-item-cancelled
-  .queue-scroller-status {
-  color: #be123c;
-}
-
-/* ========================================================
-   Highlighted ticker items
-======================================================== */
-
-.queue-scroller-item-highlighted {
-  min-width: 142px;
-
-  padding-top: 28px;
-
-  transform: translateY(-2px);
-
-  box-shadow:
-    0 12px 28px
-    rgba(15, 23, 42, 0.16);
-}
-
-.queue-scroller-item-current-treatment {
-  border-color: #1677ff;
-
-  background:
-    linear-gradient(
-      145deg,
-      #eff6ff,
-      #dbeafe
-    );
-}
-
-.queue-scroller-item-ready-patient {
-  border-color: #f59e0b;
-
-  background:
-    linear-gradient(
-      145deg,
-      #fffbeb,
-      #fef3c7
-    );
-}
-
-.queue-scroller-highlight-badge {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-
-  min-height: 23px;
-
+.queue-scroller-information {
   display: flex;
-  align-items: center;
+
+  flex-direction: column;
+
   justify-content: center;
 
-  padding: 4px 7px;
+  gap: 3px;
+}
+
+.queue-scroller-status,
+.queue-scroller-special-label {
+  display: flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  color:
+    var(--queue-text-soft);
+
+  font-size: 7px;
+
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.05em;
+}
+
+.queue-scroller-duration {
+  color:
+    var(--queue-yellow);
+
+  font-size: 8px;
+
+  font-weight: 800;
+
+  font-variant-numeric:
+    tabular-nums;
+}
+
+/* Serving */
+
+.queue-scroller-item-serving {
+  border-color:
+    rgba(56, 189, 248, 0.32);
+
+  background:
+    rgba(56, 189, 248, 0.09);
+}
+
+.queue-scroller-item-serving
+  .queue-scroller-number,
+.queue-scroller-item-serving
+  .queue-scroller-special-label {
+  color:
+    var(--queue-primary);
+}
+
+/* NEXT 1 */
+
+.queue-scroller-item-next-one {
+  border-color:
+    rgba(245, 196, 81, 0.34);
+
+  background:
+    rgba(245, 196, 81, 0.09);
+}
+
+.queue-scroller-item-next-one
+  .queue-scroller-number,
+.queue-scroller-item-next-one
+  .queue-scroller-special-label {
+  color:
+    var(--queue-yellow);
+}
+
+/* NEXT 2 */
+
+.queue-scroller-item-next-two {
+  border-color:
+    rgba(56, 189, 248, 0.23);
+
+  background:
+    rgba(56, 189, 248, 0.055);
+}
+
+.queue-scroller-item-next-two
+  .queue-scroller-number,
+.queue-scroller-item-next-two
+  .queue-scroller-special-label {
+  color:
+    #7dd3fc;
+}
+
+/* Waiting */
+
+.queue-scroller-item-waiting {
+  border-color:
+    rgba(251, 146, 60, 0.23);
+
+  background:
+    rgba(251, 146, 60, 0.055);
+}
+
+.queue-scroller-item-waiting
+  .queue-scroller-status {
+  color:
+    var(--queue-orange);
+}
+
+.queue-scroller-ready-dot {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background:
+    currentColor;
+
+  animation:
+    queueStatusPulse
+    1.8s infinite;
+}
+
+.queue-scroller-empty {
+  width: 100%;
+
+  height: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  color:
+    var(--queue-muted);
+
+  font-size: 10px;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.queue-display-footer {
+  position: relative;
+
+  z-index: 2;
+
+  min-height: 38px;
+
+  padding:
+    8px
+    clamp(22px, 2.2vw, 42px);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 9px;
+
+  color:
+    rgba(148, 163, 184, 0.75);
+
+  font-size:
+    clamp(8px, 0.63vw, 10px);
+
+  text-align: center;
+}
+
+.queue-display-footer-divider {
+  color:
+    rgba(56, 189, 248, 0.65);
+}
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.queue-display-loading {
+  min-height: 500px;
+
+  display: grid;
+
+  place-items: center;
+}
+
+.queue-display-loading-box {
+  padding: 36px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  text-align: center;
+}
+
+.queue-display-loading-title {
+  margin-top: 18px;
 
   color: #ffffff;
 
-  font-size: 9px;
-  font-weight: 900;
+  font-size: 16px;
 
-  letter-spacing: 0.08em;
+  font-weight: 700;
 }
 
-.queue-scroller-treatment-badge {
-  background:
-    linear-gradient(
-      90deg,
-      #0958d9,
-      #1677ff
-    );
+.queue-display-loading-subtitle {
+  margin-top: 6px;
+
+  color:
+    var(--queue-muted);
+
+  font-size: 11px;
 }
 
-.queue-scroller-ready-badge {
-  background:
-    linear-gradient(
-      90deg,
-      #b45309,
-      #f59e0b
-    );
-}
+/* =========================================================
+   ANIMATIONS
+========================================================= */
 
-.queue-scroller-item-current-treatment
-  .queue-scroller-number {
-  color: #0958d9;
-}
-
-.queue-scroller-item-ready-patient
-  .queue-scroller-number {
-  color: #b45309;
-}
-
-/* ========================================================
-   Empty ticker
-======================================================== */
-
-.queue-scroller-empty {
-  min-height: 82px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  gap: 10px;
-
-  color: #64748b;
-}
-
-.queue-scroller-empty
-  .anticon {
-  font-size: 22px;
-}
-
-.queue-scroller-empty
-  .ant-typography {
-  color: #64748b;
-
-  font-size: 15px;
-  font-weight: 650;
-}
-
-/* ========================================================
-   Animations
-======================================================== */
-
-@keyframes queue-live-pulse {
+@keyframes queueStatusPulse {
   0%,
   100% {
     opacity: 1;
+
     transform: scale(1);
   }
 
   50% {
-    opacity: 0.68;
-    transform: scale(0.84);
+    opacity: 0.55;
+
+    transform: scale(0.82);
   }
 }
 
-@keyframes queue-horizontal-scroll {
+@keyframes queueScrollerMove {
   from {
     transform: translateX(0);
   }
@@ -1112,180 +2284,83 @@
   }
 }
 
-/* ========================================================
-   Large screens
-======================================================== */
+/* =========================================================
+   RESPONSIVE - 1366px LAPTOP
+========================================================= */
 
-@media (min-width: 1600px) {
+@media (max-width: 1450px) {
   .queue-display-header {
-    min-height: 148px;
+    min-height: 102px;
 
-    padding:
-      28px 54px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  .queue-display-overview {
+    min-height: 66px;
   }
 
   .queue-display-main {
-    gap: 28px;
+    padding-top: 13px;
+    padding-bottom: 13px;
 
-    padding:
-      32px 46px 28px;
+    grid-template-columns:
+      minmax(220px, 0.95fr)
+      minmax(470px, 1.8fr)
+      minmax(220px, 0.95fr);
   }
 
-  .queue-patient-panel {
-    min-height: 440px;
+  .queue-card {
+    min-height: 355px;
   }
 
-  .queue-patient-panel-header {
-    min-height: 108px;
-
-    padding: 22px 26px;
+  .queue-next-item {
+    min-height: 112px;
   }
 
-  .queue-panel-icon {
-    width: 66px;
-    height: 66px;
-
-    flex-basis: 66px;
-
-    font-size: 31px;
-  }
-
-  .queue-patient-panel-body {
-    padding: 28px;
+  .queue-bottom-section {
+    min-height: 82px;
   }
 
   .queue-scroller-item {
-    min-width: 132px;
-    min-height: 100px;
+    height: 58px;
   }
 }
 
-/* ========================================================
-   Medium screens
-======================================================== */
+/* =========================================================
+   MEDIUM SCREENS
+========================================================= */
 
-@media (max-width: 1200px) {
-  .queue-display-header {
-    padding: 22px 28px;
-  }
-
-  .queue-display-main {
-    gap: 16px;
-
-    padding:
-      20px 22px;
-  }
-
-  .queue-patient-panel {
-    min-height: 360px;
-  }
-
-  .queue-patient-panel-header {
-    min-height: 86px;
-
-    padding: 16px 17px;
-  }
-
-  .queue-panel-icon {
-    width: 50px;
-    height: 50px;
-
-    flex-basis: 50px;
-
-    border-radius: 15px;
-
-    font-size: 23px;
-  }
-
-  .queue-patient-panel-body {
-    padding: 18px 15px;
-  }
-
-  .queue-number-circle {
-    width: 132px;
-    height: 132px;
-  }
-}
-/* ========================================================
-   Waiting ticker item
-======================================================== */
-
-.queue-scroller-item-waiting {
-  border-color: #ef4444;
-  background:
-    radial-gradient(
-      circle at top right,
-      rgba(239, 68, 68, 0.22),
-      transparent 42%
-    ),
-    linear-gradient(
-      145deg,
-      #fff1f2,
-      #ffffff
-    );
-  box-shadow:
-    0 10px 24px rgba(239, 68, 68, 0.18),
-    inset 4px 0 0 #ef4444;
-}
-
-.queue-scroller-item-waiting
-  .queue-scroller-number {
-  
-  color: #d80808;
-  box-shadow: 0 8px 18px rgba(239, 68, 68, 0.28);
-}
-
-.queue-scroller-waiting-content {
-  display: flex;
-  min-width: 100px;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 2px;
-}
-
-.queue-scroller-waiting-status {
-  color: #dc2626 !important;
-  font-weight: 900 !important;
-  letter-spacing: 0.05em;
-}
-
-.queue-scroller-waiting-time {
-  color: #991b1b !important;
-  font-size: 10px;
-  font-weight: 750;
-  white-space: nowrap;
-}
-/* ========================================================
-   Tablet
-======================================================== */
-
-@media (max-width: 980px) {
+@media (max-width: 1180px) {
   .queue-display-page {
     overflow-y: auto;
   }
 
-  .queue-display-page-fullscreen {
-    position: fixed;
-
-    overflow-y: auto;
-  }
-
   .queue-display-header {
-    align-items: flex-start;
+    flex-direction: column;
 
-    padding: 20px 22px;
+    align-items: stretch;
   }
 
-  .queue-display-brand-icon {
-    width: 62px;
-    height: 62px;
+  .queue-display-header-right {
+    justify-content: space-between;
+  }
 
-    flex-basis: 62px;
+  .queue-display-overview {
+    grid-template-columns:
+      1fr
+      auto;
+  }
 
-    border-radius: 19px;
+  .queue-header-statistics {
+    grid-column:
+      1 / -1;
 
-    font-size: 30px;
+    order: 3;
+  }
+
+  .queue-system-status {
+    justify-self: end;
   }
 
   .queue-display-main {
@@ -1293,152 +2368,218 @@
       repeat(2, minmax(0, 1fr));
   }
 
-  .queue-completed-panel {
-    grid-column: 1 / -1;
+  .queue-card-next {
+    grid-column:
+      1 / -1;
+
+    order: 3;
   }
 
-  .queue-completed-panel
-    .queue-patient-panel-body {
-    min-height: 280px;
+  .queue-card-now {
+    order: 1;
+  }
+
+  .queue-card-completed {
+    order: 2;
+  }
+
+  .queue-next-grid {
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
   }
 }
 
-/* ========================================================
-   Mobile
-======================================================== */
+/* =========================================================
+   TABLET
+========================================================= */
 
-@media (max-width: 700px) {
-  .queue-display-header {
+@media (max-width: 820px) {
+  .queue-display-header-right {
     flex-direction: column;
-
-    gap: 17px;
   }
 
-  .queue-display-date-time {
+  .queue-doctor-status-card,
+  .queue-header-clock {
     width: 100%;
 
+    min-width: 0;
+  }
+
+  .queue-header-clock {
     align-items: flex-start;
-
-    text-align: left;
   }
 
-  .queue-display-date {
-    justify-content: flex-start;
+  .queue-display-overview {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: stretch;
   }
 
-  .queue-display-live-status {
-    align-self: flex-start;
+  .queue-header-statistics {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .queue-system-status {
+    justify-self: auto;
+  }
+
+  .queue-doctor-waiting-banner-content {
+    flex-direction: column;
+
+    gap: 2px;
   }
 
   .queue-display-main {
-    grid-template-columns: 1fr;
-
-    padding: 16px;
+    grid-template-columns:
+      1fr;
   }
 
-  .queue-completed-panel {
+  .queue-card-next {
     grid-column: auto;
   }
 
-  .queue-patient-panel {
-    min-height: 365px;
+  .queue-next-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
   }
 
-  .queue-bottom-scroller {
-    padding-bottom: 10px;
+  .queue-bottom-section {
+    grid-template-columns: 1fr;
   }
 
-  .queue-scroller-item {
-    min-width: 105px;
-  }
+  .queue-bottom-title {
+    border-right: 0;
 
-  .queue-scroller-item-highlighted {
-    min-width: 130px;
+    border-bottom:
+      1px solid var(--queue-border);
   }
 }
 
-/* ========================================================
-   Very small mobile
-======================================================== */
+/* =========================================================
+   MOBILE / VERY SMALL EMBEDDED DISPLAY
+========================================================= */
 
-@media (max-width: 430px) {
+@media (max-width: 520px) {
+  .queue-display-header,
+  .queue-display-overview,
+  .queue-display-main,
+  .queue-display-footer {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .queue-doctor-waiting-banner,
+  .queue-display-error,
+  .queue-bottom-section {
+    margin-left: 14px;
+    margin-right: 14px;
+  }
+
+  .queue-display-brand-section {
+    align-items: flex-start;
+  }
+
+  .queue-display-logo {
+    width: 50px;
+    height: 50px;
+
+    border-radius: 15px;
+  }
+
+  .queue-header-statistics {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .queue-header-stat {
+    min-width: 0;
+  }
+
+  .queue-next-grid {
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .queue-next-item {
+    min-height: 120px;
+  }
+
+  .queue-display-footer-divider {
+    display: none;
+  }
+
+  .queue-display-footer {
+    flex-direction: column;
+
+    gap: 1px;
+  }
+}
+
+/* =========================================================
+   LARGE TV / 2K / 4K
+========================================================= */
+
+@media (min-width: 1900px) {
   .queue-display-header {
-    padding: 17px 15px;
+    min-height: 135px;
   }
 
-  .queue-display-brand {
-    gap: 12px;
-  }
-
-  .queue-display-brand-icon {
-    width: 52px;
-    height: 52px;
-
-    flex-basis: 52px;
-
-    border-radius: 16px;
-
-    font-size: 25px;
-  }
-
-  .queue-display-eyebrow.ant-typography {
-    font-size: 10px;
-  }
-
-  .queue-display-title.ant-typography {
-    font-size: 25px;
-  }
-
-  .queue-display-subtitle.ant-typography {
-    font-size: 12px;
-  }
-
-  .queue-display-time {
-    font-size: 32px;
+  .queue-display-overview {
+    min-height: 84px;
   }
 
   .queue-display-main {
-    padding: 12px;
-
-    gap: 13px;
+    gap: 24px;
   }
 
-  .queue-patient-panel {
-    min-height: 345px;
-
-    border-radius: 21px;
+  .queue-card {
+    min-height: 540px;
   }
 
-  .queue-number-circle {
-    width: 128px;
-    height: 128px;
-
-    border-width: 7px;
+  .queue-next-grid {
+    gap: 15px;
   }
 
-  .queue-number-circle span {
-    font-size: 58px;
+  .queue-next-item {
+    min-height: 185px;
+  }
+
+  .queue-bottom-section {
+    min-height: 110px;
+  }
+
+  .queue-scroller-item {
+    height: 76px;
+
+    min-width: 145px;
+  }
+
+  .queue-scroller-number {
+    font-size: 34px;
   }
 }
 
-/* ========================================================
-   Reduced motion
-======================================================== */
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
 
 @media (
   prefers-reduced-motion:
     reduce
 ) {
-  .queue-display-live-dot,
-  .queue-scroller-track {
-    animation: none;
-  }
-
-  .queue-scroller-track {
-    transform: none;
-  }
-
-  .queue-scroller-viewport {
-    overflow-x: auto;
+  .queue-scroller-track,
+  .queue-doctor-status-indicator,
+  .queue-card-live-badge span,
+  .queue-now-status-dot,
+  .queue-ready-dot,
+  .queue-scroller-ready-dot,
+  .queue-system-status-dot {
+    animation: none !important;
   }
 }

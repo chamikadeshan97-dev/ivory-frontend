@@ -26,6 +26,11 @@ import CommonTreatments from "./pages/CommonTreatments";
 import Drugs from "./pages/Drugs";
 import SimpleAppointmentMaintenance from "./pages/SimpleAppointmentMaintenance";
 import Locations from "./pages/Locations";
+import QueueManager from "./pages/QueueManager";
+import PatientQueueDisplay from "./pages/PatientQueueDisplay";
+import PatientMediaUpload from "./pages/PatientMediaUpload";
+import PatientMediaLibrary from "./pages/PatientMediaLibrary";
+import SMSManagement from "./pages/SMSManagement";
 /* --------------------------------------------------------
    Layout wrapper
 -------------------------------------------------------- */
@@ -229,7 +234,7 @@ const App = () => {
           </RoleRoute>
         }
       />
-  <Route
+      <Route
         path="/locations"
         element={
           <RoleRoute allowedRoles={["Admin"]}>
@@ -240,11 +245,53 @@ const App = () => {
         }
       />
       <Route
+        path="/queue-manager"
+        element={
+          <RoleRoute allowedRoles={["Admin"]}>
+            <LayoutPage>
+              <QueueManager />
+            </LayoutPage>
+          </RoleRoute>
+        }
+      />
+      <Route path="/patient-queue" element={<PatientQueueDisplay />} />
+      <Route
         path="/drugs"
         element={
           <RoleRoute allowedRoles={["Admin"]}>
             <LayoutPage>
               <Drugs />
+            </LayoutPage>
+          </RoleRoute>
+        }
+      />
+      <Route
+        path="/sms-management"
+        element={
+          <RoleRoute allowedRoles={["Admin"]}>
+            <LayoutPage>
+              <SMSManagement />
+            </LayoutPage>
+          </RoleRoute>
+        }
+      />
+
+      <Route
+        path="/patient-media-upload"
+        element={
+          <RoleRoute allowedRoles={["Admin", "Dentist"]}>
+            <LayoutPage>
+              <PatientMediaUpload />
+            </LayoutPage>
+          </RoleRoute>
+        }
+      />
+      <Route
+        path="/patient-media"
+        element={
+          <RoleRoute allowedRoles={["Admin", "Dentist"]}>
+            <LayoutPage>
+              <PatientMediaLibrary />
             </LayoutPage>
           </RoleRoute>
         }

@@ -1,4 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import { Spin, Typography } from "antd";
 
@@ -8,17 +13,24 @@ import {
   ClockCircleOutlined,
   CloseCircleOutlined,
   MedicineBoxOutlined,
+  SafetyCertificateOutlined,
+  TeamOutlined,
   UserOutlined,
+  WifiOutlined,
 } from "@ant-design/icons";
 
-import { getAllWaitingRecords, getAppointmentsByDate } from "../api/endPoints";
+import {
+  getAllWaitingRecords,
+  getAppointmentsByDate,
+  getDoctorArrivalStatus,
+} from "../api/endPoints";
 
 import "./css/QueueDisplay.css";
 
 const { Title, Text } = Typography;
 
 /* ========================================================
-   Status configuration
+   CONFIGURATION
 ======================================================== */
 
 const TREATMENT_COMPLETED_STATUSES = [
@@ -41,29 +53,49 @@ const VISIBLE_STATUSES = [
 
 const LOCKED_PATIENT_COUNT = 2;
 
-const READY_PATIENT_STORAGE_PREFIX = "queue-display-ready-patient";
+const DISPLAY_NEXT_PATIENT_COUNT = 8;
+
+const READY_PATIENT_STORAGE_PREFIX =
+  "queue-display-ready-patient";
 
 /* ========================================================
-   General helpers
+   GENERAL HELPERS
 ======================================================== */
 
-const normalizeStatus = (status) => {
-  return String(status || "")
+const normalizeStatus = (status) =>
+  String(status || "")
     .trim()
     .toLowerCase();
-};
 
 const normalizeIdentifier = (value) => {
-  if (value === null || value === undefined || value === "") {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
     return null;
   }
 
   return String(value).trim();
 };
 
-const getAppointmentId = (appointment) => {
-  return normalizeIdentifier(appointment?.appointment_id ?? appointment?.id);
+const convertToBoolean = (value) => {
+  if (value === true || value === 1) {
+    return true;
+  }
+
+  return ["true", "yes", "1"].includes(
+    String(value ?? "")
+      .trim()
+      .toLowerCase(),
+  );
 };
+
+const getAppointmentId = (appointment) =>
+  normalizeIdentifier(
+    appointment?.appointment_id ??
+      appointment?.id,
+  );
 
 const getAppointmentNumber = (appointment) => {
   const appointmentNumber =
@@ -76,87 +108,149 @@ const getAppointmentNumber = (appointment) => {
     appointmentNumber === undefined ||
     appointmentNumber === ""
   ) {
-    return "-";
+    return "--";
   }
 
-  return appointmentNumber;
+  return String(appointmentNumber).padStart(
+    2,
+    "0",
+  );
 };
 
-const getNumericAppointmentNumber = (appointment) => {
-  const appointmentNumber = Number(getAppointmentNumber(appointment));
+const getNumericAppointmentNumber = (
+  appointment,
+) => {
+  const number = Number(
+    appointment?.appointment_number ??
+      appointment?.queue_number ??
+      appointment?.number,
+  );
 
-  if (!Number.isFinite(appointmentNumber)) {
-    return Number.MAX_SAFE_INTEGER;
-  }
-
-  return appointmentNumber;
+  return Number.isFinite(number)
+    ? number
+    : Number.MAX_SAFE_INTEGER;
 };
+
+/* ========================================================
+   DATE / TIME HELPERS
+======================================================== */
 
 const formatDateForApi = (date) => {
   const year = date.getFullYear();
 
-  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const month = String(
+    date.getMonth() + 1,
+  ).padStart(2, "0");
 
-  const day = String(date.getDate()).padStart(2, "0");
+  const day = String(
+    date.getDate(),
+  ).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
 };
 
-const formatDisplayDate = (date) => {
-  return new Intl.DateTimeFormat("en-GB", {
+const formatDisplayDate = (date) =>
+  new Intl.DateTimeFormat("en-GB", {
     weekday: "long",
     day: "2-digit",
     month: "long",
     year: "numeric",
   }).format(date);
-};
 
-const formatDisplayTime = (date) => {
-  return new Intl.DateTimeFormat("en-GB", {
+const formatDisplayTime = (date) =>
+  new Intl.DateTimeFormat("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
     hour12: true,
   }).format(date);
+
+const formatArrivalTime = (value) => {
+  if (!value) {
+    return "";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  }).format(date);
 };
 
-const formatWaitingDuration = (startTime, currentTime = new Date()) => {
+const formatWaitingDuration = (
+  startTime,
+  currentTime = new Date(),
+) => {
   if (!startTime) {
     return "00:00";
   }
 
-  const normalizedValue = String(startTime).trim();
+  const normalized =
+    String(startTime).trim();
 
   let parsedStartTime = null;
 
-  const timeOnlyMatch = normalizedValue.match(
+  const timeOnlyMatch = normalized.match(
     /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?$/i,
   );
 
   if (timeOnlyMatch) {
-    let hours = Number(timeOnlyMatch[1]);
+    let hours = Number(
+      timeOnlyMatch[1],
+    );
 
-    const minutes = Number(timeOnlyMatch[2]);
+    const minutes = Number(
+      timeOnlyMatch[2],
+    );
 
-    const seconds = Number(timeOnlyMatch[3] || 0);
+    const seconds = Number(
+      timeOnlyMatch[3] || 0,
+    );
 
-    const meridiem = String(timeOnlyMatch[4] || "").toUpperCase();
+    const meridiem = String(
+      timeOnlyMatch[4] || "",
+    ).toUpperCase();
 
-    if (meridiem === "AM" && hours === 12) {
+    if (
+      meridiem === "AM" &&
+      hours === 12
+    ) {
       hours = 0;
     }
 
-    if (meridiem === "PM" && hours < 12) {
+    if (
+      meridiem === "PM" &&
+      hours < 12
+    ) {
       hours += 12;
     }
 
-    parsedStartTime = new Date(currentTime);
+    parsedStartTime = new Date(
+      currentTime,
+    );
 
-    parsedStartTime.setHours(hours, minutes, seconds, 0);
+    parsedStartTime.setHours(
+      hours,
+      minutes,
+      seconds,
+      0,
+    );
   } else {
-    const parsedDate = new Date(normalizedValue);
+    const parsedDate = new Date(
+      normalized,
+    );
 
-    if (!Number.isNaN(parsedDate.getTime())) {
+    if (
+      !Number.isNaN(
+        parsedDate.getTime(),
+      )
+    ) {
       parsedStartTime = parsedDate;
     }
   }
@@ -165,244 +259,388 @@ const formatWaitingDuration = (startTime, currentTime = new Date()) => {
     return "00:00";
   }
 
-  const elapsedMilliseconds = currentTime.getTime() - parsedStartTime.getTime();
+  const milliseconds =
+    currentTime.getTime() -
+    parsedStartTime.getTime();
 
-  const elapsedSeconds = Math.max(0, Math.floor(elapsedMilliseconds / 1000));
+  const totalSeconds = Math.max(
+    0,
+    Math.floor(milliseconds / 1000),
+  );
 
-  const minutes = Math.floor(elapsedSeconds / 60);
+  const minutes = Math.floor(
+    totalSeconds / 60,
+  );
 
-  const seconds = elapsedSeconds % 60;
+  const seconds =
+    totalSeconds % 60;
 
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
+  return `${String(minutes).padStart(
+    2,
+    "0",
+  )}:${String(seconds).padStart(
     2,
     "0",
   )}`;
 };
 
-const getAppointmentTimeValue = (appointment) => {
-  return appointment?.appointment_time || "";
-};
+/* ========================================================
+   SORTING HELPERS
+======================================================== */
 
-const getCheckedInTimeValue = (appointment) => {
-  return (
-    appointment?.checked_in_time ||
-    appointment?.appointment_time ||
-    appointment?.updated_at ||
-    ""
-  );
-};
+const getAppointmentTimeValue = (
+  appointment,
+) =>
+  appointment?.appointment_time || "";
 
-const getComparableTimeValue = (value) => {
-  const normalizedValue = String(value || "").trim();
+const getCheckedInTimeValue = (
+  appointment,
+) =>
+  appointment?.checked_in_time ||
+  appointment?.appointment_time ||
+  appointment?.updated_at ||
+  "";
 
-  if (!normalizedValue) {
+const getComparableTimeValue = (
+  value,
+) => {
+  const normalized =
+    String(value || "").trim();
+
+  if (!normalized) {
     return Number.MAX_SAFE_INTEGER;
   }
 
-  const timeMatch = normalizedValue.match(
+  const match = normalized.match(
     /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?$/i,
   );
 
-  if (timeMatch) {
-    let hours = Number(timeMatch[1]);
+  if (match) {
+    let hours = Number(match[1]);
 
-    const minutes = Number(timeMatch[2]);
+    const minutes = Number(match[2]);
 
-    const seconds = Number(timeMatch[3] || 0);
+    const seconds = Number(
+      match[3] || 0,
+    );
 
-    const meridiem = String(timeMatch[4] || "").toUpperCase();
+    const meridiem = String(
+      match[4] || "",
+    ).toUpperCase();
 
-    if (meridiem === "AM" && hours === 12) {
+    if (
+      meridiem === "AM" &&
+      hours === 12
+    ) {
       hours = 0;
     }
 
-    if (meridiem === "PM" && hours < 12) {
+    if (
+      meridiem === "PM" &&
+      hours < 12
+    ) {
       hours += 12;
     }
 
-    return hours * 60 * 60 + minutes * 60 + seconds;
+    return (
+      hours * 3600 +
+      minutes * 60 +
+      seconds
+    );
   }
 
-  const dateTimeValue = Date.parse(normalizedValue);
+  const timestamp =
+    Date.parse(normalized);
 
-  if (Number.isFinite(dateTimeValue)) {
-    return dateTimeValue;
+  if (Number.isFinite(timestamp)) {
+    return timestamp;
   }
 
   return Number.MAX_SAFE_INTEGER;
 };
 
-const arraysAreEqual = (firstArray, secondArray) => {
-  if (firstArray.length !== secondArray.length) {
-    return false;
-  }
+const sortCheckedInPatients = (
+  a,
+  b,
+) => {
+  const firstTime =
+    getComparableTimeValue(
+      getCheckedInTimeValue(a),
+    );
 
-  return firstArray.every(
-    (value, index) => String(value) === String(secondArray[index]),
-  );
-};
+  const secondTime =
+    getComparableTimeValue(
+      getCheckedInTimeValue(b),
+    );
 
-const parseLockedPatientIds = (storedValue) => {
-  if (!storedValue) {
-    return [];
-  }
-
-  try {
-    const parsedValue = JSON.parse(storedValue);
-
-    if (Array.isArray(parsedValue)) {
-      return parsedValue
-        .map(normalizeIdentifier)
-        .filter(Boolean)
-        .slice(0, LOCKED_PATIENT_COUNT);
-    }
-
-    const singleValue = normalizeIdentifier(parsedValue);
-
-    return singleValue ? [singleValue] : [];
-  } catch {
-    /*
-     * Backward compatibility for the old storage format,
-     * where one appointment ID was stored as plain text.
-     */
-    const singleValue = normalizeIdentifier(storedValue);
-
-    return singleValue ? [singleValue] : [];
-  }
-};
-
-/* ========================================================
-   Waiting helpers
-======================================================== */
-
-const extractWaitingRecords = (response) => {
-  const responseData = response?.data ?? response;
-
-  if (Array.isArray(responseData)) {
-    return responseData;
-  }
-
-  if (Array.isArray(responseData?.records)) {
-    return responseData.records;
-  }
-
-  if (Array.isArray(responseData?.data)) {
-    return responseData.data;
-  }
-
-  return [];
-};
-
-const getWaitingAppointmentId = (waitingRecord) => {
-  return normalizeIdentifier(
-    waitingRecord?.id ?? waitingRecord?.appointment_id,
-  );
-};
-
-const isActiveWaitingRecord = (waitingRecord) => {
-  const appointmentId = getWaitingAppointmentId(waitingRecord);
-
-  const startTime = String(waitingRecord?.start_time ?? "").trim();
-
-  const endTime = String(waitingRecord?.end_time ?? "").trim();
-
-  return Boolean(appointmentId && startTime && !endTime);
-};
-
-/* ========================================================
-   Sorting helpers
-======================================================== */
-
-const sortCheckedInPatients = (firstAppointment, secondAppointment) => {
-  const firstTime = getComparableTimeValue(
-    getCheckedInTimeValue(firstAppointment),
-  );
-
-  const secondTime = getComparableTimeValue(
-    getCheckedInTimeValue(secondAppointment),
-  );
-
-  const timeComparison = firstTime - secondTime;
-
-  if (timeComparison !== 0) {
-    return timeComparison;
+  if (firstTime !== secondTime) {
+    return firstTime - secondTime;
   }
 
   return (
-    getNumericAppointmentNumber(firstAppointment) -
-    getNumericAppointmentNumber(secondAppointment)
+    getNumericAppointmentNumber(a) -
+    getNumericAppointmentNumber(b)
   );
 };
 
-const sortByAppointmentNumber = (firstAppointment, secondAppointment) => {
+const sortByAppointmentNumber = (
+  a,
+  b,
+) => {
   const numberComparison =
-    getNumericAppointmentNumber(firstAppointment) -
-    getNumericAppointmentNumber(secondAppointment);
+    getNumericAppointmentNumber(a) -
+    getNumericAppointmentNumber(b);
 
   if (numberComparison !== 0) {
     return numberComparison;
   }
 
   return (
-    getComparableTimeValue(getAppointmentTimeValue(firstAppointment)) -
-    getComparableTimeValue(getAppointmentTimeValue(secondAppointment))
+    getComparableTimeValue(
+      getAppointmentTimeValue(a),
+    ) -
+    getComparableTimeValue(
+      getAppointmentTimeValue(b),
+    )
   );
 };
 
 const sortByHighestAppointmentNumber = (
-  firstAppointment,
-  secondAppointment,
+  a,
+  b,
+) =>
+  getNumericAppointmentNumber(b) -
+  getNumericAppointmentNumber(a);
+
+const arraysAreEqual = (
+  firstArray,
+  secondArray,
 ) => {
-  return (
-    getNumericAppointmentNumber(secondAppointment) -
-    getNumericAppointmentNumber(firstAppointment)
+  if (
+    firstArray.length !==
+    secondArray.length
+  ) {
+    return false;
+  }
+
+  return firstArray.every(
+    (value, index) =>
+      String(value) ===
+      String(secondArray[index]),
   );
 };
 
 /* ========================================================
-   Status display helpers
+   LOCK HELPERS
 ======================================================== */
 
-const getDisplayStatus = (appointment, waitingRecord) => {
+const parseLockedPatientIds = (
+  storedValue,
+) => {
+  if (!storedValue) {
+    return [];
+  }
+
+  try {
+    const parsed =
+      JSON.parse(storedValue);
+
+    if (Array.isArray(parsed)) {
+      return parsed
+        .map(normalizeIdentifier)
+        .filter(Boolean)
+        .slice(
+          0,
+          LOCKED_PATIENT_COUNT,
+        );
+    }
+
+    const single =
+      normalizeIdentifier(parsed);
+
+    return single ? [single] : [];
+  } catch {
+    const single =
+      normalizeIdentifier(
+        storedValue,
+      );
+
+    return single ? [single] : [];
+  }
+};
+
+/* ========================================================
+   WAITING HELPERS
+======================================================== */
+
+const extractWaitingRecords = (
+  response,
+) => {
+  const data =
+    response?.data ?? response;
+
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (
+    Array.isArray(data?.records)
+  ) {
+    return data.records;
+  }
+
+  if (Array.isArray(data?.data)) {
+    return data.data;
+  }
+
+  return [];
+};
+
+const getWaitingAppointmentId = (
+  record,
+) =>
+  normalizeIdentifier(
+    record?.appointment_id ??
+      record?.id,
+  );
+
+const isActiveWaitingRecord = (
+  record,
+) => {
+  const appointmentId =
+    getWaitingAppointmentId(record);
+
+  const startTime = String(
+    record?.start_time ?? "",
+  ).trim();
+
+  const endTime = String(
+    record?.end_time ?? "",
+  ).trim();
+
+  return Boolean(
+    appointmentId &&
+      startTime &&
+      !endTime,
+  );
+};
+
+/* ========================================================
+   API RESPONSE HELPERS
+======================================================== */
+
+const extractAppointments = (
+  response,
+) => {
+  const data =
+    response?.data ?? response;
+
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (
+    Array.isArray(
+      data?.appointments,
+    )
+  ) {
+    return data.appointments;
+  }
+
+  if (Array.isArray(data?.data)) {
+    return data.data;
+  }
+
+  return [];
+};
+
+const extractDoctorArrivalRecord = (
+  response,
+) => {
+  const data =
+    response?.data ?? response;
+
+  if (!data) {
+    return null;
+  }
+
+  if (
+    data?.data &&
+    !Array.isArray(data.data)
+  ) {
+    return data.data;
+  }
+
+  if (data?.record) {
+    return data.record;
+  }
+
+  return data;
+};
+
+/* ========================================================
+   STATUS DISPLAY
+======================================================== */
+
+const getDisplayStatus = (
+  appointment,
+  waitingRecord,
+) => {
   if (waitingRecord) {
     return {
       key: "waiting",
       label: "Waiting",
-      IconComponent: ClockCircleOutlined,
-      waitingStartTime: waitingRecord.start_time || "",
+      IconComponent:
+        ClockCircleOutlined,
+      waitingStartTime:
+        waitingRecord.start_time || "",
     };
   }
 
-  const normalizedStatus = normalizeStatus(appointment?.status);
+  const status = normalizeStatus(
+    appointment?.status,
+  );
 
-  if (TREATMENT_COMPLETED_STATUSES.includes(normalizedStatus)) {
+  if (
+    TREATMENT_COMPLETED_STATUSES.includes(
+      status,
+    )
+  ) {
     return {
       key: "treatment-done",
       label: "Done",
-      IconComponent: CheckCircleOutlined,
+      IconComponent:
+        CheckCircleOutlined,
       waitingStartTime: "",
     };
   }
 
-  if (normalizedStatus === "cancelled" || normalizedStatus === "canceled") {
+  if (
+    status === "cancelled" ||
+    status === "canceled"
+  ) {
     return {
       key: "cancelled",
       label: "Cancelled",
-      IconComponent: CloseCircleOutlined,
+      IconComponent:
+        CloseCircleOutlined,
       waitingStartTime: "",
     };
   }
 
-  if (normalizedStatus === "in treatment") {
+  if (
+    status === "in treatment"
+  ) {
     return {
       key: "in-treatment",
       label: "In Treatment",
-      IconComponent: MedicineBoxOutlined,
+      IconComponent:
+        MedicineBoxOutlined,
       waitingStartTime: "",
     };
   }
 
-  if (normalizedStatus === "checked in") {
+  if (status === "checked in") {
     return {
       key: "checked-in",
       label: "Checked In",
@@ -411,177 +649,243 @@ const getDisplayStatus = (appointment, waitingRecord) => {
     };
   }
 
+  if (status === "confirmed") {
+    return {
+      key: "confirmed",
+      label: "Confirmed",
+      IconComponent:
+        ClockCircleOutlined,
+      waitingStartTime: "",
+    };
+  }
+
   return {
     key: "pending",
     label: "Pending",
-    IconComponent: ClockCircleOutlined,
+    IconComponent:
+      ClockCircleOutlined,
     waitingStartTime: "",
   };
 };
 
-const createTickerItems = (appointmentRecords, waitingRecordMap) => {
-  const uniqueAppointments = new Map();
+/* ========================================================
+   TICKER DATA
+======================================================== */
 
-  appointmentRecords.forEach((appointment, index) => {
-    const appointmentNumber = getNumericAppointmentNumber(appointment);
+const createTickerItems = (
+  appointmentRecords,
+  waitingRecordMap,
+) => {
+  const uniqueAppointments =
+    new Map();
 
-    if (appointmentNumber === Number.MAX_SAFE_INTEGER) {
-      return;
-    }
+  appointmentRecords.forEach(
+    (appointment, index) => {
+      const number =
+        getNumericAppointmentNumber(
+          appointment,
+        );
 
-    const appointmentId = getAppointmentId(appointment);
+      if (
+        number ===
+        Number.MAX_SAFE_INTEGER
+      ) {
+        return;
+      }
 
-    const uniqueKey = appointmentId || `${appointmentNumber}-${index}`;
+      const appointmentId =
+        getAppointmentId(
+          appointment,
+        );
 
-    uniqueAppointments.set(uniqueKey, appointment);
-  });
+      const uniqueKey =
+        appointmentId ||
+        `${number}-${index}`;
 
-  return Array.from(uniqueAppointments.values())
+      uniqueAppointments.set(
+        uniqueKey,
+        appointment,
+      );
+    },
+  );
+
+  return Array.from(
+    uniqueAppointments.values(),
+  )
     .map((appointment) => {
-      const appointmentId = getAppointmentId(appointment);
+      const appointmentId =
+        getAppointmentId(
+          appointment,
+        );
 
-      const waitingRecord = appointmentId
-        ? waitingRecordMap.get(appointmentId)
-        : null;
+      const waitingRecord =
+        appointmentId
+          ? waitingRecordMap.get(
+              appointmentId,
+            )
+          : null;
 
-      const displayStatus = getDisplayStatus(appointment, waitingRecord);
+      const status =
+        getDisplayStatus(
+          appointment,
+          waitingRecord,
+        );
 
       return {
         appointmentId,
 
-        appointmentNumber: getNumericAppointmentNumber(appointment),
+        appointmentNumber:
+          getNumericAppointmentNumber(
+            appointment,
+          ),
 
-        statusKey: displayStatus.key,
+        statusKey: status.key,
 
-        statusLabel: displayStatus.label,
+        statusLabel: status.label,
 
-        waitingStartTime: displayStatus.waitingStartTime,
+        waitingStartTime:
+          status.waitingStartTime,
 
-        IconComponent: displayStatus.IconComponent,
+        IconComponent:
+          status.IconComponent,
       };
     })
-    .sort((firstAppointment, secondAppointment) => {
-      return (
-        firstAppointment.appointmentNumber - secondAppointment.appointmentNumber
-      );
-    });
+    .sort(
+      (a, b) =>
+        a.appointmentNumber -
+        b.appointmentNumber,
+    );
 };
 
 /* ========================================================
-   API response helper
+   SMALL UI COMPONENTS
 ======================================================== */
 
-const extractAppointments = (response) => {
-  const responseData = response?.data ?? response;
+const HeaderStatistic = ({
+  icon,
+  label,
+  value,
+  tone = "default",
+}) => (
+  <div
+    className={[
+      "queue-header-stat",
+      `queue-header-stat--${tone}`,
+    ].join(" ")}
+  >
+    <div className="queue-header-stat-icon">
+      {icon}
+    </div>
 
-  if (Array.isArray(responseData)) {
-    return responseData;
-  }
+    <div className="queue-header-stat-content">
+      <span className="queue-header-stat-value">
+        {value}
+      </span>
 
-  if (Array.isArray(responseData?.appointments)) {
-    return responseData.appointments;
-  }
-
-  if (Array.isArray(responseData?.data)) {
-    return responseData.data;
-  }
-
-  return [];
-};
+      <span className="queue-header-stat-label">
+        {label}
+      </span>
+    </div>
+  </div>
+);
 
 /* ========================================================
-   Main patient panel
+   NOW SERVING
 ======================================================== */
 
-const QueuePatientPanel = ({ type, appointment, readyPosition = null }) => {
-  const isTreatment = type === "treatment";
-
-  const isSecondReadyPatient = !isTreatment && readyPosition === 1;
-
-  const panelTitle = isTreatment
-    ? "TREATMENT ROOM"
-    : isSecondReadyPatient
-      ? "UPCOMING PATIENT"
-      : "PLEASE PREPARE";
-
-  const panelSubtitle = isTreatment
-    ? "Now Serving"
-    : isSecondReadyPatient
-      ? "Next Patient 2"
-      : "Next Patient 1";
-
-  const numberStatus = isTreatment
-    ? "NOW BEING TREATED"
-    : isSecondReadyPatient
-      ? "PLEASE REMAIN READY"
-      : "PLEASE BE READY";
-
-  const emptyTitle = isTreatment
-    ? "No Patient Being Treated"
-    : isSecondReadyPatient
-      ? "No Second Patient Ready"
-      : "No Patient Currently Waiting";
-
-  const emptyDescription = isTreatment
-    ? "The next patient will be called shortly."
-    : isSecondReadyPatient
-      ? "The second ready patient will appear here."
-      : "Please wait for the next appointment update.";
-
-  const PanelIcon = isTreatment ? MedicineBoxOutlined : ClockCircleOutlined;
-
+const QueuePatientPanel = ({
+  appointment,
+  doctorArrived,
+}) => {
   return (
     <section
       className={[
-        "queue-patient-panel",
-        isTreatment ? "queue-treatment-panel" : "queue-ready-panel",
-        isSecondReadyPatient ? "queue-ready-panel-secondary" : "",
+        "queue-card",
+        "queue-card-now",
         appointment
-          ? "queue-patient-panel-active"
-          : "queue-patient-panel-empty",
-      ]
-        .filter(Boolean)
-        .join(" ")}
+          ? "queue-card-active"
+          : "queue-card-empty",
+      ].join(" ")}
     >
-      <div className="queue-patient-panel-header">
-        <div className="queue-panel-header-content">
-          <div className="queue-panel-icon">
-            <PanelIcon />
+      <div className="queue-card-accent" />
+
+      <div className="queue-card-header">
+        <div className="queue-card-header-left">
+          <div className="queue-card-header-icon">
+            <MedicineBoxOutlined />
           </div>
 
-          <div className="queue-panel-heading">
-            <Text className="queue-panel-title">{panelTitle}</Text>
+          <div>
+            <Text className="queue-card-kicker">
+              TREATMENT ROOM
+            </Text>
 
-            <Title level={2} className="queue-panel-subtitle">
-              {panelSubtitle}
+            <Title
+              level={2}
+              className="queue-card-title"
+            >
+              Now Serving
             </Title>
           </div>
         </div>
+
+        {appointment && (
+          <div className="queue-card-live-badge">
+            <span />
+
+            LIVE
+          </div>
+        )}
       </div>
 
-      <div className="queue-patient-panel-body">
+      <div className="queue-card-body queue-now-body">
         {appointment ? (
-          <div className="queue-number-content">
-            <Text className="queue-number-caption" />
+          <>
+            <div className="queue-now-message">
+              Patient currently receiving treatment
+            </div>
 
-            <div className="queue-number-circle-wrapper" aria-live="polite">
-              <div className="queue-number-circle">
-                <span>{getAppointmentNumber(appointment)}</span>
+            <div className="queue-now-number-ring">
+              <div className="queue-now-number-inner">
+                <span className="queue-now-hash">
+                  #
+                </span>
+
+                <span className="queue-now-number">
+                  {getAppointmentNumber(
+                    appointment,
+                  )}
+                </span>
               </div>
             </div>
 
-            <div className="queue-number-status">{numberStatus}</div>
-          </div>
+            <div className="queue-now-status">
+              <span className="queue-now-status-dot" />
+
+              NOW BEING TREATED
+            </div>
+
+            <Text className="queue-now-helper">
+              Please wait until your queue
+              number is called.
+            </Text>
+          </>
         ) : (
-          <div className="queue-panel-empty-content">
-            <div className="queue-panel-empty-icon">
+          <div className="queue-empty-state">
+            <div className="queue-empty-icon">
               <UserOutlined />
             </div>
 
-            <Text className="queue-panel-empty-title">{emptyTitle}</Text>
+            <Text className="queue-empty-title">
+              {doctorArrived
+                ? "Treatment Room Available"
+                : "Waiting for Doctor"}
+            </Text>
 
-            <Text className="queue-panel-empty-description">
-              {emptyDescription}
+            <Text className="queue-empty-description">
+              {doctorArrived
+                ? "The next patient will be called shortly."
+                : "Queue processing will begin once the doctor arrives."}
             </Text>
           </div>
         )}
@@ -591,59 +895,291 @@ const QueuePatientPanel = ({ type, appointment, readyPosition = null }) => {
 };
 
 /* ========================================================
-   Highest completed queue panel
+   NEXT PATIENTS
 ======================================================== */
 
-const CompletedQueuePanel = ({ appointment }) => {
+const NextPatientsPanel = ({
+  patients = [],
+  doctorArrived = false,
+}) => {
+  const displayedPatients =
+    Array.from(
+      {
+        length:
+          DISPLAY_NEXT_PATIENT_COUNT,
+      },
+      (_, index) =>
+        patients[index] || null,
+    );
+
+  const hasAnyPatient =
+    displayedPatients.some(Boolean);
+
   return (
     <section
       className={[
-        "queue-patient-panel",
-        "queue-completed-panel",
-        appointment
-          ? "queue-patient-panel-active"
-          : "queue-patient-panel-empty",
-      ]
-        .filter(Boolean)
-        .join(" ")}
+        "queue-card",
+        "queue-card-next",
+        doctorArrived
+          ? "queue-card-next-arrived"
+          : "queue-card-next-waiting",
+      ].join(" ")}
     >
-      <div className="queue-patient-panel-header">
-        <div className="queue-panel-header-content">
-          <div className="queue-panel-icon">
+      <div className="queue-card-accent" />
+
+      <div className="queue-card-header queue-next-header">
+        <div className="queue-card-header-left">
+          <div className="queue-card-header-icon">
+            <TeamOutlined />
+          </div>
+
+          <div>
+            <Text className="queue-card-kicker">
+              {doctorArrived
+                ? "UPCOMING QUEUE"
+                : "CHECKED-IN QUEUE"}
+            </Text>
+
+            <Title
+              level={2}
+              className="queue-card-title"
+            >
+              {doctorArrived
+                ? "Please Be Ready"
+                : "Patient Queue"}
+            </Title>
+          </div>
+        </div>
+
+        <div className="queue-next-summary">
+          {doctorArrived ? (
+            <>
+              <div className="queue-next-summary-ready">
+                <span />
+
+                2 Ready
+              </div>
+
+              <div className="queue-next-summary-total">
+                Next 8
+              </div>
+            </>
+          ) : (
+            <div className="queue-next-summary-total">
+              Queue Order
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="queue-card-body queue-next-body">
+        {hasAnyPatient ? (
+          <div className="queue-next-grid">
+            {displayedPatients.map(
+              (appointment, index) => {
+                const position =
+                  index + 1;
+
+                const isLocked =
+                  doctorArrived &&
+                  index <
+                    LOCKED_PATIENT_COUNT;
+
+                const isFirst =
+                  doctorArrived &&
+                  position === 1;
+
+                const isSecond =
+                  doctorArrived &&
+                  position === 2;
+
+                return (
+                  <div
+                    key={
+                      appointment
+                        ? `${
+                            getAppointmentId(
+                              appointment,
+                            ) ||
+                            getAppointmentNumber(
+                              appointment,
+                            )
+                          }-${position}`
+                        : `empty-${position}`
+                    }
+                    className={[
+                      "queue-next-item",
+
+                      isFirst
+                        ? "queue-next-item-first"
+                        : "",
+
+                      isSecond
+                        ? "queue-next-item-second"
+                        : "",
+
+                      isLocked
+                        ? "queue-next-item-ready"
+                        : "",
+
+                      !appointment
+                        ? "queue-next-item-empty"
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
+                    <div className="queue-next-item-top">
+                      <span className="queue-next-position">
+                        {doctorArrived
+                          ? `NEXT ${position}`
+                          : `QUEUE ${position}`}
+                      </span>
+
+                      {isLocked &&
+                        appointment && (
+                          <span className="queue-ready-pill">
+                            READY
+                          </span>
+                        )}
+                    </div>
+
+                    <div className="queue-next-number">
+                      {appointment
+                        ? getAppointmentNumber(
+                            appointment,
+                          )
+                        : "--"}
+                    </div>
+
+                    <div className="queue-next-item-footer">
+                      {!appointment ? (
+                        "AVAILABLE"
+                      ) : !doctorArrived ? (
+                        "IN QUEUE"
+                      ) : isFirst ? (
+                        <>
+                          <span className="queue-ready-dot" />
+
+                          PLEASE BE READY
+                        </>
+                      ) : isSecond ? (
+                        <>
+                          <span className="queue-ready-dot" />
+
+                          REMAIN READY
+                        </>
+                      ) : (
+                        "UPCOMING"
+                      )}
+                    </div>
+                  </div>
+                );
+              },
+            )}
+          </div>
+        ) : (
+          <div className="queue-empty-state">
+            <div className="queue-empty-icon">
+              <TeamOutlined />
+            </div>
+
+            <Text className="queue-empty-title">
+              {doctorArrived
+                ? "No Patients in Queue"
+                : "No Checked-In Patients"}
+            </Text>
+
+            <Text className="queue-empty-description">
+              New checked-in patients
+              will automatically appear
+              here.
+            </Text>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
+
+/* ========================================================
+   COMPLETED
+======================================================== */
+
+const CompletedQueuePanel = ({
+  appointment,
+}) => {
+  return (
+    <section
+      className={[
+        "queue-card",
+        "queue-card-completed",
+        appointment
+          ? "queue-card-active"
+          : "queue-card-empty",
+      ].join(" ")}
+    >
+      <div className="queue-card-accent" />
+
+      <div className="queue-card-header">
+        <div className="queue-card-header-left">
+          <div className="queue-card-header-icon">
             <CheckCircleOutlined />
           </div>
 
-          <div className="queue-panel-heading">
-            <Text className="queue-panel-title">COMPLETED</Text>
+          <div>
+            <Text className="queue-card-kicker">
+              COMPLETED
+            </Text>
 
-            <Title level={2} className="queue-panel-subtitle">
+            <Title
+              level={2}
+              className="queue-card-title"
+            >
               Last Completed
             </Title>
           </div>
         </div>
       </div>
 
-      <div className="queue-patient-panel-body">
+      <div className="queue-card-body queue-completed-body">
         {appointment ? (
-          <div className="queue-number-content">
-            <Text className="queue-number-caption" />
+          <>
+            <Text className="queue-completed-label">
+              Most recently completed treatment
+            </Text>
 
-            <div className="queue-number-circle-wrapper" aria-live="polite">
-              <div className="queue-number-circle">
-                <span>{getAppointmentNumber(appointment)}</span>
+            <div className="queue-completed-number-ring">
+              <div className="queue-completed-number">
+                {getAppointmentNumber(
+                  appointment,
+                )}
               </div>
             </div>
 
-            <div className="queue-number-status">TREATMENT COMPLETED</div>
-          </div>
+            <div className="queue-completed-status">
+              <CheckCircleOutlined />
+
+              TREATMENT COMPLETED
+            </div>
+
+            <Text className="queue-completed-helper">
+              Thank you for visiting us.
+            </Text>
+          </>
         ) : (
-          <div className="queue-panel-empty-content">
-            <div className="queue-panel-empty-icon">
+          <div className="queue-empty-state">
+            <div className="queue-empty-icon">
               <CheckCircleOutlined />
             </div>
 
-            <Text className="queue-panel-empty-title">
+            <Text className="queue-empty-title">
               No Completed Treatments
+            </Text>
+
+            <Text className="queue-empty-description">
+              The latest completed queue
+              number will appear here.
             </Text>
           </div>
         )}
@@ -653,7 +1189,7 @@ const CompletedQueuePanel = ({ appointment }) => {
 };
 
 /* ========================================================
-   Bottom scrolling queue item
+   TICKER ITEM
 ======================================================== */
 
 const QueueScrollerItem = ({
@@ -661,449 +1197,886 @@ const QueueScrollerItem = ({
   currentTreatmentPatient,
   readyPatients,
   currentDateTime,
+  doctorArrived,
 }) => {
-  const ItemIcon = item?.IconComponent || ClockCircleOutlined;
+  const ItemIcon =
+    item?.IconComponent ||
+    ClockCircleOutlined;
 
-  const itemAppointmentId = normalizeIdentifier(item?.appointmentId);
+  const itemAppointmentId =
+    normalizeIdentifier(
+      item?.appointmentId,
+    );
 
-  const treatmentAppointmentId = getAppointmentId(currentTreatmentPatient);
+  const treatmentAppointmentId =
+    getAppointmentId(
+      currentTreatmentPatient,
+    );
 
-  const readyPatientPosition = readyPatients.findIndex((appointment) => {
-    return getAppointmentId(appointment) === itemAppointmentId;
-  });
+  const readyPatientPosition =
+    doctorArrived
+      ? readyPatients.findIndex(
+          (appointment) =>
+            getAppointmentId(
+              appointment,
+            ) === itemAppointmentId,
+        )
+      : -1;
 
-  const isCurrentTreatment = Boolean(
-    currentTreatmentPatient &&
-    treatmentAppointmentId &&
-    treatmentAppointmentId === itemAppointmentId,
-  );
+  const isCurrentTreatment =
+    Boolean(
+      currentTreatmentPatient &&
+        treatmentAppointmentId &&
+        treatmentAppointmentId ===
+          itemAppointmentId,
+    );
 
-  const isReadyPatient = readyPatientPosition !== -1;
+  const isReadyPatient =
+    doctorArrived &&
+    readyPatientPosition !== -1;
 
-  const isFirstReadyPatient = readyPatientPosition === 0;
+  const isFirstReady =
+    readyPatientPosition === 0;
 
-  const isSecondReadyPatient = readyPatientPosition === 1;
+  const isSecondReady =
+    readyPatientPosition === 1;
 
-  const isWaiting = item?.statusKey === "waiting";
-
-  const isHighlighted = isCurrentTreatment || isReadyPatient;
+  const isWaiting =
+    item?.statusKey === "waiting";
 
   return (
     <div
       className={[
         "queue-scroller-item",
+
         `queue-scroller-item-${item.statusKey}`,
-        isHighlighted ? "queue-scroller-item-highlighted" : "",
-        isCurrentTreatment ? "queue-scroller-item-current-treatment" : "",
-        isReadyPatient ? "queue-scroller-item-ready-patient" : "",
-        isFirstReadyPatient ? "queue-scroller-item-ready-patient-first" : "",
-        isSecondReadyPatient ? "queue-scroller-item-ready-patient-second" : "",
-        isWaiting ? "queue-scroller-item-waiting" : "",
+
+        isCurrentTreatment
+          ? "queue-scroller-item-serving"
+          : "",
+
+        isFirstReady
+          ? "queue-scroller-item-next-one"
+          : "",
+
+        isSecondReady
+          ? "queue-scroller-item-next-two"
+          : "",
+
+        isWaiting
+          ? "queue-scroller-item-waiting"
+          : "",
       ]
         .filter(Boolean)
         .join(" ")}
     >
-      {isCurrentTreatment && (
-        <div className="queue-scroller-highlight-badge queue-scroller-treatment-badge">
-          NOW SERVING
-        </div>
-      )}
+      <div className="queue-scroller-number">
+        {String(
+          item.appointmentNumber,
+        ).padStart(2, "0")}
+      </div>
 
-      {isFirstReadyPatient && (
-        <div className="queue-scroller-highlight-badge queue-scroller-ready-badge">
-          NEXT 1
-        </div>
-      )}
+      <div className="queue-scroller-information">
+        {isCurrentTreatment ? (
+          <span className="queue-scroller-special-label">
+            <MedicineBoxOutlined />
 
-      {isSecondReadyPatient && (
-        <div className="queue-scroller-highlight-badge queue-scroller-ready-badge queue-scroller-ready-badge-secondary">
-          NEXT 2
-        </div>
-      )}
+            NOW SERVING
+          </span>
+        ) : isFirstReady ? (
+          <span className="queue-scroller-special-label">
+            <span className="queue-scroller-ready-dot" />
 
-      {isWaiting && (
-        <div className="queue-scroller-waiting-content">
-          <Text className="queue-scroller-status queue-scroller-waiting-status">
+            NEXT 1
+          </span>
+        ) : isSecondReady ? (
+          <span className="queue-scroller-special-label">
+            <span className="queue-scroller-ready-dot" />
+
+            NEXT 2
+          </span>
+        ) : isWaiting ? (
+          <>
+            <span className="queue-scroller-status">
+              <ItemIcon />
+
+              WAITING
+            </span>
+
+            <span className="queue-scroller-duration">
+              {formatWaitingDuration(
+                item.waitingStartTime,
+                currentDateTime,
+              )}
+            </span>
+          </>
+        ) : (
+          <span className="queue-scroller-status">
             <ItemIcon />
 
-            <span>WAITING</span>
-          </Text>
-
-          <Text className="queue-scroller-waiting-time">
-            Waiting{" "}
-            {formatWaitingDuration(item.waitingStartTime, currentDateTime)}
-          </Text>
-        </div>
-      )}
-
-      {!isWaiting && !isReadyPatient && !isCurrentTreatment && (
-        <Text className="queue-scroller-status">
-          <ItemIcon />
-
-          <span>{item.statusLabel}</span>
-        </Text>
-      )}
-
-      <div className="queue-scroller-number">{item.appointmentNumber}</div>
+            {item.statusLabel}
+          </span>
+        )}
+      </div>
     </div>
   );
 };
 
 /* ========================================================
-   QueueDisplay component
+   MAIN COMPONENT
 ======================================================== */
 
-const QueueDisplay = ({ embedded = false }) => {
-  const [appointments, setAppointments] = useState([]);
+const QueueDisplay = ({
+  embedded = false,
+}) => {
+  const [
+    appointments,
+    setAppointments,
+  ] = useState([]);
 
-  const [waitingRecords, setWaitingRecords] = useState([]);
+  const [
+    waitingRecords,
+    setWaitingRecords,
+  ] = useState([]);
 
-  const [loading, setLoading] = useState(true);
+  const [
+    doctorArrived,
+    setDoctorArrived,
+  ] = useState(false);
 
-  const [hasLoadedAppointments, setHasLoadedAppointments] = useState(false);
+  const [
+    doctorArrivalRecord,
+    setDoctorArrivalRecord,
+  ] = useState(null);
 
-  const [loadError, setLoadError] = useState("");
+  const [loading, setLoading] =
+    useState(true);
 
-  const [currentDateTime, setCurrentDateTime] = useState(new Date());
+  const [
+    hasLoadedAppointments,
+    setHasLoadedAppointments,
+  ] = useState(false);
 
-  const [lockedReadyPatientIds, setLockedReadyPatientIds] = useState([]);
+  const [loadError, setLoadError] =
+    useState("");
 
-  const [readyPatientLockDate, setReadyPatientLockDate] = useState(null);
+  const [
+    currentDateTime,
+    setCurrentDateTime,
+  ] = useState(new Date());
 
-  const selectedDate = useMemo(() => {
-    return formatDateForApi(currentDateTime);
-  }, [currentDateTime]);
+  const [
+    lockedReadyPatientIds,
+    setLockedReadyPatientIds,
+  ] = useState([]);
 
-  const readyPatientStorageKey = useMemo(() => {
-    return `${READY_PATIENT_STORAGE_PREFIX}:${selectedDate}`;
-  }, [selectedDate]);
+  const [
+    readyPatientLockDate,
+    setReadyPatientLockDate,
+  ] = useState(null);
 
-  /* ------------------------------------------------------
-     Live clock
-  ------------------------------------------------------ */
+  /* ========================================================
+     CURRENT DATE
+  ======================================================== */
+
+  const selectedDate =
+    useMemo(
+      () =>
+        formatDateForApi(
+          currentDateTime,
+        ),
+      [currentDateTime],
+    );
+
+  const readyPatientStorageKey =
+    useMemo(
+      () =>
+        `${READY_PATIENT_STORAGE_PREFIX}:${selectedDate}`,
+      [selectedDate],
+    );
+
+  /* ========================================================
+     CLOCK
+  ======================================================== */
 
   useEffect(() => {
-    const clockInterval = window.setInterval(() => {
-      setCurrentDateTime(new Date());
-    }, 1000);
+    const interval =
+      window.setInterval(() => {
+        setCurrentDateTime(
+          new Date(),
+        );
+      }, 1000);
 
-    return () => {
-      window.clearInterval(clockInterval);
-    };
+    return () =>
+      window.clearInterval(
+        interval,
+      );
   }, []);
 
-  /* ------------------------------------------------------
-     Restore the ready-patient locks
-  ------------------------------------------------------ */
+  /* ========================================================
+     RESTORE LOCKS
+  ======================================================== */
 
   useEffect(() => {
-    let savedPatientIds = [];
+    let savedIds = [];
 
     try {
-      const storedValue = window.localStorage.getItem(readyPatientStorageKey);
+      const stored =
+        window.localStorage.getItem(
+          readyPatientStorageKey,
+        );
 
-      savedPatientIds = parseLockedPatientIds(storedValue);
+      savedIds =
+        parseLockedPatientIds(
+          stored,
+        );
     } catch {
-      savedPatientIds = [];
+      savedIds = [];
     }
 
-    setReadyPatientLockDate(selectedDate);
+    setReadyPatientLockDate(
+      selectedDate,
+    );
 
-    setLockedReadyPatientIds(savedPatientIds);
-  }, [readyPatientStorageKey, selectedDate]);
+    setLockedReadyPatientIds(
+      savedIds,
+    );
+  }, [
+    readyPatientStorageKey,
+    selectedDate,
+  ]);
 
-  /* ------------------------------------------------------
-     Save the ready-patient locks
-  ------------------------------------------------------ */
+  /* ========================================================
+     SAVE LOCKS
+  ======================================================== */
 
   useEffect(() => {
-    if (readyPatientLockDate !== selectedDate) {
+    if (
+      readyPatientLockDate !==
+      selectedDate
+    ) {
       return;
     }
 
     try {
-      if (lockedReadyPatientIds.length > 0) {
+      if (!doctorArrived) {
+        window.localStorage.removeItem(
+          readyPatientStorageKey,
+        );
+
+        return;
+      }
+
+      if (
+        lockedReadyPatientIds.length
+      ) {
         window.localStorage.setItem(
           readyPatientStorageKey,
-          JSON.stringify(lockedReadyPatientIds),
+          JSON.stringify(
+            lockedReadyPatientIds,
+          ),
         );
       } else {
-        window.localStorage.removeItem(readyPatientStorageKey);
+        window.localStorage.removeItem(
+          readyPatientStorageKey,
+        );
       }
     } catch {
-      // Continue when local storage is unavailable.
+      // localStorage unavailable
     }
   }, [
+    doctorArrived,
     lockedReadyPatientIds,
     readyPatientLockDate,
     readyPatientStorageKey,
     selectedDate,
   ]);
 
-  /* ------------------------------------------------------
-     Listen for lock changes from Appointment Maintenance
-  ------------------------------------------------------ */
+  /* ========================================================
+     STORAGE SYNC
+  ======================================================== */
 
   useEffect(() => {
-    const handleStorageChange = (event) => {
-      if (event.key !== readyPatientStorageKey) {
+    const handleStorageChange = (
+      event,
+    ) => {
+      if (
+        event.key !==
+        readyPatientStorageKey
+      ) {
         return;
       }
 
-      const updatedIds = parseLockedPatientIds(event.newValue);
+      if (!doctorArrived) {
+        setLockedReadyPatientIds(
+          [],
+        );
 
-      setLockedReadyPatientIds(updatedIds);
-    };
+        return;
+      }
 
-    window.addEventListener("storage", handleStorageChange);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, [readyPatientStorageKey]);
-
-  /* ------------------------------------------------------
-     Load appointments and waiting records
-  ------------------------------------------------------ */
-
-  const loadAppointments = useCallback(async () => {
-    try {
-      setLoadError("");
-
-      const [appointmentsResponse, waitingResponse] = await Promise.all([
-        getAppointmentsByDate(selectedDate),
-        getAllWaitingRecords(),
-      ]);
-
-      const appointmentRecords = extractAppointments(appointmentsResponse);
-
-      const waitingList = extractWaitingRecords(waitingResponse);
-
-      setAppointments(appointmentRecords);
-
-      setWaitingRecords(waitingList);
-    } catch (error) {
-      console.error("Error loading queue appointments:", error);
-
-      setLoadError(
-        "Unable to load the patient queue. Reconnecting automatically.",
+      setLockedReadyPatientIds(
+        parseLockedPatientIds(
+          event.newValue,
+        ),
       );
-    } finally {
-      setLoading(false);
+    };
 
-      setHasLoadedAppointments(true);
-    }
-  }, [selectedDate]);
+    window.addEventListener(
+      "storage",
+      handleStorageChange,
+    );
+
+    return () =>
+      window.removeEventListener(
+        "storage",
+        handleStorageChange,
+      );
+  }, [
+    doctorArrived,
+    readyPatientStorageKey,
+  ]);
+
+  /* ========================================================
+     DOCTOR ARRIVAL
+  ======================================================== */
+
+  const fetchDoctorArrivalStatus =
+    useCallback(async () => {
+      try {
+        const response =
+          await getDoctorArrivalStatus(
+            selectedDate,
+          );
+
+        const record =
+          extractDoctorArrivalRecord(
+            response,
+          );
+
+        const arrived =
+          convertToBoolean(
+            record?.arrived,
+          );
+
+        setDoctorArrivalRecord(
+          record,
+        );
+
+        setDoctorArrived(
+          arrived,
+        );
+
+        if (!arrived) {
+          setLockedReadyPatientIds(
+            [],
+          );
+
+          try {
+            window.localStorage.removeItem(
+              readyPatientStorageKey,
+            );
+          } catch {
+            // ignored
+          }
+        }
+      } catch (error) {
+        console.error(
+          "Failed to load doctor arrival status:",
+          error,
+        );
+
+        setDoctorArrivalRecord(
+          null,
+        );
+
+        setDoctorArrived(false);
+
+        setLockedReadyPatientIds(
+          [],
+        );
+      }
+    }, [
+      selectedDate,
+      readyPatientStorageKey,
+    ]);
+
+  /* ========================================================
+     LOAD APPOINTMENTS
+  ======================================================== */
+
+  const loadAppointments =
+    useCallback(async () => {
+      try {
+        setLoadError("");
+
+        const [
+          appointmentsResponse,
+          waitingResponse,
+        ] = await Promise.all([
+          getAppointmentsByDate(
+            selectedDate,
+          ),
+          getAllWaitingRecords(),
+        ]);
+
+        setAppointments(
+          extractAppointments(
+            appointmentsResponse,
+          ),
+        );
+
+        setWaitingRecords(
+          extractWaitingRecords(
+            waitingResponse,
+          ),
+        );
+      } catch (error) {
+        console.error(
+          "Error loading queue:",
+          error,
+        );
+
+        setLoadError(
+          "Queue connection interrupted. Reconnecting automatically...",
+        );
+      } finally {
+        setLoading(false);
+
+        setHasLoadedAppointments(
+          true,
+        );
+      }
+    }, [selectedDate]);
+
+  /* ========================================================
+     REFRESH
+  ======================================================== */
 
   useEffect(() => {
     setLoading(true);
 
-    setHasLoadedAppointments(false);
+    setHasLoadedAppointments(
+      false,
+    );
 
     loadAppointments();
 
-    const refreshInterval = window.setInterval(() => {
-      loadAppointments();
-    }, 15000);
+    fetchDoctorArrivalStatus();
 
-    return () => {
-      window.clearInterval(refreshInterval);
-    };
-  }, [loadAppointments]);
+    const interval =
+      window.setInterval(() => {
+        loadAppointments();
+
+        fetchDoctorArrivalStatus();
+      }, 15000);
+
+    return () =>
+      window.clearInterval(
+        interval,
+      );
+  }, [
+    loadAppointments,
+    fetchDoctorArrivalStatus,
+  ]);
 
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        loadAppointments();
-      }
-    };
+    const handleVisibilityChange =
+      () => {
+        if (
+          document.visibilityState ===
+          "visible"
+        ) {
+          loadAppointments();
 
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+          fetchDoctorArrivalStatus();
+        }
+      };
 
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [loadAppointments]);
-
-  /* ------------------------------------------------------
-     Active waiting data
-  ------------------------------------------------------ */
-
-  const activeWaitingRecords = useMemo(() => {
-    return waitingRecords.filter(isActiveWaitingRecord);
-  }, [waitingRecords]);
-
-  const waitingRecordMap = useMemo(() => {
-    return new Map(
-      activeWaitingRecords.map((waitingRecord) => [
-        getWaitingAppointmentId(waitingRecord),
-        waitingRecord,
-      ]),
+    document.addEventListener(
+      "visibilitychange",
+      handleVisibilityChange,
     );
-  }, [activeWaitingRecords]);
 
-  const isAppointmentWaiting = useCallback(
-    (appointment) => {
-      const appointmentId = getAppointmentId(appointment);
+    return () =>
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange,
+      );
+  }, [
+    loadAppointments,
+    fetchDoctorArrivalStatus,
+  ]);
 
-      return Boolean(appointmentId && waitingRecordMap.has(appointmentId));
-    },
-    [waitingRecordMap],
-  );
+  /* ========================================================
+     WAITING MAP
+  ======================================================== */
 
-  /* ------------------------------------------------------
-     Visible appointments
-  ------------------------------------------------------ */
+  const activeWaitingRecords =
+    useMemo(
+      () =>
+        waitingRecords.filter(
+          isActiveWaitingRecord,
+        ),
+      [waitingRecords],
+    );
 
-  const visibleAppointments = useMemo(() => {
-    return appointments.filter((appointment) => {
-      const normalizedStatus = normalizeStatus(appointment?.status);
+  const waitingRecordMap =
+    useMemo(
+      () =>
+        new Map(
+          activeWaitingRecords.map(
+            (record) => [
+              getWaitingAppointmentId(
+                record,
+              ),
+              record,
+            ],
+          ),
+        ),
+      [activeWaitingRecords],
+    );
 
-      return VISIBLE_STATUSES.includes(normalizedStatus);
-    });
-  }, [appointments]);
+  const isAppointmentWaiting =
+    useCallback(
+      (appointment) => {
+        const id =
+          getAppointmentId(
+            appointment,
+          );
 
-  /* ------------------------------------------------------
-     Current treatment patient
-  ------------------------------------------------------ */
+        return Boolean(
+          id &&
+            waitingRecordMap.has(id),
+        );
+      },
+      [waitingRecordMap],
+    );
 
-  const inTreatmentPatients = useMemo(() => {
-    return visibleAppointments
-      .filter((appointment) => {
-        return normalizeStatus(appointment?.status) === "in treatment";
-      })
-      .sort(sortByAppointmentNumber);
-  }, [visibleAppointments]);
+  /* ========================================================
+     VISIBLE APPOINTMENTS
+  ======================================================== */
 
-  const currentTreatmentPatient = inTreatmentPatients[0] || null;
+  const visibleAppointments =
+    useMemo(
+      () =>
+        appointments.filter(
+          (appointment) =>
+            VISIBLE_STATUSES.includes(
+              normalizeStatus(
+                appointment?.status,
+              ),
+            ),
+        ),
+      [appointments],
+    );
 
-  /* ------------------------------------------------------
-     Highest completed treatment number
-  ------------------------------------------------------ */
+  /* ========================================================
+     CURRENT TREATMENT
+  ======================================================== */
 
-  const completedTreatmentPatients = useMemo(() => {
-    return visibleAppointments
-      .filter((appointment) => {
-        const normalizedStatus = normalizeStatus(appointment?.status);
+  const inTreatmentPatients =
+    useMemo(
+      () =>
+        visibleAppointments
+          .filter(
+            (appointment) =>
+              normalizeStatus(
+                appointment?.status,
+              ) === "in treatment",
+          )
+          .sort(
+            sortByAppointmentNumber,
+          ),
+      [visibleAppointments],
+    );
 
-        return TREATMENT_COMPLETED_STATUSES.includes(normalizedStatus);
-      })
-      .sort(sortByHighestAppointmentNumber);
-  }, [visibleAppointments]);
+  const currentTreatmentPatient =
+    inTreatmentPatients[0] ||
+    null;
+
+  /* ========================================================
+     COMPLETED
+  ======================================================== */
+
+  const completedTreatmentPatients =
+    useMemo(
+      () =>
+        visibleAppointments
+          .filter((appointment) =>
+            TREATMENT_COMPLETED_STATUSES.includes(
+              normalizeStatus(
+                appointment?.status,
+              ),
+            ),
+          )
+          .sort(
+            sortByHighestAppointmentNumber,
+          ),
+      [visibleAppointments],
+    );
 
   const highestCompletedTreatmentPatient =
-    completedTreatmentPatients[0] || null;
+    completedTreatmentPatients[0] ||
+    null;
 
-  /* ------------------------------------------------------
-     Checked-in patients
-  ------------------------------------------------------ */
+  /* ========================================================
+     CHECKED-IN
+  ======================================================== */
 
-  const checkedInPatients = useMemo(() => {
-    return visibleAppointments
-      .filter((appointment) => {
-        return (
-          normalizeStatus(appointment?.status) === "checked in" &&
-          !isAppointmentWaiting(appointment)
-        );
-      })
-      .sort(sortCheckedInPatients);
-  }, [visibleAppointments, isAppointmentWaiting]);
+  const checkedInPatients =
+    useMemo(
+      () =>
+        visibleAppointments
+          .filter(
+            (appointment) =>
+              normalizeStatus(
+                appointment?.status,
+              ) === "checked in" &&
+              !isAppointmentWaiting(
+                appointment,
+              ),
+          )
+          .sort(
+            sortCheckedInPatients,
+          ),
+      [
+        visibleAppointments,
+        isAppointmentWaiting,
+      ],
+    );
 
-  /* ------------------------------------------------------
-     Keep two ready patients locked
-  ------------------------------------------------------ */
+  /* ========================================================
+     AUTO LOCK NEXT TWO
+  ======================================================== */
 
   useEffect(() => {
-    if (!hasLoadedAppointments) {
+    if (
+      !hasLoadedAppointments
+    ) {
       return;
     }
 
-    if (readyPatientLockDate !== selectedDate) {
+    if (
+      readyPatientLockDate !==
+      selectedDate
+    ) {
       return;
     }
 
-    setLockedReadyPatientIds((currentPatientIds) => {
-      const availablePatientIds = checkedInPatients
-        .map(getAppointmentId)
-        .filter(Boolean);
-
-      const validCurrentIds = currentPatientIds
-        .map(normalizeIdentifier)
-        .filter(
-          (appointmentId) =>
-            appointmentId && availablePatientIds.includes(appointmentId),
-        );
-
-      const additionalPatientIds = availablePatientIds.filter(
-        (appointmentId) => !validCurrentIds.includes(appointmentId),
+    if (!doctorArrived) {
+      setLockedReadyPatientIds(
+        [],
       );
 
-      const effectivePatientIds = [
-        ...validCurrentIds,
-        ...additionalPatientIds,
-      ].slice(0, LOCKED_PATIENT_COUNT);
-
-      if (arraysAreEqual(currentPatientIds, effectivePatientIds)) {
-        return currentPatientIds;
+      try {
+        window.localStorage.removeItem(
+          readyPatientStorageKey,
+        );
+      } catch {
+        // ignored
       }
 
-      return effectivePatientIds;
-    });
+      return;
+    }
+
+    setLockedReadyPatientIds(
+      (currentIds) => {
+        const availableIds =
+          checkedInPatients
+            .map(getAppointmentId)
+            .filter(Boolean);
+
+        const validCurrentIds =
+          currentIds
+            .map(
+              normalizeIdentifier,
+            )
+            .filter(
+              (id) =>
+                id &&
+                availableIds.includes(
+                  id,
+                ),
+            );
+
+        const additionalIds =
+          availableIds.filter(
+            (id) =>
+              !validCurrentIds.includes(
+                id,
+              ),
+          );
+
+        const finalIds = [
+          ...validCurrentIds,
+          ...additionalIds,
+        ].slice(
+          0,
+          LOCKED_PATIENT_COUNT,
+        );
+
+        if (
+          arraysAreEqual(
+            currentIds,
+            finalIds,
+          )
+        ) {
+          return currentIds;
+        }
+
+        return finalIds;
+      },
+    );
   }, [
+    doctorArrived,
     checkedInPatients,
     hasLoadedAppointments,
     readyPatientLockDate,
     selectedDate,
+    readyPatientStorageKey,
   ]);
 
-  /* ------------------------------------------------------
-     Ready patients
-  ------------------------------------------------------ */
+  /* ========================================================
+     READY PATIENTS
+  ======================================================== */
 
-  const readyPatients = useMemo(() => {
-    return lockedReadyPatientIds
-      .map((lockedPatientId) => {
-        return (
-          checkedInPatients.find((appointment) => {
-            return (
-              getAppointmentId(appointment) ===
-              normalizeIdentifier(lockedPatientId)
-            );
-          }) || null
+  const readyPatients =
+    useMemo(() => {
+      if (!doctorArrived) {
+        return [];
+      }
+
+      return lockedReadyPatientIds
+        .map(
+          (lockedId) =>
+            checkedInPatients.find(
+              (appointment) =>
+                getAppointmentId(
+                  appointment,
+                ) ===
+                normalizeIdentifier(
+                  lockedId,
+                ),
+            ) || null,
+        )
+        .filter(Boolean)
+        .slice(
+          0,
+          LOCKED_PATIENT_COUNT,
         );
-      })
-      .filter(Boolean)
-      .slice(0, LOCKED_PATIENT_COUNT);
-  }, [checkedInPatients, lockedReadyPatientIds]);
+    }, [
+      doctorArrived,
+      checkedInPatients,
+      lockedReadyPatientIds,
+    ]);
 
-  const firstReadyPatient = readyPatients[0] || null;
+  /* ========================================================
+     NEXT 8
+  ======================================================== */
 
-  const secondReadyPatient = readyPatients[1] || null;
+  const nextEightPatients =
+    useMemo(() => {
+      if (!doctorArrived) {
+        return checkedInPatients.slice(
+          0,
+          DISPLAY_NEXT_PATIENT_COUNT,
+        );
+      }
 
-  /* ------------------------------------------------------
-     Individual scrolling queue items
-  ------------------------------------------------------ */
+      const lockedPatients =
+        readyPatients.filter(Boolean);
 
-  const tickerItems = useMemo(() => {
-    return createTickerItems(visibleAppointments, waitingRecordMap);
-  }, [visibleAppointments, waitingRecordMap]);
+      const lockedIds =
+        new Set(
+          lockedPatients
+            .map(getAppointmentId)
+            .filter(Boolean),
+        );
 
-  const tickerDuration = useMemo(() => {
-    const calculatedDuration = tickerItems.length * 6;
+      const additionalPatients =
+        checkedInPatients.filter(
+          (appointment) => {
+            const id =
+              getAppointmentId(
+                appointment,
+              );
 
-    return `${Math.max(calculatedDuration, 24)}s`;
-  }, [tickerItems.length]);
+            return (
+              id &&
+              !lockedIds.has(id)
+            );
+          },
+        );
 
-  const queueLiveText = loadError ? "Reconnecting" : "Queue is live";
+      return [
+        ...lockedPatients,
+        ...additionalPatients,
+      ].slice(
+        0,
+        DISPLAY_NEXT_PATIENT_COUNT,
+      );
+    }, [
+      doctorArrived,
+      readyPatients,
+      checkedInPatients,
+    ]);
 
-  /* ------------------------------------------------------
-     Render
-  ------------------------------------------------------ */
+  /* ========================================================
+     TICKER
+  ======================================================== */
+
+  const tickerItems =
+    useMemo(
+      () =>
+        createTickerItems(
+          visibleAppointments,
+          waitingRecordMap,
+        ),
+      [
+        visibleAppointments,
+        waitingRecordMap,
+      ],
+    );
+
+  const tickerDuration =
+    useMemo(() => {
+      const duration =
+        tickerItems.length * 6;
+
+      return `${Math.max(
+        duration,
+        28,
+      )}s`;
+    }, [tickerItems.length]);
+
+  /* ========================================================
+     EXTRA DISPLAY VALUES
+  ======================================================== */
+
+  const totalQueueCount =
+    checkedInPatients.length;
+
+  const waitingCount =
+    activeWaitingRecords.length;
+
+  const completedCount =
+    completedTreatmentPatients.length;
+
+  const queueModeText =
+    doctorArrived
+      ? "Live Treatment Queue"
+      : "Pre-Arrival Queue";
+
+  /* ========================================================
+     RENDER
+  ======================================================== */
 
   return (
     <div
       className={[
         "queue-display-page",
+
         embedded
           ? "queue-display-page-embedded"
           : "queue-display-page-fullscreen",
@@ -1111,136 +2084,411 @@ const QueueDisplay = ({ embedded = false }) => {
         .filter(Boolean)
         .join(" ")}
     >
+      {/* Background decorations */}
+
+      <div className="queue-display-bg-glow queue-display-bg-glow-one" />
+
+      <div className="queue-display-bg-glow queue-display-bg-glow-two" />
+
+      {/* ===================================================
+          HEADER
+      =================================================== */}
+
       <header className="queue-display-header">
-        <div className="queue-display-brand">
-          <div className="queue-display-brand-icon">
+        <div className="queue-display-brand-section">
+          <div className="queue-display-logo">
             <MedicineBoxOutlined />
           </div>
 
-          <div className="queue-display-brand-content">
-            <Text className="queue-display-eyebrow">PATIENT QUEUE</Text>
+          <div className="queue-display-brand-text">
+            <div className="queue-display-eyebrow">
+              DENTAL PATIENT MANAGEMENT
+            </div>
 
-            <Title level={1} className="queue-display-title">
-               Dental CAD / CAM Laboratory
+            <Title
+              level={1}
+              className="queue-display-title"
+            >
+              Dental CAD / CAM
+              Laboratory
             </Title>
 
             <Text className="queue-display-subtitle">
-              Please watch the screen for your queue number
+              Live Patient Queue &
+              Treatment Status
             </Text>
           </div>
         </div>
 
-        <div className="queue-display-date-time">
-          <div className="queue-display-date">
-            <CalendarOutlined />
-
-            <span>{formatDisplayDate(currentDateTime)}</span>
-          </div>
-
-          <div className="queue-display-time">
-            {formatDisplayTime(currentDateTime)}
-          </div>
-
+        <div className="queue-display-header-right">
           <div
             className={[
-              "queue-display-live-status",
-              loadError ? "queue-display-live-status-error" : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-          >
-            <span className="queue-display-live-dot" />
+              "queue-doctor-status-card",
 
-            <Text>{queueLiveText}</Text>
+              doctorArrived
+                ? "queue-doctor-status-card-arrived"
+                : "queue-doctor-status-card-waiting",
+            ].join(" ")}
+          >
+            <div className="queue-doctor-status-icon">
+              <SafetyCertificateOutlined />
+            </div>
+
+            <div className="queue-doctor-status-details">
+              <span className="queue-doctor-status-caption">
+                DOCTOR STATUS
+              </span>
+
+              <span className="queue-doctor-status-text">
+                {doctorArrived
+                  ? "Doctor Available"
+                  : "Waiting for Doctor"}
+              </span>
+
+              {doctorArrived &&
+                doctorArrivalRecord?.arrived_at && (
+                  <span className="queue-doctor-arrival-time">
+                    Arrived at{" "}
+                    {formatArrivalTime(
+                      doctorArrivalRecord.arrived_at,
+                    )}
+                  </span>
+                )}
+            </div>
+
+            <span className="queue-doctor-status-indicator" />
+          </div>
+
+          <div className="queue-header-clock">
+            <div className="queue-header-date">
+              <CalendarOutlined />
+
+              {formatDisplayDate(
+                currentDateTime,
+              )}
+            </div>
+
+            <div className="queue-header-time">
+              {formatDisplayTime(
+                currentDateTime,
+              )}
+            </div>
           </div>
         </div>
       </header>
 
+      {/* ===================================================
+          OVERVIEW BAR
+      =================================================== */}
+
+      <section className="queue-display-overview">
+        <div className="queue-mode-indicator">
+          <div
+            className={[
+              "queue-mode-icon",
+              doctorArrived
+                ? "queue-mode-icon-active"
+                : "",
+            ].join(" ")}
+          >
+            <WifiOutlined />
+          </div>
+
+          <div>
+            <span className="queue-mode-label">
+              CURRENT MODE
+            </span>
+
+            <span className="queue-mode-value">
+              {queueModeText}
+            </span>
+          </div>
+        </div>
+
+        <div className="queue-header-statistics">
+          <HeaderStatistic
+            icon={<TeamOutlined />}
+            label="In Queue"
+            value={totalQueueCount}
+            tone="queue"
+          />
+
+          <HeaderStatistic
+            icon={
+              <ClockCircleOutlined />
+            }
+            label="On Hold"
+            value={waitingCount}
+            tone="waiting"
+          />
+
+          <HeaderStatistic
+            icon={
+              <MedicineBoxOutlined />
+            }
+            label="In Treatment"
+            value={
+              currentTreatmentPatient
+                ? 1
+                : 0
+            }
+            tone="treatment"
+          />
+
+          <HeaderStatistic
+            icon={
+              <CheckCircleOutlined />
+            }
+            label="Completed"
+            value={completedCount}
+            tone="completed"
+          />
+        </div>
+
+        <div
+          className={[
+            "queue-system-status",
+
+            loadError
+              ? "queue-system-status-error"
+              : "",
+          ].join(" ")}
+        >
+          <span className="queue-system-status-dot" />
+
+          <div>
+            <span className="queue-system-status-title">
+              {loadError
+                ? "RECONNECTING"
+                : "QUEUE LIVE"}
+            </span>
+
+            <span className="queue-system-status-subtitle">
+              Auto refresh every 15 sec
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* ===================================================
+          DOCTOR NOT ARRIVED MESSAGE
+      =================================================== */}
+
+      {!doctorArrived &&
+        !loading && (
+          <div className="queue-doctor-waiting-banner">
+            <div className="queue-doctor-waiting-banner-icon">
+              <ClockCircleOutlined />
+            </div>
+
+            <div className="queue-doctor-waiting-banner-content">
+              <strong>
+                Doctor has not arrived yet
+              </strong>
+
+              <span>
+                Checked-in patients
+                remain in the normal queue.
+                Ready positions will be
+                assigned after doctor
+                arrival.
+              </span>
+            </div>
+          </div>
+        )}
+
+      {/* ===================================================
+          ERROR
+      =================================================== */}
+
       {loadError && (
-        <div className="queue-display-error" role="alert">
+        <div
+          className="queue-display-error"
+          role="alert"
+        >
           <CloseCircleOutlined />
 
-          <Text>{loadError}</Text>
+          <span>{loadError}</span>
         </div>
       )}
 
-      {loading && !hasLoadedAppointments ? (
-        <div className="queue-display-loading">
-          <Spin size="large" />
+      {/* ===================================================
+          CONTENT
+      =================================================== */}
 
-          <Text>Loading patient queue...</Text>
+      {loading &&
+      !hasLoadedAppointments ? (
+        <div className="queue-display-loading">
+          <div className="queue-display-loading-box">
+            <Spin size="large" />
+
+            <div className="queue-display-loading-title">
+              Preparing Patient Queue
+            </div>
+
+            <div className="queue-display-loading-subtitle">
+              Loading today's appointments
+              and treatment status...
+            </div>
+          </div>
         </div>
       ) : (
         <>
-          <main className="queue-display-main queue-display-main-four-panels">
+          <main className="queue-display-main">
             <QueuePatientPanel
-              type="treatment"
-              appointment={currentTreatmentPatient}
+              appointment={
+                currentTreatmentPatient
+              }
+              doctorArrived={
+                doctorArrived
+              }
             />
 
-            <QueuePatientPanel
-              type="ready"
-              readyPosition={0}
-              appointment={firstReadyPatient}
-            />
-
-            <QueuePatientPanel
-              type="ready"
-              readyPosition={1}
-              appointment={secondReadyPatient}
+            <NextPatientsPanel
+              patients={
+                nextEightPatients
+              }
+              doctorArrived={
+                doctorArrived
+              }
             />
 
             <CompletedQueuePanel
-              appointment={highestCompletedTreatmentPatient}
+              appointment={
+                highestCompletedTreatmentPatient
+              }
             />
           </main>
 
-          <section className="queue-bottom-scroller">
+          {/* =================================================
+              BOTTOM TICKER
+          ================================================= */}
+
+          <section className="queue-bottom-section">
+            <div className="queue-bottom-title">
+              <div className="queue-bottom-title-icon">
+                <WifiOutlined />
+              </div>
+
+              <div>
+                <span>
+                  LIVE QUEUE STATUS
+                </span>
+
+                <small>
+                  Today's appointment
+                  numbers
+                </small>
+              </div>
+            </div>
+
             <div className="queue-scroller-viewport">
-              {tickerItems.length > 0 ? (
+              <div className="queue-scroller-fade queue-scroller-fade-left" />
+
+              <div className="queue-scroller-fade queue-scroller-fade-right" />
+
+              {tickerItems.length >
+              0 ? (
                 <div
                   className="queue-scroller-track"
                   style={{
-                    "--queue-scroll-duration": tickerDuration,
+                    "--queue-scroll-duration":
+                      tickerDuration,
                   }}
                 >
                   <div className="queue-scroller-set">
-                    {tickerItems.map((item, index) => (
-                      <QueueScrollerItem
-                        key={`queue-original-${
-                          item.appointmentId || item.appointmentNumber
-                        }-${index}`}
-                        item={item}
-                        currentTreatmentPatient={currentTreatmentPatient}
-                        readyPatients={readyPatients}
-                        currentDateTime={currentDateTime}
-                      />
-                    ))}
+                    {tickerItems.map(
+                      (
+                        item,
+                        index,
+                      ) => (
+                        <QueueScrollerItem
+                          key={`queue-original-${
+                            item.appointmentId ||
+                            item.appointmentNumber
+                          }-${index}`}
+                          item={item}
+                          currentTreatmentPatient={
+                            currentTreatmentPatient
+                          }
+                          readyPatients={
+                            readyPatients
+                          }
+                          currentDateTime={
+                            currentDateTime
+                          }
+                          doctorArrived={
+                            doctorArrived
+                          }
+                        />
+                      ),
+                    )}
                   </div>
 
-                  <div className="queue-scroller-set" aria-hidden="true">
-                    {tickerItems.map((item, index) => (
-                      <QueueScrollerItem
-                        key={`queue-copy-${
-                          item.appointmentId || item.appointmentNumber
-                        }-${index}`}
-                        item={item}
-                        currentTreatmentPatient={currentTreatmentPatient}
-                        readyPatients={readyPatients}
-                        currentDateTime={currentDateTime}
-                      />
-                    ))}
+                  <div
+                    className="queue-scroller-set"
+                    aria-hidden="true"
+                  >
+                    {tickerItems.map(
+                      (
+                        item,
+                        index,
+                      ) => (
+                        <QueueScrollerItem
+                          key={`queue-copy-${
+                            item.appointmentId ||
+                            item.appointmentNumber
+                          }-${index}`}
+                          item={item}
+                          currentTreatmentPatient={
+                            currentTreatmentPatient
+                          }
+                          readyPatients={
+                            readyPatients
+                          }
+                          currentDateTime={
+                            currentDateTime
+                          }
+                          doctorArrived={
+                            doctorArrived
+                          }
+                        />
+                      ),
+                    )}
                   </div>
                 </div>
               ) : (
                 <div className="queue-scroller-empty">
                   <ClockCircleOutlined />
 
-                  <Text>No appointment numbers are currently available</Text>
+                  <span>
+                    No appointment numbers
+                    available
+                  </span>
                 </div>
               )}
             </div>
           </section>
+
+          {/* =================================================
+              FOOTER
+          ================================================= */}
+
+          <footer className="queue-display-footer">
+            <span>
+              Please remain in the waiting
+              area until your number is
+              displayed.
+            </span>
+
+            <span className="queue-display-footer-divider">
+              •
+            </span>
+
+            <span>
+              Thank you for your patience.
+            </span>
+          </footer>
         </>
       )}
     </div>

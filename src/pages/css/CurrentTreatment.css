@@ -1381,3 +1381,249 @@
     flex: 1;
   }
 }
+
+/* =========================================================
+   TREATMENT INFORMATION CARD
+========================================================= */
+
+.current-treatment-information-card {
+  border-radius: 16px;
+  border: 1px solid #e8edf3;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.current-treatment-information-card .ant-card-body {
+  padding: 0;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.current-treatment-information-card
+  .current-treatment-section-heading {
+  padding: 20px 22px 16px;
+  margin: 0;
+  border-bottom: 1px solid #edf0f4;
+}
+
+.current-treatment-information-card
+  .current-treatment-section-heading
+  .ant-typography {
+  margin-bottom: 0;
+}
+
+
+/* =========================================================
+   TABS
+========================================================= */
+
+.current-treatment-information-tabs {
+  width: 100%;
+}
+
+.current-treatment-information-tabs > .ant-tabs-nav {
+  margin: 0;
+  padding: 0 22px;
+  background: #fafbfc;
+  border-bottom: 1px solid #edf0f4;
+}
+
+.current-treatment-information-tabs
+  > .ant-tabs-nav::before {
+  border-bottom: none;
+}
+
+.current-treatment-information-tabs
+  .ant-tabs-tab {
+  padding: 15px 4px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.current-treatment-information-tabs
+  .ant-tabs-tab
+  .anticon {
+  font-size: 16px;
+}
+
+.current-treatment-information-tabs
+  .ant-tabs-tab-active
+  .ant-tabs-tab-btn {
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   TAB CONTENT
+========================================================= */
+
+.current-treatment-tab-content {
+  padding: 22px;
+}
+
+
+/* =========================================================
+   PRESCRIPTION
+========================================================= */
+
+.current-treatment-prescription-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.current-treatment-prescription-heading
+  .ant-typography {
+  margin: 0;
+}
+
+.current-treatment-prescription-icon {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: #eef6ff;
+  color: #1677ff;
+
+  font-size: 19px;
+
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   DRUG BUTTONS
+========================================================= */
+
+.current-treatment-drug-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+
+  padding: 16px;
+
+  margin-bottom: 22px;
+
+  background: #fafbfc;
+
+  border: 1px solid #edf0f4;
+  border-radius: 12px;
+}
+
+.current-treatment-drug-button {
+  height: 36px;
+
+  border-radius: 9px;
+
+  font-weight: 500;
+}
+
+.current-treatment-drug-button--selected {
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   PRESCRIPTION TABLE HEADER
+========================================================= */
+
+.current-treatment-prescription-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 16px;
+
+  margin-bottom: 12px;
+}
+
+.current-treatment-prescription-table-description {
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.current-treatment-prescription-table {
+  margin-bottom: 14px;
+}
+
+.current-treatment-prescription-table
+  .ant-table {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   ADD DRUG BUTTON
+========================================================= */
+
+.current-treatment-add-drug-row-button {
+  height: 42px;
+
+  border-radius: 10px;
+
+  font-weight: 500;
+}
+
+
+/* =========================================================
+   EXTRA CLINICAL DETAILS
+========================================================= */
+
+.current-treatment-extra-details {
+  margin-top: 8px;
+
+  border-radius: 12px;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+  .current-treatment-information-card
+    .current-treatment-section-heading {
+    padding: 17px;
+  }
+
+  .current-treatment-information-tabs
+    > .ant-tabs-nav {
+    padding: 0 16px;
+  }
+
+  .current-treatment-tab-content {
+    padding: 17px;
+  }
+
+  .current-treatment-prescription-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .current-treatment-prescription-heading
+    > .ant-btn {
+    width: 100%;
+  }
+
+  .current-treatment-prescription-table-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

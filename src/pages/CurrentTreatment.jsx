@@ -26,6 +26,7 @@ import {
   Spin,
   Steps,
   Table,
+  Tabs,
   Tag,
   Typography,
   message,
@@ -1106,7 +1107,7 @@ const CurrentTreatment = () => {
 
       setPrintPrescriptionData(prescriptionData);
 
-      setPrescriptionPreviewOpen(true);
+      //setPrescriptionPreviewOpen(true);
 
       message.success("Treatment saved successfully");
 
@@ -1287,233 +1288,361 @@ const CurrentTreatment = () => {
     ];
 
     return (
-      <div className="current-treatment-step">
-        <div className="current-treatment-section-heading">
-          <div>
-            <Title level={4}>Treatment Information</Title>
+  <div className="current-treatment-step">
+    <Card
+      bordered={false}
+      className="current-treatment-information-card"
+    >
+      {/* =====================================================
+          CARD HEADER
+      ====================================================== */}
+      <div className="current-treatment-section-heading">
+        <div>
+          <Title level={4}>Treatment Information</Title>
 
-            <Text type="secondary">
-              Record the dental procedure performed for the patient.
-            </Text>
-          </div>
-
-          <div className="current-treatment-section-icon">
-            <MedicineBoxOutlined />
-          </div>
+          <Text type="secondary">
+            Record the treatment details and prescription for the patient.
+          </Text>
         </div>
 
-        <Row gutter={[18, 0]}>
-          <Col xs={24} md={16}>
-            <Form.Item
-              label={
-                <Space wrap>
-                  <Text strong>Treatment</Text>
+        <div className="current-treatment-section-icon">
+          <MedicineBoxOutlined />
+        </div>
+      </div>
 
-                  {!treatmentEditable && (
-                    <Tag color="blue">Filled automatically</Tag>
+      {/* =====================================================
+          TABS
+      ====================================================== */}
+      <Tabs
+        defaultActiveKey="treatment-details"
+        className="current-treatment-information-tabs"
+        items={[
+          /* =================================================
+             TAB 1 — TREATMENT DETAILS
+          ================================================== */
+          {
+            key: "treatment-details",
+
+            label: (
+              <Space size={8}>
+                <MedicineBoxOutlined />
+                <span>Treatment Details</span>
+              </Space>
+            ),
+
+            children: (
+              <div className="current-treatment-tab-content">
+                {/* =================================================
+                    TREATMENT + TOOTH NUMBER
+                ================================================== */}
+                <Row gutter={[18, 0]}>
+                  <Col xs={24} md={16}>
+                    <Form.Item
+                      label={
+                        <Space wrap>
+                          <Text strong>Treatment</Text>
+
+                          {!treatmentEditable && (
+                            <Tag color="blue">
+                              Filled automatically
+                            </Tag>
+                          )}
+
+                          {selectedCommonTreatmentFee > 0 && (
+                            <Tag
+                              color="green"
+                              icon={<DollarOutlined />}
+                            >
+                              Standard Fee:{" "}
+                              {formatCurrency(
+                                selectedCommonTreatmentFee,
+                              )}
+                            </Tag>
+                          )}
+                        </Space>
+                      }
+                      name="treatment_name"
+                      rules={[
+                        {
+                          required: true,
+                          whitespace: true,
+                          message: "Please enter the treatment",
+                        },
+                      ]}
+                    >
+                      <Input
+                        size="large"
+                        readOnly={!treatmentEditable}
+                        prefix={<MedicineBoxOutlined />}
+                        placeholder="Enter treatment"
+                        className={
+                          treatmentEditable
+                            ? "current-treatment-name-input"
+                            : "current-treatment-name-input current-treatment-name-input--locked"
+                        }
+                        addonAfter={
+                          <Button
+                            type="text"
+                            size="small"
+                            icon={<EditOutlined />}
+                            onClick={() =>
+                              setTreatmentEditable(
+                                (previous) => !previous,
+                              )
+                            }
+                          >
+                            {treatmentEditable
+                              ? "Lock"
+                              : "Change"}
+                          </Button>
+                        }
+                      />
+                    </Form.Item>
+                  </Col>
+
+                  <Col xs={24} md={8}>
+                    <Form.Item
+                      label={<Text strong>Tooth Number</Text>}
+                      name="tooth_number"
+                      extra="Leave empty when not required."
+                    >
+                      <Input
+                        size="large"
+                        placeholder="Example: 16"
+                      />
+                    </Form.Item>
+                  </Col>
+                </Row>
+
+                {/* =================================================
+                    TREATMENT DETAILS
+                ================================================== */}
+                <Form.Item
+                  label={
+                    <Text strong>
+                      What treatment was performed?
+                    </Text>
+                  }
+                  name="treatment_details"
+                  rules={[
+                    {
+                      required: true,
+                      whitespace: true,
+                      message:
+                        "Please enter the treatment details",
+                    },
+                  ]}
+                  extra="Enter a clear clinical note describing what was completed."
+                >
+                  <TextArea
+                    rows={3}
+                    maxLength={1500}
+                    showCount
+                    placeholder="Example: Removed decay and completed composite filling"
+                    className="current-treatment-details-input"
+                  />
+                </Form.Item>
+
+                {/* =================================================
+                    EXTRA CLINICAL DETAILS
+                ================================================== */}
+                <Collapse
+                  items={extraClinicalItems}
+                  className="current-treatment-extra-details"
+                />
+              </div>
+            ),
+          },
+
+          /* =================================================
+             TAB 2 — PRESCRIPTION
+          ================================================== */
+          {
+            key: "prescription",
+
+            label: (
+              <Space size={8}>
+                <MedicineBoxOutlined />
+
+                <span>Prescription</span>
+
+                {selectedPrescriptionDrugNames.length > 0 && (
+                  <Tag
+                    color="blue"
+                    style={{
+                      marginInlineStart: 2,
+                      marginInlineEnd: 0,
+                    }}
+                  >
+                    {selectedPrescriptionDrugNames.length}
+                  </Tag>
+                )}
+              </Space>
+            ),
+
+            children: (
+              <div className="current-treatment-tab-content">
+                {/* =================================================
+                    PRESCRIPTION HEADER
+                ================================================== */}
+                <div className="current-treatment-prescription-heading">
+                  <div>
+                    <Space size={10}>
+                      <div className="current-treatment-prescription-icon">
+                        <MedicineBoxOutlined />
+                      </div>
+
+                      <div>
+                        <Title level={5}>
+                          Prescription Medicines
+                        </Title>
+
+                        <Text type="secondary">
+                          Select medicines, dose and number of
+                          days.
+                        </Text>
+                      </div>
+                    </Space>
+                  </div>
+
+                  {selectedPrescriptionDrugNames.length > 0 && (
+                    <Button
+                      htmlType="button"
+                      size="small"
+                      danger
+                      onClick={clearPrescription}
+                    >
+                      Clear Prescription
+                    </Button>
                   )}
+                </div>
 
-                  {selectedCommonTreatmentFee > 0 && (
-                    <Tag color="green" icon={<DollarOutlined />}>
-                      Standard Fee: {formatCurrency(selectedCommonTreatmentFee)}
+                {/* =================================================
+                    DRUG QUICK SELECT
+                ================================================== */}
+                {drugs.length > 0 ? (
+                  <div className="current-treatment-drug-list">
+                    {drugs.map((drug) => {
+                      const drugId = getDrugId(drug);
+
+                      const drugName = getDrugName(drug);
+
+                      const isSelected =
+                        selectedPrescriptionDrugNames.some(
+                          (selectedDrugName) =>
+                            normalizeForComparison(
+                              selectedDrugName,
+                            ) ===
+                            normalizeForComparison(drugName),
+                        );
+
+                      return (
+                        <Button
+                          key={drugId}
+                          htmlType="button"
+                          type={
+                            isSelected
+                              ? "primary"
+                              : "default"
+                          }
+                          icon={
+                            isSelected ? (
+                              <CheckCircleOutlined />
+                            ) : (
+                              <PlusOutlined />
+                            )
+                          }
+                          className={
+                            isSelected
+                              ? "current-treatment-drug-button current-treatment-drug-button--selected"
+                              : "current-treatment-drug-button"
+                          }
+                          onClick={() =>
+                            toggleDrugInPrescription(drug)
+                          }
+                        >
+                          {drugName}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <Alert
+                    type="info"
+                    showIcon
+                    message="No medicines available"
+                    description="Add medicines from the Drugs management page to show them here."
+                    style={{
+                      marginBottom: 18,
+                    }}
+                  />
+                )}
+
+                {/* =================================================
+                    PRESCRIPTION TABLE HEADER
+                ================================================== */}
+                <div className="current-treatment-prescription-table-header">
+                  <div>
+                    <Text strong>
+                      Selected Medicines
+                    </Text>
+
+                    <div>
+                      <Text
+                        type="secondary"
+                        className="current-treatment-prescription-table-description"
+                      >
+                        Configure the dose and treatment duration
+                        for each medicine.
+                      </Text>
+                    </div>
+                  </div>
+
+                  {selectedPrescriptionDrugNames.length > 0 && (
+                    <Tag color="blue">
+                      {selectedPrescriptionDrugNames.length}{" "}
+                      selected
                     </Tag>
                   )}
-                </Space>
-              }
-              name="treatment_name"
-              rules={[
-                {
-                  required: true,
-                  whitespace: true,
-                  message: "Please enter the treatment",
-                },
-              ]}
-            >
-              <Input
-                size="large"
-                readOnly={!treatmentEditable}
-                prefix={<MedicineBoxOutlined />}
-                placeholder="Enter treatment"
-                className={
-                  treatmentEditable
-                    ? "current-treatment-name-input"
-                    : "current-treatment-name-input current-treatment-name-input--locked"
-                }
-                addonAfter={
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<EditOutlined />}
-                    onClick={() =>
-                      setTreatmentEditable((previous) => !previous)
-                    }
-                  >
-                    {treatmentEditable ? "Lock" : "Change"}
-                  </Button>
-                }
-              />
-            </Form.Item>
-          </Col>
-
-          <Col xs={24} md={8}>
-            <Form.Item
-              label="Tooth Number"
-              name="tooth_number"
-              extra="Leave empty when not required."
-            >
-              <Input size="large" placeholder="Example: 16" />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Form.Item
-          label={<Text strong>What treatment was performed?</Text>}
-          name="treatment_details"
-          rules={[
-            {
-              required: true,
-              whitespace: true,
-              message: "Please enter the treatment details",
-            },
-          ]}
-          extra="Enter a clear clinical note describing what was completed."
-        >
-          <TextArea
-            rows={2}
-            maxLength={1500}
-            showCount
-            placeholder="Example: Removed decay and completed composite filling"
-            className="current-treatment-details-input"
-          />
-        </Form.Item>
-
-        <Card bordered={false} className="current-treatment-prescription-card">
-          <div className="current-treatment-prescription-heading">
-            <div>
-              <Space size={9}>
-                <div className="current-treatment-prescription-icon">
-                  <MedicineBoxOutlined />
                 </div>
 
-                <div>
-                  <Title level={5}>Prescription</Title>
+                {/* =================================================
+                    PRESCRIPTION TABLE
+                ================================================== */}
+                <Table
+                  rowKey="key"
+                  columns={prescriptionColumns}
+                  dataSource={prescriptionRows}
+                  pagination={false}
+                  bordered
+                  size="small"
+                  scroll={{
+                    x: 700,
+                  }}
+                  className="current-treatment-prescription-table"
+                />
 
-                  <Text type="secondary">
-                    Select medicines, dose and number of days.
-                  </Text>
-                </div>
-              </Space>
-            </div>
-
-            {selectedPrescriptionDrugNames.length > 0 && (
-              <Button
-                htmlType="button"
-                size="small"
-                danger
-                onClick={clearPrescription}
-              >
-                Clear Prescription
-              </Button>
-            )}
-          </div>
-
-          {drugs.length > 0 ? (
-            <div className="current-treatment-drug-list">
-              {drugs.map((drug) => {
-                const drugId = getDrugId(drug);
-
-                const drugName = getDrugName(drug);
-
-                const isSelected = selectedPrescriptionDrugNames.some(
-                  (selectedDrugName) =>
-                    normalizeForComparison(selectedDrugName) ===
-                    normalizeForComparison(drugName),
-                );
-
-                return (
-                  <Button
-                    key={drugId}
-                    htmlType="button"
-                    type={isSelected ? "primary" : "default"}
-                    icon={
-                      isSelected ? <CheckCircleOutlined /> : <PlusOutlined />
-                    }
-                    className={
-                      isSelected
-                        ? "current-treatment-drug-button current-treatment-drug-button--selected"
-                        : "current-treatment-drug-button"
-                    }
-                    onClick={() => toggleDrugInPrescription(drug)}
-                  >
-                    {drugName}
-                  </Button>
-                );
-              })}
-            </div>
-          ) : (
-            <Alert
-              type="info"
-              showIcon
-              message="No medicines available"
-              description="Add medicines from the Drugs management page to show them here."
-              style={{
-                marginBottom: 18,
-              }}
-            />
-          )}
-
-          <div className="current-treatment-prescription-table-header">
-            <div>
-              <Text strong>Prescription Medicines</Text>
-
-              <div>
-                <Text
-                  type="secondary"
-                  className="current-treatment-prescription-table-description"
+                {/* =================================================
+                    ADD CUSTOM ROW
+                ================================================== */}
+                <Button
+                  htmlType="button"
+                  type="dashed"
+                  block
+                  icon={<PlusOutlined />}
+                  onClick={addPrescriptionRow}
+                  className="current-treatment-add-drug-row-button"
                 >
-                  Select the dose and treatment duration for each drug.
-                </Text>
+                  Add Another Drug
+                </Button>
               </div>
-            </div>
-
-            {selectedPrescriptionDrugNames.length > 0 && (
-              <Tag color="blue">
-                {selectedPrescriptionDrugNames.length} selected
-              </Tag>
-            )}
-          </div>
-
-          <Table
-            rowKey="key"
-            columns={prescriptionColumns}
-            dataSource={prescriptionRows}
-            pagination={false}
-            bordered
-            size="small"
-            scroll={{
-              x: 700,
-            }}
-            className="current-treatment-prescription-table"
-          />
-
-          <Button
-            htmlType="button"
-            type="dashed"
-            block
-            icon={<PlusOutlined />}
-            onClick={addPrescriptionRow}
-            className="current-treatment-add-drug-row-button"
-          >
-            Add Another Drug
-          </Button>
-        </Card>
-
-        <Collapse
-          items={extraClinicalItems}
-          className="current-treatment-extra-details"
-        />
-      </div>
-    );
+            ),
+          },
+        ]}
+      />
+    </Card>
+  </div>
+);
   };
 
   /* ------------------------------------------------------
@@ -1602,7 +1731,7 @@ const CurrentTreatment = () => {
                 name="treatment_charge"
                 rules={[
                   {
-                    required: true,
+                   
                     message: "Please enter the treatment fee",
                   },
                   {

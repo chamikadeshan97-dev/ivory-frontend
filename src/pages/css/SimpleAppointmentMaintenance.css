@@ -2766,3 +2766,480 @@
       46px;
   }
 }
+/* ========================================================
+   Doctor Arrival Card
+======================================================== */
+
+.doctor-arrival-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 20px 22px;
+  margin-bottom: 14px;
+
+  border-radius: 18px;
+  border: 1px solid #dbeafe;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(239, 246, 255, 0.96),
+      rgba(248, 250, 252, 0.98)
+    );
+
+  box-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.06);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.doctor-arrival-card:hover {
+  box-shadow:
+    0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+/* ========================================================
+   Doctor Not Arrived
+======================================================== */
+
+.doctor-arrival-card-not-arrived {
+  border-color: #fcd34d;
+
+  background:
+    linear-gradient(
+      135deg,
+      #fffbeb 0%,
+      #fff7ed 50%,
+      #ffffff 100%
+    );
+}
+
+.doctor-arrival-card-not-arrived .doctor-arrival-icon {
+  color: #d97706;
+  background: #fef3c7;
+  border-color: #fcd34d;
+}
+
+.doctor-arrival-card-not-arrived .doctor-arrival-title {
+  color: #92400e !important;
+}
+
+/* ========================================================
+   Doctor Arrived
+======================================================== */
+
+.doctor-arrival-card-arrived {
+  border-color: #86efac;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f0fdf4 0%,
+      #ecfdf5 50%,
+      #ffffff 100%
+    );
+}
+
+.doctor-arrival-card-arrived .doctor-arrival-icon {
+  color: #15803d;
+  background: #dcfce7;
+  border-color: #86efac;
+}
+
+.doctor-arrival-card-arrived .doctor-arrival-title {
+  color: #166534 !important;
+}
+
+/* ========================================================
+   Doctor Arrival Content
+======================================================== */
+
+.doctor-arrival-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  min-width: 0;
+  flex: 1;
+}
+
+.doctor-arrival-icon {
+  width: 58px;
+  height: 58px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 16px;
+  border: 1px solid;
+
+  font-size: 25px;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.doctor-arrival-information {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.doctor-arrival-label {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: #64748b !important;
+
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.doctor-arrival-title.ant-typography {
+  margin: 0 !important;
+
+  font-size: 20px;
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+.doctor-arrival-description {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #64748b !important;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ========================================================
+   Doctor Arrived Button
+======================================================== */
+
+.doctor-arrived-button.ant-btn {
+  min-width: 240px;
+  min-height: 48px;
+
+  padding: 0 20px;
+
+  border: none;
+  border-radius: 13px;
+
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+
+  background:
+    linear-gradient(
+      135deg,
+      #1677ff,
+      #0891b2
+    );
+
+  box-shadow:
+    0 8px 18px rgba(22, 119, 255, 0.2);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.doctor-arrived-button.ant-btn:hover {
+  transform: translateY(-1px);
+
+  background:
+    linear-gradient(
+      135deg,
+      #0958d9,
+      #0e7490
+    ) !important;
+
+  box-shadow:
+    0 11px 24px rgba(22, 119, 255, 0.26);
+}
+
+.doctor-arrived-button.ant-btn:active {
+  transform: translateY(0);
+}
+
+.doctor-arrived-button.ant-btn-loading {
+  opacity: 0.82;
+}
+
+/* ========================================================
+   Queue Mode Alert
+======================================================== */
+
+.appointment-cards-section > .ant-alert {
+  margin-bottom: 18px;
+
+  border-radius: 14px;
+
+  padding: 12px 16px;
+
+  border-width: 1px;
+
+  box-shadow:
+    0 4px 14px rgba(15, 23, 42, 0.035);
+}
+
+.appointment-cards-section > .ant-alert .ant-alert-icon {
+  margin-top: 2px;
+
+  font-size: 17px;
+}
+
+.appointment-cards-section > .ant-alert .ant-alert-message {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.appointment-cards-section > .ant-alert .ant-alert-description {
+  margin-top: 2px;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Waiting for doctor */
+
+.appointment-cards-section > .ant-alert-warning {
+  background: #fffbeb;
+
+  border-color: #fde68a;
+}
+
+.appointment-cards-section > .ant-alert-warning .ant-alert-message {
+  color: #92400e;
+}
+
+/* Doctor arrived / first selection */
+
+.appointment-cards-section > .ant-alert-info {
+  background: #eff6ff;
+
+  border-color: #bfdbfe;
+}
+
+.appointment-cards-section > .ant-alert-info .ant-alert-message {
+  color: #1e40af;
+}
+
+/* Normal queue active */
+
+.appointment-cards-section > .ant-alert-success {
+  background: #f0fdf4;
+
+  border-color: #bbf7d0;
+}
+
+.appointment-cards-section > .ant-alert-success .ant-alert-message {
+  color: #166534;
+}
+
+/* ========================================================
+   Waiting Patients Section
+======================================================== */
+
+.waiting-patients-section {
+  margin-bottom: 22px;
+
+  padding: 18px;
+
+  border-radius: 18px;
+
+  border: 1px solid #fde68a;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 251, 235, 0.9),
+      rgba(255, 255, 255, 0.96)
+    );
+
+  box-shadow:
+    0 7px 22px rgba(15, 23, 42, 0.045);
+}
+
+.waiting-patients-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 15px;
+}
+
+.waiting-patients-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.waiting-patients-icon {
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 12px;
+
+  color: #d97706;
+  background: #fef3c7;
+
+  border: 1px solid #fde68a;
+
+  font-size: 19px;
+}
+
+.waiting-patients-title.ant-typography {
+  margin: 0 !important;
+
+  color: #78350f;
+
+  font-size: 17px;
+  font-weight: 750;
+}
+
+.waiting-patients-subtitle {
+  display: block;
+
+  margin-top: 2px;
+
+  color: #92400e !important;
+
+  font-size: 12px;
+}
+
+.waiting-patients-layout {
+  margin-top: 4px;
+}
+
+/* ========================================================
+   Better visual separation
+======================================================== */
+
+.doctor-arrival-card + .ant-alert {
+  margin-top: 0;
+}
+
+.appointment-cards-section > .ant-alert + .waiting-patients-section {
+  margin-top: 0;
+}
+
+/* ========================================================
+   Tablet
+======================================================== */
+
+@media (max-width: 900px) {
+  .doctor-arrival-card {
+    align-items: stretch;
+    flex-direction: column;
+
+    gap: 14px;
+
+    padding: 18px;
+  }
+
+  .doctor-arrived-button.ant-btn {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* ========================================================
+   Mobile
+======================================================== */
+
+@media (max-width: 576px) {
+  .doctor-arrival-card {
+    padding: 14px;
+
+    border-radius: 15px;
+  }
+
+  .doctor-arrival-content {
+    gap: 11px;
+  }
+
+  .doctor-arrival-icon {
+    width: 46px;
+    height: 46px;
+
+    border-radius: 12px;
+
+    font-size: 20px;
+  }
+
+  .doctor-arrival-title.ant-typography {
+    font-size: 16px;
+  }
+
+  .doctor-arrival-description {
+    font-size: 11px;
+  }
+
+  .doctor-arrival-label {
+    font-size: 10px;
+  }
+
+  .doctor-arrived-button.ant-btn {
+    min-height: 44px;
+
+    border-radius: 11px;
+
+    font-size: 12px;
+  }
+
+  .appointment-cards-section > .ant-alert {
+    padding: 10px 12px;
+
+    border-radius: 12px;
+  }
+
+  .appointment-cards-section > .ant-alert .ant-alert-message {
+    font-size: 13px;
+  }
+
+  .appointment-cards-section > .ant-alert .ant-alert-description {
+    font-size: 11px;
+  }
+
+  .waiting-patients-section {
+    padding: 13px;
+
+    border-radius: 15px;
+  }
+
+  .waiting-patients-icon {
+    width: 38px;
+    height: 38px;
+
+    font-size: 16px;
+  }
+
+  .waiting-patients-title.ant-typography {
+    font-size: 15px;
+  }
+
+  .waiting-patients-subtitle {
+    font-size: 11px;
+  }
+}

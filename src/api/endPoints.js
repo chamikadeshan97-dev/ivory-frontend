@@ -1,4 +1,32 @@
+import dayjs from "dayjs";
 import axiosInstance from "./axiosInstance";
+
+
+export const loginSmsApi = () =>
+  axiosInstance.post("/sms/login");
+
+export const sendTemplateSMS = async (payload) => {
+   axiosInstance.post("/sms/send-template", payload);
+};
+export const sendSMS = (payload) =>
+  axiosInstance.post("/sms/send", payload);
+
+
+export const sendBulkSms = (payload) =>
+  axiosInstance.post("/sms/bulk", payload);
+
+
+export const normalizeSmsNumber = (number) =>
+  axiosInstance.post("/sms/normalize", {
+    number,
+  });
+
+export const getSmsTokenStatus = () =>
+  axiosInstance.get("/sms/token-status");
+
+
+export const clearSmsToken = () =>
+  axiosInstance.delete("/sms/token");
 
 /* ========================================================
    Patients
@@ -15,7 +43,22 @@ export const createPatient = (data) => {
 export const updatePatient = (id, data) => {
   return axiosInstance.put(`/patients/${id}`, data);
 };
+export const getAllPatients = () => {
+  return axiosInstance.get("/patients");
+};
+export const uploadPatientMedia = async (formData, onUploadProgress) => {
+  return axiosInstance.post(
+    "/patient-media/upload",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
 
+      onUploadProgress,
+    },
+  );
+};
 export const deletePatient = (id) => {
   return axiosInstance.delete(`/patients/${id}`);
 };
@@ -382,7 +425,6 @@ export const getCommonTreatmentStatistics = () => {
   return axiosInstance.get("/common-treatments/statistics");
 };
 
-
 /* ========================================================
    Drugs
 ======================================================== */
@@ -423,9 +465,7 @@ export const searchDrugs = (searchText = "") => {
  * GET /drugs/:id
  */
 export const getDrugById = (id) => {
-  return axiosInstance.get(
-    `/drugs/${encodeURIComponent(id)}`,
-  );
+  return axiosInstance.get(`/drugs/${encodeURIComponent(id)}`);
 };
 
 /**
@@ -476,10 +516,7 @@ export const createDrugsBulk = (drugs) => {
  * }
  */
 export const updateDrug = (id, data) => {
-  return axiosInstance.put(
-    `/drugs/${encodeURIComponent(id)}`,
-    data,
-  );
+  return axiosInstance.put(`/drugs/${encodeURIComponent(id)}`, data);
 };
 
 /**
@@ -493,10 +530,7 @@ export const updateDrug = (id, data) => {
  * }
  */
 export const patchDrug = (id, data) => {
-  return axiosInstance.patch(
-    `/drugs/${encodeURIComponent(id)}`,
-    data,
-  );
+  return axiosInstance.patch(`/drugs/${encodeURIComponent(id)}`, data);
 };
 
 /**
@@ -505,9 +539,7 @@ export const patchDrug = (id, data) => {
  * DELETE /drugs/:id
  */
 export const deleteDrug = (id) => {
-  return axiosInstance.delete(
-    `/drugs/${encodeURIComponent(id)}`,
-  );
+  return axiosInstance.delete(`/drugs/${encodeURIComponent(id)}`);
 };
 
 export const startAppointmentWaiting = (appointmentId) => {
@@ -536,44 +568,124 @@ export const getWaitingByAppointmentId = (appointmentId) => {
   );
 };
 export const getLocations = () => {
-  return axiosInstance.get(
-    "/locations",
-  );
+  return axiosInstance.get("/locations");
 };
 
 export const createLocation = (payload) => {
-  return axiosInstance.post(
-    "/locations",
-    payload,
-  );
+  return axiosInstance.post("/locations", payload);
 };
 
-export const updateLocation = (
-  locationId,
-  payload,
-) => {
+export const updateLocation = (locationId, payload) => {
   return axiosInstance.put(
     `/locations/${encodeURIComponent(locationId)}`,
     payload,
   );
 };
 
-export const deleteLocation = (
-  locationId,
-) => {
-  return axiosInstance.delete(
-    `/locations/${encodeURIComponent(locationId)}`,
-  );
+export const deleteLocation = (locationId) => {
+  return axiosInstance.delete(`/locations/${encodeURIComponent(locationId)}`);
 };
+
+
+export const getDoctorArrivalStatus = (date) =>
+  axiosInstance.get(
+    `/dentists/arrival/${date || dayjs().format("YYYY-MM-DD")}`,
+  );
+
+export const markDoctorArrived = (date) =>
+  axiosInstance.post("/dentists/arrival", {
+    date: date || dayjs().format("YYYY-MM-DD"),
+    send_sms: true,
+  });
 
 export const reassignAppointmentNumber = (
   sourceAppointmentId,
   targetAppointmentId,
-) => {
-  return axiosInstance.patch(
+) =>
+  axiosInstance.patch(
     `/appointments/${sourceAppointmentId}/reassign-number`,
     {
       target_appointment_id: targetAppointmentId,
     },
+  );
+  /* ========================================================
+   Queue Order
+======================================================== */
+
+export const getQueueOrderByDate = (date) =>
+  axiosInstance.get("/queue-order", {
+    params: { date },
+  });
+
+export const addAppointmentToQueueOrder = (data) =>
+  axiosInstance.post("/queue-order", data);
+
+export const reorderQueueOrder = (data) =>
+  axiosInstance.put("/queue-order/reorder", data);
+
+export const updateQueueOrderStatus = (
+  appointmentId,
+  data
+) =>
+  axiosInstance.patch(
+    `/queue-order/${appointmentId}/status`,
+    data
+  );
+
+export const removeAppointmentFromQueueOrder = (
+  appointmentId,
+  date
+) =>
+  axiosInstance.delete(
+    `/queue-order/${appointmentId}`,
+    {
+      data: { date },
+    }
+  );
+
+
+export const saveQueueOrder = (data) =>
+  axiosInstance.put(
+    "/queue-order",
+    data
+  );
+
+export const clearQueueOrder = (date) =>
+  axiosInstance.delete(
+    "/queue-order",
+    {
+      params: { date },
+    }
+  );
+
+
+  /* ========================================================
+   PATIENT MEDIA
+======================================================== */
+
+export const getPatientMedia = (patientId) => {
+  return axiosInstance.get(
+    `/patient-media/patient/${encodeURIComponent(patientId)}`,
+  );
+};
+
+export const getPatientMediaViewUrl = (mediaId) => {
+  return `${axiosInstance.defaults.baseURL}/patient-media/${encodeURIComponent(
+    mediaId,
+  )}/view`;
+};
+
+export const downloadPatientMedia = (mediaId) => {
+  return axiosInstance.get(
+    `/patient-media/${encodeURIComponent(mediaId)}/download`,
+    {
+      responseType: "blob",
+    },
+  );
+};
+
+export const deletePatientMedia = (mediaId) => {
+  return axiosInstance.delete(
+    `/patient-media/${encodeURIComponent(mediaId)}`,
   );
 };

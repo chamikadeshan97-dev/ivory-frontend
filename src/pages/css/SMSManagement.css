@@ -1,0 +1,408 @@
+/* =========================================================
+   PAGE
+========================================================= */
+
+.sms-management-page {
+  min-height: 100%;
+  padding: 24px;
+  background: #f5f7fb;
+}
+
+.sms-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 22px;
+}
+
+.sms-page-title {
+  margin: 0 !important;
+}
+
+.sms-header-icon {
+  width: 52px;
+  height: 52px;
+
+  border-radius: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 24px;
+
+  color: #1677ff;
+
+  background: rgba(22, 119, 255, 0.1);
+}
+
+/* =========================================================
+   STATISTICS
+========================================================= */
+
+.sms-statistics-row {
+  margin-bottom: 20px;
+}
+
+.sms-stat-card {
+  height: 100%;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+/* =========================================================
+   ALERT
+========================================================= */
+
+.sms-info-alert {
+  margin-bottom: 28px;
+
+  border-radius: 12px;
+}
+
+/* =========================================================
+   SECTION HEADER
+========================================================= */
+
+.sms-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 16px;
+}
+
+.sms-section-header h4 {
+  margin-bottom: 2px !important;
+}
+
+/* =========================================================
+   TEMPLATE CARD
+========================================================= */
+
+.sms-template-card {
+  height: 100%;
+
+  border-radius: 16px;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.sms-template-card:hover {
+  transform: translateY(-2px);
+
+  border-color: #91caff;
+
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.sms-template-disabled {
+  opacity: 0.7;
+}
+
+.sms-template-card-header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 18px;
+}
+
+.sms-template-icon {
+  width: 44px;
+  height: 44px;
+
+  border-radius: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 20px;
+
+  color: #1677ff;
+
+  background: rgba(22, 119, 255, 0.08);
+}
+
+.sms-template-title {
+  margin-bottom: 6px !important;
+}
+
+.sms-template-description {
+  min-height: 44px;
+
+  margin-bottom: 14px !important;
+}
+
+/* =========================================================
+   MESSAGE PREVIEW
+========================================================= */
+
+.sms-message-preview {
+  min-height: 125px;
+  max-height: 125px;
+
+  overflow-y: auto;
+
+  padding: 14px;
+
+  line-height: 1.6;
+
+  font-size: 13px;
+
+  border-radius: 12px;
+
+  background: #f7f8fa;
+
+  border: 1px solid #edf0f3;
+
+  white-space: pre-wrap;
+}
+
+.sms-template-meta {
+  margin-top: 14px;
+}
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+.sms-variable-area {
+  margin-top: 16px;
+
+  padding-top: 14px;
+
+  border-top: 1px solid #f0f0f0;
+}
+
+.sms-variable-label {
+  display: block;
+
+  margin-bottom: 8px;
+}
+
+.sms-modal-variables {
+  margin-top: 8px;
+
+  padding: 12px;
+
+  border-radius: 10px;
+
+  background: #f7f8fa;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.sms-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  flex-wrap: wrap;
+
+  margin-top: 20px;
+}
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+.sms-history-card {
+  margin-top: 28px;
+
+  border-radius: 16px;
+
+  overflow: hidden;
+}
+
+/* =========================================================
+   PHONE PREVIEW
+========================================================= */
+
+.sms-phone-preview {
+  width: 100%;
+  max-width: 390px;
+
+  margin: 10px auto 20px;
+
+  border: 8px solid #1f1f1f;
+
+  border-radius: 28px;
+
+  overflow: hidden;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.15);
+}
+
+.sms-phone-header {
+  padding: 14px 16px;
+
+  font-weight: 600;
+
+  text-align: center;
+
+  border-bottom: 1px solid #eeeeee;
+
+  background: #fafafa;
+}
+
+.sms-phone-content {
+  min-height: 250px;
+
+  padding: 20px 14px;
+
+  background: #f1f2f4;
+}
+
+.sms-message-bubble {
+  max-width: 90%;
+
+  padding: 12px 14px;
+
+  line-height: 1.5;
+
+  font-size: 14px;
+
+  border-radius: 14px 14px 14px 4px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.sms-preview-stats {
+  display: flex;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  flex-wrap: wrap;
+}
+
+/* =========================================================
+   TEST SMS
+========================================================= */
+
+.sms-test-alert {
+  margin-bottom: 20px;
+}
+
+.sms-test-message {
+  margin-top: 10px;
+  margin-bottom: 8px;
+
+  padding: 14px;
+
+  line-height: 1.6;
+
+  border-radius: 10px;
+
+  border: 1px solid #e8e8e8;
+
+  background: #f7f8fa;
+
+  white-space: pre-wrap;
+}
+
+/* =========================================================
+   DARK THEME SUPPORT
+========================================================= */
+
+html[data-theme="dark"] .sms-management-page,
+body.dark .sms-management-page,
+.dark .sms-management-page {
+  background: #101214;
+}
+
+html[data-theme="dark"] .sms-message-preview,
+html[data-theme="dark"] .sms-modal-variables,
+html[data-theme="dark"] .sms-test-message,
+body.dark .sms-message-preview,
+body.dark .sms-modal-variables,
+body.dark .sms-test-message,
+.dark .sms-message-preview,
+.dark .sms-modal-variables,
+.dark .sms-test-message {
+  background: #1b1d20;
+
+  border-color: #303236;
+}
+
+html[data-theme="dark"] .sms-phone-header,
+body.dark .sms-phone-header,
+.dark .sms-phone-header {
+  background: #181a1d;
+
+  border-color: #303236;
+}
+
+html[data-theme="dark"] .sms-phone-content,
+body.dark .sms-phone-content,
+.dark .sms-phone-content {
+  background: #111315;
+}
+
+html[data-theme="dark"] .sms-message-bubble,
+body.dark .sms-message-bubble,
+.dark .sms-message-bubble {
+  background: #24272b;
+}
+
+html[data-theme="dark"] .sms-variable-area,
+body.dark .sms-variable-area,
+.dark .sms-variable-area {
+  border-color: #303236;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+  .sms-management-page {
+    padding: 16px;
+  }
+
+  .sms-page-header {
+    align-items: flex-start;
+  }
+
+  .sms-card-actions {
+    width: 100%;
+  }
+
+  .sms-card-actions .ant-btn {
+    flex: 1;
+  }
+
+  .sms-phone-preview {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .sms-template-description {
+    min-height: auto;
+  }
+
+  .sms-message-preview {
+    max-height: none;
+  }
+}

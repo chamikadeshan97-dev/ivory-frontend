@@ -1,0 +1,2174 @@
+/* ========================================================
+   QUEUE MANAGER
+   LIGHT + DARK THEME
+======================================================== */
+
+/* ========================================================
+   LIGHT THEME - DEFAULT
+======================================================== */
+
+:root,
+[data-theme="light"],
+.light-theme {
+  --qm-page-bg: transparent;
+
+  --qm-surface: #ffffff;
+  --qm-surface-secondary: #f8fafc;
+  --qm-surface-tertiary: #f1f5f9;
+
+  --qm-text-primary: #0f172a;
+  --qm-text-secondary: #64748b;
+  --qm-text-muted: #94a3b8;
+
+  --qm-border: #e2e8f0;
+  --qm-border-soft: #dbe3ed;
+
+  --qm-primary: #1677ff;
+  --qm-primary-hover: #4096ff;
+  --qm-primary-border: #91caff;
+  --qm-primary-soft: #e6f4ff;
+  --qm-primary-softer: #f0f7ff;
+
+  --qm-success: #52c41a;
+  --qm-success-dark: #389e0d;
+  --qm-success-text: #237804;
+  --qm-success-border: #95de64;
+  --qm-success-soft-border: #d9f7be;
+  --qm-success-soft: #f6ffed;
+
+  --qm-danger: #ff4d4f;
+  --qm-danger-dark: #cf1322;
+  --qm-danger-text: #a8071a;
+  --qm-danger-soft: #fff1f0;
+  --qm-danger-drop: #fff2f0;
+
+  --qm-shadow-soft:
+    0 3px 12px rgba(15, 23, 42, 0.035);
+
+  --qm-shadow-card:
+    0 4px 16px rgba(15, 23, 42, 0.04);
+
+  --qm-shadow-hover:
+    0 7px 20px rgba(15, 23, 42, 0.09);
+
+  --qm-shadow-overlay:
+    0 18px 38px rgba(15, 23, 42, 0.22);
+
+  --qm-scroll-track: #f1f5f9;
+  --qm-scroll-thumb: #cbd5e1;
+  --qm-scroll-thumb-hover: #94a3b8;
+
+  --qm-drop-top-start: #f8fbff;
+  --qm-drop-top-end: #ffffff;
+
+  --qm-drop-bottom: #fafafa;
+
+  --qm-card-active-start: #ffffff;
+  --qm-card-active-end: #f0f7ff;
+
+  --qm-treatment-start: #f6ffed;
+  --qm-treatment-end: #ffffff;
+
+  --qm-input-bg: #ffffff;
+  --qm-input-border: #d9d9d9;
+}
+
+
+/* ========================================================
+   DARK THEME
+======================================================== */
+
+[data-theme="dark"],
+.dark-theme {
+  --qm-page-bg: transparent;
+
+  --qm-surface: #111827;
+  --qm-surface-secondary: #172033;
+  --qm-surface-tertiary: #1e293b;
+
+  --qm-text-primary: #f8fafc;
+  --qm-text-secondary: #cbd5e1;
+  --qm-text-muted: #94a3b8;
+
+  --qm-border: #334155;
+  --qm-border-soft: #374151;
+
+  --qm-primary: #4096ff;
+  --qm-primary-hover: #69b1ff;
+  --qm-primary-border: #1668dc;
+  --qm-primary-soft: #102a49;
+  --qm-primary-softer: #111f36;
+
+  --qm-success: #73d13d;
+  --qm-success-dark: #95de64;
+  --qm-success-text: #b7eb8f;
+  --qm-success-border: #389e0d;
+  --qm-success-soft-border: #274916;
+  --qm-success-soft: #162312;
+
+  --qm-danger: #ff7875;
+  --qm-danger-dark: #ff7875;
+  --qm-danger-text: #ffa39e;
+  --qm-danger-soft: #2a1215;
+  --qm-danger-drop: #2c1618;
+
+  --qm-shadow-soft:
+    0 4px 14px rgba(0, 0, 0, 0.16);
+
+  --qm-shadow-card:
+    0 5px 18px rgba(0, 0, 0, 0.2);
+
+  --qm-shadow-hover:
+    0 8px 24px rgba(0, 0, 0, 0.32);
+
+  --qm-shadow-overlay:
+    0 20px 45px rgba(0, 0, 0, 0.48);
+
+  --qm-scroll-track: #1e293b;
+  --qm-scroll-thumb: #475569;
+  --qm-scroll-thumb-hover: #64748b;
+
+  --qm-drop-top-start: #111c2e;
+  --qm-drop-top-end: #111827;
+
+  --qm-drop-bottom: #151d2b;
+
+  --qm-card-active-start: #172033;
+  --qm-card-active-end: #111f36;
+
+  --qm-treatment-start: #162312;
+  --qm-treatment-end: #111827;
+
+  --qm-input-bg: #172033;
+  --qm-input-border: #475569;
+}
+
+
+/* ========================================================
+   PAGE
+======================================================== */
+
+.queue-manager-page {
+  width: 100%;
+
+  padding-bottom: 40px;
+
+  color: var(--qm-text-primary);
+
+  background: var(--qm-page-bg);
+
+  transition:
+    color 0.25s ease,
+    background-color 0.25s ease;
+}
+
+
+/* ========================================================
+   ANT DESIGN TYPOGRAPHY
+======================================================== */
+
+.queue-manager-page .ant-typography {
+  color: var(--qm-text-primary);
+}
+
+.queue-manager-page .ant-typography-secondary {
+  color: var(--qm-text-secondary) !important;
+}
+
+
+/* ========================================================
+   HEADER
+======================================================== */
+
+.queue-manager-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 24px;
+
+  margin-bottom: 20px;
+}
+
+.queue-manager-eyebrow {
+  margin-bottom: 5px;
+
+  color: var(--qm-primary);
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: 1.4px;
+}
+
+.queue-manager-page-title {
+  margin: 0 0 4px !important;
+
+  color: var(--qm-text-primary) !important;
+}
+
+
+/* ========================================================
+   STATS
+======================================================== */
+
+.queue-manager-stats {
+  display: grid;
+
+  grid-template-columns:
+    minmax(285px, 1.6fr)
+    repeat(4, minmax(120px, 1fr));
+
+  gap: 12px;
+
+  margin-bottom: 20px;
+}
+
+.queue-manager-stat {
+  min-height: 96px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding: 14px 16px;
+
+  border: 1px solid var(--qm-border);
+  border-radius: 15px;
+
+  background: var(--qm-surface);
+
+  box-shadow: var(--qm-shadow-soft);
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.queue-manager-stat > span {
+  margin-bottom: 5px;
+
+  color: var(--qm-text-secondary);
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.queue-manager-stat > strong {
+  color: var(--qm-text-primary);
+
+  font-size: 19px;
+}
+
+
+/* ========================================================
+   CURRENT TREATMENT
+======================================================== */
+
+.queue-manager-treatment-stat {
+  border-color: var(--qm-border);
+
+  background:
+    linear-gradient(
+      145deg,
+      var(--qm-surface),
+      var(--qm-surface-secondary)
+    );
+}
+
+.queue-manager-treatment-active {
+  border-color: var(--qm-success-border);
+
+  background:
+    linear-gradient(
+      145deg,
+      var(--qm-treatment-start),
+      var(--qm-treatment-end)
+    );
+
+  box-shadow:
+    0 5px 18px rgba(82, 196, 26, 0.09);
+}
+
+.queue-manager-treatment-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-bottom: 10px;
+}
+
+.queue-manager-treatment-title {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  color: var(--qm-text-secondary);
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 1px;
+}
+
+.queue-manager-treatment-title .anticon {
+  color: var(--qm-success);
+
+  font-size: 15px;
+}
+
+.queue-manager-treatment-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+}
+
+.queue-manager-treatment-number {
+  color: var(--qm-text-primary);
+
+  font-size: 38px;
+  font-weight: 900;
+
+  line-height: 1;
+}
+
+.queue-manager-treatment-number span {
+  margin-right: 2px;
+
+  color: var(--qm-text-muted);
+
+  font-size: 21px;
+}
+
+.queue-manager-no-treatment {
+  color: var(--qm-text-muted);
+
+  font-size: 12px;
+}
+
+
+/* ========================================================
+   ALERT
+======================================================== */
+
+.queue-manager-alert {
+  margin-bottom: 18px;
+}
+
+
+/* ========================================================
+   QUEUE SECTIONS
+======================================================== */
+
+.queue-section-card {
+  border: 1px solid var(--qm-border) !important;
+
+  border-radius: 18px !important;
+
+  background: var(--qm-surface) !important;
+
+  box-shadow: var(--qm-shadow-card);
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.queue-section-card .ant-card-body {
+  background: transparent;
+}
+
+.queue-section-active {
+  border-top:
+    4px solid var(--qm-primary) !important;
+}
+
+.queue-section-available {
+  border-top:
+    4px solid var(--qm-text-muted) !important;
+}
+
+.queue-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 16px;
+}
+
+.queue-section-title-row {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
+
+.queue-section-number {
+  width: 36px;
+  height: 36px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 11px;
+
+  background: var(--qm-primary);
+
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.queue-section-number-secondary {
+  background: var(--qm-text-secondary);
+}
+
+.queue-section-title {
+  margin: 0 !important;
+
+  color: var(--qm-text-primary) !important;
+}
+
+
+/* ========================================================
+   DROP AREAS
+======================================================== */
+
+.queue-drop-area {
+  min-height: 205px;
+
+  padding: 16px;
+
+  border:
+    2px dashed var(--qm-border-soft);
+
+  border-radius: 16px;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.queue-drop-area-top {
+  background:
+    linear-gradient(
+      180deg,
+      var(--qm-drop-top-start),
+      var(--qm-drop-top-end)
+    );
+}
+
+.queue-drop-area-bottom {
+  background: var(--qm-drop-bottom);
+}
+
+.queue-drop-area-over {
+  border-color: var(--qm-primary);
+
+  background: var(--qm-primary-soft);
+
+  box-shadow:
+    inset 0 0 0 1px
+      rgba(22, 119, 255, 0.15);
+}
+
+.queue-drop-area-remove {
+  border-color: var(--qm-danger);
+
+  background: var(--qm-danger-drop);
+}
+
+
+/* ========================================================
+   EMPTY QUEUE
+======================================================== */
+
+.queue-empty-drop {
+  min-height: 165px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  color: var(--qm-text-muted);
+}
+
+.queue-empty-drop-icon {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 9px;
+
+  border-radius: 12px;
+
+  background: var(--qm-primary-soft);
+
+  color: var(--qm-primary);
+
+  font-size: 19px;
+}
+
+.queue-empty-drop strong {
+  color: var(--qm-text-secondary);
+
+  font-size: 14px;
+}
+
+.queue-empty-drop span {
+  max-width: 350px;
+
+  margin-top: 4px;
+
+  font-size: 12px;
+}
+
+
+/* ========================================================
+   ACTIVE QUEUE LAYOUT
+======================================================== */
+
+.queue-active-layout {
+  width: 100%;
+
+  display: flex;
+  align-items: stretch;
+
+  gap: 18px;
+}
+
+.queue-active-waiting-area {
+  flex: 1;
+
+  min-width: 0;
+
+  overflow-x: auto;
+}
+
+.queue-active-waiting-area .queue-card-row {
+  min-height: 100%;
+}
+
+
+/* ========================================================
+   TREATMENT DONE AREA
+======================================================== */
+
+.queue-treatment-done-area {
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 8px;
+
+  margin-left: auto;
+
+  padding-left: 16px;
+
+  border-left:
+    1px solid var(--qm-success-soft-border);
+}
+
+
+/* ========================================================
+   TREATMENT DONE CARD
+======================================================== */
+
+.queue-treatment-done-card {
+  min-width: 92px;
+  height: 92px;
+
+  padding: 12px;
+
+  border:
+    2px solid var(--qm-success);
+
+  border-radius: 16px;
+
+  background: var(--qm-success-soft);
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  box-shadow:
+    0 4px 14px rgba(82, 196, 26, 0.14);
+}
+
+.queue-treatment-done-check {
+  color: var(--qm-success);
+
+  font-size: 26px;
+
+  line-height: 1;
+}
+
+.queue-treatment-done-number {
+  color: var(--qm-success-text);
+
+  font-size: 21px;
+  font-weight: 800;
+
+  line-height: 1;
+}
+
+.queue-treatment-done-number span {
+  margin-right: 2px;
+}
+
+
+/* ========================================================
+   HORIZONTAL CARD ROW
+======================================================== */
+
+.queue-card-row {
+  width: 100%;
+
+  display: flex;
+
+  gap: 13px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  padding: 3px 3px 12px;
+
+  scroll-behavior: smooth;
+}
+
+.queue-card-row::-webkit-scrollbar {
+  height: 8px;
+}
+
+.queue-card-row::-webkit-scrollbar-track {
+  border-radius: 10px;
+
+  background: var(--qm-scroll-track);
+}
+
+.queue-card-row::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+
+  background: var(--qm-scroll-thumb);
+}
+
+.queue-card-row::-webkit-scrollbar-thumb:hover {
+  background: var(--qm-scroll-thumb-hover);
+}
+
+
+/* ========================================================
+   QUEUE CARD
+======================================================== */
+
+.queue-card {
+  position: relative;
+
+  width: 220px;
+  min-width: 220px;
+  min-height: 230px;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 13px;
+
+  border:
+    1px solid var(--qm-border-soft);
+
+  border-radius: 15px;
+
+  background: var(--qm-surface);
+
+  color: var(--qm-text-primary);
+
+  user-select: none;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.25s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.queue-card:hover {
+  border-color: var(--qm-primary-border);
+
+  box-shadow: var(--qm-shadow-hover);
+}
+
+.queue-card-active {
+  border-color: var(--qm-primary-border);
+
+  background:
+    linear-gradient(
+      145deg,
+      var(--qm-card-active-start),
+      var(--qm-card-active-end)
+    );
+}
+
+.queue-card-current-treatment {
+  border-color: var(--qm-success-border);
+
+  background:
+    linear-gradient(
+      145deg,
+      var(--qm-treatment-start),
+      var(--qm-treatment-end)
+    );
+}
+
+.queue-card-available {
+  min-height: 205px;
+
+  background: var(--qm-surface);
+}
+
+.queue-card-dragging {
+  opacity: 0.3;
+}
+
+
+/* ========================================================
+   DRAG HANDLE
+======================================================== */
+
+.queue-card-drag-handle {
+  position: absolute;
+
+  top: 8px;
+  right: 8px;
+
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 4px;
+
+  padding: 0 8px;
+
+  border:
+    1px solid var(--qm-border);
+
+  border-radius: 8px;
+
+  background: var(--qm-surface-secondary);
+
+  color: var(--qm-text-secondary);
+
+  font-size: 10px;
+  font-weight: 600;
+
+  cursor: grab;
+
+  touch-action: none;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.queue-card-drag-handle:hover {
+  border-color: var(--qm-primary-border);
+
+  background: var(--qm-primary-soft);
+
+  color: var(--qm-primary);
+}
+
+.queue-card-drag-handle:active {
+  cursor: grabbing;
+}
+
+
+/* ========================================================
+   QUEUE POSITION
+======================================================== */
+
+.queue-card-position {
+  position: absolute;
+
+  top: 9px;
+  left: 9px;
+
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+
+  background: var(--qm-primary);
+
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+
+/* ========================================================
+   TREATMENT BADGE
+======================================================== */
+
+.queue-card-treatment-badge {
+  position: absolute;
+
+  top: 45px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  padding: 4px 7px;
+
+  border-radius: 6px;
+
+  background: var(--qm-success-soft);
+
+  color: var(--qm-success-dark);
+
+  font-size: 8px;
+  font-weight: 800;
+
+  letter-spacing: 0.4px;
+
+  white-space: nowrap;
+}
+
+
+/* ========================================================
+   APPOINTMENT NUMBER
+======================================================== */
+
+.queue-card-main {
+  min-height: 92px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding-top: 25px;
+
+  text-align: center;
+}
+
+.queue-card-number {
+  color: var(--qm-text-primary);
+
+  font-size: 42px;
+  font-weight: 900;
+
+  line-height: 1;
+}
+
+.queue-card-number span {
+  margin-right: 2px;
+
+  color: var(--qm-text-muted);
+
+  font-size: 21px;
+}
+
+.queue-card-name {
+  width: 100%;
+
+  margin-top: 7px;
+
+  overflow: hidden;
+
+  color: var(--qm-text-secondary);
+
+  font-size: 11px;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+/* ========================================================
+   META
+======================================================== */
+
+.queue-card-meta {
+  min-height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 4px;
+
+  margin-bottom: 8px;
+
+  overflow: hidden;
+}
+
+.queue-card-meta .ant-tag {
+  max-width: 90px;
+
+  margin-inline-end: 0;
+
+  overflow: hidden;
+
+  font-size: 9px;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+/* ========================================================
+   MOVE TO TREATMENT
+======================================================== */
+
+.queue-card-treatment-action {
+  width: 100%;
+
+  margin-top: 10px;
+  margin-bottom: 9px;
+}
+
+.queue-card-treatment-button-wrapper {
+  display: block;
+
+  width: 100%;
+}
+
+.queue-card-treatment-button {
+  width: 100%;
+
+  font-weight: 600;
+}
+
+.queue-card-treatment-button:disabled {
+  opacity: 0.65;
+}
+
+
+/* ========================================================
+   TOP CARD CONTROLS
+======================================================== */
+
+.queue-card-controls {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  margin-top: auto;
+
+  padding-top: 9px;
+
+  border-top:
+    1px solid var(--qm-border);
+}
+
+.queue-card-move-buttons {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap: 5px;
+}
+
+.queue-card-move-buttons .ant-btn {
+  width: 100%;
+
+  padding-inline: 0;
+}
+
+.queue-card-position-select {
+  width: 100%;
+}
+
+.queue-card-remove-button {
+  width: 100%;
+}
+
+
+/* ========================================================
+   DAILY APPOINTMENT ACTIONS
+======================================================== */
+
+.queue-card-available-actions {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+
+  margin-top: 10px;
+}
+
+.queue-card-action-wrapper {
+  display: block;
+
+  width: 100%;
+}
+
+.queue-card-checkin-button {
+  width: 100%;
+
+  font-weight: 600;
+}
+
+.queue-card-add-button {
+  margin-top: auto;
+}
+
+
+/* ========================================================
+   CHECKED IN
+======================================================== */
+
+.queue-card-checked-in {
+  border-color: var(--qm-success-border);
+}
+
+.queue-card-checkin-done.ant-btn {
+  color: var(--qm-success-dark) !important;
+
+  border-color:
+    var(--qm-success-border) !important;
+
+  background:
+    var(--qm-success-soft) !important;
+
+  opacity: 1 !important;
+
+  font-weight: 700;
+}
+
+
+/* ========================================================
+   SYSTEM SKIP
+======================================================== */
+
+.queue-card-system-skip {
+  border:
+    2px solid var(--qm-danger) !important;
+
+  background:
+    var(--qm-danger-soft) !important;
+
+  box-shadow:
+    0 4px 14px
+      rgba(255, 77, 79, 0.14) !important;
+}
+
+.queue-card-system-skip:hover {
+  border-color:
+    var(--qm-danger-dark) !important;
+
+  box-shadow:
+    0 8px 22px
+      rgba(255, 77, 79, 0.2) !important;
+}
+
+.queue-card-system-skip .queue-card-number {
+  color: var(--qm-danger-dark);
+}
+
+.queue-card-system-skip .queue-card-name {
+  color: var(--qm-danger-text);
+
+  font-weight: 700;
+}
+
+.queue-card-system-skip .queue-card-drag-handle {
+  color: var(--qm-danger-dark);
+}
+
+.queue-card-system-skip-badge {
+  display: inline-flex;
+  align-items: center;
+
+  width: fit-content;
+
+  margin-bottom: 8px;
+
+  padding: 4px 9px;
+
+  border-radius: 6px;
+
+  background: var(--qm-danger-dark);
+
+  color: #ffffff;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 0.7px;
+}
+
+
+/* ========================================================
+   DRAG OVERLAY
+======================================================== */
+
+.queue-card-overlay {
+  width: 210px;
+  min-width: 210px;
+
+  border-color: var(--qm-primary);
+
+  opacity: 0.97;
+
+  box-shadow: var(--qm-shadow-overlay);
+
+  transform: rotate(2deg);
+}
+
+
+/* ========================================================
+   TRANSFER HINT
+======================================================== */
+
+.queue-transfer-hint {
+  min-height: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 13px;
+
+  padding: 10px;
+
+  color: var(--qm-text-secondary);
+
+  text-align: center;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  letter-spacing: 0.3px;
+
+  text-transform: uppercase;
+}
+
+.queue-transfer-arrow {
+  width: 28px;
+  height: 28px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: var(--qm-primary-soft);
+
+  color: var(--qm-primary);
+
+  font-size: 17px;
+}
+
+
+/* ========================================================
+   ANT DESIGN DARK MODE SUPPORT
+
+   These are important if your global Ant Design
+   ConfigProvider is not already using darkAlgorithm.
+======================================================== */
+
+[data-theme="dark"] .queue-manager-page .ant-picker,
+.dark-theme .queue-manager-page .ant-picker {
+  border-color: var(--qm-input-border);
+
+  background: var(--qm-input-bg);
+
+  color: var(--qm-text-primary);
+}
+
+[data-theme="dark"] .queue-manager-page .ant-picker input,
+.dark-theme .queue-manager-page .ant-picker input {
+  color: var(--qm-text-primary);
+}
+
+[data-theme="dark"] .queue-manager-page .ant-picker-suffix,
+.dark-theme .queue-manager-page .ant-picker-suffix {
+  color: var(--qm-text-secondary);
+}
+
+
+/* ========================================================
+   SELECT
+======================================================== */
+
+[data-theme="dark"]
+  .queue-manager-page
+  .ant-select-selector,
+.dark-theme
+  .queue-manager-page
+  .ant-select-selector {
+  border-color:
+    var(--qm-input-border) !important;
+
+  background:
+    var(--qm-input-bg) !important;
+
+  color:
+    var(--qm-text-primary) !important;
+}
+
+[data-theme="dark"]
+  .queue-manager-page
+  .ant-select-selection-item,
+.dark-theme
+  .queue-manager-page
+  .ant-select-selection-item {
+  color:
+    var(--qm-text-primary) !important;
+}
+
+[data-theme="dark"]
+  .queue-manager-page
+  .ant-select-arrow,
+.dark-theme
+  .queue-manager-page
+  .ant-select-arrow {
+  color: var(--qm-text-secondary);
+}
+
+
+/* ========================================================
+   DEFAULT BUTTONS
+======================================================== */
+
+[data-theme="dark"]
+  .queue-manager-page
+  .ant-btn-default:not(.ant-btn-dangerous),
+.dark-theme
+  .queue-manager-page
+  .ant-btn-default:not(.ant-btn-dangerous) {
+  border-color: var(--qm-border);
+
+  background: var(--qm-surface-secondary);
+
+  color: var(--qm-text-primary);
+}
+
+[data-theme="dark"]
+  .queue-manager-page
+  .ant-btn-default:not(.ant-btn-dangerous):hover,
+.dark-theme
+  .queue-manager-page
+  .ant-btn-default:not(.ant-btn-dangerous):hover {
+  border-color: var(--qm-primary);
+
+  color: var(--qm-primary);
+
+  background: var(--qm-primary-soft);
+}
+
+
+/* ========================================================
+   DISABLED BUTTONS
+======================================================== */
+
+[data-theme="dark"]
+  .queue-manager-page
+  .ant-btn-default:disabled,
+.dark-theme
+  .queue-manager-page
+  .ant-btn-default:disabled {
+  border-color: #334155;
+
+  background: #1e293b;
+
+  color: #64748b;
+}
+
+
+/* ========================================================
+   EMPTY COMPONENT
+======================================================== */
+
+[data-theme="dark"]
+  .queue-manager-page
+  .ant-empty-description,
+.dark-theme
+  .queue-manager-page
+  .ant-empty-description {
+  color: var(--qm-text-secondary);
+}
+
+
+/* ========================================================
+   SELECT DROPDOWN
+
+   Dropdown is rendered through portal, therefore this
+   selector is intentionally outside queue-manager-page.
+======================================================== */
+
+[data-theme="dark"] .ant-select-dropdown,
+.dark-theme .ant-select-dropdown {
+  background: #172033;
+
+  border:
+    1px solid #334155;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"]
+  .ant-select-item,
+.dark-theme
+  .ant-select-item {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"]
+  .ant-select-item-option-active:not(
+    .ant-select-item-option-disabled
+  ),
+.dark-theme
+  .ant-select-item-option-active:not(
+    .ant-select-item-option-disabled
+  ) {
+  background: #1e293b;
+}
+
+[data-theme="dark"]
+  .ant-select-item-option-selected:not(
+    .ant-select-item-option-disabled
+  ),
+.dark-theme
+  .ant-select-item-option-selected:not(
+    .ant-select-item-option-disabled
+  ) {
+  background: #102a49;
+
+  color: #69b1ff;
+}
+
+
+/* ========================================================
+   DATE PICKER POPUP
+======================================================== */
+
+[data-theme="dark"] .ant-picker-dropdown .ant-picker-panel-container,
+.dark-theme .ant-picker-dropdown .ant-picker-panel-container {
+  background: #172033;
+
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .ant-picker-dropdown .ant-picker-header,
+.dark-theme .ant-picker-dropdown .ant-picker-header {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .ant-picker-dropdown .ant-picker-header button,
+.dark-theme .ant-picker-dropdown .ant-picker-header button {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .ant-picker-dropdown .ant-picker-content th,
+.dark-theme .ant-picker-dropdown .ant-picker-content th {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .ant-picker-dropdown .ant-picker-cell,
+.dark-theme .ant-picker-dropdown .ant-picker-cell {
+  color: #64748b;
+}
+
+[data-theme="dark"]
+  .ant-picker-dropdown
+  .ant-picker-cell-in-view,
+.dark-theme
+  .ant-picker-dropdown
+  .ant-picker-cell-in-view {
+  color: #e2e8f0;
+}
+
+
+/* ========================================================
+   RESPONSIVE
+======================================================== */
+
+@media (max-width: 1350px) {
+  .queue-manager-stats {
+    grid-template-columns:
+      repeat(4, 1fr);
+  }
+
+  .queue-manager-treatment-stat {
+    grid-column: span 2;
+  }
+}
+
+
+@media (max-width: 1000px) {
+  .queue-manager-stats {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .queue-manager-treatment-stat {
+    grid-column: span 2;
+  }
+}
+
+
+@media (max-width: 900px) {
+  .queue-active-layout {
+    flex-direction: column;
+  }
+
+  .queue-treatment-done-area {
+    width: 100%;
+
+    justify-content: flex-end;
+
+    padding-left: 0;
+    padding-top: 12px;
+
+    border-left: none;
+
+    border-top:
+      1px solid
+      var(--qm-success-soft-border);
+  }
+}
+
+
+@media (max-width: 768px) {
+  .queue-manager-header {
+    flex-direction: column;
+  }
+
+  .queue-section-header {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .queue-card {
+    width: 205px;
+
+    min-width: 205px;
+  }
+}
+
+
+@media (max-width: 550px) {
+  .queue-manager-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .queue-manager-treatment-stat {
+    grid-column: auto;
+  }
+
+  .queue-manager-treatment-content {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+  .queue-card {
+    width: 190px;
+
+    min-width: 190px;
+  }
+}
+
+/* ========================================================
+   QUEUE MANAGER — DARK THEME ENHANCEMENTS
+   Append this block to the end of your stylesheet.
+   It extends and completes dark mode coverage without
+   affecting the light theme.
+======================================================== */
+
+
+/* ========================================================
+   DARK THEME — REFINED TOKENS
+   (Overrides / supplements the base dark tokens)
+======================================================== */
+
+[data-theme="dark"],
+.dark-theme {
+  color-scheme: dark;
+
+  --qm-page-bg: transparent;
+
+  /* Surfaces */
+  --qm-surface: #0f172a;
+  --qm-surface-secondary: #16203a;
+  --qm-surface-tertiary: #1e293b;
+
+  /* Text */
+  --qm-text-primary: #f1f5f9;
+  --qm-text-secondary: #cbd5e1;
+  --qm-text-muted: #7c8aa3;
+
+  /* Borders */
+  --qm-border: #2b3a55;
+  --qm-border-soft: #24324b;
+
+  /* Primary */
+  --qm-primary: #4d9bff;
+  --qm-primary-hover: #79b8ff;
+  --qm-primary-border: #1c5fb8;
+  --qm-primary-soft: #0e2a4d;
+  --qm-primary-softer: #101f38;
+
+  /* Success */
+  --qm-success: #7ed957;
+  --qm-success-dark: #a0e57a;
+  --qm-success-text: #c3efab;
+  --qm-success-border: #3d8b2a;
+  --qm-success-soft-border: #23421a;
+  --qm-success-soft: #12210f;
+
+  /* Danger */
+  --qm-danger: #ff7a7a;
+  --qm-danger-dark: #ff9a9a;
+  --qm-danger-text: #ffb3b3;
+  --qm-danger-soft: #2a1113;
+  --qm-danger-drop: #2d1416;
+
+  /* Shadows (deeper for dark surfaces) */
+  --qm-shadow-soft:
+    0 3px 12px rgba(0, 0, 0, 0.35);
+  --qm-shadow-card:
+    0 4px 18px rgba(0, 0, 0, 0.45);
+  --qm-shadow-hover:
+    0 8px 26px rgba(0, 0, 0, 0.55);
+  --qm-shadow-overlay:
+    0 22px 50px rgba(0, 0, 0, 0.65);
+
+  /* Scrollbars */
+  --qm-scroll-track: #1e293b;
+  --qm-scroll-thumb: #3b4a63;
+  --qm-scroll-thumb-hover: #556684;
+
+  /* Gradients */
+  --qm-drop-top-start: #0d1a2f;
+  --qm-drop-top-end: #0f172a;
+
+  --qm-drop-bottom: #131c30;
+
+  --qm-card-active-start: #16203a;
+  --qm-card-active-end: #0e2447;
+
+  --qm-treatment-start: #12210f;
+  --qm-treatment-end: #0f172a;
+
+  /* Inputs */
+  --qm-input-bg: #16203a;
+  --qm-input-border: #3b4a63;
+}
+
+
+/* ========================================================
+   DARK THEME — PAGE BACKGROUND SMOOTHNESS
+======================================================== */
+
+[data-theme="dark"] body,
+.dark-theme body,
+[data-theme="dark"] .queue-manager-page,
+.dark-theme .queue-manager-page {
+  background-color: #0a1122;
+}
+
+
+/* ========================================================
+   DARK THEME — CARD & SECTION POLISH
+======================================================== */
+
+[data-theme="dark"] .queue-section-card,
+.dark-theme .queue-section-card {
+  border-color: var(--qm-border) !important;
+  background: linear-gradient(
+    180deg,
+    var(--qm-surface) 0%,
+    var(--qm-surface-secondary) 100%
+  ) !important;
+}
+
+[data-theme="dark"] .queue-card,
+.dark-theme .queue-card {
+  border-color: var(--qm-border-soft);
+  background: var(--qm-surface);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="dark"] .queue-card:hover,
+.dark-theme .queue-card:hover {
+  border-color: var(--qm-primary-border);
+  background: var(--qm-surface-secondary);
+}
+
+[data-theme="dark"] .queue-card-active,
+.dark-theme .queue-card-active {
+  border-color: var(--qm-primary-border);
+}
+
+[data-theme="dark"] .queue-card-current-treatment,
+.dark-theme .queue-card-current-treatment {
+  border-color: var(--qm-success-border);
+}
+
+[data-theme="dark"] .queue-card-drag-handle,
+.dark-theme .queue-card-drag-handle {
+  border-color: var(--qm-border);
+  background: var(--qm-surface-tertiary);
+  color: var(--qm-text-secondary);
+}
+
+[data-theme="dark"] .queue-card-drag-handle:hover,
+.dark-theme .queue-card-drag-handle:hover {
+  border-color: var(--qm-primary);
+  background: var(--qm-primary-soft);
+  color: var(--qm-primary-hover);
+}
+
+[data-theme="dark"] .queue-card-position,
+.dark-theme .queue-card-position {
+  background: var(--qm-primary);
+  color: #ffffff;
+}
+
+
+/* ========================================================
+   DARK THEME — TREATMENT BADGE
+======================================================== */
+
+[data-theme="dark"] .queue-card-treatment-badge,
+.dark-theme .queue-card-treatment-badge {
+  background: var(--qm-success-soft);
+  color: var(--qm-success-text);
+  border: 1px solid var(--qm-success-soft-border);
+}
+
+
+/* ========================================================
+   DARK THEME — TREATMENT DONE CARD
+======================================================== */
+
+[data-theme="dark"] .queue-treatment-done-card,
+.dark-theme .queue-treatment-done-card {
+  background: var(--qm-success-soft);
+  border-color: var(--qm-success-border);
+  box-shadow:
+    0 4px 14px rgba(126, 217, 87, 0.18);
+}
+
+[data-theme="dark"] .queue-treatment-done-number,
+.dark-theme .queue-treatment-done-number {
+  color: var(--qm-success-text);
+}
+
+
+/* ========================================================
+   DARK THEME — SYSTEM SKIP CARD
+======================================================== */
+
+[data-theme="dark"] .queue-card-system-skip,
+.dark-theme .queue-card-system-skip {
+  border-color: var(--qm-danger) !important;
+  background: var(--qm-danger-soft) !important;
+  box-shadow:
+    0 4px 16px rgba(255, 122, 122, 0.2) !important;
+}
+
+[data-theme="dark"] .queue-card-system-skip:hover,
+.dark-theme .queue-card-system-skip:hover {
+  border-color: var(--qm-danger-dark) !important;
+  box-shadow:
+    0 8px 22px rgba(255, 122, 122, 0.3) !important;
+}
+
+[data-theme="dark"] .queue-card-system-skip-badge,
+.dark-theme .queue-card-system-skip-badge {
+  background: var(--qm-danger);
+  color: #1a0e0e;
+}
+
+
+/* ========================================================
+   DARK THEME — DROP AREAS
+======================================================== */
+
+[data-theme="dark"] .queue-drop-area,
+.dark-theme .queue-drop-area {
+  border-color: var(--qm-border-soft);
+}
+
+[data-theme="dark"] .queue-drop-area-over,
+.dark-theme .queue-drop-area-over {
+  border-color: var(--qm-primary);
+  background: var(--qm-primary-soft);
+  box-shadow:
+    inset 0 0 0 1px rgba(77, 155, 255, 0.25);
+}
+
+[data-theme="dark"] .queue-drop-area-remove,
+.dark-theme .queue-drop-area-remove {
+  border-color: var(--qm-danger);
+  background: var(--qm-danger-drop);
+}
+
+
+/* ========================================================
+   DARK THEME — EMPTY DROP
+======================================================== */
+
+[data-theme="dark"] .queue-empty-drop,
+.dark-theme .queue-empty-drop {
+  color: var(--qm-text-muted);
+}
+
+[data-theme="dark"] .queue-empty-drop-icon,
+.dark-theme .queue-empty-drop-icon {
+  background: var(--qm-primary-soft);
+  color: var(--qm-primary-hover);
+}
+
+[data-theme="dark"] .queue-empty-drop strong,
+.dark-theme .queue-empty-drop strong {
+  color: var(--qm-text-secondary);
+}
+
+
+/* ========================================================
+   DARK THEME — QUEUE CARD ROW SCROLLBAR
+======================================================== */
+
+[data-theme="dark"] .queue-card-row::-webkit-scrollbar-track,
+.dark-theme .queue-card-row::-webkit-scrollbar-track {
+  background: var(--qm-scroll-track);
+}
+
+[data-theme="dark"] .queue-card-row::-webkit-scrollbar-thumb,
+.dark-theme .queue-card-row::-webkit-scrollbar-thumb {
+  background: var(--qm-scroll-thumb);
+}
+
+[data-theme="dark"] .queue-card-row::-webkit-scrollbar-thumb:hover,
+.dark-theme .queue-card-row::-webkit-scrollbar-thumb:hover {
+  background: var(--qm-scroll-thumb-hover);
+}
+
+
+/* ========================================================
+   DARK THEME — GLOBAL SCROLLBAR
+======================================================== */
+
+[data-theme="dark"] ::-webkit-scrollbar,
+.dark-theme ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track,
+.dark-theme ::-webkit-scrollbar-track {
+  background: var(--qm-scroll-track);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb,
+.dark-theme ::-webkit-scrollbar-thumb {
+  background: var(--qm-scroll-thumb);
+  border-radius: 10px;
+  border: 2px solid var(--qm-scroll-track);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover,
+.dark-theme ::-webkit-scrollbar-thumb:hover {
+  background: var(--qm-scroll-thumb-hover);
+}
+
+
+/* ========================================================
+   DARK THEME — ANT TAGS
+======================================================== */
+
+[data-theme="dark"] .queue-manager-page .ant-tag,
+.dark-theme .queue-manager-page .ant-tag {
+  background: var(--qm-surface-tertiary);
+  border-color: var(--qm-border);
+  color: var(--qm-text-secondary);
+}
+
+[data-theme="dark"] .queue-manager-page .ant-tag-blue,
+.dark-theme .queue-manager-page .ant-tag-blue {
+  background: var(--qm-primary-soft);
+  border-color: var(--qm-primary-border);
+  color: var(--qm-primary-hover);
+}
+
+[data-theme="dark"] .queue-manager-page .ant-tag-green,
+.dark-theme .queue-manager-page .ant-tag-green {
+  background: var(--qm-success-soft);
+  border-color: var(--qm-success-soft-border);
+  color: var(--qm-success-text);
+}
+
+[data-theme="dark"] .queue-manager-page .ant-tag-red,
+.dark-theme .queue-manager-page .ant-tag-red {
+  background: var(--qm-danger-soft);
+  border-color: var(--qm-danger);
+  color: var(--qm-danger-text);
+}
+
+
+/* ========================================================
+   DARK THEME — ANT ALERT
+======================================================== */
+
+[data-theme="dark"] .queue-manager-page .ant-alert,
+.dark-theme .queue-manager-page .ant-alert {
+  border-radius: 12px;
+  border: 1px solid var(--qm-border);
+  background: var(--qm-surface-secondary);
+  color: var(--qm-text-primary);
+}
+
+[data-theme="dark"] .queue-manager-page .ant-alert-info,
+.dark-theme .queue-manager-page .ant-alert-info {
+  border-color: var(--qm-primary-border);
+  background: var(--qm-primary-softer);
+}
+
+[data-theme="dark"] .queue-manager-page .ant-alert-info .ant-alert-message,
+.dark-theme .queue-manager-page .ant-alert-info .ant-alert-message {
+  color: var(--qm-primary-hover);
+}
+
+[data-theme="dark"] .queue-manager-page .ant-alert-warning,
+.dark-theme .queue-manager-page .ant-alert-warning {
+  border-color: #7a5314;
+  background: #2a1e0a;
+}
+
+[data-theme="dark"] .queue-manager-page .ant-alert-error,
+.dark-theme .queue-manager-page .ant-alert-error {
+  border-color: var(--qm-danger);
+  background: var(--qm-danger-soft);
+}
+
+[data-theme="dark"] .queue-manager-page .ant-alert-success,
+.dark-theme .queue-manager-page .ant-alert-success {
+  border-color: var(--qm-success-border);
+  background: var(--qm-success-soft);
+}
+
+
+/* ========================================================
+   DARK THEME — ANT BUTTONS (PRIMARY / DANGER / LINK)
+======================================================== */
+
+[data-theme="dark"] .queue-manager-page .ant-btn-primary,
+.dark-theme .queue-manager-page .ant-btn-primary {
+  background: var(--qm-primary);
+  border-color: var(--qm-primary);
+  color: #ffffff;
+}
+
+[data-theme="dark"] .queue-manager-page .ant-btn-primary:hover,
+.dark-theme .queue-manager-page .ant-btn-primary:hover {
+  background: var(--qm-primary-hover);
+  border-color: var(--qm-primary-hover);
+}
+
+[data-theme="dark"] .queue-manager-page .ant-btn-primary:disabled,
+.dark-theme .queue-manager-page .ant-btn-primary:disabled {
+  background: #1c5fb8;
+  border-color: #1c5fb8;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] .queue-manager-page .ant-btn-dangerous,
+.dark-theme .queue-manager-page .ant-btn-dangerous {
+  background: var(--qm-danger-soft);
+  border-color: var(--qm-danger);
+  color: var(--qm-danger-text);
+}
+
+[data-theme="dark"] .queue-manager-page .ant-btn-dangerous:hover,
+.dark-theme .queue-manager-page .ant-btn-dangerous:hover {
+  background: var(--qm-danger);
+  border-color: var(--qm-danger);
+  color: #1a0e0e;
+}
+
+[data-theme="dark"] .queue-manager-page .ant-btn-link,
+.dark-theme .queue-manager-page .ant-btn-link {
+  color: var(--qm-primary-hover);
+}
+
+[data-theme="dark"] .queue-manager-page .ant-btn-link:hover,
+.dark-theme .queue-manager-page .ant-btn-link:hover {
+  color: #a3ccff;
+}
+
+[data-theme="dark"] .queue-manager-page .ant-btn-text,
+.dark-theme .queue-manager-page .ant-btn-text {
+  color: var(--qm-text-secondary);
+}
+
+[data-theme="dark"] .queue-manager-page .ant-btn-text:hover,
+.dark-theme .queue-manager-page .ant-btn-text:hover {
+  background: var(--qm-surface-tertiary);
+  color: var(--qm-text-primary);
+}
+
+
+/* ========================================================
+   DARK THEME — ANT MODAL
+======================================================== */
+
+[data-theme="dark"] .ant-modal-content,
+.dark-theme .ant-modal-content {
+  background: var(--qm-surface);
+  color: var(--qm-text-primary);
+  border: 1px solid var(--qm-border);
+  border-radius: 16px;
+}
+
+[data-theme="dark"] .ant-modal-header,
+.dark-theme .ant-modal-header {
+  background: transparent;
+  border-bottom: 1px solid var(--qm-border);
+}
+
+[data-theme="dark"] .ant-modal-title,
+.dark-theme .ant-modal-title {
+  color: var(--qm-text-primary);
+}
+
+[data-theme="dark"] .ant-modal-close,
+.dark-theme .ant-modal-close {
+  color: var(--qm-text-secondary);
+}
+
+[data-theme="dark"] .ant-modal-close:hover,
+.dark-theme .ant-modal-close:hover {
+  color: var(--qm-text-primary);
+  background: var(--qm-surface-tertiary);
+}
+
+[data-theme="dark"] .ant-modal-footer,
+.dark-theme .ant-modal-footer {
+  border-top: 1px solid var(--qm-border);
+}
+
+
+/* ========================================================
+   DARK THEME — ANT TOOLTIP & POPOVER
+======================================================== */
+
+[data-theme="dark"] .ant-tooltip-inner,
+.dark-theme .ant-tooltip-inner {
+  background: #1e293b;
+  color: var(--qm-text-primary);
+  border: 1px solid var(--qm-border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .ant-tooltip-arrow::before,
+.dark-theme .ant-tooltip-arrow::before {
+  background: #1e293b;
+  border: 1px solid var(--qm-border);
+}
+
+[data-theme="dark"] .ant-popover-inner,
+.dark-theme .ant-popover-inner {
+  background: var(--qm-surface-secondary);
+  border: 1px solid var(--qm-border);
+  color: var(--qm-text-primary);
+}
+
+[data-theme="dark"] .ant-popover-arrow::before,
+.dark-theme .ant-popover-arrow::before {
+  background: var(--qm-surface-secondary);
+  border: 1px solid var(--qm-border);
+}
+
+
+/* ========================================================
+   DARK THEME — ANT MESSAGE & NOTIFICATION
+======================================================== */
+
+[data-theme="dark"] .ant-message-notice-content,
+.dark-theme .ant-message-notice-content {
+  background: var(--qm-surface-secondary);
+  color: var(--qm-text-primary);
+  border: 1px solid var(--qm-border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+}
+
+[data-theme="dark"] .ant-notification-notice,
+.dark-theme .ant-notification-notice {
+  background: var(--qm-surface-secondary);
+  color: var(--qm-text-primary);
+  border: 1px solid var(--qm-border);
+}
+
+[data-theme="dark"] .ant-notification-notice-message,
+.dark-theme .ant-notification-notice-message {
+  color: var(--qm-text-primary);
+}
+
+[data-theme="dark"] .ant-notification-notice-description,
+.dark-theme .ant-notification-notice-description {
+  color: var(--qm-text-secondary);
+}
+
+
+/* ========================================================
+   DARK THEME — ANT SPIN
+======================================================== */
+
+[data-theme="dark"] .queue-manager-page .ant-spin-dot-item,
+.dark-theme .queue-manager-page .ant-spin-dot-item {
+  background-color: var(--qm-primary);
+}
+
+[data-theme="dark"] .queue-manager-page .ant-spin-text,
+.dark-theme .queue-manager-page .ant-spin-text {
+  color: var(--qm-text-secondary);
+}
+
+
+/* ========================================================
+   DARK THEME — ANT DIVIDER
+======================================================== */
+
+[data-theme="dark"] .queue-manager-page .ant-divider,
+.dark-theme .queue-manager-page .ant-divider {
+  border-color: var(--qm-border);
+}
+
+[data-theme="dark"] .queue-manager-page .ant-divider-inner-text,
+.dark-theme .queue-manager-page .ant-divider-inner-text {
+  color: var(--qm-text-secondary);
+}
+
+
+/* ========================================================
+   DARK THEME — LINK
+======================================================== */
+
+[data-theme="dark"] .queue-manager-page a,
+.dark-theme .queue-manager-page a {
+  color: var(--qm-primary-hover);
+}
+
+[data-theme="dark"] .queue-manager-page a:hover,
+.dark-theme .queue-manager-page a:hover {
+  color: #a3ccff;
+}
+
+
+/* ========================================================
+   DARK THEME — SELECT DROPDOWN (PORTAL)
+   Extra polish on top of what already exists
+======================================================== */
+
+[data-theme="dark"] .ant-select-dropdown .ant-select-item-option-selected,
+.dark-theme .ant-select-dropdown .ant-select-item-option-selected {
+  background: var(--qm-primary-soft);
+  color: var(--qm-primary-hover);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .ant-select-dropdown .ant-select-item-option-active,
+.dark-theme .ant-select-dropdown .ant-select-item-option-active {
+  background: var(--qm-surface-tertiary);
+}
+
+[data-theme="dark"] .ant-select-dropdown .ant-select-item-option-disabled,
+.dark-theme .ant-select-dropdown .ant-select-item-option-disabled {
+  color: #4b5566;
+}
+
+
+/* ========================================================
+   DARK THEME — DATE PICKER (EXTRA POLISH)
+======================================================== */
+
+[data-theme="dark"] .ant-picker-dropdown .ant-picker-cell:hover .ant-picker-cell-inner,
+.dark-theme .ant-picker-dropdown .ant-picker-cell:hover .ant-picker-cell-inner {
+  background: var(--qm-primary-soft) !important;
+}
+
+[data-theme="dark"] .ant-picker-dropdown .ant-picker-cell-selected .ant-picker-cell-inner,
+.dark-theme .ant-picker-dropdown .ant-picker-cell-selected .ant-picker-cell-inner {
+  background: var(--qm-primary) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .ant-picker-dropdown .ant-picker-cell-today .ant-picker-cell-inner::before,
+.dark-theme .ant-picker-dropdown .ant-picker-cell-today .ant-picker-cell-inner::before {
+  border-color: var(--qm-primary-hover) !important;
+}
+
+
+/* ========================================================
+   DARK THEME — FOCUS RING
+======================================================== */
+
+[data-theme="dark"] .queue-manager-page *:focus-visible,
+.dark-theme .queue-manager-page *:focus-visible {
+  outline: 2px solid var(--qm-primary);
+  outline-offset: 2px;
+}
+
+
+/* ========================================================
+   DARK THEME — REDUCED MOTION
+======================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="dark"] .queue-manager-page *,
+  .dark-theme .queue-manager-page * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

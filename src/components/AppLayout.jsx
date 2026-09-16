@@ -29,6 +29,8 @@ import {
   UserAddOutlined,
   UserOutlined,
   WalletOutlined,
+  FileImageOutlined,
+  MessageOutlined,
 } from "@ant-design/icons";
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -100,6 +102,18 @@ const allMenuItems = [
         label: <Link to="/patients">Patients</Link>,
       },
       {
+        key: "/patient-media-upload",
+        icon: <FileImageOutlined />,
+        roles: CLINIC_ROLES,
+        label: <Link to="/patient-media-upload">Patient Media</Link>,
+      },
+      {
+        key: "/patient-media",
+        icon: <FileImageOutlined />,
+        roles: CLINIC_ROLES,
+        label: <Link to="/patient-media">Patient Media Library</Link>,
+      },
+      {
         key: "/dentists",
         icon: <MedicineBoxOutlined />,
         roles: [ROLES.ADMIN],
@@ -136,15 +150,18 @@ const allMenuItems = [
         roles: CLINIC_ROLES,
         label: <Link to="/appointment-history">Appointment History</Link>,
       },
-
-      // {
-      //   key: "/appointment-maintenance", //simple-appointment-maintenance
-      //   icon: <SolutionOutlined />,
-      //   roles: CLINIC_ROLES,
-      //   label: (
-      //     <Link to="/appointment-maintenance">Appointment Maintenance</Link>
-      //   ),
-      // },
+{
+        key: "/sms-management",
+        icon: <MessageOutlined />,
+        roles: CLINIC_ROLES,
+        label: <Link to="/sms-management">SMS Management</Link>,
+      },
+      {
+        key: "/queue-manager", //simple-appointment-maintenance
+        icon: <SolutionOutlined />,
+        roles: CLINIC_ROLES,
+        label: <Link to="/queue-manager">Queue Manager</Link>,
+      },
       {
         key: "/simple-appointment-maintenance", //simple-appointment-maintenance
         icon: <SolutionOutlined />,
@@ -188,6 +205,7 @@ const allMenuItems = [
       },
     ],
   },
+
 
   {
     type: "group",
@@ -262,7 +280,7 @@ const SidebarContent = ({ collapsed = false, selectedKey, menuItems }) => {
       {/* Opens Queue Display in a new browser tab */}
 
       <a
-        href="/queue-display"
+        href="/patient-queue"
         target="_blank"
         rel="noopener noreferrer"
         className="clinic-brand-link"

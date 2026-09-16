@@ -22,6 +22,7 @@ import {
   Typography,
   message,
   TimePicker,
+  InputNumber,
 } from "antd";
 
 import {
@@ -42,11 +43,13 @@ import {
   UserAddOutlined,
   UserOutlined,
   WarningOutlined,
+  MessageOutlined,
+  SendOutlined,
 } from "@ant-design/icons";
 
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-
+import { createCommonTreatment } from "../api/endPoints";
 import {
   checkInAppointmentToQueue,
   createAppointment,
@@ -58,6 +61,7 @@ import {
   getPatients,
   updateAppointment,
   updateAppointmentStatus,
+  sendTemplateSMS,
 } from "../api/endPoints";
 
 import ClinicPage from "../components/ClinicPage";
@@ -68,9 +72,19 @@ dayjs.extend(customParseFormat);
 
 const { Title, Text } = Typography;
 
-/* --------------------------------------------------------
+/* ========================================================
+   Configuration
+======================================================== */
+
+const DEFAULT_APPOINTMENT_TIME = "16:00";
+
+const SKIPPED_PATIENT_ID = "SYSTEM_SKIP";
+const SKIPPED_STATUS = "Skipped";
+const SKIPPED_RECORD_TYPE = "appointment_number_skip";
+
+/* ========================================================
    Status options
--------------------------------------------------------- */
+======================================================== */
 
 const bookingStatusOptions = [
   {
@@ -145,6 +159,11 @@ const activeStatuses = [
 ];
 
 const completedStatuses = ["Paid", "Completed"];
+
+/* ========================================================
+   Patient helpers
+======================================================== */
+
 const getPatientLocation = (patient) => {
   return (
     patient?.location ||
@@ -173,9 +192,10 @@ const formatPatientDistance = (distance) => {
     maximumFractionDigits: 2,
   })} km from clinic`;
 };
-/* --------------------------------------------------------
+
+/* ========================================================
    Form options
--------------------------------------------------------- */
+======================================================== */
 
 const genderOptions = [
   {
@@ -192,9 +212,9 @@ const genderOptions = [
   },
 ];
 
-/* --------------------------------------------------------
+/* ========================================================
    Time slots
--------------------------------------------------------- */
+======================================================== */
 
 const makeTimeOption = (time) => ({
   value: time,
@@ -271,9 +291,9 @@ const appointmentTimeSlots = appointmentTimeOptions.flatMap((group) =>
   group.options.map((option) => option.value),
 );
 
-/* --------------------------------------------------------
+/* ========================================================
    Helpers
--------------------------------------------------------- */
+======================================================== */
 
 const extractArray = (response) => {
   const data = response?.data?.data || response?.data || [];
@@ -289,6 +309,37 @@ const normalizeStatus = (value) => {
 
 const normalizeText = (value) => {
   return String(value ?? "").trim();
+};
+
+const checkBooleanFlag = (value) => {
+  if (value === true || value === 1) {
+    return true;
+  }
+
+  return ["true", "1", "yes"].includes(
+    String(value ?? "")
+      .trim()
+      .toLowerCase(),
+  );
+};
+
+const isSkippedAppointment = (appointment) => {
+  if (!appointment) {
+    return false;
+  }
+
+  const recordType = normalizeText(appointment?.record_type).toLowerCase();
+
+  const status = normalizeStatus(appointment?.status);
+
+  const patientId = normalizeText(appointment?.patient_id).toUpperCase();
+
+  return (
+    recordType === SKIPPED_RECORD_TYPE ||
+    status === normalizeStatus(SKIPPED_STATUS) ||
+    checkBooleanFlag(appointment?.is_skipped) ||
+    patientId === SKIPPED_PATIENT_ID
+  );
 };
 
 const getAppointmentId = (record) => {
@@ -398,9 +449,9 @@ const getStatusColor = (status) => {
   return colors[status] || "default";
 };
 
-/* --------------------------------------------------------
+/* ========================================================
    Summary card
--------------------------------------------------------- */
+======================================================== */
 
 const AppointmentSummaryCard = ({ title, value, helper, icon, tone }) => {
   return (
@@ -423,26 +474,44 @@ const AppointmentSummaryCard = ({ title, value, helper, icon, tone }) => {
   );
 };
 
-/* --------------------------------------------------------
+/* ========================================================
    Component
--------------------------------------------------------- */
+======================================================== */
 
 const Appointments = () => {
   const [form] = Form.useForm();
   const [patientForm] = Form.useForm();
 
-  const selectedAppointmentTime = Form.useWatch("appointment_time", form);
-  const selectedAppointmentDate =
-    Form.useWatch("appointment_date", form) || dayjs();
+  /* ======================================================
+     General states
+  ====================================================== */
+
   const [loading, setLoading] = useState(false);
+
   const [editTime, setEditTime] = useState(false);
   const [editDate, setEditDate] = useState(false);
+
   const [saving, setSaving] = useState(false);
 
   const [checkingInId, setCheckingInId] = useState(null);
 
+  /* ======================================================
+     SKIP APPOINTMENT NUMBER
+  ====================================================== */
+
+  const [skipAppointmentNumber, setSkipAppointmentNumber] = useState(false);
+
+  /* ======================================================
+     Locations
+  ====================================================== */
+
   const [patientLocations, setPatientLocations] = useState([]);
   const [locationsLoading, setLocationsLoading] = useState(false);
+  const [newTreatmentModalOpen, setNewTreatmentModalOpen] = useState(false);
+
+  const [savingTreatment, setSavingTreatment] = useState(false);
+
+  const [newTreatmentForm] = Form.useForm();
   const loadPatientLocations = useCallback(async () => {
     try {
       setLocationsLoading(true);
@@ -459,7 +528,9 @@ const Appointments = () => {
         ? locationData
             .map((location) => ({
               id: location.id,
+
               city: location.location || location.city || location.name || "",
+
               distance: Number(location.distance_km ?? location.distance ?? 0),
             }))
             .filter((location) => location.city)
@@ -474,14 +545,21 @@ const Appointments = () => {
       console.error("Failed to load patient locations:", error);
 
       message.error("Failed to load locations.");
+
       setPatientLocations([]);
     } finally {
       setLocationsLoading(false);
     }
   }, []);
+
   useEffect(() => {
     loadPatientLocations();
   }, [loadPatientLocations]);
+
+  /* ======================================================
+     Main data
+  ====================================================== */
+
   const [patientSaving, setPatientSaving] = useState(false);
 
   const [appointments, setAppointments] = useState([]);
@@ -497,32 +575,34 @@ const Appointments = () => {
   const [statusFilter, setStatusFilter] = useState("all");
 
   const [dateFilter, setDateFilter] = useState(dayjs());
+  const [sendingAppointmentSMS, setSendingAppointmentSMS] = useState(false);
 
-  /* ------------------------------------------------------
+  const [sendingDoctorArrivalSMS, setSendingDoctorArrivalSMS] = useState(false);
+  /* ======================================================
      Appointment modal
-  ------------------------------------------------------ */
+  ====================================================== */
 
   const [modalOpen, setModalOpen] = useState(false);
 
   const [editingAppointment, setEditingAppointment] = useState(null);
 
-  /* ------------------------------------------------------
+  /* ======================================================
      Patient modal
-  ------------------------------------------------------ */
+  ====================================================== */
 
   const [patientModalOpen, setPatientModalOpen] = useState(false);
 
   const [showPatientMoreOptions, setShowPatientMoreOptions] = useState(false);
 
-  /* ------------------------------------------------------
-     Watched form values
-  ------------------------------------------------------ */
-  const patientLocationOptions = useMemo(() => {
-    return patientLocations.map((location) => ({
-      label: `${location.city} • ${location.distance} km`,
-      value: location.city,
-    }));
-  }, [patientLocations]);
+  /* ======================================================
+     Form watches
+  ====================================================== */
+
+  const selectedAppointmentTime = Form.useWatch("appointment_time", form);
+
+  const selectedAppointmentDate =
+    Form.useWatch("appointment_date", form) || dayjs();
+
   const patientHasAllergies = Form.useWatch("has_allergies", patientForm);
 
   const watchedAppointmentDate = Form.useWatch("appointment_date", form);
@@ -534,77 +614,33 @@ const Appointments = () => {
   const selectedDentistId = Form.useWatch("dentist_id", form);
 
   const selectedPatientId = Form.useWatch("patient_id", form);
-  const DEFAULT_APPOINTMENT_TIME = "16:00";
-  const setAppointmentTime = (time) => {
-    if (!time) {
-      form.setFieldValue("appointment_time", undefined);
-      return;
-    }
 
-    if (lastAppointmentTime) {
-      const selectedTime = dayjs(time, "HH:mm", true);
-      const previousLastTime = dayjs(lastAppointmentTime, "HH:mm", true);
+  /* ======================================================
+     Patient location options
+  ====================================================== */
 
-      if (
-        selectedTime.isValid() &&
-        previousLastTime.isValid() &&
-        !selectedTime.isAfter(previousLastTime)
-      ) {
-        message.warning(
-          `Appointment time must be after ${formatAppointmentTime(
-            lastAppointmentTime,
-          )}`,
-        );
+  const patientLocationOptions = useMemo(() => {
+    return patientLocations.map((location) => ({
+      label: `${location.city} • ${location.distance} km`,
+      value: location.city,
+    }));
+  }, [patientLocations]);
 
-        return;
-      }
-    }
-
-    form.setFieldValue("appointment_time", time);
-
-    form.validateFields(["appointment_time"]).catch(() => {
-      // Ant Design displays the validation message.
-    });
-  };
+  /* ======================================================
+     Appointment date/time actions
+  ====================================================== */
 
   const setAppointmentDate = (date) => {
     const normalizedDate = date ? dayjs(date) : null;
 
     form.setFieldValue("appointment_date", normalizedDate);
 
-    form.validateFields(["appointment_date"]).catch(() => {
-      // Ant Design displays the validation message.
-    });
-  };
+    /*
+     * If date changes, the skipped number automatically
+     * recalculates for the newly selected date.
+     */
 
-  const addMinutesToAppointmentTime = (minutes) => {
-    const currentTime =
-      form.getFieldValue("appointment_time") || DEFAULT_APPOINTMENT_TIME;
-
-    const parsedTime = dayjs(currentTime, "HH:mm", true);
-
-    const baseTime = parsedTime.isValid()
-      ? parsedTime
-      : dayjs(DEFAULT_APPOINTMENT_TIME, "HH:mm");
-
-    const updatedTime = baseTime.add(minutes, "minute").format("HH:mm");
-
-    setAppointmentTime(updatedTime);
-  };
-
-  const subtractMinutesFromAppointmentTime = (minutes) => {
-    const currentTime =
-      form.getFieldValue("appointment_time") || DEFAULT_APPOINTMENT_TIME;
-
-    const parsedTime = dayjs(currentTime, "HH:mm", true);
-
-    const baseTime = parsedTime.isValid()
-      ? parsedTime
-      : dayjs(DEFAULT_APPOINTMENT_TIME, "HH:mm");
-
-    const updatedTime = baseTime.subtract(minutes, "minute").format("HH:mm");
-
-    setAppointmentTime(updatedTime);
+    form.validateFields(["appointment_date"]).catch(() => {});
   };
 
   const addDaysToAppointmentDate = (days) => {
@@ -622,14 +658,16 @@ const Appointments = () => {
 
     if (nextDate.isBefore(dayjs().startOf("day"))) {
       message.warning("Appointment date cannot be in the past");
+
       return;
     }
 
     setAppointmentDate(nextDate);
   };
-  /* ------------------------------------------------------
+
+  /* ======================================================
      Load data
-  ------------------------------------------------------ */
+  ====================================================== */
 
   const loadInitialData = useCallback(async () => {
     setLoading(true);
@@ -664,6 +702,32 @@ const Appointments = () => {
       );
 
       const enrichedAppointments = appointmentData.map((appointment) => {
+        /*
+         * Special skipped-number records intentionally
+         * do not have a real patient.
+         */
+        if (isSkippedAppointment(appointment)) {
+          const dentist = dentistMap.get(String(appointment?.dentist_id));
+
+          return {
+            ...appointment,
+
+            patient_name: "Reserved Number",
+
+            phone: "-",
+
+            patient_has_allergies: false,
+
+            patient_allergy_details: "",
+
+            dentist_name:
+              appointment?.dentist_name ||
+              getDentistName(dentist) ||
+              appointment?.dentist_id ||
+              "-",
+          };
+        }
+
         const patient = patientMap.get(String(appointment?.patient_id));
 
         const dentist = dentistMap.get(String(appointment?.dentist_id));
@@ -704,6 +768,7 @@ const Appointments = () => {
       setAppointments(enrichedAppointments);
 
       setPatients(patientData);
+
       setDentists(dentistData);
 
       setCommonTreatments(commonTreatmentData);
@@ -719,6 +784,11 @@ const Appointments = () => {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    loadInitialData();
+  }, [loadInitialData]);
+
   useEffect(() => {
     if (!modalOpen || editingAppointment) {
       return;
@@ -730,13 +800,10 @@ const Appointments = () => {
       form.setFieldValue("appointment_time", DEFAULT_APPOINTMENT_TIME);
     }
   }, [modalOpen, editingAppointment, form]);
-  useEffect(() => {
-    loadInitialData();
-  }, [loadInitialData]);
 
-  /* ------------------------------------------------------
+  /* ======================================================
      Patient options
-  ------------------------------------------------------ */
+  ====================================================== */
 
   const patientOptions = useMemo(() => {
     return patients.map((patient) => {
@@ -758,12 +825,15 @@ const Appointments = () => {
 
       return {
         value: patientId,
-        label: patientName,
+
+        label: patientName + getPatientPhone(patient),
 
         patientName,
+
         phone: getPatientPhone(patient),
 
         location,
+
         distance,
 
         hasAllergy,
@@ -783,9 +853,9 @@ const Appointments = () => {
     );
   }, [patientOptions, selectedPatientId]);
 
-  /* ------------------------------------------------------
+  /* ======================================================
      Dentist options
-  ------------------------------------------------------ */
+  ====================================================== */
 
   const dentistOptions = useMemo(() => {
     return dentists.map((dentist) => ({
@@ -805,9 +875,9 @@ const Appointments = () => {
     }
   }, [dentistOptions, form]);
 
-  /* ------------------------------------------------------
+  /* ======================================================
      Common treatment options
-  ------------------------------------------------------ */
+  ====================================================== */
 
   const commonTreatmentOptions = useMemo(() => {
     const treatmentMap = new Map();
@@ -836,33 +906,32 @@ const Appointments = () => {
       });
     });
 
-    /*
-     * Keep an old reason visible while editing,
-     * even when it no longer exists in the
-     * common treatment sheet.
-     */
     const existingReason = normalizeText(editingAppointment?.reason_for_visit);
 
     if (existingReason && !treatmentMap.has(existingReason.toLowerCase())) {
       treatmentMap.set(existingReason.toLowerCase(), {
         value: existingReason,
+
         label: existingReason,
+
         treatmentId: "",
+
         fee: null,
+
         isLegacy: true,
       });
     }
 
-    /*
-     * Keep Other as a manual/general
-     * appointment reason.
-     */
     if (!treatmentMap.has("other")) {
       treatmentMap.set("other", {
         value: "Other",
+
         label: "Other",
+
         treatmentId: "",
+
         fee: null,
+
         isOther: true,
       });
     }
@@ -896,10 +965,58 @@ const Appointments = () => {
       ) || null
     );
   }, [commonTreatmentOptions, watchedReasonForVisit]);
+  const handleSaveNewTreatment = async () => {
+    try {
+      const values = await newTreatmentForm.validateFields();
 
-  /* ------------------------------------------------------
+      const payload = {
+        treatment_name: String(values.treatment_name || "").trim(),
+        fee: Number(values.fee),
+      };
+
+      setSavingTreatment(true);
+
+      await createCommonTreatment(payload);
+
+      message.success("Common treatment created successfully");
+
+      /*
+       * Reload dropdown options first
+       */
+      await getCommonTreatments();
+
+      /*
+       * Set the newly created treatment
+       * into the appointment form
+       */
+      form.setFieldValue("reason_for_visit", payload.treatment_name);
+
+      setNewTreatmentModalOpen(false);
+
+      newTreatmentForm.resetFields();
+    } catch (error) {
+      if (error?.errorFields) {
+        return;
+      }
+
+      console.error("Failed to create common treatment:", error);
+
+      messageApi.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to create common treatment",
+      );
+    } finally {
+      setSavingTreatment(false);
+    }
+  };
+  /* ======================================================
      Next appointment time
-  ------------------------------------------------------ */
+
+     IMPORTANT:
+     Skipped records are ignored here.
+  ====================================================== */
+
   const getNextAppointmentTime = useCallback(
     (selectedDate) => {
       if (!selectedDate) {
@@ -913,9 +1030,21 @@ const Appointments = () => {
           const appointmentDate =
             appointment?.appointment_date || appointment?.date;
 
-          const status = appointment?.status || "Pending";
+          const status = normalizeStatus(appointment?.status);
 
-          return appointmentDate === selectedDateText && status !== "Cancelled";
+          if (appointmentDate !== selectedDateText) {
+            return false;
+          }
+
+          if (status === "cancelled") {
+            return false;
+          }
+
+          if (isSkippedAppointment(appointment)) {
+            return false;
+          }
+
+          return true;
         })
         .sort((first, second) => {
           const firstTime = first?.appointment_time || first?.time || "";
@@ -947,6 +1076,7 @@ const Appointments = () => {
     },
     [appointments],
   );
+
   useEffect(() => {
     if (!modalOpen || editingAppointment || !watchedAppointmentDate) {
       return;
@@ -963,50 +1093,129 @@ const Appointments = () => {
     form,
     getNextAppointmentTime,
   ]);
+  const [skippingNumber, setSkippingNumber] = useState(false);
+  /* ======================================================
+     Appointment number logic
 
-  /* ------------------------------------------------------
-     Appointment number preview
-  ------------------------------------------------------ */
+     Example:
+
+     Existing:
+     #1
+     #2
+     #3
+     #4
+
+     Normal:
+     current = #5
+
+     Skip enabled:
+     special record = #5
+     patient appointment = #6
+  ====================================================== */
 
   const {
-    appointmentNo: currentModalAppointmentNo,
+    nextAppointmentNo,
+    currentModalAppointmentNo,
+    skippedAppointmentNo,
     lastAppointment_reason_for_visit,
     lastAppointmentTime,
   } = useMemo(() => {
     if (!watchedAppointmentDate) {
       return {
-        appointmentNo: 1,
+        nextAppointmentNo: 1,
+
+        currentModalAppointmentNo: 1,
+
+        skippedAppointmentNo: null,
+
+        lastAppointment_reason_for_visit: null,
+
         lastAppointmentTime: null,
       };
     }
 
     const selectedDate = watchedAppointmentDate.format("YYYY-MM-DD");
 
-    const selectedTime = watchedAppointmentTime || "23:59";
+    /*
+     * IMPORTANT:
+     * We include skipped records here because
+     * their appointment number is already consumed.
+     */
 
-    const sameDateAppointments = appointments
+    const sameDateAppointments = appointments.filter((appointment) => {
+      const appointmentDate =
+        appointment?.appointment_date || appointment?.date;
+
+      if (appointmentDate !== selectedDate) {
+        return false;
+      }
+
+      if (
+        editingAppointment &&
+        getAppointmentId(appointment) === getAppointmentId(editingAppointment)
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+
+    const savedNumbers = sameDateAppointments
+      .map((appointment) => Number(appointment?.appointment_number))
+      .filter((number) => Number.isFinite(number) && number > 0);
+
+    /*
+     * Supports older records that may not have
+     * appointment_number saved.
+     */
+
+    const highestSavedNumber =
+      savedNumbers.length > 0 ? Math.max(...savedNumbers) : 0;
+
+    const fallbackHighestNumber = sameDateAppointments.length;
+
+    const highestAppointmentNumber = Math.max(
+      highestSavedNumber,
+      fallbackHighestNumber,
+    );
+
+    const calculatedNextNumber = highestAppointmentNumber + 1;
+
+    /*
+     * Editing should keep the original number.
+     */
+
+    if (editingAppointment) {
+      const existingAppointmentNumber = Number(
+        editingAppointment?.appointment_number,
+      );
+
+      return {
+        nextAppointmentNo: existingAppointmentNumber || calculatedNextNumber,
+
+        currentModalAppointmentNo:
+          existingAppointmentNumber || calculatedNextNumber,
+
+        skippedAppointmentNo: null,
+
+        lastAppointment_reason_for_visit: null,
+
+        lastAppointmentTime: null,
+      };
+    }
+
+    /*
+     * Find the last REAL appointment.
+     * Skipped/system records do not count.
+     */
+
+    const realAppointments = sameDateAppointments
       .filter((appointment) => {
-        const appointmentDate =
-          appointment?.appointment_date || appointment?.date;
-
-        const status = appointment?.status || "Pending";
-
-        if (appointmentDate !== selectedDate) {
+        if (isSkippedAppointment(appointment)) {
           return false;
         }
 
-        if (status === "Cancelled") {
-          return false;
-        }
-
-        if (
-          editingAppointment &&
-          getAppointmentId(appointment) === getAppointmentId(editingAppointment)
-        ) {
-          return false;
-        }
-
-        return true;
+        return normalizeStatus(appointment?.status) !== "cancelled";
       })
       .sort((first, second) => {
         const firstTime = first?.appointment_time || first?.time || "";
@@ -1016,20 +1225,19 @@ const Appointments = () => {
         return firstTime.localeCompare(secondTime);
       });
 
-    const beforeCount = sameDateAppointments.filter((appointment) => {
-      const appointmentTime =
-        appointment?.appointment_time || appointment?.time || "";
-
-      return appointmentTime < selectedTime;
-    }).length;
-
     const lastAppointment =
-      sameDateAppointments.length > 0
-        ? sameDateAppointments[sameDateAppointments.length - 1]
+      realAppointments.length > 0
+        ? realAppointments[realAppointments.length - 1]
         : null;
 
     return {
-      appointmentNo: beforeCount + 1,
+      nextAppointmentNo: calculatedNextNumber,
+
+      skippedAppointmentNo: skipAppointmentNumber ? calculatedNextNumber : null,
+
+      currentModalAppointmentNo: skipAppointmentNumber
+        ? calculatedNextNumber + 1
+        : calculatedNextNumber,
 
       lastAppointment_reason_for_visit:
         lastAppointment?.reason_for_visit || null,
@@ -1040,13 +1248,86 @@ const Appointments = () => {
   }, [
     appointments,
     watchedAppointmentDate,
-    watchedAppointmentTime,
     editingAppointment,
+    skipAppointmentNumber,
   ]);
 
-  /* ------------------------------------------------------
-     Appointment numbering
-  ------------------------------------------------------ */
+  /* ======================================================
+     Appointment time actions
+  ====================================================== */
+
+  const setAppointmentTime = (time) => {
+    if (!time) {
+      form.setFieldValue("appointment_time", undefined);
+
+      return;
+    }
+
+    /*
+     * Only enforce "after last appointment"
+     * when creating a new appointment.
+     */
+
+    if (!editingAppointment && lastAppointmentTime) {
+      const selectedTime = dayjs(time, "HH:mm", true);
+
+      const previousLastTime = dayjs(lastAppointmentTime, "HH:mm", true);
+
+      if (
+        selectedTime.isValid() &&
+        previousLastTime.isValid() &&
+        !selectedTime.isAfter(previousLastTime)
+      ) {
+        message.warning(
+          `Appointment time must be after ${formatAppointmentTime(
+            lastAppointmentTime,
+          )}`,
+        );
+
+        return;
+      }
+    }
+
+    form.setFieldValue("appointment_time", time);
+
+    form.validateFields(["appointment_time"]).catch(() => {});
+  };
+
+  const addMinutesToAppointmentTime = (minutes) => {
+    const currentTime =
+      form.getFieldValue("appointment_time") || DEFAULT_APPOINTMENT_TIME;
+
+    const parsedTime = dayjs(currentTime, "HH:mm", true);
+
+    const baseTime = parsedTime.isValid()
+      ? parsedTime
+      : dayjs(DEFAULT_APPOINTMENT_TIME, "HH:mm");
+
+    const updatedTime = baseTime.add(minutes, "minute").format("HH:mm");
+
+    setAppointmentTime(updatedTime);
+  };
+
+  const subtractMinutesFromAppointmentTime = (minutes) => {
+    const currentTime =
+      form.getFieldValue("appointment_time") || DEFAULT_APPOINTMENT_TIME;
+
+    const parsedTime = dayjs(currentTime, "HH:mm", true);
+
+    const baseTime = parsedTime.isValid()
+      ? parsedTime
+      : dayjs(DEFAULT_APPOINTMENT_TIME, "HH:mm");
+
+    const updatedTime = baseTime.subtract(minutes, "minute").format("HH:mm");
+
+    setAppointmentTime(updatedTime);
+  };
+
+  /* ======================================================
+     Appointment numbering for table
+
+     Prefer the number saved in the database.
+  ====================================================== */
 
   const appointmentsWithNumber = useMemo(() => {
     const sortedAppointments = [...appointments].sort((first, second) => {
@@ -1056,6 +1337,14 @@ const Appointments = () => {
 
       if (firstDate !== secondDate) {
         return firstDate.localeCompare(secondDate);
+      }
+
+      const firstNumber = Number(first?.appointment_number);
+
+      const secondNumber = Number(second?.appointment_number);
+
+      if (Number.isFinite(firstNumber) && Number.isFinite(secondNumber)) {
+        return firstNumber - secondNumber;
       }
 
       const firstTime = first?.appointment_time || first?.time || "";
@@ -1076,77 +1365,121 @@ const Appointments = () => {
         numberMap[date] = 1;
       }
 
-      const appointmentNumber = status === "Cancelled" ? "-" : numberMap[date];
+      const storedNumber = Number(appointment?.appointment_number);
 
-      if (status !== "Cancelled") {
+      let appointmentNumber;
+
+      if (Number.isFinite(storedNumber) && storedNumber > 0) {
+        appointmentNumber = storedNumber;
+
+        numberMap[date] = Math.max(numberMap[date], storedNumber + 1);
+      } else {
+        appointmentNumber = numberMap[date];
+
         numberMap[date] += 1;
       }
 
+      /*
+       * Keep the old UI behavior for
+       * cancelled appointments.
+       */
+
+      const displayNumber = status === "Cancelled" ? "-" : appointmentNumber;
+
       return {
         ...appointment,
-        appointment_number: appointmentNumber,
+
+        appointment_number: displayNumber,
+
+        stored_appointment_number: appointmentNumber,
       };
     });
   }, [appointments]);
 
-  /* ------------------------------------------------------
-     Date-specific appointments
-  ------------------------------------------------------ */
-
   const dateAppointments = useMemo(() => {
-    if (!dateFilter) {
-      return appointmentsWithNumber;
+    let selectedAppointments = appointmentsWithNumber;
+
+    if (dateFilter) {
+      const selectedDate = dateFilter.format("YYYY-MM-DD");
+
+      selectedAppointments = appointmentsWithNumber.filter((appointment) => {
+        const appointmentDate =
+          appointment?.appointment_date || appointment?.date;
+
+        return appointmentDate === selectedDate;
+      });
     }
 
-    const selectedDate = dateFilter.format("YYYY-MM-DD");
+    /*
+     * Do not show special skipped-number
+     * records as patient appointments.
+     */
 
-    return appointmentsWithNumber.filter((appointment) => {
-      const appointmentDate =
-        appointment?.appointment_date || appointment?.date;
-
-      return appointmentDate === selectedDate;
-    });
+    return selectedAppointments;
   }, [appointmentsWithNumber, dateFilter]);
 
-  /* ------------------------------------------------------
+  /* ======================================================
      Summary
-  ------------------------------------------------------ */
+  ====================================================== */
 
   const appointmentSummary = useMemo(() => {
-    const pending = dateAppointments.filter((appointment) =>
+    const realAppointments = dateAppointments;
+    console.log(dateAppointments.length);
+
+    const skippedAppointments = dateAppointments.filter((appointment) =>
+      isSkippedAppointment(appointment),
+    );
+
+    const pending = realAppointments.filter((appointment) =>
       ["Pending", "Confirmed"].includes(appointment?.status || "Pending"),
     ).length;
 
-    const checkedIn = dateAppointments.filter(
+    const checkedIn = realAppointments.filter(
       (appointment) => appointment?.status === "Checked In",
     ).length;
 
-    const completed = dateAppointments.filter((appointment) =>
+    const completed = realAppointments.filter((appointment) =>
       completedStatuses.includes(appointment?.status),
     ).length;
 
-    const cancelled = dateAppointments.filter(
+    const cancelled = realAppointments.filter(
       (appointment) => appointment?.status === "Cancelled",
     ).length;
 
     return {
-      total: dateAppointments.length,
+      total: realAppointments.length,
       pending,
       checkedIn,
       completed,
       cancelled,
+
+      skipped: skippedAppointments.length,
     };
   }, [dateAppointments]);
 
-  /* ------------------------------------------------------
-     Search and status filter
-  ------------------------------------------------------ */
+  /* ======================================================
+     Search/filter
+  ====================================================== */
 
   const filteredAppointments = useMemo(() => {
     const keyword = search.toLowerCase().trim();
 
     return dateAppointments.filter((appointment) => {
       const status = appointment?.status || "Pending";
+
+      const skipped = isSkippedAppointment(appointment);
+      let matchesFilter = false;
+
+      if (statusFilter === "skipped") {
+        matchesFilter = skipped;
+      } else {
+        matchesFilter =
+          statusFilter === "all" ||
+          (statusFilter === "active" && activeStatuses.includes(status)) ||
+          (statusFilter === "completed" &&
+            completedStatuses.includes(status)) ||
+          (statusFilter === "cancelled" && status === "Cancelled");
+      }
 
       const searchableValues = [
         getAppointmentId(appointment),
@@ -1161,6 +1494,8 @@ const Appointments = () => {
 
         appointment?.reason_for_visit,
 
+        appointment?.skip_note,
+
         status,
       ];
 
@@ -1172,19 +1507,13 @@ const Appointments = () => {
             .includes(keyword),
         );
 
-      const matchesFilter =
-        statusFilter === "all" ||
-        (statusFilter === "active" && activeStatuses.includes(status)) ||
-        (statusFilter === "completed" && completedStatuses.includes(status)) ||
-        (statusFilter === "cancelled" && status === "Cancelled");
-
       return matchesSearch && matchesFilter;
     });
   }, [dateAppointments, search, statusFilter]);
 
-  /* ------------------------------------------------------
+  /* ======================================================
      Patient modal
-  ------------------------------------------------------ */
+  ====================================================== */
 
   const openPatientModal = () => {
     setShowPatientMoreOptions(false);
@@ -1193,14 +1522,23 @@ const Appointments = () => {
 
     patientForm.setFieldsValue({
       name: "",
+
       phone: "",
+
       age: "",
+
       gender: "Male",
+
       address: "",
+
       status: "Active",
+
       location: undefined,
+
       distance: undefined,
+
       has_allergies: false,
+
       allergy_details: "",
     });
 
@@ -1215,28 +1553,252 @@ const Appointments = () => {
     patientForm.resetFields();
   };
 
-  /* ------------------------------------------------------
+  /* ======================================================
      Appointment modal
-  ------------------------------------------------------ */
+  ====================================================== */
 
   const openAddModal = () => {
     setEditingAppointment(null);
+
+    setSkipAppointmentNumber(false);
+
     setEditDate(false);
+
     setEditTime(false);
+
     form.resetFields();
 
     form.setFieldsValue({
       patient_id: undefined,
+
       dentist_id: dentistOptions?.[0]?.value,
+
       appointment_date: dayjs(),
-      appointment_time: "16:00",
-    reason_for_visit: commonTreatmentOptions?.[0]?.value,
+
+      appointment_time: DEFAULT_APPOINTMENT_TIME,
+
+      reason_for_visit: commonTreatmentOptions?.[0]?.value,
+
       status: "Pending",
     });
 
     setModalOpen(true);
   };
+  /* ======================================================
+   TODAY'S SMS APPOINTMENTS
 
+   SMS can only be sent to appointments for TODAY.
+
+   Excludes:
+   - Reserved / skipped appointment numbers
+   - Cancelled appointments
+   - Patients without a valid phone number
+====================================================== */
+  /* ======================================================
+   SEND TODAY'S APPOINTMENT SMS
+====================================================== */
+  /* ======================================================
+   SEND TODAY'S DOCTOR ARRIVAL SMS
+====================================================== */
+
+  const handleSendTodayDoctorArrivalSMS = async () => {
+    if (todaysSmsAppointments.length === 0) {
+      message.warning(
+        "There are no valid appointments for today that can receive SMS.",
+      );
+
+      return;
+    }
+
+    try {
+      setSendingDoctorArrivalSMS(true);
+
+      let successCount = 0;
+      let failedCount = 0;
+
+      for (const appointment of todaysSmsAppointments) {
+        try {
+          const phone = String(appointment?.phone || "")
+            .replace(/\s+/g, "")
+            .trim();
+
+          await sendTemplateSMS({
+            mobile: phone,
+
+            template: "doctorArrival",
+
+            data: {
+              patientName:
+                appointment?.patient_name ||
+                appointment?.patient_id ||
+                "Patient",
+
+              appointmentNumber:
+                appointment?.stored_appointment_number ||
+                appointment?.appointment_number,
+            },
+          });
+
+          successCount += 1;
+        } catch (error) {
+          failedCount += 1;
+
+          console.error(
+            `Failed to send doctor arrival SMS to ${appointment?.phone}:`,
+            error,
+          );
+        }
+      }
+
+      if (successCount > 0) {
+        message.success(
+          `Doctor arrival SMS sent to ${successCount} patient${
+            successCount !== 1 ? "s" : ""
+          }.`,
+        );
+      }
+
+      if (failedCount > 0) {
+        message.warning(
+          `${failedCount} SMS message${
+            failedCount !== 1 ? "s" : ""
+          } could not be sent.`,
+        );
+      }
+    } catch (error) {
+      console.error("Failed to send doctor arrival SMS:", error);
+
+      message.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to send doctor arrival SMS",
+      );
+    } finally {
+      setSendingDoctorArrivalSMS(false);
+    }
+  };
+  const handleSendTodayAppointmentSMS = async () => {
+    if (todaysSmsAppointments.length === 0) {
+      message.warning(
+        "There are no valid appointments for today that can receive SMS.",
+      );
+
+      return;
+    }
+
+    try {
+      setSendingAppointmentSMS(true);
+
+      let successCount = 0;
+      let failedCount = 0;
+
+      for (const appointment of todaysSmsAppointments) {
+        try {
+          const phone = String(appointment?.phone || "")
+            .replace(/\s+/g, "")
+            .trim();
+
+          await sendTemplateSMS({
+            mobile: phone,
+
+            template: "appointmentDetails",
+
+            data: {
+              patientName:
+                appointment?.patient_name ||
+                appointment?.patient_id ||
+                "Patient",
+
+              date: formatDate(
+                appointment?.appointment_date || appointment?.date,
+              ),
+
+              time: formatAppointmentTime(
+                appointment?.appointment_time || appointment?.time,
+              ),
+
+              appointmentNumber:
+                appointment?.stored_appointment_number ||
+                appointment?.appointment_number,
+
+              reason: appointment?.reason_for_visit || "-",
+            },
+          });
+
+          successCount += 1;
+        } catch (error) {
+          failedCount += 1;
+
+          console.error(
+            `Failed to send appointment SMS to ${appointment?.phone}:`,
+            error,
+          );
+        }
+      }
+
+      if (successCount > 0) {
+        message.success(
+          `Appointment SMS sent to ${successCount} patient${
+            successCount !== 1 ? "s" : ""
+          }.`,
+        );
+      }
+
+      if (failedCount > 0) {
+        message.warning(
+          `${failedCount} SMS message${
+            failedCount !== 1 ? "s" : ""
+          } could not be sent.`,
+        );
+      }
+    } catch (error) {
+      console.error("Failed to send today's appointment SMS:", error);
+
+      message.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to send appointment SMS",
+      );
+    } finally {
+      setSendingAppointmentSMS(false);
+    }
+  };
+  const todaysSmsAppointments = useMemo(() => {
+    const today = dayjs().format("YYYY-MM-DD");
+
+    return appointmentsWithNumber.filter((appointment) => {
+      const appointmentDate =
+        appointment?.appointment_date || appointment?.date || "";
+
+      const status = normalizeStatus(appointment?.status);
+
+      const phone = String(appointment?.phone || "")
+        .replace(/\s+/g, "")
+        .trim();
+
+      if (appointmentDate !== today) {
+        return false;
+      }
+
+      if (isSkippedAppointment(appointment)) {
+        return false;
+      }
+
+      if (status === "cancelled") {
+        return false;
+      }
+
+      /*
+       * Sri Lankan mobile number:
+       * Example: 0771234567
+       */
+      if (!/^0\d{9}$/.test(phone)) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [appointmentsWithNumber]);
   const openEditModal = (appointment) => {
     const appointmentDate = appointment?.appointment_date || appointment?.date;
 
@@ -1250,8 +1812,13 @@ const Appointments = () => {
       : null;
 
     setEditingAppointment(appointment);
+
+    setSkipAppointmentNumber(false);
+
     setEditDate(false);
+
     setEditTime(false);
+
     form.resetFields();
 
     form.setFieldsValue({
@@ -1270,16 +1837,24 @@ const Appointments = () => {
 
     setModalOpen(true);
   };
+
   const closeModal = () => {
     setModalOpen(false);
+
     setEditingAppointment(null);
+
+    setSkipAppointmentNumber(false);
+
     setEditDate(false);
+
     setEditTime(false);
+
     form.resetFields();
   };
-  /* ------------------------------------------------------
+
+  /* ======================================================
      Create patient
-  ------------------------------------------------------ */
+  ====================================================== */
 
   const handleCreatePatient = async () => {
     try {
@@ -1295,6 +1870,7 @@ const Appointments = () => {
         patientForm.setFields([
           {
             name: "location",
+
             errors: ["Please select a valid patient location"],
           },
         ]);
@@ -1306,14 +1882,19 @@ const Appointments = () => {
 
       const payload = {
         name: values.name?.trim() || "",
+
         phone: values.phone?.trim() || "",
 
         age: values.age ? Number(values.age) : "",
+
         gender: values.gender || "",
+
         address: values.address?.trim() || "",
+
         status: values.status || "Active",
 
         location: selectedLocation.city,
+
         distance: selectedLocation.distance,
 
         has_allergies: hasPatientAllergy,
@@ -1326,6 +1907,7 @@ const Appointments = () => {
       const response = await createPatient(payload);
 
       message.success("Patient added successfully");
+
       const createdPatient =
         response?.data?.data || response?.data?.patient || response?.data;
 
@@ -1335,6 +1917,7 @@ const Appointments = () => {
 
       setPatients((previousPatients) => [
         createdPatient,
+
         ...previousPatients.filter(
           (patient) => getPatientId(patient) !== createdPatientId,
         ),
@@ -1360,25 +1943,117 @@ const Appointments = () => {
     }
   };
 
-  /* ------------------------------------------------------
+  /* ======================================================
      Save appointment
-  ------------------------------------------------------ */
+
+     IMPORTANT:
+
+     If Skip is enabled:
+
+     1. Create SYSTEM record for skipped number.
+     2. Create patient's appointment with next number.
+  ====================================================== */
+  const handleSaveSkippedAppointment = async () => {
+    try {
+      const values = await form.validateFields([
+        "dentist_id",
+        "appointment_date",
+        "appointment_time",
+      ]);
+
+      if (editingAppointment) {
+        message.warning(
+          "Appointment numbers can only be reserved while creating a new appointment.",
+        );
+        return;
+      }
+
+      if (!nextAppointmentNo) {
+        message.error("Unable to determine the next appointment number.");
+        return;
+      }
+
+      setSkippingNumber(true);
+
+      const skippedPayload = {
+        patient_id: SKIPPED_PATIENT_ID,
+
+        dentist_id: values.dentist_id,
+
+        appointment_date: values.appointment_date
+          ? dayjs(values.appointment_date).format("YYYY-MM-DD")
+          : dayjs().format("YYYY-MM-DD"),
+
+        appointment_number: nextAppointmentNo,
+
+        appointment_time: values.appointment_time || DEFAULT_APPOINTMENT_TIME,
+
+        reason_for_visit: "Appointment Number Reserved",
+
+        status: "Pending",
+
+        record_type: SKIPPED_RECORD_TYPE,
+
+        is_skipped: true,
+
+        skip_note:
+          "Appointment number intentionally reserved from appointment booking screen",
+      };
+
+      await createAppointment(skippedPayload);
+
+      message.success(
+        `Appointment #${nextAppointmentNo} reserved successfully.`,
+      );
+
+      /*
+       * Refresh appointments.
+       *
+       * Example:
+       * Before: nextAppointmentNo = 5
+       *
+       * Save #5 as reserved
+       *
+       * After refresh:
+       * nextAppointmentNo = 6
+       * currentModalAppointmentNo = 6
+       */
+      await loadInitialData();
+
+      setSkipAppointmentNumber(false);
+    } catch (error) {
+      if (error?.errorFields) {
+        return;
+      }
+
+      console.error("Failed to reserve appointment number:", error);
+
+      message.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to reserve appointment number",
+      );
+    } finally {
+      setSkippingNumber(false);
+    }
+  };
 
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
 
       setSaving(true);
-      console.log(values);
+
+      const appointmentDate = values.appointment_date
+        ? dayjs(values.appointment_date).format("YYYY-MM-DD")
+        : undefined;
 
       const payload = {
         patient_id: values.patient_id,
 
         dentist_id: values.dentist_id,
 
-        appointment_date: values.appointment_date
-          ? dayjs(values.appointment_date).format("YYYY-MM-DD")
-          : undefined,
+        appointment_date: appointmentDate,
 
         appointment_number: currentModalAppointmentNo,
 
@@ -1387,7 +2062,12 @@ const Appointments = () => {
         reason_for_visit: values.reason_for_visit || "",
 
         status: values.status || "Pending",
+
+        record_type: "appointment",
+
+        is_skipped: false,
       };
+
       if (editingAppointment) {
         await updateAppointment(getAppointmentId(editingAppointment), payload);
 
@@ -1395,10 +2075,13 @@ const Appointments = () => {
       } else {
         await createAppointment(payload);
 
-        message.success("Appointment added successfully");
+        message.success(
+          `Appointment #${currentModalAppointmentNo} added successfully`,
+        );
       }
 
       closeModal();
+
       await loadInitialData();
     } catch (error) {
       if (error?.errorFields) {
@@ -1417,9 +2100,9 @@ const Appointments = () => {
     }
   };
 
-  /* ------------------------------------------------------
+  /* ======================================================
      Status changes
-  ------------------------------------------------------ */
+  ====================================================== */
 
   const handleStatusChange = async (appointment, status) => {
     try {
@@ -1470,6 +2153,7 @@ const Appointments = () => {
           getAppointmentId(item) === appointmentId
             ? {
                 ...item,
+
                 status: "Checked In",
               }
             : item,
@@ -1492,15 +2176,18 @@ const Appointments = () => {
     await handleStatusChange(appointment, "Cancelled");
   };
 
-  /* ------------------------------------------------------
-     Table columns
-  ------------------------------------------------------ */
+  /* ======================================================
+     Table
+  ====================================================== */
 
   const columns = [
     {
       title: "Appointment",
+
       key: "appointment",
+
       width: 145,
+
       fixed: "left",
 
       render: (_, record) => (
@@ -1515,9 +2202,12 @@ const Appointments = () => {
         </div>
       ),
     },
+
     {
       title: "Date and Time",
+
       key: "date_time",
+
       width: 180,
 
       render: (_, record) => (
@@ -1539,9 +2229,12 @@ const Appointments = () => {
         </Space>
       ),
     },
+
     {
       title: "Patient",
+
       key: "patient",
+
       width: 240,
 
       render: (_, record) => {
@@ -1582,9 +2275,12 @@ const Appointments = () => {
         );
       },
     },
+
     {
       title: "Phone",
+
       key: "phone",
+
       width: 155,
 
       render: (_, record) => (
@@ -1598,9 +2294,13 @@ const Appointments = () => {
 
     {
       title: "Reason",
+
       dataIndex: "reason_for_visit",
+
       key: "reason_for_visit",
+
       width: 225,
+
       ellipsis: true,
 
       render: (value) => (
@@ -1609,14 +2309,19 @@ const Appointments = () => {
         </Tooltip>
       ),
     },
+
     {
       title: "Status",
+
       dataIndex: "status",
+
       key: "status",
+
       width: 165,
 
       filters: allStatusOptions.map((option) => ({
         text: option.label,
+
         value: option.value,
       })),
 
@@ -1635,42 +2340,6 @@ const Appointments = () => {
             disabled={isLocked}
             options={isLocked ? allStatusOptions : bookingStatusOptions}
             onChange={(newStatus) => handleStatusChange(record, newStatus)}
-            optionRender={(option) => {
-              const patient = option.data;
-
-              return (
-                <div
-                  className={
-                    patient.hasAllergy
-                      ? "booking-patient-option booking-patient-option--allergy"
-                      : "booking-patient-option"
-                  }
-                >
-                  <div className="booking-patient-option__content">
-                    <Text strong={patient.hasAllergy}>
-                      {patient.patientName}
-                    </Text>
-
-                    <Text type="secondary">
-                      <PhoneOutlined /> {patient.phone}
-                    </Text>
-
-                    <Text type="secondary">
-                      <EnvironmentOutlined /> {patient.location}
-                      {patient.distance !== null
-                        ? ` • ${patient.distance} km`
-                        : ""}
-                    </Text>
-                  </div>
-
-                  {patient.hasAllergy && (
-                    <Tag color="red" icon={<WarningOutlined />}>
-                      Allergy
-                    </Tag>
-                  )}
-                </div>
-              );
-            }}
             labelRender={(selected) => (
               <Tag
                 color={getStatusColor(selected.value)}
@@ -1683,10 +2352,14 @@ const Appointments = () => {
         );
       },
     },
+
     {
       title: "Actions",
+
       key: "actions",
+
       width: 255,
+
       fixed: "right",
 
       render: (_, record) => {
@@ -1756,6 +2429,10 @@ const Appointments = () => {
     },
   ];
 
+  /* ======================================================
+     Render
+  ====================================================== */
+
   return (
     <ClinicPage
       title="Appointments"
@@ -1780,6 +2457,81 @@ const Appointments = () => {
           </div>
         </div>,
 
+        <Popconfirm
+          key="appointment-sms"
+          title="Send Appointment SMS?"
+          description={
+            <div>
+              Send appointment details to{" "}
+              <strong>{todaysSmsAppointments.length}</strong> patient
+              {todaysSmsAppointments.length !== 1 ? "s" : ""} with appointments
+              today?
+            </div>
+          }
+          okText="Send SMS"
+          cancelText="Cancel"
+          onConfirm={handleSendTodayAppointmentSMS}
+          disabled={
+            todaysSmsAppointments.length === 0 ||
+            sendingAppointmentSMS ||
+            sendingDoctorArrivalSMS
+          }
+        >
+          <Tooltip
+            title={`Send appointment SMS to today's ${todaysSmsAppointments.length} patient${
+              todaysSmsAppointments.length !== 1 ? "s" : ""
+            }`}
+          >
+            <Button
+              icon={<MessageOutlined />}
+              loading={sendingAppointmentSMS}
+              disabled={
+                todaysSmsAppointments.length === 0 || sendingDoctorArrivalSMS
+              }
+            >
+              Appointment SMS {todaysSmsAppointments.length }
+            </Button>
+          </Tooltip>
+        </Popconfirm>,
+
+        <Popconfirm
+          key="doctor-arrival-sms"
+          title="Send Doctor Arrival SMS?"
+          description={
+            <div>
+              Notify <strong>{todaysSmsAppointments.length}</strong> patient
+              {todaysSmsAppointments.length !== 1 ? "s" : ""} with appointments
+              today that the doctor has arrived?
+            </div>
+          }
+          okText="Send SMS"
+          cancelText="Cancel"
+          onConfirm={handleSendTodayDoctorArrivalSMS}
+          disabled={
+            todaysSmsAppointments.length === 0 ||
+            sendingAppointmentSMS ||
+            sendingDoctorArrivalSMS
+          }
+        >
+          <Tooltip
+            title={`Send doctor arrival SMS to today's ${todaysSmsAppointments.length} patient${
+              todaysSmsAppointments.length !== 1 ? "s" : ""
+            }`}
+          >
+            <Button
+              type="primary"
+              ghost
+              icon={<SendOutlined />}
+              loading={sendingDoctorArrivalSMS}
+              disabled={
+                todaysSmsAppointments.length === 0 || sendingAppointmentSMS
+              }
+            >
+              Doctor Arrival SMS
+            </Button>
+          </Tooltip>
+        </Popconfirm>,
+
         <Button
           key="refresh"
           icon={<ReloadOutlined />}
@@ -1799,7 +2551,9 @@ const Appointments = () => {
         </Button>,
       ]}
     >
-      {/* Summary cards */}
+      {/* ==================================================
+          SUMMARY
+      ================================================== */}
 
       <Row gutter={[16, 16]} className="booking-summary-row">
         <Col xs={24} sm={12} xl={6}>
@@ -1845,7 +2599,9 @@ const Appointments = () => {
         </Col>
       </Row>
 
-      {/* Appointment directory */}
+      {/* ==================================================
+          APPOINTMENT DIRECTORY
+      ================================================== */}
 
       <Card bordered={false} className="booking-directory-card">
         <div className="booking-directory-header">
@@ -1872,7 +2628,6 @@ const Appointments = () => {
             onChange={(event) => setSearch(event.target.value)}
             className="booking-search-input"
           />
-
           <Segmented
             value={statusFilter}
             onChange={setStatusFilter}
@@ -1894,6 +2649,10 @@ const Appointments = () => {
                 label: `Cancelled (${appointmentSummary.cancelled})`,
                 value: "cancelled",
               },
+              {
+                label: `Skipped (${appointmentSummary.skipped})`,
+                value: "skipped",
+              },
             ]}
           />
         </div>
@@ -1905,6 +2664,7 @@ const Appointments = () => {
           dataSource={filteredAppointments}
           pagination={{
             pageSize: 8,
+
             showSizeChanger: false,
 
             showTotal: (total) =>
@@ -1959,7 +2719,9 @@ const Appointments = () => {
         />
       </Card>
 
-      {/* Add patient modal */}
+      {/* ==================================================
+          ADD PATIENT MODAL
+      ================================================== */}
 
       <Modal
         title={
@@ -1993,10 +2755,15 @@ const Appointments = () => {
           layout="vertical"
           initialValues={{
             gender: "Male",
+
             status: "Active",
+
             has_allergies: false,
+
             allergy_details: "",
+
             location: undefined,
+
             distance: undefined,
           }}
         >
@@ -2010,6 +2777,7 @@ const Appointments = () => {
 
                   <div>
                     <Text strong>Basic Information</Text>
+
                     <Text type="secondary">Required patient details</Text>
                   </div>
                 </div>
@@ -2066,6 +2834,7 @@ const Appointments = () => {
                   <Select
                     showSearch
                     allowClear
+                    loading={locationsLoading}
                     placeholder="Search and select city"
                     options={patientLocationOptions}
                     optionFilterProp="label"
@@ -2087,6 +2856,7 @@ const Appointments = () => {
                     onClear={() => {
                       patientForm.setFieldsValue({
                         location: undefined,
+
                         distance: undefined,
                       });
                     }}
@@ -2185,7 +2955,9 @@ const Appointments = () => {
                         rules={[
                           {
                             required: true,
+
                             whitespace: true,
+
                             message:
                               "Please enter the patient's allergy details",
                           },
@@ -2284,7 +3056,9 @@ const Appointments = () => {
         </Form>
       </Modal>
 
-      {/* Add/Edit appointment modal */}
+      {/* ==================================================
+          ADD / EDIT APPOINTMENT
+      ================================================== */}
 
       <Modal
         title={
@@ -2321,13 +3095,89 @@ const Appointments = () => {
       >
         <Form form={form} layout="vertical">
           <Row>
+            {/* =============================================
+                LEFT
+            ============================================= */}
+
             <Col xs={24} lg={10}>
+              {/* ===========================================
+                  APPOINTMENT NUMBER + SKIP
+              =========================================== */}
+
               <div className="booking-appointment-number">
                 <Text>Appointment Number</Text>
 
                 <div className="booking-appointment-number__value">
                   #{currentModalAppointmentNo}
                 </div>
+
+                {!editingAppointment && (
+                  <div
+                    style={{
+                      width: "100%",
+                      marginTop: 12,
+                    }}
+                  >
+                    {!skipAppointmentNumber ? (
+                      <Popconfirm
+                        title={`Reserve appointment #${nextAppointmentNo}?`}
+                        description={`Appointment #${nextAppointmentNo} will be saved as a reserved number.`}
+                        okText="Reserve Number"
+                        cancelText="Cancel"
+                        okButtonProps={{
+                          danger: true,
+                          loading: skippingNumber,
+                        }}
+                        onConfirm={handleSaveSkippedAppointment}
+                      >
+                        <Button
+                          htmlType="button"
+                          block
+                          danger
+                          ghost
+                          loading={skippingNumber}
+                          disabled={saving}
+                        >
+                          Reserve #{nextAppointmentNo}
+                        </Button>
+                      </Popconfirm>
+                    ) : (
+                      <Alert
+                        type="warning"
+                        showIcon
+                        message={`Appointment #${skippedAppointmentNo} will be skipped`}
+                        description={
+                          <div>
+                            <div>
+                              A special skipped-number record will be saved as{" "}
+                              <strong>#{skippedAppointmentNo}</strong>.
+                            </div>
+
+                            <div
+                              style={{
+                                marginTop: 5,
+                              }}
+                            >
+                              This patient will receive{" "}
+                              <strong>#{currentModalAppointmentNo}</strong>.
+                            </div>
+
+                            <Button
+                              htmlType="button"
+                              size="small"
+                              style={{
+                                marginTop: 10,
+                              }}
+                              onClick={() => setSkipAppointmentNumber(false)}
+                            >
+                              Undo Skip
+                            </Button>
+                          </div>
+                        }
+                      />
+                    )}
+                  </div>
+                )}
 
                 {lastAppointmentTime && (
                   <div className="booking-last-appointment">
@@ -2339,13 +3189,18 @@ const Appointments = () => {
                         {formatAppointmentTime(lastAppointmentTime)}
                       </strong>
                     </span>
+
                     <span>
-                      -{"  "}
-                      <strong> {lastAppointment_reason_for_visit}</strong>
+                      - <strong>{lastAppointment_reason_for_visit}</strong>
                     </span>
                   </div>
                 )}
               </div>
+
+              {/* ===========================================
+                  PATIENT / DENTIST
+              =========================================== */}
+
               <div className="booking-form-section">
                 <div className="booking-form-section__heading">
                   <div className="booking-form-section__icon">
@@ -2482,26 +3337,6 @@ const Appointments = () => {
                   />
                 )}
 
-                {selectedPatient?.hasAllergy && (
-                  <Alert
-                    type="error"
-                    showIcon
-                    icon={<WarningOutlined />}
-                    message="Patient Allergy Warning"
-                    description={
-                      <>
-                        <Text strong>{selectedPatient.patientName}</Text> has a
-                        recorded allergy.
-                        <div className="booking-selected-allergy-details">
-                          <strong>Allergy details:</strong>{" "}
-                          {selectedPatient.allergyDetails}
-                        </div>
-                      </>
-                    }
-                    className="booking-selected-allergy-alert"
-                  />
-                )}
-
                 <div className="booking-new-patient-action">
                   <Text type="secondary">Cannot find the patient?</Text>
 
@@ -2554,6 +3389,10 @@ const Appointments = () => {
               </div>
             </Col>
 
+            {/* =============================================
+                RIGHT
+            ============================================= */}
+
             <Col xs={24} lg={14}>
               <div className="booking-form-section booking-form-section--schedule">
                 <div className="booking-form-section__heading">
@@ -2575,7 +3414,8 @@ const Appointments = () => {
                   align="bottom"
                   className="booking-date-time-row"
                 >
-                  {/* Appointment Time */}
+                  {/* Date */}
+
                   <Col xs={24} md={12}>
                     <div className="booking-time-selection">
                       <Form.Item
@@ -2584,7 +3424,7 @@ const Appointments = () => {
                         rules={[
                           {
                             required: true,
-                            message: "Please select appointment time",
+                            message: "Please select appointment date",
                           },
                         ]}
                       >
@@ -2613,12 +3453,16 @@ const Appointments = () => {
                           className="booking-selected-time-card__edit"
                           onClick={() => {
                             setEditTime(false);
+
                             setEditDate((previous) => !previous);
                           }}
-                        ></Button>
+                        />
                       </div>
                     </div>
                   </Col>
+
+                  {/* Time */}
+
                   <Col xs={24} md={12}>
                     <div className="booking-time-selection">
                       <Form.Item
@@ -2659,9 +3503,10 @@ const Appointments = () => {
                             className="booking-selected-time-card__edit"
                             onClick={() => {
                               setEditDate(false);
+
                               setEditTime((previous) => !previous);
                             }}
-                          ></Button>
+                          />
                         </div>
                       ) : (
                         <Button
@@ -2678,6 +3523,11 @@ const Appointments = () => {
                     </div>
                   </Col>
                 </Row>
+
+                {/* =========================================
+                    DATE ADJUSTMENT
+                ========================================= */}
+
                 {editDate && (
                   <div className="booking-date-adjustment">
                     <div className="booking-date-adjustment__heading">
@@ -2779,6 +3629,11 @@ const Appointments = () => {
                     </div>
                   </div>
                 )}
+
+                {/* =========================================
+                    TIME ADJUSTMENT
+                ========================================= */}
+
                 {editTime && (
                   <div className="booking-date-adjustment">
                     <div className="booking-time-adjustment__heading">
@@ -2816,6 +3671,7 @@ const Appointments = () => {
                       <div className="booking-time-adjustment__group">
                         <div className="booking-time-adjustment__group-heading">
                           <Text strong>Earlier</Text>
+
                           <Text type="secondary">
                             Move the appointment back
                           </Text>
@@ -2854,6 +3710,7 @@ const Appointments = () => {
                       <div className="booking-time-adjustment__group booking-time-adjustment__group--later">
                         <div className="booking-time-adjustment__group-heading">
                           <Text strong>Later</Text>
+
                           <Text type="secondary">
                             Move the appointment forward
                           </Text>
@@ -2891,9 +3748,13 @@ const Appointments = () => {
                     </div>
                   </div>
                 )}
-                {/* ----------------------------------------
-                    Common treatment selection
-                ---------------------------------------- */}
+
+                {/* =========================================
+                    TREATMENT
+                ========================================= */}
+                {/* =========================================
+    TREATMENT
+========================================= */}
 
                 <Form.Item
                   label="Reason For Visit / Treatment"
@@ -2971,6 +3832,44 @@ const Appointments = () => {
                   />
                 </Form.Item>
 
+                {/* =========================================
+    ADD NEW COMMON TREATMENT
+========================================= */}
+
+                <div className="booking-new-treatment-action">
+                  <div className="booking-new-treatment-action__content">
+                    <div className="booking-new-treatment-action__icon">
+                      <MedicineBoxOutlined />
+                    </div>
+
+                    <div className="booking-new-treatment-action__text">
+                      <Text strong>Cannot find the treatment?</Text>
+
+                      <Text type="secondary">
+                        Create a new common treatment and add it to the list.
+                      </Text>
+                    </div>
+                  </div>
+
+                  <Button
+                    htmlType="button"
+                    type="primary"
+                    ghost
+                    icon={<PlusOutlined />}
+                    onClick={() => {
+                      newTreatmentForm.resetFields();
+
+                      setNewTreatmentModalOpen(true);
+                    }}
+                  >
+                    New Treatment
+                  </Button>
+                </div>
+
+                {/* =========================================
+    SELECTED TREATMENT FEE
+========================================= */}
+
                 {selectedCommonTreatment &&
                   selectedCommonTreatment.fee !== null &&
                   selectedCommonTreatment.fee !== undefined &&
@@ -2984,16 +3883,138 @@ const Appointments = () => {
                           {formatCurrency(selectedCommonTreatment.fee)}
                         </Text>
                       }
-                      style={{ marginBottom: 18 }}
+                      style={{
+                        marginTop: 16,
+                        marginBottom: 18,
+                      }}
                     />
                   )}
 
-                <Form.Item label="Booking Status" name="status" hidden={true}>
+                <Form.Item label="Booking Status" name="status" hidden>
                   <Select size="large" options={bookingStatusOptions} />
                 </Form.Item>
               </div>
             </Col>
           </Row>
+        </Form>
+      </Modal>
+      <Modal
+        title={
+          <div className="booking-modal-title">
+            <div className="booking-modal-title__icon">
+              <MedicineBoxOutlined />
+            </div>
+
+            <div>
+              <Text strong>Add Common Treatment</Text>
+
+              <Text type="secondary">
+                Create a treatment that can be used for future appointments.
+              </Text>
+            </div>
+          </div>
+        }
+        open={newTreatmentModalOpen}
+        onCancel={() => {
+          if (savingTreatment) {
+            return;
+          }
+
+          setNewTreatmentModalOpen(false);
+
+          newTreatmentForm.resetFields();
+        }}
+        onOk={handleSaveNewTreatment}
+        confirmLoading={savingTreatment}
+        okText="Add Treatment"
+        cancelText="Cancel"
+        centered
+        width={520}
+        destroyOnHidden
+        className="booking-treatment-modal"
+      >
+        <Form form={newTreatmentForm} layout="vertical" requiredMark={false}>
+          {/* =====================================
+        Treatment Name
+    ====================================== */}
+
+          <Form.Item
+            label="Treatment Name"
+            name="treatment_name"
+            rules={[
+              {
+                required: true,
+                whitespace: true,
+                message: "Please enter treatment name",
+              },
+              {
+                min: 2,
+                message: "Treatment name must contain at least 2 characters",
+              },
+            ]}
+          >
+            <Input
+              size="large"
+              prefix={<MedicineBoxOutlined />}
+              placeholder="Example: Tooth Extraction"
+              maxLength={150}
+              showCount
+              autoFocus
+            />
+          </Form.Item>
+
+          {/* =====================================
+        Standard Fee
+    ====================================== */}
+
+          <Form.Item
+            label="Standard Fee"
+            name="fee"
+            rules={[
+              {
+                required: true,
+                message: "Please enter treatment fee",
+              },
+              {
+                validator: (_, value) => {
+                  if (value === undefined || value === null || value === "") {
+                    return Promise.resolve();
+                  }
+
+                  if (Number(value) < 0) {
+                    return Promise.reject(
+                      new Error("Treatment fee cannot be negative"),
+                    );
+                  }
+
+                  return Promise.resolve();
+                },
+              },
+            ]}
+          >
+            <InputNumber
+              size="large"
+              min={0}
+              step={500}
+              precision={2}
+              placeholder="Enter treatment fee"
+              style={{
+                width: "100%",
+              }}
+              addonBefore="Rs."
+              formatter={(value) =>
+                value ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""
+              }
+              parser={(value) => (value ? value.replace(/,/g, "") : "")}
+            />
+          </Form.Item>
+
+          <Alert
+            type="info"
+            showIcon
+            message="Common Treatment"
+            description="Once created, this treatment will be available in the Reason For Visit / Treatment dropdown for future appointments."
+          />
         </Form>
       </Modal>
     </ClinicPage>

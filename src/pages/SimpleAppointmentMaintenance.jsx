@@ -1,22 +1,22 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
+  Alert,
   Button,
   DatePicker,
   Descriptions,
   Drawer,
   Empty,
   Input,
+  Modal,
   Segmented,
   Select,
   Space,
-  Modal,
   Spin,
   Tag,
   Tooltip,
   Typography,
   message,
-  Alert,
 } from "antd";
 
 import {
@@ -43,11 +43,12 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import ClinicPage from "../components/ClinicPage";
 
 import {
-  checkInAppointmentToQueue,
   endAppointmentWaiting,
   getAllWaitingRecords,
   getAppointmentsByDate,
+  getDoctorArrivalStatus,
   getPatients,
+  markDoctorArrived,
   reassignAppointmentNumber,
   startAppointmentWaiting,
   updateAppointmentStatus,
@@ -67,9 +68,10 @@ const getTodayDate = () => dayjs().format("YYYY-MM-DD");
 
 const READY_PATIENT_STORAGE_PREFIX = "queue-display-ready-patient";
 
+const LOCKED_PATIENT_COUNT = 2;
+
 const getReadyPatientStorageKey = (date) =>
   `${READY_PATIENT_STORAGE_PREFIX}:${date}`;
-const LOCKED_PATIENT_COUNT = 2;
 
 const VIEW_OPTIONS = [
   {
@@ -149,7 +151,6 @@ const FILTER_OPTIONS = [
     label: "Treatment Done",
     value: "Treatment Done",
   },
-
   {
     label: "Cancelled",
     value: "Cancelled",
@@ -173,22 +174,23 @@ const STATUS_COLORS = {
    Helpers
 ======================================================== */
 
-const extractWaitingRecords = (response) => {
-  const responseData = response?.data ?? response;
+const normalizeStatus = (value) =>
+  String(value || "")
+    .trim()
+    .toLowerCase();
 
-  if (Array.isArray(responseData)) {
-    return responseData;
-  }
+const normalizeSearchValue = (value) =>
+  String(value ?? "")
+    .trim()
+    .toLowerCase();
 
-  if (Array.isArray(responseData?.records)) {
-    return responseData.records;
-  }
+const getAppointmentId = (appointment) =>
+  String(appointment?.appointment_id || appointment?.id || "").trim();
 
-  if (Array.isArray(responseData?.data)) {
-    return responseData.data;
-  }
+const isCancelledStatus = (status) => {
+  const normalized = normalizeStatus(status);
 
-  return [];
+  return normalized === "cancelled" || normalized === "canceled";
 };
 
 const extractArray = (response, possibleKeys = []) => {
@@ -207,6 +209,42 @@ const extractArray = (response, possibleKeys = []) => {
   }
 
   return [];
+};
+
+const extractWaitingRecords = (response) => {
+  const responseData = response?.data ?? response;
+
+  if (Array.isArray(responseData)) {
+    return responseData;
+  }
+
+  if (Array.isArray(responseData?.records)) {
+    return responseData.records;
+  }
+
+  if (Array.isArray(responseData?.data)) {
+    return responseData.data;
+  }
+
+  return [];
+};
+
+const extractDoctorArrivalRecord = (response) => {
+  const responseData = response?.data ?? response;
+
+  if (!responseData) {
+    return null;
+  }
+
+  if (responseData?.data && !Array.isArray(responseData.data)) {
+    return responseData.data;
+  }
+
+  if (responseData?.record) {
+    return responseData.record;
+  }
+
+  return responseData;
 };
 
 const convertToBoolean = (value) => {
@@ -301,6 +339,17 @@ const getAppointmentNumber = (appointment) => {
   return String(number).padStart(2, "0");
 };
 
+const getRawAppointmentNumber = (appointment) => {
+  const value =
+    appointment?.appointment_number ??
+    appointment?.queue_number ??
+    appointment?.number;
+
+  const parsed = Number(value);
+
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
 const getDistanceValue = (appointment) => {
   const rawDistance =
     appointment?.patient_distance_km ??
@@ -312,20 +361,14 @@ const getDistanceValue = (appointment) => {
   return Number.isFinite(parsedDistance) ? parsedDistance : null;
 };
 
-const getStatusClassName = (status) => {
-  return String(status || "Pending")
+const getStatusClassName = (status) =>
+  String(status || "Pending")
     .trim()
     .toLowerCase()
     .replace(/\s+/g, "-");
-};
-
-const normalizeSearchValue = (value) =>
-  String(value ?? "")
-    .trim()
-    .toLowerCase();
 
 const getWaitingAppointmentId = (record) =>
-  String(record?.id ?? record?.appointment_id ?? "").trim();
+  String(record?.appointment_id ?? record?.id ?? "").trim();
 
 const isWaitingRecordActive = (record) => {
   const appointmentId = getWaitingAppointmentId(record);
@@ -334,37 +377,41 @@ const isWaitingRecordActive = (record) => {
 
   return Boolean(appointmentId && !endTime);
 };
-const normalizeStatus = (value) => {
-  return String(value || "")
-    .trim()
-    .toLowerCase();
-};
+
 /* ========================================================
    Component
 ======================================================== */
-const getAppointmentId = (appointment) => {
-  return appointment?.appointment_id || appointment?.id || "";
-};
+
 const AppointmentMaintenance = () => {
-  const [reassignModalOpen, setReassignModalOpen] = useState(false);
-
-  const [reassignSourceAppointment, setReassignSourceAppointment] =
-    useState(null);
-
-  const [reassignTargetAppointmentId, setReassignTargetAppointmentId] =
-    useState(null);
-
-  const [reassigningNumber, setReassigningNumber] = useState(false);
+  /* ========================================================
+     Main state
+  ======================================================== */
 
   const [selectedDate, setSelectedDate] = useState(getTodayDate());
 
-  const [waitingRecords, setWaitingRecords] = useState([]);
-
   const [appointments, setAppointments] = useState([]);
+
+  const [waitingRecords, setWaitingRecords] = useState([]);
 
   const [loading, setLoading] = useState(false);
 
   const [updatingId, setUpdatingId] = useState(null);
+
+  /* ========================================================
+     Doctor arrival
+  ======================================================== */
+
+  const [doctorArrivalRecord, setDoctorArrivalRecord] = useState(null);
+
+  const [doctorArrived, setDoctorArrived] = useState(false);
+
+  const [doctorArrivalLoading, setDoctorArrivalLoading] = useState(false);
+
+  const [markingDoctorArrival, setMarkingDoctorArrival] = useState(false);
+
+  /* ========================================================
+     UI
+  ======================================================== */
 
   const [viewMode, setViewMode] = useState("minimal");
 
@@ -376,25 +423,83 @@ const AppointmentMaintenance = () => {
 
   const [lockedNextPatientIds, setLockedNextPatientIds] = useState([]);
 
+  /* ========================================================
+     Drawer
+  ======================================================== */
+
   const [detailsDrawerOpen, setDetailsDrawerOpen] = useState(false);
 
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+
+  /* ========================================================
+     Reassign modal
+  ======================================================== */
+
+  const [reassignModalOpen, setReassignModalOpen] = useState(false);
+
+  const [reassignSourceAppointment, setReassignSourceAppointment] =
+    useState(null);
+
+  const [reassignTargetAppointmentId, setReassignTargetAppointmentId] =
+    useState(null);
+
+  const [reassigningNumber, setReassigningNumber] = useState(false);
+
+  /* ========================================================
+     Date picker
+  ======================================================== */
+
   const selectedDatePickerValue = useMemo(() => {
     const parsedDate = dayjs(selectedDate, "YYYY-MM-DD", true);
 
     return parsedDate.isValid() ? parsedDate : dayjs();
   }, [selectedDate]);
+
   /* ========================================================
-     Load data
+     Doctor arrival loading
+  ======================================================== */
+
+  const fetchDoctorArrival = useCallback(async () => {
+    const dateToLoad = selectedDate || getTodayDate();
+
+    try {
+      setDoctorArrivalLoading(true);
+
+      const response = await getDoctorArrivalStatus(dateToLoad);
+
+      const record = extractDoctorArrivalRecord(response);
+
+      setDoctorArrivalRecord(record);
+
+      setDoctorArrived(convertToBoolean(record?.arrived));
+    } catch (error) {
+      console.error("Failed to get doctor arrival status:", error);
+
+      /*
+       * If there is no arrival row for the date, keep it as not arrived.
+       * We don't want the whole page to fail just because this endpoint
+       * returns 404/no record.
+       */
+      setDoctorArrivalRecord(null);
+      setDoctorArrived(false);
+    } finally {
+      setDoctorArrivalLoading(false);
+    }
+  }, [selectedDate]);
+
+  /* ========================================================
+     Load appointments
   ======================================================== */
 
   const fetchAppointments = useCallback(async () => {
+    const dateToLoad = selectedDate || getTodayDate();
+
     try {
       setLoading(true);
 
       const [appointmentsResponse, patientsResponse, waitingResponse] =
         await Promise.all([
-          getAppointmentsByDate(selectedDate),
+          getAppointmentsByDate(dateToLoad),
           getPatients(),
           getAllWaitingRecords(),
         ]);
@@ -424,6 +529,12 @@ const AppointmentMaintenance = () => {
 
           patient_age: appointment.patient_age ?? patient?.age ?? "",
 
+          patient_gender:
+            appointment.patient_gender || patient?.gender || "",
+
+          patient_address:
+            appointment.patient_address || patient?.address || "",
+
           patient_location:
             appointment.patient_location ||
             appointment.location ||
@@ -438,11 +549,6 @@ const AppointmentMaintenance = () => {
             patient?.distance ??
             "",
 
-          patient_gender: appointment.patient_gender || patient?.gender || "",
-
-          patient_address:
-            appointment.patient_address || patient?.address || "",
-
           is_allergies: convertToBoolean(
             appointment.is_allergies ??
               appointment.has_allergies ??
@@ -456,15 +562,19 @@ const AppointmentMaintenance = () => {
 
       setWaitingRecords(waitingList);
 
+      /*
+       * Keep drawer appointment synchronized after reload.
+       */
       setSelectedAppointment((currentAppointment) => {
         if (!currentAppointment) {
           return null;
         }
 
+        const currentId = getAppointmentId(currentAppointment);
+
         return (
           mergedAppointments.find(
-            (appointment) =>
-              appointment.appointment_id === currentAppointment.appointment_id,
+            (appointment) => getAppointmentId(appointment) === currentId,
           ) || currentAppointment
         );
       });
@@ -481,40 +591,75 @@ const AppointmentMaintenance = () => {
     }
   }, [selectedDate]);
 
+  /* ========================================================
+     Full refresh
+  ======================================================== */
+
+  const refreshPage = useCallback(async () => {
+    await Promise.all([fetchAppointments(), fetchDoctorArrival()]);
+  }, [fetchAppointments, fetchDoctorArrival]);
+
   useEffect(() => {
-    fetchAppointments();
-  }, [fetchAppointments]);
+    refreshPage();
+  }, [refreshPage]);
+
+  /* ========================================================
+     Mark doctor arrived
+  ======================================================== */
+
+  const handleMarkDoctorArrived = async () => {
+    const dateToSend = selectedDate || getTodayDate();
+
+    try {
+      setMarkingDoctorArrival(true);
+
+      await markDoctorArrived(dateToSend);
+
+      message.success("Doctor arrival marked successfully");
+
+      await fetchDoctorArrival();
+    } catch (error) {
+      console.error("Failed to mark doctor arrival:", error);
+
+      message.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to mark doctor arrival",
+      );
+    } finally {
+      setMarkingDoctorArrival(false);
+    }
+  };
 
   /* ========================================================
      Waiting data
   ======================================================== */
 
-  const activeWaitingRecords = useMemo(() => {
-    return waitingRecords.filter(isWaitingRecordActive);
-  }, [waitingRecords]);
+  const activeWaitingRecords = useMemo(
+    () => waitingRecords.filter(isWaitingRecordActive),
+    [waitingRecords],
+  );
 
   const activeWaitingAppointmentIds = useMemo(() => {
     return new Set(
-      activeWaitingRecords.map((waitingRecord) =>
-        getWaitingAppointmentId(waitingRecord),
+      activeWaitingRecords.map((record) =>
+        getWaitingAppointmentId(record),
       ),
     );
   }, [activeWaitingRecords]);
 
   const waitingRecordMap = useMemo(() => {
     return new Map(
-      activeWaitingRecords.map((waitingRecord) => [
-        getWaitingAppointmentId(waitingRecord),
-        waitingRecord,
+      activeWaitingRecords.map((record) => [
+        getWaitingAppointmentId(record),
+        record,
       ]),
     );
   }, [activeWaitingRecords]);
 
   const isAppointmentWaiting = useCallback(
     (appointment) => {
-      const appointmentId = String(
-        appointment?.appointment_id ?? appointment?.id ?? "",
-      ).trim();
+      const appointmentId = getAppointmentId(appointment);
 
       return Boolean(
         appointmentId && activeWaitingAppointmentIds.has(appointmentId),
@@ -525,9 +670,7 @@ const AppointmentMaintenance = () => {
 
   const getAppointmentWaitingRecord = useCallback(
     (appointment) => {
-      const appointmentId = String(
-        appointment?.appointment_id ?? appointment?.id ?? "",
-      ).trim();
+      const appointmentId = getAppointmentId(appointment);
 
       return waitingRecordMap.get(appointmentId) || null;
     },
@@ -535,89 +678,41 @@ const AppointmentMaintenance = () => {
   );
 
   /* ========================================================
-     Queue data
+     Current treatment
   ======================================================== */
-  const handleCheckInCancelledAppointment = async (appointment) => {
-    const appointmentId = getAppointmentId(appointment);
 
-    if (!appointmentId) {
-      message.error("Appointment ID is missing");
-      return;
-    }
-
-    try {
-      setUpdatingId(appointmentId);
-
-      await updateAppointmentStatus(appointmentId, "Checked In");
-
-      message.success(
-        `${appointment.patient_name || "Patient"} checked in again as No. ${getAppointmentNumber(
-          appointment,
-        )}`,
-      );
-
-      await fetchAppointments();
-    } catch (error) {
-      console.error("Failed to check in cancelled appointment:", error);
-
-      message.error(
-        error?.response?.data?.message ||
-          error?.message ||
-          "Failed to check in appointment",
-      );
-    } finally {
-      setUpdatingId(null);
-    }
-  };
-  const handleOpenReassignNumber = (appointment) => {
-    setReassignSourceAppointment(appointment);
-    setReassignTargetAppointmentId(null);
-    setReassignModalOpen(true);
-  };
-  const reassignableAppointments = useMemo(() => {
-    if (!reassignSourceAppointment) {
-      return [];
-    }
-
-    const sourceId = String(getAppointmentId(reassignSourceAppointment));
-
-    return appointments.filter((appointment) => {
-      const appointmentId = String(getAppointmentId(appointment));
-
-      if (!appointmentId || appointmentId === sourceId) {
-        return false;
-      }
-
-      return ["Pending", "Confirmed", "Checked In"].includes(
-        appointment.status,
-      );
-    });
-  }, [appointments, reassignSourceAppointment]);
   const currentTreatmentPatient = useMemo(() => {
     return (
       appointments.find(
-        (appointment) => appointment.status === "In Treatment",
+        (appointment) =>
+          normalizeStatus(appointment.status) === "in treatment",
       ) || null
     );
   }, [appointments]);
+
+  /* ========================================================
+     Checked-in queue
+  ======================================================== */
 
   const checkedInAppointments = useMemo(() => {
     return appointments
       .filter(
         (appointment) =>
-          appointment.status === "Checked In" &&
+          normalizeStatus(appointment.status) === "checked in" &&
           !isAppointmentWaiting(appointment),
       )
       .sort((first, second) => {
-        const checkedInDifference =
-          getDateTimeValue(
-            first.checked_in_time,
-            first.appointment_date || selectedDate,
-          ) -
-          getDateTimeValue(
-            second.checked_in_time,
-            second.appointment_date || selectedDate,
-          );
+        const firstCheckedIn = getDateTimeValue(
+          first.checked_in_time,
+          first.appointment_date || selectedDate,
+        );
+
+        const secondCheckedIn = getDateTimeValue(
+          second.checked_in_time,
+          second.appointment_date || selectedDate,
+        );
+
+        const checkedInDifference = firstCheckedIn - secondCheckedIn;
 
         if (checkedInDifference !== 0) {
           return checkedInDifference;
@@ -642,11 +737,16 @@ const AppointmentMaintenance = () => {
           Number(second.appointment_number || 0)
         );
       });
-  }, [appointments, selectedDate, isAppointmentWaiting]);
+  }, [appointments, isAppointmentWaiting, selectedDate]);
+
+  /* ========================================================
+     Locked NEXT 1 / NEXT 2
+  ======================================================== */
+
   const lockedCheckedInAppointmentIds = useMemo(() => {
     const availableIds = new Set(
       checkedInAppointments.map((appointment) =>
-        String(appointment.appointment_id),
+        getAppointmentId(appointment),
       ),
     );
 
@@ -655,71 +755,34 @@ const AppointmentMaintenance = () => {
     );
 
     const remainingIds = checkedInAppointments
-      .map((appointment) => String(appointment.appointment_id))
-      .filter((appointmentId) => !validLockedIds.includes(appointmentId));
+      .map((appointment) => getAppointmentId(appointment))
+      .filter(
+        (appointmentId) =>
+          appointmentId && !validLockedIds.includes(appointmentId),
+      );
 
-    return [...validLockedIds, ...remainingIds].slice(0, LOCKED_PATIENT_COUNT);
+    return [...validLockedIds, ...remainingIds].slice(
+      0,
+      LOCKED_PATIENT_COUNT,
+    );
   }, [checkedInAppointments, lockedNextPatientIds]);
 
-  const firstLockedAppointmentId = lockedCheckedInAppointmentIds[0] || null;
+  const firstLockedAppointmentId =
+    lockedCheckedInAppointmentIds[0] || null;
 
-  const handleReassignAppointmentNumber = async () => {
-    if (!reassignSourceAppointment) {
-      message.error("Cancelled appointment is missing");
-      return;
-    }
-
-    if (!reassignTargetAppointmentId) {
-      message.warning("Please select another appointment");
-      return;
-    }
-
-    const sourceId = getAppointmentId(reassignSourceAppointment);
-
-    try {
-      setReassigningNumber(true);
-
-      await reassignAppointmentNumber(sourceId, reassignTargetAppointmentId);
-
-      message.success(
-        `Appointment No. ${getAppointmentNumber(
-          reassignSourceAppointment,
-        )} reassigned successfully`,
-      );
-
-      setReassignModalOpen(false);
-      setReassignSourceAppointment(null);
-      setReassignTargetAppointmentId(null);
-
-      await fetchAppointments();
-    } catch (error) {
-      console.error("Failed to reassign appointment number:", error);
-
-      message.error(
-        error?.response?.data?.message ||
-          error?.message ||
-          "Failed to reassign appointment number",
-      );
-    } finally {
-      setReassigningNumber(false);
-    }
-  };
+  /* ========================================================
+     Restore locked patients
+  ======================================================== */
 
   useEffect(() => {
     const storageKey = getReadyPatientStorageKey(selectedDate);
 
     const availableIds = checkedInAppointments
-      .map((appointment) => String(appointment.appointment_id || ""))
+      .map((appointment) => getAppointmentId(appointment))
       .filter(Boolean);
 
     if (availableIds.length === 0) {
-      setLockedNextPatientIds((currentIds) => {
-        if (currentIds.length === 0) {
-          return currentIds;
-        }
-
-        return [];
-      });
+      setLockedNextPatientIds([]);
 
       if (typeof window !== "undefined") {
         window.localStorage.removeItem(storageKey);
@@ -734,9 +797,13 @@ const AppointmentMaintenance = () => {
       try {
         const storedValue = window.localStorage.getItem(storageKey);
 
-        const parsedValue = storedValue ? JSON.parse(storedValue) : [];
+        const parsedValue = storedValue
+          ? JSON.parse(storedValue)
+          : [];
 
-        storedIds = Array.isArray(parsedValue) ? parsedValue.map(String) : [];
+        storedIds = Array.isArray(parsedValue)
+          ? parsedValue.map(String)
+          : [];
       } catch {
         storedIds = [];
       }
@@ -752,31 +819,26 @@ const AppointmentMaintenance = () => {
       );
 
       const preservedIds =
-        validCurrentIds.length > 0 ? validCurrentIds : validStoredIds;
+        validCurrentIds.length > 0
+          ? validCurrentIds
+          : validStoredIds;
 
       const additionalIds = availableIds.filter(
-        (appointmentId) => !preservedIds.includes(appointmentId),
+        (appointmentId) =>
+          !preservedIds.includes(appointmentId),
       );
 
-      const nextLockedIds = [...preservedIds, ...additionalIds].slice(
+      return [...preservedIds, ...additionalIds].slice(
         0,
         LOCKED_PATIENT_COUNT,
       );
-
-      const hasChanged =
-        nextLockedIds.length !== currentIds.length ||
-        nextLockedIds.some(
-          (appointmentId, index) =>
-            String(appointmentId) !== String(currentIds[index]),
-        );
-
-      if (!hasChanged) {
-        return currentIds;
-      }
-
-      return nextLockedIds;
     });
   }, [selectedDate, checkedInAppointments]);
+
+  /* ========================================================
+     Save locked patients
+  ======================================================== */
+
   useEffect(() => {
     if (typeof window === "undefined") {
       return;
@@ -786,6 +848,7 @@ const AppointmentMaintenance = () => {
 
     if (lockedNextPatientIds.length === 0) {
       window.localStorage.removeItem(storageKey);
+
       return;
     }
 
@@ -794,6 +857,11 @@ const AppointmentMaintenance = () => {
       JSON.stringify(lockedNextPatientIds),
     );
   }, [selectedDate, lockedNextPatientIds]);
+
+  /* ========================================================
+     Sync QueueDisplay tab
+  ======================================================== */
+
   useEffect(() => {
     if (typeof window === "undefined") {
       return undefined;
@@ -808,6 +876,7 @@ const AppointmentMaintenance = () => {
 
       if (!event.newValue) {
         setLockedNextPatientIds([]);
+
         return;
       }
 
@@ -820,17 +889,22 @@ const AppointmentMaintenance = () => {
 
         const availableIds = new Set(
           checkedInAppointments.map((appointment) =>
-            String(appointment.appointment_id),
+            getAppointmentId(appointment),
           ),
         );
 
         const validIds = storedIds
-          .filter((appointmentId) => availableIds.has(appointmentId))
+          .filter((appointmentId) =>
+            availableIds.has(appointmentId),
+          )
           .slice(0, LOCKED_PATIENT_COUNT);
 
         setLockedNextPatientIds(validIds);
       } catch (error) {
-        console.error("Failed to sync locked queue patients:", error);
+        console.error(
+          "Failed to sync locked queue patients:",
+          error,
+        );
       }
     };
 
@@ -840,51 +914,160 @@ const AppointmentMaintenance = () => {
       window.removeEventListener("storage", handleStorageChange);
     };
   }, [selectedDate, checkedInAppointments]);
+
+  /* ========================================================
+     Reassign appointment number
+  ======================================================== */
+
+  const handleOpenReassignNumber = (appointment) => {
+    setReassignSourceAppointment(appointment);
+
+    setReassignTargetAppointmentId(null);
+
+    setReassignModalOpen(true);
+  };
+
+  const reassignableAppointments = useMemo(() => {
+    if (!reassignSourceAppointment) {
+      return [];
+    }
+
+    const sourceId = getAppointmentId(reassignSourceAppointment);
+
+    return appointments.filter((appointment) => {
+      const appointmentId = getAppointmentId(appointment);
+
+      if (!appointmentId || appointmentId === sourceId) {
+        return false;
+      }
+
+      const status = normalizeStatus(appointment.status);
+
+      return [
+        "pending",
+        "confirmed",
+        "checked in",
+      ].includes(status);
+    });
+  }, [appointments, reassignSourceAppointment]);
+
   const availableReassignAppointments = useMemo(() => {
     if (!reassignSourceAppointment) {
       return [];
     }
 
-    const sourceNumber = Number(
-      getAppointmentNumber(reassignSourceAppointment),
+    const sourceNumber = getRawAppointmentNumber(
+      reassignSourceAppointment,
     );
 
     const sourceDate =
       reassignSourceAppointment?.appointment_date ||
-      reassignSourceAppointment?.date;
+      reassignSourceAppointment?.date ||
+      selectedDate;
 
-    if (!Number.isFinite(sourceNumber)) {
+    if (sourceNumber === null) {
       return [];
     }
 
     return reassignableAppointments
       .filter((appointment) => {
-        const appointmentNumber = Number(getAppointmentNumber(appointment));
+        const appointmentNumber =
+          getRawAppointmentNumber(appointment);
 
         const appointmentDate =
-          appointment?.appointment_date || appointment?.date;
+          appointment?.appointment_date ||
+          appointment?.date ||
+          selectedDate;
 
-        const status = normalizeStatus(appointment?.status);
+        if (appointmentNumber === null) {
+          return false;
+        }
 
         return (
           appointmentDate === sourceDate &&
-          Number.isFinite(appointmentNumber) &&
           appointmentNumber > sourceNumber &&
-          status !== "cancelled" &&
-          status !== "canceled"
+          !isCancelledStatus(appointment.status)
         );
       })
-      .sort(
-        (first, second) =>
-          Number(getAppointmentNumber(first)) -
-          Number(getAppointmentNumber(second)),
+      .sort((first, second) => {
+        return (
+          getRawAppointmentNumber(first) -
+          getRawAppointmentNumber(second)
+        );
+      });
+  }, [
+    reassignableAppointments,
+    reassignSourceAppointment,
+    selectedDate,
+  ]);
+
+  const handleReassignAppointmentNumber = async () => {
+    if (!reassignSourceAppointment) {
+      message.error("Cancelled appointment is missing");
+
+      return;
+    }
+
+    if (!reassignTargetAppointmentId) {
+      message.warning("Please select another appointment");
+
+      return;
+    }
+
+    const sourceId = getAppointmentId(
+      reassignSourceAppointment,
+    );
+
+    try {
+      setReassigningNumber(true);
+
+      await reassignAppointmentNumber(
+        sourceId,
+        reassignTargetAppointmentId,
       );
-  }, [reassignableAppointments, reassignSourceAppointment]);
+
+      message.success(
+        `Appointment No. ${getAppointmentNumber(
+          reassignSourceAppointment,
+        )} reassigned successfully`,
+      );
+
+      setReassignModalOpen(false);
+
+      setReassignSourceAppointment(null);
+
+      setReassignTargetAppointmentId(null);
+
+      await fetchAppointments();
+    } catch (error) {
+      console.error(
+        "Failed to reassign appointment number:",
+        error,
+      );
+
+      message.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to reassign appointment number",
+      );
+    } finally {
+      setReassigningNumber(false);
+    }
+  };
+
   /* ========================================================
      Waiting actions
   ======================================================== */
 
   const handleStartWaiting = async (appointment) => {
+    const appointmentId = getAppointmentId(appointment);
+
+    if (!appointmentId) {
+      message.error("Appointment ID is missing");
+
+      return;
+    }
+
     if (isAppointmentWaiting(appointment)) {
       message.info("This patient is already waiting.");
 
@@ -892,17 +1075,22 @@ const AppointmentMaintenance = () => {
     }
 
     try {
-      setUpdatingId(appointment.appointment_id);
+      setUpdatingId(appointmentId);
 
-      await startAppointmentWaiting(appointment.appointment_id);
+      await startAppointmentWaiting(appointmentId);
 
       message.success(
-        `${appointment.patient_name || "Patient"} moved to waiting.`,
+        `${
+          appointment.patient_name || "Patient"
+        } moved to waiting.`,
       );
 
       await fetchAppointments();
     } catch (error) {
-      console.error("Failed to keep patient waiting:", error);
+      console.error(
+        "Failed to keep patient waiting:",
+        error,
+      );
 
       message.error(
         error?.response?.data?.message ||
@@ -915,16 +1103,26 @@ const AppointmentMaintenance = () => {
   };
 
   const handleEndWaiting = async (appointment) => {
+    const appointmentId = getAppointmentId(appointment);
+
+    if (!appointmentId) {
+      message.error("Appointment ID is missing");
+
+      return;
+    }
+
     if (!isAppointmentWaiting(appointment)) {
-      message.info("This patient is not currently waiting.");
+      message.info(
+        "This patient is not currently waiting.",
+      );
 
       return;
     }
 
     try {
-      setUpdatingId(appointment.appointment_id);
+      setUpdatingId(appointmentId);
 
-      await endAppointmentWaiting(appointment.appointment_id);
+      await endAppointmentWaiting(appointmentId);
 
       message.success(
         `${
@@ -947,14 +1145,20 @@ const AppointmentMaintenance = () => {
   };
 
   /* ========================================================
-     Sort cards
+     Appointment sorting
   ======================================================== */
 
   const sortedAppointments = useMemo(() => {
     return [...appointments].sort((first, second) => {
-      const firstIsCurrent = first.status === "In Treatment";
+      const firstId = getAppointmentId(first);
 
-      const secondIsCurrent = second.status === "In Treatment";
+      const secondId = getAppointmentId(second);
+
+      const firstIsCurrent =
+        normalizeStatus(first.status) === "in treatment";
+
+      const secondIsCurrent =
+        normalizeStatus(second.status) === "in treatment";
 
       if (firstIsCurrent && !secondIsCurrent) {
         return -1;
@@ -964,15 +1168,14 @@ const AppointmentMaintenance = () => {
         return 1;
       }
 
-      const firstLockedIndex = lockedCheckedInAppointmentIds.indexOf(
-        String(first.appointment_id),
-      );
+      const firstLockedIndex =
+        lockedCheckedInAppointmentIds.indexOf(firstId);
 
-      const secondLockedIndex = lockedCheckedInAppointmentIds.indexOf(
-        String(second.appointment_id),
-      );
+      const secondLockedIndex =
+        lockedCheckedInAppointmentIds.indexOf(secondId);
 
       const firstIsLocked = firstLockedIndex !== -1;
+
       const secondIsLocked = secondLockedIndex !== -1;
 
       if (firstIsLocked && !secondIsLocked) {
@@ -987,9 +1190,11 @@ const AppointmentMaintenance = () => {
         return firstLockedIndex - secondLockedIndex;
       }
 
-      const firstIsWaiting = isAppointmentWaiting(first);
+      const firstIsWaiting =
+        isAppointmentWaiting(first);
 
-      const secondIsWaiting = isAppointmentWaiting(second);
+      const secondIsWaiting =
+        isAppointmentWaiting(second);
 
       if (firstIsWaiting && !secondIsWaiting) {
         return 1;
@@ -1004,9 +1209,11 @@ const AppointmentMaintenance = () => {
 
         const secondDistance = getDistanceValue(second);
 
-        const firstHasDistance = firstDistance !== null;
+        const firstHasDistance =
+          firstDistance !== null;
 
-        const secondHasDistance = secondDistance !== null;
+        const secondHasDistance =
+          secondDistance !== null;
 
         if (firstHasDistance && !secondHasDistance) {
           return -1;
@@ -1053,20 +1260,26 @@ const AppointmentMaintenance = () => {
     isAppointmentWaiting,
     distanceSort,
   ]);
+
   /* ========================================================
-     Filter and search
+     Search + status filtering
   ======================================================== */
 
   const filteredAppointments = useMemo(() => {
-    const normalizedSearch = normalizeSearchValue(searchValue);
+    const normalizedSearch =
+      normalizeSearchValue(searchValue);
 
     return sortedAppointments.filter((appointment) => {
-      const isWaitingPatient = isAppointmentWaiting(appointment);
+      const isWaitingPatient =
+        isAppointmentWaiting(appointment);
 
-      const effectiveStatus = isWaitingPatient ? "Waiting" : appointment.status;
+      const effectiveStatus = isWaitingPatient
+        ? "Waiting"
+        : appointment.status;
 
       const matchesStatus =
-        statusFilter === "All" || effectiveStatus === statusFilter;
+        statusFilter === "All" ||
+        effectiveStatus === statusFilter;
 
       if (!matchesStatus) {
         return false;
@@ -1076,11 +1289,9 @@ const AppointmentMaintenance = () => {
         return true;
       }
 
-      const appointmentNumber = getAppointmentNumber(appointment);
-
       const searchableValues = [
-        appointmentNumber,
-        appointment.appointment_id,
+        getAppointmentNumber(appointment),
+        getAppointmentId(appointment),
         appointment.patient_id,
         appointment.patient_name,
         appointment.phone,
@@ -1093,14 +1304,25 @@ const AppointmentMaintenance = () => {
       ];
 
       return searchableValues.some((value) =>
-        normalizeSearchValue(value).includes(normalizedSearch),
+        normalizeSearchValue(value).includes(
+          normalizedSearch,
+        ),
       );
     });
-  }, [sortedAppointments, statusFilter, searchValue, isAppointmentWaiting]);
+  }, [
+    sortedAppointments,
+    statusFilter,
+    searchValue,
+    isAppointmentWaiting,
+  ]);
 
   /* ========================================================
-   Separate waiting patients
-======================================================== */
+     Waiting section
+
+     IMPORTANT:
+     This is intentionally independent from the main
+     status/search controls, so waiting patients stay visible.
+  ======================================================== */
 
   const waitingAppointments = useMemo(() => {
     return sortedAppointments.filter((appointment) =>
@@ -1109,14 +1331,24 @@ const AppointmentMaintenance = () => {
   }, [sortedAppointments, isAppointmentWaiting]);
 
   /* ========================================================
-   Main appointments without waiting patients
-======================================================== */
+     Main cards
+
+     IMPORTANT:
+     Waiting patients are removed here so they do not
+     appear twice.
+  ======================================================== */
 
   const mainFilteredAppointments = useMemo(() => {
     return filteredAppointments.filter(
-      (appointment) => !isAppointmentWaiting(appointment),
+      (appointment) =>
+        !isAppointmentWaiting(appointment),
     );
   }, [filteredAppointments, isAppointmentWaiting]);
+
+  /* ========================================================
+     Filter counts
+  ======================================================== */
+
   const filterCounts = useMemo(() => {
     const counts = {
       All: appointments.length,
@@ -1124,7 +1356,10 @@ const AppointmentMaintenance = () => {
     };
 
     FILTER_OPTIONS.forEach((option) => {
-      if (["All", "Waiting"].includes(option.value)) {
+      if (
+        option.value === "All" ||
+        option.value === "Waiting"
+      ) {
         return;
       }
 
@@ -1136,7 +1371,11 @@ const AppointmentMaintenance = () => {
     });
 
     return counts;
-  }, [appointments, activeWaitingAppointmentIds, isAppointmentWaiting]);
+  }, [
+    appointments,
+    activeWaitingAppointmentIds,
+    isAppointmentWaiting,
+  ]);
 
   const filterOptionsWithCounts = useMemo(() => {
     return FILTER_OPTIONS.map((option) => ({
@@ -1155,37 +1394,38 @@ const AppointmentMaintenance = () => {
   }, [filterCounts]);
 
   /* ========================================================
-     Appointment actions
+     Check in
   ======================================================== */
 
   const handleCheckIn = async (appointment) => {
-    const appointmentId = appointment?.appointment_id || appointment?.id || "";
+    const appointmentId = getAppointmentId(appointment);
 
     if (!appointmentId) {
       message.error("Appointment ID is missing");
+
       return;
     }
 
     try {
       setUpdatingId(appointmentId);
-      await updateAppointmentStatus(appointment.appointment_id, "Checked In");
+
+      await updateAppointmentStatus(
+        appointmentId,
+        "Checked In",
+      );
 
       message.success(
-        `${appointment.patient_name || "Patient"} checked in successfully`,
+        `${
+          appointment.patient_name || "Patient"
+        } checked in successfully`,
       );
 
-      setAppointments((previous) =>
-        previous.map((item) =>
-          String(item?.appointment_id || item?.id) === String(appointmentId)
-            ? {
-                ...item,
-                status: "Checked In",
-              }
-            : item,
-        ),
-      );
+      await fetchAppointments();
     } catch (error) {
-      console.error("Failed to check in patient:", error);
+      console.error(
+        "Failed to check in patient:",
+        error,
+      );
 
       message.error(
         error?.response?.data?.message ||
@@ -1196,50 +1436,50 @@ const AppointmentMaintenance = () => {
       setUpdatingId(null);
     }
   };
-  const handleCancelAppointment = async (appointment) => {
+
+  /* ========================================================
+     Cancel appointment
+  ======================================================== */
+
+  const handleCancelAppointment = async (
+    appointment,
+  ) => {
     const appointmentId = getAppointmentId(appointment);
 
     if (!appointmentId) {
       message.error("Appointment ID is missing");
+
       return;
     }
 
     try {
       setUpdatingId(appointmentId);
 
-      await updateAppointmentStatus(appointmentId, "Cancelled");
+      /*
+       * If the patient is currently in Waiting,
+       * close waiting before cancelling.
+       */
+      if (isAppointmentWaiting(appointment)) {
+        await endAppointmentWaiting(appointmentId);
+      }
+
+      await updateAppointmentStatus(
+        appointmentId,
+        "Cancelled",
+      );
 
       message.success(
-        `${appointment.patient_name || "Patient"} appointment cancelled`,
+        `${
+          appointment.patient_name || "Patient"
+        } appointment cancelled`,
       );
 
-      setAppointments((previous) =>
-        previous.map((item) =>
-          String(getAppointmentId(item)) === String(appointmentId)
-            ? {
-                ...item,
-                status: "Cancelled",
-              }
-            : item,
-        ),
-      );
-
-      // Update drawer data too if this appointment is currently open
-      setSelectedAppointment((current) => {
-        if (
-          current &&
-          String(getAppointmentId(current)) === String(appointmentId)
-        ) {
-          return {
-            ...current,
-            status: "Cancelled",
-          };
-        }
-
-        return current;
-      });
+      await fetchAppointments();
     } catch (error) {
-      console.error("Failed to cancel appointment:", error);
+      console.error(
+        "Failed to cancel appointment:",
+        error,
+      );
 
       message.error(
         error?.response?.data?.message ||
@@ -1250,16 +1490,85 @@ const AppointmentMaintenance = () => {
       setUpdatingId(null);
     }
   };
-  const handleStartTreatment = async (appointment) => {
-    const isWaitingPatient = isAppointmentWaiting(appointment);
 
+  /* ========================================================
+     Check in cancelled appointment again
+  ======================================================== */
+
+  const handleCheckInCancelledAppointment = async (
+    appointment,
+  ) => {
+    const appointmentId = getAppointmentId(appointment);
+
+    if (!appointmentId) {
+      message.error("Appointment ID is missing");
+
+      return;
+    }
+
+    try {
+      setUpdatingId(appointmentId);
+
+      await updateAppointmentStatus(
+        appointmentId,
+        "Checked In",
+      );
+
+      message.success(
+        `${
+          appointment.patient_name || "Patient"
+        } checked in again as No. ${getAppointmentNumber(
+          appointment,
+        )}`,
+      );
+
+      await fetchAppointments();
+    } catch (error) {
+      console.error(
+        "Failed to check in cancelled appointment:",
+        error,
+      );
+
+      message.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to check in appointment",
+      );
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  /* ========================================================
+     Start treatment
+  ======================================================== */
+
+  const handleStartTreatment = async (
+    appointment,
+  ) => {
+    const appointmentId = getAppointmentId(appointment);
+
+    if (!appointmentId) {
+      message.error("Appointment ID is missing");
+
+      return;
+    }
+
+    const isWaitingPatient =
+      isAppointmentWaiting(appointment);
+
+    /*
+     * Only one patient can be in treatment.
+     */
     if (
       currentTreatmentPatient &&
-      currentTreatmentPatient.appointment_id !== appointment.appointment_id
+      getAppointmentId(currentTreatmentPatient) !==
+        appointmentId
     ) {
       message.warning(
         `${
-          currentTreatmentPatient.patient_name || "Another patient"
+          currentTreatmentPatient.patient_name ||
+          "Another patient"
         } is currently in treatment`,
       );
 
@@ -1267,41 +1576,56 @@ const AppointmentMaintenance = () => {
     }
 
     /*
-     * Normal checked-in patients must be the locked next patient.
-     * Waiting patients can start treatment at any time.
+     * Normal checked-in patients must be NEXT 1.
+     *
+     * Waiting patients are an exception and can be
+     * brought directly into treatment.
      */
     if (
       !isWaitingPatient &&
-      String(appointment.appointment_id) !== String(firstLockedAppointmentId)
+      appointmentId !== firstLockedAppointmentId
     ) {
-      message.warning("Only the first locked patient can start treatment");
+      message.warning(
+        "Only the first locked patient can start treatment",
+      );
 
       return;
     }
+
     try {
-      setUpdatingId(appointment.appointment_id);
+      setUpdatingId(appointmentId);
 
       /*
-       * Close the active waiting record before starting treatment.
+       * Close waiting record before entering treatment.
        */
       if (isWaitingPatient) {
-        await endAppointmentWaiting(appointment.appointment_id);
+        await endAppointmentWaiting(appointmentId);
       }
 
-      await updateAppointmentStatus(appointment.appointment_id, "In Treatment");
+      await updateAppointmentStatus(
+        appointmentId,
+        "In Treatment",
+      );
 
       message.success(
-        `Treatment started for ${appointment.patient_name || "the patient"}`,
+        `Treatment started for ${
+          appointment.patient_name || "the patient"
+        }`,
       );
 
       await fetchAppointments();
 
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
+      if (typeof window !== "undefined") {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }
     } catch (error) {
-      console.error("Failed to start treatment:", error);
+      console.error(
+        "Failed to start treatment:",
+        error,
+      );
 
       message.error(
         error?.response?.data?.message ||
@@ -1312,6 +1636,7 @@ const AppointmentMaintenance = () => {
       setUpdatingId(null);
     }
   };
+
   /* ========================================================
      Drawer
   ======================================================== */
@@ -1336,33 +1661,45 @@ const AppointmentMaintenance = () => {
     lockedPosition,
     isWaitingPatient,
   ) => {
-    let ribbonText = appointment.status || "Pending";
+    let ribbonText =
+      appointment.status || "Pending";
 
-    let ribbonClass = `status-ribbon-${getStatusClassName(appointment.status)}`;
+    let ribbonClass = `status-ribbon-${getStatusClassName(
+      appointment.status,
+    )}`;
 
     if (isWaitingPatient) {
       ribbonText = "WAITING";
+
       ribbonClass = "waiting-corner-ribbon";
     } else if (isCurrentPatient) {
       ribbonText = "CURRENT";
+
       ribbonClass = "current-corner-ribbon";
     } else if (lockedPosition === 0) {
       ribbonText = "NEXT 1";
+
       ribbonClass = "next-corner-ribbon";
     } else if (lockedPosition === 1) {
       ribbonText = "NEXT 2";
+
       ribbonClass = "next-corner-ribbon";
     }
 
     return (
-      <div className={["left-corner-ribbon", ribbonClass].join(" ")}>
+      <div
+        className={[
+          "left-corner-ribbon",
+          ribbonClass,
+        ].join(" ")}
+      >
         <span>{ribbonText}</span>
       </div>
     );
   };
 
   /* ========================================================
-     Card actions
+     Main card action
   ======================================================== */
 
   const renderCardAction = (
@@ -1370,22 +1707,25 @@ const AppointmentMaintenance = () => {
     isCurrentPatient,
     isFirstLockedPatient,
   ) => {
-    const appointmentId = getAppointmentId(appointment);
+    const appointmentId =
+      getAppointmentId(appointment);
 
-    const isUpdating = String(updatingId || "") === String(appointmentId || "");
+    const isUpdating =
+      String(updatingId || "") ===
+      String(appointmentId || "");
 
-    const isWaitingPatient = isAppointmentWaiting(appointment);
+    const isWaitingPatient =
+      isAppointmentWaiting(appointment);
 
     if (isCurrentPatient) {
       return null;
     }
-    /*
-     * ======================================================
-     * CANCELLED
-     * Restore or reuse appointment number
-     * ======================================================
-     */
-    if (appointment.status === "Cancelled") {
+
+    /* ======================================================
+       CANCELLED
+    ====================================================== */
+
+    if (isCancelledStatus(appointment.status)) {
       return (
         <div className="cancelled-appointment-actions">
           <Button
@@ -1398,7 +1738,9 @@ const AppointmentMaintenance = () => {
             onClick={(event) => {
               event.stopPropagation();
 
-              handleCheckInCancelledAppointment(appointment);
+              handleCheckInCancelledAppointment(
+                appointment,
+              );
             }}
           >
             Check In Again
@@ -1415,18 +1757,22 @@ const AppointmentMaintenance = () => {
               handleOpenReassignNumber(appointment);
             }}
           >
-            Assign No. {getAppointmentNumber(appointment)}
+            Assign No.{" "}
+            {getAppointmentNumber(appointment)}
           </Button>
         </div>
       );
     }
-    /*
-     * ======================================================
-     * PENDING
-     * Check In + Cancel Appointment
-     * ======================================================
-     */
-    if (appointment.status === "Pending" && !isWaitingPatient) {
+
+    /* ======================================================
+       PENDING
+    ====================================================== */
+
+    if (
+      normalizeStatus(appointment.status) ===
+        "pending" &&
+      !isWaitingPatient
+    ) {
       return (
         <div className="pending-appointment-actions">
           <Button
@@ -1464,13 +1810,15 @@ const AppointmentMaintenance = () => {
       );
     }
 
-    /*
-     * ======================================================
-     * CONFIRMED
-     * Check In only
-     * ======================================================
-     */
-    if (appointment.status === "Confirmed" && !isWaitingPatient) {
+    /* ======================================================
+       CONFIRMED
+    ====================================================== */
+
+    if (
+      normalizeStatus(appointment.status) ===
+        "confirmed" &&
+      !isWaitingPatient
+    ) {
       return (
         <Button
           block
@@ -1490,22 +1838,19 @@ const AppointmentMaintenance = () => {
       );
     }
 
-    /*
-     * ======================================================
-     * START TREATMENT
-     * ======================================================
-     *
-     * Waiting patient:
-     * Can start treatment at any time.
-     *
-     * Normal checked-in patient:
-     * Must be the first locked patient.
-     */
+    /* ======================================================
+       START TREATMENT
+    ====================================================== */
+
     const canStartTreatment =
-      appointment.status === "Checked In" &&
+      normalizeStatus(appointment.status) ===
+        "checked in" &&
       (isWaitingPatient || isFirstLockedPatient);
 
-    if (canStartTreatment && !currentTreatmentPatient) {
+    if (
+      canStartTreatment &&
+      !currentTreatmentPatient
+    ) {
       return (
         <Button
           block
@@ -1520,19 +1865,36 @@ const AppointmentMaintenance = () => {
             handleStartTreatment(appointment);
           }}
         >
-          {isWaitingPatient ? "START TREATMENT NOW" : "START TREATMENT"}
+          {isWaitingPatient
+            ? "START TREATMENT NOW"
+            : "START TREATMENT"}
         </Button>
       );
     }
 
     return null;
   };
-  const renderWaitingActionButton = (appointment) => {
-    const isUpdating = updatingId === appointment.appointment_id;
 
-    const isWaitingPatient = isAppointmentWaiting(appointment);
+  /* ========================================================
+     Waiting action
+  ======================================================== */
 
-    const canUseWaiting = appointment.status === "Checked In";
+  const renderWaitingActionButton = (
+    appointment,
+  ) => {
+    const appointmentId =
+      getAppointmentId(appointment);
+
+    const isUpdating =
+      String(updatingId || "") ===
+      String(appointmentId || "");
+
+    const isWaitingPatient =
+      isAppointmentWaiting(appointment);
+
+    const canUseWaiting =
+      normalizeStatus(appointment.status) ===
+      "checked in";
 
     if (!canUseWaiting) {
       return null;
@@ -1582,25 +1944,35 @@ const AppointmentMaintenance = () => {
      Completed card
   ======================================================== */
 
-  const renderCompletedCard = (appointment, appointmentNumber, view) => {
+  const renderCompletedCard = (
+    appointment,
+    appointmentNumber,
+    view,
+  ) => {
     const isMinimal = view === "minimal";
 
     return (
       <div
         className={[
           "completed-card-content",
-          isMinimal ? "completed-card-content-minimal" : "",
+          isMinimal
+            ? "completed-card-content-minimal"
+            : "",
         ]
           .filter(Boolean)
           .join(" ")}
       >
-        <div className="completed-number-badge">No. {appointmentNumber}</div>
+        <div className="completed-number-badge">
+          No. {appointmentNumber}
+        </div>
 
         <div className="completed-icon-wrapper">
           <CheckCircleFilled />
         </div>
 
-        <Text className="completed-card-title">Completed</Text>
+        <Text className="completed-card-title">
+          Completed
+        </Text>
 
         {!isMinimal && (
           <Text className="completed-card-message">
@@ -1611,7 +1983,8 @@ const AppointmentMaintenance = () => {
         <div className="completed-divider" />
 
         <Text className="completed-patient-name">
-          {appointment.patient_name || "Unknown Patient"}
+          {appointment.patient_name ||
+            "Unknown Patient"}
         </Text>
       </div>
     );
@@ -1621,8 +1994,12 @@ const AppointmentMaintenance = () => {
      Waiting notice
   ======================================================== */
 
-  const renderWaitingNotice = (appointment, compact = false) => {
-    const waitingRecord = getAppointmentWaitingRecord(appointment);
+  const renderWaitingNotice = (
+    appointment,
+    compact = false,
+  ) => {
+    const waitingRecord =
+      getAppointmentWaitingRecord(appointment);
 
     if (!waitingRecord) {
       return null;
@@ -1632,7 +2009,9 @@ const AppointmentMaintenance = () => {
       <div
         className={[
           "waiting-patient-notice",
-          compact ? "waiting-patient-notice-compact" : "",
+          compact
+            ? "waiting-patient-notice-compact"
+            : "",
         ]
           .filter(Boolean)
           .join(" ")}
@@ -1645,7 +2024,8 @@ const AppointmentMaintenance = () => {
           </Text>
 
           <Text className="waiting-patient-notice-description">
-            Since {formatTime(waitingRecord.start_time)}
+            Since{" "}
+            {formatTime(waitingRecord.start_time)}
           </Text>
         </div>
       </div>
@@ -1653,25 +2033,42 @@ const AppointmentMaintenance = () => {
   };
 
   /* ========================================================
-     Render card
+     Render appointment card
   ======================================================== */
 
-  const renderAppointmentCard = (appointment) => {
-    const appointmentNumber = getAppointmentNumber(appointment);
+  const renderAppointmentCard = (
+    appointment,
+  ) => {
+    const appointmentId =
+      getAppointmentId(appointment);
 
-    const isCurrentPatient = appointment.status === "In Treatment";
+    const appointmentNumber =
+      getAppointmentNumber(appointment);
 
-    const isWaitingPatient = isAppointmentWaiting(appointment);
+    const isCurrentPatient =
+      normalizeStatus(appointment.status) ===
+      "in treatment";
 
-    const lockedPosition = lockedCheckedInAppointmentIds.indexOf(
-      String(appointment.appointment_id),
-    );
+    const isWaitingPatient =
+      isAppointmentWaiting(appointment);
 
-    const isLockedPatient = !isWaitingPatient && lockedPosition !== -1;
+    const lockedPosition =
+      lockedCheckedInAppointmentIds.indexOf(
+        appointmentId,
+      );
 
-    const isFirstLockedPatient = isLockedPatient && lockedPosition === 0;
+    const isLockedPatient =
+      !isWaitingPatient && lockedPosition !== -1;
 
-    const isCompleted = appointment.status === "Completed";
+    const isFirstLockedPatient =
+      isLockedPatient && lockedPosition === 0;
+
+    const isCompleted =
+      normalizeStatus(appointment.status) ===
+      "completed";
+
+    const isCancelled =
+      isCancelledStatus(appointment.status);
 
     const actionContent = renderCardAction(
       appointment,
@@ -1679,37 +2076,58 @@ const AppointmentMaintenance = () => {
       isFirstLockedPatient,
     );
 
-    const waitingAction = renderWaitingActionButton(appointment);
+    const waitingAction =
+      renderWaitingActionButton(appointment);
 
-    const hasActions = actionContent || waitingAction;
+    const hasActions =
+      Boolean(actionContent) ||
+      Boolean(waitingAction);
 
     const cardClasses = [
       "appointment-number-card",
 
-      isCurrentPatient ? "current-treatment-card" : "",
+      isCurrentPatient
+        ? "current-treatment-card"
+        : "",
 
-      isLockedPatient ? "next-patient-card" : "",
-      isWaitingPatient ? "waiting-patient-card" : "",
+      isLockedPatient
+        ? "next-patient-card"
+        : "",
 
-      appointment.is_allergies ? "allergy-card" : "",
+      isWaitingPatient
+        ? "waiting-patient-card"
+        : "",
+
+      appointment.is_allergies
+        ? "allergy-card"
+        : "",
 
       isCompleted ? "completed-card" : "",
 
-      appointment.status === "Cancelled" ? "cancelled-card" : "",
+      isCancelled ? "cancelled-card" : "",
     ]
       .filter(Boolean)
       .join(" ");
 
+    /* ======================================================
+       MINIMAL
+    ====================================================== */
+
     if (viewMode === "minimal") {
       return (
         <article
-          key={appointment.appointment_id}
+          key={appointmentId}
           role="button"
           tabIndex={0}
           className={`${cardClasses} minimal-appointment-card`}
-          onClick={() => openAppointmentDetails(appointment)}
+          onClick={() =>
+            openAppointmentDetails(appointment)
+          }
           onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
+            if (
+              event.key === "Enter" ||
+              event.key === " "
+            ) {
               event.preventDefault();
 
               openAppointmentDetails(appointment);
@@ -1724,11 +2142,17 @@ const AppointmentMaintenance = () => {
           )}
 
           {isCompleted ? (
-            renderCompletedCard(appointment, appointmentNumber, "minimal")
+            renderCompletedCard(
+              appointment,
+              appointmentNumber,
+              "minimal",
+            )
           ) : (
             <>
               <div className="minimal-number-center">
-                <div className="minimal-number-square">{appointmentNumber}</div>
+                <div className="minimal-number-square">
+                  {appointmentNumber}
+                </div>
               </div>
 
               {isWaitingPatient && (
@@ -1740,7 +2164,8 @@ const AppointmentMaintenance = () => {
               )}
 
               <Text className="minimal-patient-name">
-                {appointment.patient_name || "Unknown Patient"}
+                {appointment.patient_name ||
+                  "Unknown Patient"}
               </Text>
 
               {appointment.patient_location && (
@@ -1749,10 +2174,20 @@ const AppointmentMaintenance = () => {
 
                   {appointment.patient_location}
 
-                  {appointment.patient_distance_km !== "" &&
-                    appointment.patient_distance_km !== null &&
-                    appointment.patient_distance_km !== undefined && (
-                      <span> · {appointment.patient_distance_km} km</span>
+                  {appointment.patient_distance_km !==
+                    "" &&
+                    appointment.patient_distance_km !==
+                      null &&
+                    appointment.patient_distance_km !==
+                      undefined && (
+                      <span>
+                        {" "}
+                        ·{" "}
+                        {
+                          appointment.patient_distance_km
+                        }{" "}
+                        km
+                      </span>
                     )}
                 </Text>
               )}
@@ -1776,16 +2211,25 @@ const AppointmentMaintenance = () => {
       );
     }
 
+    /* ======================================================
+       SUMMARY
+    ====================================================== */
+
     if (viewMode === "summary") {
       return (
         <article
-          key={appointment.appointment_id}
+          key={appointmentId}
           role="button"
           tabIndex={0}
           className={`${cardClasses} summary-appointment-card`}
-          onClick={() => openAppointmentDetails(appointment)}
+          onClick={() =>
+            openAppointmentDetails(appointment)
+          }
           onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
+            if (
+              event.key === "Enter" ||
+              event.key === " "
+            ) {
               event.preventDefault();
 
               openAppointmentDetails(appointment);
@@ -1800,7 +2244,11 @@ const AppointmentMaintenance = () => {
           )}
 
           {isCompleted ? (
-            renderCompletedCard(appointment, appointmentNumber, "summary")
+            renderCompletedCard(
+              appointment,
+              appointmentNumber,
+              "summary",
+            )
           ) : (
             <>
               <div className="summary-card-header">
@@ -1811,7 +2259,11 @@ const AppointmentMaintenance = () => {
                 </div>
               </div>
 
-              {isWaitingPatient && renderWaitingNotice(appointment, true)}
+              {isWaitingPatient &&
+                renderWaitingNotice(
+                  appointment,
+                  true,
+                )}
 
               <div className="summary-patient-section">
                 <div className="summary-patient-avatar">
@@ -1820,10 +2272,14 @@ const AppointmentMaintenance = () => {
 
                 <div className="summary-patient-information">
                   <Tooltip
-                    title={appointment.patient_name || "Unknown Patient"}
+                    title={
+                      appointment.patient_name ||
+                      "Unknown Patient"
+                    }
                   >
                     <Text className="summary-patient-name">
-                      {appointment.patient_name || "Unknown Patient"}
+                      {appointment.patient_name ||
+                        "Unknown Patient"}
                     </Text>
                   </Tooltip>
 
@@ -1839,12 +2295,24 @@ const AppointmentMaintenance = () => {
                     <Text className="summary-patient-location">
                       <EnvironmentOutlined />
 
-                      {appointment.patient_location}
+                      {
+                        appointment.patient_location
+                      }
 
-                      {appointment.patient_distance_km !== "" &&
-                        appointment.patient_distance_km !== null &&
-                        appointment.patient_distance_km !== undefined && (
-                          <span> · {appointment.patient_distance_km} km</span>
+                      {appointment.patient_distance_km !==
+                        "" &&
+                        appointment.patient_distance_km !==
+                          null &&
+                        appointment.patient_distance_km !==
+                          undefined && (
+                          <span>
+                            {" "}
+                            ·{" "}
+                            {
+                              appointment.patient_distance_km
+                            }{" "}
+                            km
+                          </span>
                         )}
                     </Text>
                   )}
@@ -1869,25 +2337,36 @@ const AppointmentMaintenance = () => {
         </article>
       );
     }
+
+    /* ======================================================
+       ROW
+    ====================================================== */
+
     if (viewMode === "row") {
       return (
         <article
-          key={appointment.appointment_id}
+          key={appointmentId}
           role="button"
           tabIndex={0}
           className={`${cardClasses} row-appointment-card`}
-          onClick={() => openAppointmentDetails(appointment)}
+          onClick={() =>
+            openAppointmentDetails(appointment)
+          }
           onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
+            if (
+              event.key === "Enter" ||
+              event.key === " "
+            ) {
               event.preventDefault();
+
               openAppointmentDetails(appointment);
             }
           }}
         >
-          {/* Queue Number */}
-          <div className="row-appointment-number">{appointmentNumber}</div>
+          <div className="row-appointment-number">
+            {appointmentNumber}
+          </div>
 
-          {/* Patient */}
           <div className="row-appointment-patient">
             <div className="row-patient-avatar">
               <UserOutlined />
@@ -1895,18 +2374,20 @@ const AppointmentMaintenance = () => {
 
             <div className="row-patient-info">
               <Text className="row-patient-name">
-                {appointment.patient_name || "Unknown Patient"}
+                {appointment.patient_name ||
+                  "Unknown Patient"}
               </Text>
 
               {appointment.reason_for_visit && (
                 <Text className="row-patient-reason">
-                  {appointment.reason_for_visit}
+                  {
+                    appointment.reason_for_visit
+                  }
                 </Text>
               )}
             </div>
           </div>
 
-          {/* Phone */}
           <div className="row-appointment-info">
             {appointment.phone ? (
               <>
@@ -1919,20 +2400,32 @@ const AppointmentMaintenance = () => {
             )}
           </div>
 
-          {/* Location */}
           <div className="row-appointment-info row-location">
             {appointment.patient_location ? (
               <>
                 <EnvironmentOutlined />
 
                 <div>
-                  <Text>{appointment.patient_location}</Text>
+                  <Text>
+                    {
+                      appointment.patient_location
+                    }
+                  </Text>
 
-                  {appointment.patient_distance_km !== "" &&
-                    appointment.patient_distance_km !== null &&
-                    appointment.patient_distance_km !== undefined && (
-                      <Text type="secondary" className="row-distance">
-                        {appointment.patient_distance_km} km
+                  {appointment.patient_distance_km !==
+                    "" &&
+                    appointment.patient_distance_km !==
+                      null &&
+                    appointment.patient_distance_km !==
+                      undefined && (
+                      <Text
+                        type="secondary"
+                        className="row-distance"
+                      >
+                        {
+                          appointment.patient_distance_km
+                        }{" "}
+                        km
                       </Text>
                     )}
                 </div>
@@ -1942,17 +2435,21 @@ const AppointmentMaintenance = () => {
             )}
           </div>
 
-          {/* Appointment Time */}
           <div className="row-appointment-info">
             <ClockCircleOutlined />
 
-            <Text strong>{formatTime(appointment.appointment_time)}</Text>
+            <Text strong>
+              {formatTime(
+                appointment.appointment_time,
+              )}
+            </Text>
           </div>
 
-          {/* Status */}
           <div className="row-status-section">
             {isCurrentPatient && (
-              <span className="row-status-badge treatment">In Treatment</span>
+              <span className="row-status-badge treatment">
+                In Treatment
+              </span>
             )}
 
             {isWaitingPatient && (
@@ -1962,31 +2459,41 @@ const AppointmentMaintenance = () => {
               </span>
             )}
 
-            {isLockedPatient && !isWaitingPatient && (
-              <span className="row-status-badge next">
-                {lockedPosition === 0 ? "Next 1" : `Next ${lockedPosition + 1}`}
-              </span>
-            )}
+            {isLockedPatient &&
+              !isWaitingPatient && (
+                <span className="row-status-badge next">
+                  {lockedPosition === 0
+                    ? "Next 1"
+                    : `Next ${
+                        lockedPosition + 1
+                      }`}
+                </span>
+              )}
 
-            {!isCurrentPatient && !isWaitingPatient && !isLockedPatient && (
-              <span
-                className={`row-status-badge ${String(appointment.status || "")
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")}`}
-              >
-                {appointment.status || "Pending"}
-              </span>
-            )}
+            {!isCurrentPatient &&
+              !isWaitingPatient &&
+              !isLockedPatient && (
+                <span
+                  className={`row-status-badge ${getStatusClassName(
+                    appointment.status,
+                  )}`}
+                >
+                  {appointment.status ||
+                    "Pending"}
+                </span>
+              )}
           </div>
 
-          {/* Actions */}
           <div
             className="row-action-section"
-            onClick={(event) => event.stopPropagation()}
+            onClick={(event) =>
+              event.stopPropagation()
+            }
           >
             {hasActions ? (
               <Space size={6}>
                 {actionContent}
+
                 {waitingAction}
               </Space>
             ) : (
@@ -1996,15 +2503,25 @@ const AppointmentMaintenance = () => {
         </article>
       );
     }
+
+    /* ======================================================
+       FULL
+    ====================================================== */
+
     return (
       <article
-        key={appointment.appointment_id}
+        key={appointmentId}
         role="button"
         tabIndex={0}
         className={`${cardClasses} full-appointment-card`}
-        onClick={() => openAppointmentDetails(appointment)}
+        onClick={() =>
+          openAppointmentDetails(appointment)
+        }
         onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
+          if (
+            event.key === "Enter" ||
+            event.key === " "
+          ) {
             event.preventDefault();
 
             openAppointmentDetails(appointment);
@@ -2019,7 +2536,11 @@ const AppointmentMaintenance = () => {
         )}
 
         {isCompleted ? (
-          renderCompletedCard(appointment, appointmentNumber, "full")
+          renderCompletedCard(
+            appointment,
+            appointmentNumber,
+            "full",
+          )
         ) : (
           <>
             <div className="appointment-card-top">
@@ -2037,7 +2558,8 @@ const AppointmentMaintenance = () => {
 
               <div className="appointment-patient-details">
                 <Text className="appointment-patient-name">
-                  {appointment.patient_name || "Unknown Patient"}
+                  {appointment.patient_name ||
+                    "Unknown Patient"}
                 </Text>
 
                 {appointment.phone && (
@@ -2054,27 +2576,42 @@ const AppointmentMaintenance = () => {
 
                     {appointment.patient_location}
 
-                    {appointment.patient_distance_km !== "" &&
-                      appointment.patient_distance_km !== null &&
-                      appointment.patient_distance_km !== undefined && (
-                        <span> · {appointment.patient_distance_km} km</span>
+                    {appointment.patient_distance_km !==
+                      "" &&
+                      appointment.patient_distance_km !==
+                        null &&
+                      appointment.patient_distance_km !==
+                        undefined && (
+                        <span>
+                          {" "}
+                          ·{" "}
+                          {
+                            appointment.patient_distance_km
+                          }{" "}
+                          km
+                        </span>
                       )}
                   </Text>
                 )}
               </div>
             </div>
 
-            {isWaitingPatient && renderWaitingNotice(appointment)}
+            {isWaitingPatient &&
+              renderWaitingNotice(appointment)}
 
             <div className="appointment-details-box">
               <div className="appointment-detail-row">
                 <ClockCircleOutlined />
 
                 <div>
-                  <Text className="detail-label">Appointment Time</Text>
+                  <Text className="detail-label">
+                    Appointment Time
+                  </Text>
 
                   <Text className="detail-value">
-                    {formatTime(appointment.appointment_time)}
+                    {formatTime(
+                      appointment.appointment_time,
+                    )}
                   </Text>
                 </div>
               </div>
@@ -2083,10 +2620,13 @@ const AppointmentMaintenance = () => {
                 <MedicineBoxOutlined />
 
                 <div>
-                  <Text className="detail-label">Reason</Text>
+                  <Text className="detail-label">
+                    Reason
+                  </Text>
 
                   <Text className="appointment-reason">
-                    {appointment.reason_for_visit || "General consultation"}
+                    {appointment.reason_for_visit ||
+                      "General consultation"}
                   </Text>
                 </div>
               </div>
@@ -2112,27 +2652,39 @@ const AppointmentMaintenance = () => {
   };
 
   /* ========================================================
-     Selected appointment
+     Selected appointment drawer calculations
   ======================================================== */
 
-  const selectedAppointmentNumber = selectedAppointment
-    ? getAppointmentNumber(selectedAppointment)
-    : "--";
+  const selectedAppointmentNumber =
+    selectedAppointment
+      ? getAppointmentNumber(
+          selectedAppointment,
+        )
+      : "--";
 
-  const selectedIsCurrent = selectedAppointment?.status === "In Treatment";
+  const selectedIsCurrent =
+    normalizeStatus(
+      selectedAppointment?.status,
+    ) === "in treatment";
 
   const selectedIsWaiting = selectedAppointment
-    ? isAppointmentWaiting(selectedAppointment)
+    ? isAppointmentWaiting(
+        selectedAppointment,
+      )
     : false;
 
-  const selectedLockedPosition = selectedAppointment
-    ? lockedCheckedInAppointmentIds.indexOf(
-        String(selectedAppointment.appointment_id),
-      )
-    : -1;
+  const selectedLockedPosition =
+    selectedAppointment
+      ? lockedCheckedInAppointmentIds.indexOf(
+          getAppointmentId(
+            selectedAppointment,
+          ),
+        )
+      : -1;
 
   const selectedIsFirstLocked =
-    !selectedIsWaiting && selectedLockedPosition === 0;
+    !selectedIsWaiting &&
+    selectedLockedPosition === 0;
 
   const selectedAction = selectedAppointment
     ? renderCardAction(
@@ -2142,20 +2694,27 @@ const AppointmentMaintenance = () => {
       )
     : null;
 
-  const selectedWaitingAction = selectedAppointment
-    ? renderWaitingActionButton(selectedAppointment)
-    : null;
+  const selectedWaitingAction =
+    selectedAppointment
+      ? renderWaitingActionButton(
+          selectedAppointment,
+        )
+      : null;
 
-  const selectedWaitingRecord = selectedAppointment
-    ? getAppointmentWaitingRecord(selectedAppointment)
-    : null;
+  const selectedWaitingRecord =
+    selectedAppointment
+      ? getAppointmentWaitingRecord(
+          selectedAppointment,
+        )
+      : null;
 
-  const selectedEffectiveStatus = selectedIsWaiting
-    ? "Waiting"
-    : selectedAppointment?.status;
+  const selectedEffectiveStatus =
+    selectedIsWaiting
+      ? "Waiting"
+      : selectedAppointment?.status;
 
   /* ========================================================
-     Page
+     Render
   ======================================================== */
 
   return (
@@ -2175,19 +2734,21 @@ const AppointmentMaintenance = () => {
                 return;
               }
 
-              const nextDate = date.format("YYYY-MM-DD");
+              const nextDate =
+                date.format("YYYY-MM-DD");
 
-              setSelectedDate((currentDate) =>
-                currentDate === nextDate ? currentDate : nextDate,
-              );
+              setSelectedDate(nextDate);
             }}
           />
 
           <Tooltip title="Refresh appointments">
             <Button
               icon={<ReloadOutlined />}
-              loading={loading}
-              onClick={fetchAppointments}
+              loading={
+                loading ||
+                doctorArrivalLoading
+              }
+              onClick={refreshPage}
               className="appointment-refresh-button"
             />
           </Tooltip>
@@ -2203,10 +2764,97 @@ const AppointmentMaintenance = () => {
       }
     >
       <div className="appointment-maintenance-page">
+        {/* =====================================================
+            DOCTOR ARRIVAL STATUS
+        ===================================================== */}
+
+        <section
+          className={[
+            "doctor-arrival-card",
+            doctorArrived
+              ? "doctor-arrival-card-arrived"
+              : "doctor-arrival-card-not-arrived",
+          ].join(" ")}
+        >
+          <Spin spinning={doctorArrivalLoading}>
+            <div className="doctor-arrival-content">
+              <div className="doctor-arrival-icon">
+                {doctorArrived ? (
+                  <CheckCircleFilled />
+                ) : (
+                  <MedicineBoxOutlined />
+                )}
+              </div>
+
+              <div className="doctor-arrival-information">
+                <Text className="doctor-arrival-label">
+                  Doctor Status
+                </Text>
+
+                <Title
+                  level={4}
+                  className="doctor-arrival-title"
+                >
+                  {doctorArrived
+                    ? "Doctor Has Arrived"
+                    : "Doctor Has Not Arrived"}
+                </Title>
+
+                <Text className="doctor-arrival-description">
+                  {doctorArrived
+                    ? doctorArrivalRecord?.arrived_at
+                      ? `Arrived at ${formatTime(
+                          doctorArrivalRecord.arrived_at,
+                        )}`
+                      : "Doctor arrival has been confirmed."
+                    : `Arrival has not been marked for ${dayjs(
+                        selectedDate,
+                      ).format("DD MMMM YYYY")}.`}
+                </Text>
+              </div>
+
+              <div className="doctor-arrival-action">
+                {doctorArrived ? (
+                  <Tag
+                    color="success"
+                    icon={
+                      <CheckCircleOutlined />
+                    }
+                    className="doctor-arrival-status-tag"
+                  >
+                    ARRIVED
+                  </Tag>
+                ) : (
+                  <Button
+                    type="primary"
+                    icon={
+                      <CheckCircleOutlined />
+                    }
+                    loading={
+                      markingDoctorArrival
+                    }
+                    disabled={
+                      markingDoctorArrival
+                    }
+                    onClick={
+                      handleMarkDoctorArrived
+                    }
+                    className="doctor-arrived-button"
+                  >
+                    MARK DOCTOR ARRIVED
+                  </Button>
+                )}
+              </div>
+            </div>
+          </Spin>
+        </section>
+
         <section className="appointment-cards-section">
           {/* =====================================================
-      WAITING PATIENTS
-  ====================================================== */}
+              WAITING PATIENTS
+
+              This stays separate from normal filters.
+          ===================================================== */}
 
           {waitingAppointments.length > 0 && (
             <div className="waiting-patients-section">
@@ -2217,28 +2865,39 @@ const AppointmentMaintenance = () => {
                   </div>
 
                   <div>
-                    <Title level={4} className="waiting-patients-title">
+                    <Title
+                      level={4}
+                      className="waiting-patients-title"
+                    >
                       Waiting Patients
                     </Title>
 
                     <Text className="waiting-patients-subtitle">
-                      Patients currently kept in the waiting queue
+                      Patients currently kept in
+                      the waiting queue
                     </Text>
                   </div>
                 </div>
+
+                <Tag color="gold">
+                  {waitingAppointments.length}{" "}
+                  Waiting
+                </Tag>
               </div>
 
               <div
                 className={`appointment-card-layout waiting-patients-layout view-${viewMode}`}
               >
-                {waitingAppointments.map(renderAppointmentCard)}
+                {waitingAppointments.map(
+                  renderAppointmentCard,
+                )}
               </div>
             </div>
           )}
 
           {/* =====================================================
-      MAIN TOOLBAR
-  ====================================================== */}
+              TOOLBAR
+          ===================================================== */}
 
           <div className="appointment-toolbar">
             <div className="appointment-search-wrapper">
@@ -2248,7 +2907,11 @@ const AppointmentMaintenance = () => {
                 prefix={<SearchOutlined />}
                 placeholder="Search number, patient, phone or reason"
                 className="appointment-search-input"
-                onChange={(event) => setSearchValue(event.target.value)}
+                onChange={(event) =>
+                  setSearchValue(
+                    event.target.value,
+                  )
+                }
               />
             </div>
 
@@ -2257,7 +2920,9 @@ const AppointmentMaintenance = () => {
               options={DISTANCE_SORT_OPTIONS}
               onChange={setDistanceSort}
               popupMatchSelectWidth={false}
-              suffixIcon={<EnvironmentOutlined />}
+              suffixIcon={
+                <EnvironmentOutlined />
+              }
               className="appointment-distance-sort"
               style={{
                 minWidth: 180,
@@ -2267,26 +2932,42 @@ const AppointmentMaintenance = () => {
             <div className="appointment-filter-scroll">
               <Segmented
                 value={statusFilter}
-                options={filterOptionsWithCounts}
+                options={
+                  filterOptionsWithCounts
+                }
                 className="appointment-status-filter"
                 onChange={setStatusFilter}
               />
             </div>
           </div>
 
+          {/* =====================================================
+              MAIN APPOINTMENTS
+          ===================================================== */}
+
           <Spin spinning={loading}>
-            {filteredAppointments.length === 0 ? (
+            {mainFilteredAppointments.length ===
+            0 ? (
               <div className="appointments-empty">
                 <Empty
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  image={
+                    Empty.PRESENTED_IMAGE_SIMPLE
+                  }
                   description={
-                    searchValue || statusFilter !== "All"
-                      ? "No appointments match the selected filters"
-                      : "No appointments found for the selected date"
+                    statusFilter === "Waiting" &&
+                    waitingAppointments.length >
+                      0
+                      ? "Waiting patients are shown in the Waiting Patients section above"
+                      : searchValue ||
+                          statusFilter !==
+                            "All"
+                        ? "No appointments match the selected filters"
+                        : "No appointments found for the selected date"
                   }
                 />
 
-                {(searchValue || statusFilter !== "All") && (
+                {(searchValue ||
+                  statusFilter !== "All") && (
                   <Button
                     type="link"
                     onClick={() => {
@@ -2300,12 +2981,20 @@ const AppointmentMaintenance = () => {
                 )}
               </div>
             ) : (
-              <div className={`appointment-card-layout view-${viewMode}`}>
-                {filteredAppointments.map(renderAppointmentCard)}
+              <div
+                className={`appointment-card-layout view-${viewMode}`}
+              >
+                {mainFilteredAppointments.map(
+                  renderAppointmentCard,
+                )}
               </div>
             )}
           </Spin>
         </section>
+
+        {/* =====================================================
+            DETAILS DRAWER
+        ===================================================== */}
 
         <Drawer
           open={detailsDrawerOpen}
@@ -2325,8 +3014,12 @@ const AppointmentMaintenance = () => {
                   Appointment Details
                 </Text>
 
-                <Title level={5} className="drawer-title">
-                  Number {selectedAppointmentNumber}
+                <Title
+                  level={5}
+                  className="drawer-title"
+                >
+                  Number{" "}
+                  {selectedAppointmentNumber}
                 </Title>
               </div>
             </div>
@@ -2339,13 +3032,25 @@ const AppointmentMaintenance = () => {
                 className={[
                   "drawer-appointment-hero",
 
-                  selectedAppointment.is_allergies ? "drawer-allergy-hero" : "",
+                  selectedAppointment.is_allergies
+                    ? "drawer-allergy-hero"
+                    : "",
 
-                  selectedAppointment.status === "Completed"
+                  normalizeStatus(
+                    selectedAppointment.status,
+                  ) === "completed"
                     ? "drawer-completed-hero"
                     : "",
 
-                  selectedIsWaiting ? "drawer-waiting-hero" : "",
+                  selectedIsWaiting
+                    ? "drawer-waiting-hero"
+                    : "",
+
+                  isCancelledStatus(
+                    selectedAppointment.status,
+                  )
+                    ? "drawer-cancelled-hero"
+                    : "",
                 ]
                   .filter(Boolean)
                   .join(" ")}
@@ -2356,14 +3061,20 @@ const AppointmentMaintenance = () => {
 
                 <div className="drawer-patient-main">
                   <Text className="drawer-patient-name">
-                    {selectedAppointment.patient_name || "Unknown Patient"}
+                    {selectedAppointment.patient_name ||
+                      "Unknown Patient"}
                   </Text>
 
                   <Tag
-                    color={STATUS_COLORS[selectedEffectiveStatus] || "default"}
+                    color={
+                      STATUS_COLORS[
+                        selectedEffectiveStatus
+                      ] || "default"
+                    }
                     className="drawer-status-tag"
                   >
-                    {selectedEffectiveStatus || "Pending"}
+                    {selectedEffectiveStatus ||
+                      "Pending"}
                   </Tag>
                 </div>
               </div>
@@ -2374,12 +3085,15 @@ const AppointmentMaintenance = () => {
 
                   <div>
                     <Text className="drawer-waiting-title">
-                      Patient is currently waiting
+                      Patient is currently
+                      waiting
                     </Text>
 
                     <Text className="drawer-waiting-description">
                       Waiting started at{" "}
-                      {formatTime(selectedWaitingRecord?.start_time)}
+                      {formatTime(
+                        selectedWaitingRecord?.start_time,
+                      )}
                     </Text>
                   </div>
                 </div>
@@ -2395,96 +3109,122 @@ const AppointmentMaintenance = () => {
                   label={
                     <Space size={6}>
                       <IdcardOutlined />
+
                       Appointment ID
                     </Space>
                   }
                 >
-                  {selectedAppointment.appointment_id || "-"}
+                  {getAppointmentId(
+                    selectedAppointment,
+                  ) || "-"}
                 </Descriptions.Item>
 
                 <Descriptions.Item
                   label={
                     <Space size={6}>
                       <UserOutlined />
+
                       Patient ID
                     </Space>
                   }
                 >
-                  {selectedAppointment.patient_id || "-"}
+                  {selectedAppointment.patient_id ||
+                    "-"}
                 </Descriptions.Item>
 
                 <Descriptions.Item
                   label={
                     <Space size={6}>
                       <PhoneOutlined />
+
                       Phone
                     </Space>
                   }
                 >
-                  {selectedAppointment.phone || "-"}
+                  {selectedAppointment.phone ||
+                    "-"}
                 </Descriptions.Item>
 
                 <Descriptions.Item
                   label={
                     <Space size={6}>
                       <EnvironmentOutlined />
+
                       Location
                     </Space>
                   }
                 >
-                  {selectedAppointment.patient_location || "-"}
+                  {selectedAppointment.patient_location ||
+                    "-"}
                 </Descriptions.Item>
 
                 <Descriptions.Item label="Distance">
-                  {selectedAppointment.patient_distance_km !== "" &&
-                  selectedAppointment.patient_distance_km !== null &&
-                  selectedAppointment.patient_distance_km !== undefined
+                  {selectedAppointment.patient_distance_km !==
+                    "" &&
+                  selectedAppointment.patient_distance_km !==
+                    null &&
+                  selectedAppointment.patient_distance_km !==
+                    undefined
                     ? `${selectedAppointment.patient_distance_km} km`
                     : "-"}
                 </Descriptions.Item>
 
                 <Descriptions.Item label="Age">
-                  {selectedAppointment.patient_age || "-"}
+                  {selectedAppointment.patient_age ||
+                    "-"}
                 </Descriptions.Item>
 
                 <Descriptions.Item label="Gender">
-                  {selectedAppointment.patient_gender || "-"}
+                  {selectedAppointment.patient_gender ||
+                    "-"}
                 </Descriptions.Item>
 
                 <Descriptions.Item label="Address">
-                  {selectedAppointment.patient_address || "-"}
+                  {selectedAppointment.patient_address ||
+                    "-"}
                 </Descriptions.Item>
 
                 <Descriptions.Item
                   label={
                     <Space size={6}>
                       <CalendarFilled />
+
                       Date
                     </Space>
                   }
                 >
                   {selectedAppointment.appointment_date
-                    ? dayjs(selectedAppointment.appointment_date).format(
+                    ? dayjs(
+                        selectedAppointment.appointment_date,
+                      ).format(
                         "DD MMMM YYYY",
                       )
-                    : dayjs(selectedDate).format("DD MMMM YYYY")}
+                    : dayjs(
+                        selectedDate,
+                      ).format(
+                        "DD MMMM YYYY",
+                      )}
                 </Descriptions.Item>
 
                 <Descriptions.Item
                   label={
                     <Space size={6}>
                       <ClockCircleOutlined />
+
                       Time
                     </Space>
                   }
                 >
-                  {formatTime(selectedAppointment.appointment_time)}
+                  {formatTime(
+                    selectedAppointment.appointment_time,
+                  )}
                 </Descriptions.Item>
 
                 <Descriptions.Item
                   label={
                     <Space size={6}>
                       <MedicineBoxOutlined />
+
                       Reason
                     </Space>
                   }
@@ -2495,18 +3235,24 @@ const AppointmentMaintenance = () => {
 
                 {selectedAppointment.checked_in_time && (
                   <Descriptions.Item label="Checked-In Time">
-                    {formatTime(selectedAppointment.checked_in_time)}
+                    {formatTime(
+                      selectedAppointment.checked_in_time,
+                    )}
                   </Descriptions.Item>
                 )}
 
                 {selectedWaitingRecord?.start_time && (
                   <Descriptions.Item label="Waiting Started">
-                    {formatTime(selectedWaitingRecord.start_time)}
+                    {formatTime(
+                      selectedWaitingRecord.start_time,
+                    )}
                   </Descriptions.Item>
                 )}
               </Descriptions>
 
-              {selectedAppointment.status === "Completed" && (
+              {normalizeStatus(
+                selectedAppointment.status,
+              ) === "completed" && (
                 <div className="drawer-completed-message">
                   <CheckCircleFilled />
 
@@ -2516,13 +3262,29 @@ const AppointmentMaintenance = () => {
                     </Text>
 
                     <Text className="drawer-completed-description">
-                      This appointment has been successfully completed.
+                      This appointment has been
+                      successfully completed.
                     </Text>
                   </div>
                 </div>
               )}
 
-              {(selectedAction || selectedWaitingAction) && (
+              {isCancelledStatus(
+                selectedAppointment.status,
+              ) && (
+                <Alert
+                  type="error"
+                  showIcon
+                  style={{
+                    marginTop: 16,
+                  }}
+                  message="Appointment Cancelled"
+                  description={`Appointment No. ${selectedAppointmentNumber} can either be checked in again or assigned to another later appointment.`}
+                />
+              )}
+
+              {(selectedAction ||
+                selectedWaitingAction) && (
                 <div className="drawer-action-section">
                   <Space
                     direction="vertical"
@@ -2538,167 +3300,211 @@ const AppointmentMaintenance = () => {
             </div>
           )}
         </Drawer>
-      </div>
- <Modal
-  open={reassignModalOpen}
-  className="reassign-number-modal"
-  width={560}
-  centered
-  title={
-    reassignSourceAppointment
-      ? `Fill Cancelled Appointment No. ${getAppointmentNumber(
-          reassignSourceAppointment,
-        )}`
-      : "Assign Appointment Number"
-  }
-  okText="Assign Number"
-  cancelText="Cancel"
-  confirmLoading={reassigningNumber}
-  okButtonProps={{
-    disabled: !reassignTargetAppointmentId,
-  }}
-  onOk={handleReassignAppointmentNumber}
-  onCancel={() => {
-    if (reassigningNumber) {
-      return;
-    }
 
-    setReassignModalOpen(false);
-    setReassignSourceAppointment(null);
-    setReassignTargetAppointmentId(null);
-  }}
->
-        <div className="reassign-number-modal-content">
-          {/* =====================================================
-        Cancelled / available number
-    ===================================================== */}
+        {/* =====================================================
+            REASSIGN NUMBER MODAL
+        ===================================================== */}
 
-          {reassignSourceAppointment && (
-            <div className="reassign-source-number">
-              <Text type="secondary">Available appointment number</Text>
+        <Modal
+          open={reassignModalOpen}
+          className="reassign-number-modal"
+          width={560}
+          centered
+          title={
+            reassignSourceAppointment
+              ? `Fill Cancelled Appointment No. ${getAppointmentNumber(
+                  reassignSourceAppointment,
+                )}`
+              : "Assign Appointment Number"
+          }
+          okText="Assign Number"
+          cancelText="Cancel"
+          confirmLoading={reassigningNumber}
+          okButtonProps={{
+            disabled:
+              !reassignTargetAppointmentId,
+          }}
+          onOk={
+            handleReassignAppointmentNumber
+          }
+          onCancel={() => {
+            if (reassigningNumber) {
+              return;
+            }
 
-              <div className="reassign-big-number">
-                {getAppointmentNumber(reassignSourceAppointment)}
-              </div>
+            setReassignModalOpen(false);
 
-              <Text type="secondary">
-                This number became available because{" "}
-                <strong>
-                  {reassignSourceAppointment.patient_name ||
-                    reassignSourceAppointment.patient_id ||
-                    "Unknown Patient"}
-                </strong>{" "}
-                cancelled the appointment.
-              </Text>
-            </div>
-          )}
+            setReassignSourceAppointment(
+              null,
+            );
 
-          {/* =====================================================
-        Target appointment
-    ===================================================== */}
+            setReassignTargetAppointmentId(
+              null,
+            );
+          }}
+        >
+          <div className="reassign-number-modal-content">
+            {reassignSourceAppointment && (
+              <div className="reassign-source-number">
+                <Text type="secondary">
+                  Available appointment number
+                </Text>
 
-          <div className="reassign-target-section">
-            <Text strong>
-              Select an appointment after No.{" "}
-              {reassignSourceAppointment
-                ? getAppointmentNumber(reassignSourceAppointment)
-                : ""}
-            </Text>
-
-            <Text
-              type="secondary"
-              style={{
-                display: "block",
-                marginTop: 4,
-                marginBottom: 10,
-              }}
-            >
-              Only appointments after the cancelled position are available.
-            </Text>
-
-            <Select
-              showSearch
-              allowClear
-              value={reassignTargetAppointmentId}
-              placeholder={
-                availableReassignAppointments.length > 0
-                  ? "Select appointment"
-                  : "No later appointments available"
-              }
-              className="reassign-appointment-select"
-              optionFilterProp="label"
-              disabled={availableReassignAppointments.length === 0}
-              onChange={setReassignTargetAppointmentId}
-              options={availableReassignAppointments.map((appointment) => ({
-                value: getAppointmentId(appointment),
-
-                label: `No. ${getAppointmentNumber(appointment)} - ${
-                  appointment.patient_name ||
-                  appointment.patient_id ||
-                  "Unknown Patient"
-                } - ${appointment.status || "Pending"}`,
-              }))}
-            />
-
-            {availableReassignAppointments.length === 0 &&
-              reassignSourceAppointment && (
-                <Alert
-                  type="info"
-                  showIcon
-                  style={{
-                    marginTop: 12,
-                  }}
-                  message="No later appointments available"
-                  description={`There are no eligible appointments after appointment No. ${getAppointmentNumber(
+                <div className="reassign-big-number">
+                  {getAppointmentNumber(
                     reassignSourceAppointment,
-                  )}.`}
-                />
-              )}
-          </div>
+                  )}
+                </div>
 
-          {/* =====================================================
-        Selected target preview
-    ===================================================== */}
+                <Text type="secondary">
+                  This number became available
+                  because{" "}
+                  <strong>
+                    {reassignSourceAppointment.patient_name ||
+                      reassignSourceAppointment.patient_id ||
+                      "Unknown Patient"}
+                  </strong>{" "}
+                  cancelled the appointment.
+                </Text>
+              </div>
+            )}
 
-          {reassignTargetAppointmentId && (
-            <div className="reassign-number-warning">
-              {(() => {
-                const selectedAppointment = availableReassignAppointments.find(
-                  (appointment) =>
-                    String(getAppointmentId(appointment)) ===
-                    String(reassignTargetAppointmentId),
-                );
+            <div className="reassign-target-section">
+              <Text strong>
+                Select an appointment after No.{" "}
+                {reassignSourceAppointment
+                  ? getAppointmentNumber(
+                      reassignSourceAppointment,
+                    )
+                  : ""}
+              </Text>
 
-                if (!selectedAppointment) {
-                  return null;
+              <Text
+                type="secondary"
+                style={{
+                  display: "block",
+                  marginTop: 4,
+                  marginBottom: 10,
+                }}
+              >
+                Only appointments after the
+                cancelled position are available.
+              </Text>
+
+              <Select
+                showSearch
+                allowClear
+                value={
+                  reassignTargetAppointmentId
                 }
+                placeholder={
+                  availableReassignAppointments.length >
+                  0
+                    ? "Select appointment"
+                    : "No later appointments available"
+                }
+                className="reassign-appointment-select"
+                optionFilterProp="label"
+                disabled={
+                  availableReassignAppointments.length ===
+                  0
+                }
+                onChange={
+                  setReassignTargetAppointmentId
+                }
+                options={availableReassignAppointments.map(
+                  (appointment) => ({
+                    value:
+                      getAppointmentId(
+                        appointment,
+                      ),
 
-                return (
-                  <>
-                    <strong>
-                      {selectedAppointment.patient_name ||
-                        selectedAppointment.patient_id ||
-                        "Selected Patient"}
-                    </strong>{" "}
-                    currently has appointment No.{" "}
-                    <strong>{getAppointmentNumber(selectedAppointment)}</strong>
-                    .
-                    <br />
-                    <br />
-                    This patient will receive appointment No.{" "}
-                    <strong>
-                      {reassignSourceAppointment
-                        ? getAppointmentNumber(reassignSourceAppointment)
-                        : ""}
-                    </strong>
-                    .
-                  </>
-                );
-              })()}
+                    label: `No. ${getAppointmentNumber(
+                      appointment,
+                    )} - ${
+                      appointment.patient_name ||
+                      appointment.patient_id ||
+                      "Unknown Patient"
+                    } - ${
+                      appointment.status ||
+                      "Pending"
+                    }`,
+                  }),
+                )}
+              />
+
+              {availableReassignAppointments.length ===
+                0 &&
+                reassignSourceAppointment && (
+                  <Alert
+                    type="info"
+                    showIcon
+                    style={{
+                      marginTop: 12,
+                    }}
+                    message="No later appointments available"
+                    description={`There are no eligible appointments after appointment No. ${getAppointmentNumber(
+                      reassignSourceAppointment,
+                    )}.`}
+                  />
+                )}
             </div>
-          )}
-        </div>
-      </Modal>
+
+            {reassignTargetAppointmentId && (
+              <div className="reassign-number-warning">
+                {(() => {
+                  const targetAppointment =
+                    availableReassignAppointments.find(
+                      (appointment) =>
+                        String(
+                          getAppointmentId(
+                            appointment,
+                          ),
+                        ) ===
+                        String(
+                          reassignTargetAppointmentId,
+                        ),
+                    );
+
+                  if (!targetAppointment) {
+                    return null;
+                  }
+
+                  return (
+                    <>
+                      <strong>
+                        {targetAppointment.patient_name ||
+                          targetAppointment.patient_id ||
+                          "Selected Patient"}
+                      </strong>{" "}
+                      currently has appointment
+                      No.{" "}
+                      <strong>
+                        {getAppointmentNumber(
+                          targetAppointment,
+                        )}
+                      </strong>
+                      .
+                      <br />
+                      <br />
+                      This patient will receive
+                      appointment No.{" "}
+                      <strong>
+                        {reassignSourceAppointment
+                          ? getAppointmentNumber(
+                              reassignSourceAppointment,
+                            )
+                          : ""}
+                      </strong>
+                      .
+                    </>
+                  );
+                })()}
+              </div>
+            )}
+          </div>
+        </Modal>
+      </div>
     </ClinicPage>
   );
 };
