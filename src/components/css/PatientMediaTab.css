@@ -1,106 +1,502 @@
+/* ========================================================
+   PATIENT MEDIA TAB
+   LIGHT + DARK THEME
+======================================================== */
+
+
+/* ========================================================
+   THEME VARIABLES
+======================================================== */
+
+:root,
+html[data-theme="light"] {
+  --patient-media-surface: #ffffff;
+  --patient-media-surface-secondary: #f8fafc;
+  --patient-media-surface-hover: #f8fbff;
+
+  --patient-media-text: #172033;
+  --patient-media-text-secondary: #64748b;
+  --patient-media-text-muted: #94a3b8;
+
+  --patient-media-border: #e6ebf2;
+  --patient-media-border-soft: #edf1f7;
+
+  --patient-media-preview-bg: #f5f7fa;
+
+  --patient-media-blue: #1677ff;
+  --patient-media-blue-soft:
+    rgba(22, 119, 255, 0.1);
+
+  --patient-media-red: #cf1322;
+  --patient-media-red-soft:
+    rgba(255, 77, 79, 0.1);
+
+  --patient-media-shadow:
+    0 6px 18px
+    rgba(15, 23, 42, 0.045);
+
+  --patient-media-shadow-hover:
+    0 12px 26px
+    rgba(15, 23, 42, 0.09);
+}
+
+
+html[data-theme="dark"] {
+  --patient-media-surface: #101a29;
+  --patient-media-surface-secondary: #172338;
+  --patient-media-surface-hover: #162337;
+
+  --patient-media-text: #f8fafc;
+  --patient-media-text-secondary: #c2ccda;
+  --patient-media-text-muted: #8fa0b7;
+
+  --patient-media-border: #27374b;
+  --patient-media-border-soft: #223247;
+
+  --patient-media-preview-bg: #0f1927;
+
+  --patient-media-blue: #60a5fa;
+  --patient-media-blue-soft:
+    rgba(59, 130, 246, 0.14);
+
+  --patient-media-red: #f87171;
+  --patient-media-red-soft:
+    rgba(239, 68, 68, 0.14);
+
+  --patient-media-shadow:
+    0 8px 22px
+    rgba(0, 0, 0, 0.2);
+
+  --patient-media-shadow-hover:
+    0 14px 30px
+    rgba(0, 0, 0, 0.32);
+}
+
+
+/* ========================================================
+   TAB
+======================================================== */
+
 .patient-media-tab {
   width: 100%;
 }
+
+
+/* ========================================================
+   HEADER
+======================================================== */
 
 .patient-media-tab-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 16px;
+
   margin-bottom: 18px;
 }
 
 .patient-media-tab-header h4 {
   margin: 0 0 3px !important;
+
+  color:
+    var(--patient-media-text) !important;
 }
+
+.patient-media-tab-header
+  .ant-typography-secondary {
+  color:
+    var(--patient-media-text-secondary) !important;
+}
+
+
+/* ========================================================
+   FILTER
+======================================================== */
 
 .patient-media-tab-filter {
   margin-bottom: 20px;
+
   overflow-x: auto;
+
+  scrollbar-width: none;
 }
 
-.patient-media-tab-filter .ant-segmented {
-  min-width: max-content;
+.patient-media-tab-filter::-webkit-scrollbar {
+  display: none;
 }
+
+.patient-media-tab-filter
+  .ant-segmented {
+  min-width: max-content;
+
+  padding: 4px;
+
+  background:
+    var(--patient-media-surface-secondary);
+
+  border:
+    1px solid
+    var(--patient-media-border);
+
+  border-radius: 10px;
+}
+
+.patient-media-tab-filter
+  .ant-segmented-item {
+  color:
+    var(--patient-media-text-secondary);
+
+  border-radius: 7px;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.patient-media-tab-filter
+  .ant-segmented-item:hover {
+  color:
+    var(--patient-media-text);
+}
+
+.patient-media-tab-filter
+  .ant-segmented-item-selected {
+  color:
+    var(--patient-media-text);
+
+  background:
+    var(--patient-media-surface);
+
+  box-shadow:
+    0 2px 6px
+    rgba(15, 23, 42, 0.06);
+}
+
+html[data-theme="dark"]
+  .patient-media-tab-filter
+  .ant-segmented-item-selected {
+  box-shadow:
+    0 2px 7px
+    rgba(0, 0, 0, 0.24);
+}
+
+
+/* ========================================================
+   LOADING
+======================================================== */
 
 .patient-media-tab-loading {
-  min-height: 260px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  min-height: 260px;
+
   gap: 14px;
+
+  color:
+    var(--patient-media-text-secondary);
 }
+
+
+/* ========================================================
+   MEDIA ITEM CARD
+======================================================== */
 
 .patient-media-item-card {
   height: 100%;
+
   overflow: hidden;
+
+  background:
+    var(--patient-media-surface);
+
+  border:
+    1px solid
+    var(--patient-media-border) !important;
+
+  border-radius: 14px !important;
+
+  box-shadow:
+    var(--patient-media-shadow);
+
+  transition:
+    transform 0.2s ease,
+    background-color 0.25s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
+.patient-media-item-card:hover {
+  transform:
+    translateY(-2px);
+
+  border-color:
+    rgba(22, 119, 255, 0.22) !important;
+
+  box-shadow:
+    var(--patient-media-shadow-hover);
+}
+
+.patient-media-item-card
+  .ant-card-body {
+  padding: 16px;
+}
+
+
+/* ========================================================
+   PREVIEW
+======================================================== */
+
 .patient-media-item-preview {
-  height: 175px;
+  position: relative;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  height: 175px;
+
   overflow: hidden;
-  background: var(
-    --patient-media-preview-bg,
-    #f5f7fa
-  );
+
+  background:
+    var(--patient-media-preview-bg);
+
+  border-bottom:
+    1px solid
+    var(--patient-media-border-soft);
 }
 
 .patient-media-item-image {
   width: 100% !important;
   height: 175px !important;
+
   object-fit: cover;
+
+  transition:
+    transform 0.25s ease;
 }
 
+.patient-media-item-card:hover
+  .patient-media-item-image {
+  transform:
+    scale(1.025);
+}
+
+
+/* ========================================================
+   LARGE FILE ICON
+======================================================== */
+
 .patient-media-item-large-icon {
+  color:
+    var(--patient-media-text-muted);
+
   font-size: 58px;
-  opacity: 0.55;
+
+  opacity: 0.65;
 }
 
 .patient-media-item-large-icon--pdf {
-  color: #cf1322;
-  opacity: 0.85;
+  color:
+    var(--patient-media-red);
+
+  opacity: 0.9;
 }
+
+
+/* ========================================================
+   BODY
+======================================================== */
 
 .patient-media-item-body {
   display: flex;
   flex-direction: column;
+
+  min-width: 0;
+
   gap: 9px;
 }
 
+
+/* ========================================================
+   FILE NAME
+======================================================== */
+
 .patient-media-item-name {
   display: block;
+
   width: 100%;
+
+  overflow: hidden;
+
+  color:
+    var(--patient-media-text) !important;
+
+  font-weight: 600;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
+
+/* ========================================================
+   DESCRIPTION
+======================================================== */
 
 .patient-media-item-description {
-  display: block;
+  display: -webkit-box;
+
   width: 100%;
+
+  overflow: hidden;
+
+  color:
+    var(--patient-media-text-secondary) !important;
+
+  font-size: 12px;
+  line-height: 1.5;
+
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
+
+/* ========================================================
+   DATE
+======================================================== */
+
 .patient-media-item-date {
+  color:
+    var(--patient-media-text-muted) !important;
+
   font-size: 12px;
 }
 
-.patient-media-item-actions {
-  display: flex;
-  gap: 8px;
-  padding-top: 5px;
+
+/* ========================================================
+   TAGS
+======================================================== */
+
+.patient-media-item-card
+  .ant-tag {
+  margin-inline-end: 4px;
+
+  border-radius: 6px;
+
+  font-size: 11px;
 }
 
-.patient-media-item-actions .ant-btn {
-  flex: 1;
+
+/* ========================================================
+   ACTIONS
+======================================================== */
+
+.patient-media-item-actions {
+  display: flex;
+
+  gap: 8px;
+
+  padding-top: 6px;
 }
+
+.patient-media-item-actions
+  .ant-btn {
+  flex: 1;
+
+  min-width: 0;
+
+  border-radius: 8px;
+}
+
+
+/* ========================================================
+   GENERAL TYPOGRAPHY
+======================================================== */
+
+.patient-media-tab
+  .ant-typography:not(
+    .ant-typography-secondary
+  ) {
+  color:
+    var(--patient-media-text);
+}
+
+.patient-media-tab
+  .ant-typography-secondary {
+  color:
+    var(--patient-media-text-secondary);
+}
+
+
+/* ========================================================
+   EMPTY STATE
+======================================================== */
+
+.patient-media-tab
+  .ant-empty-description {
+  color:
+    var(--patient-media-text-secondary);
+}
+
+
+/* ========================================================
+   DARK MODE CARD FIX
+======================================================== */
+
+html[data-theme="dark"]
+  .patient-media-item-card.ant-card {
+  color:
+    var(--patient-media-text);
+
+  background:
+    var(--patient-media-surface);
+}
+
+
+/* ========================================================
+   DARK SEGMENTED FIX
+======================================================== */
+
+html[data-theme="dark"]
+  .patient-media-tab
+  .ant-segmented-thumb {
+  background:
+    var(--patient-media-surface);
+}
+
+
+/* ========================================================
+   TRANSITIONS
+======================================================== */
+
+.patient-media-item-card,
+.patient-media-tab-filter
+  .ant-segmented,
+.patient-media-item-preview {
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+/* ========================================================
+   RESPONSIVE
+======================================================== */
 
 @media (max-width: 767px) {
   .patient-media-tab-header {
     flex-direction: column;
+
+    align-items: stretch;
   }
 
-  .patient-media-tab-header > .ant-space {
+  .patient-media-tab-header
+    > .ant-space {
     width: 100%;
   }
 
@@ -108,5 +504,37 @@
     > .ant-space
     .ant-btn {
     flex: 1;
+  }
+
+  .patient-media-tab-filter {
+    margin-bottom: 16px;
+  }
+
+  .patient-media-item-preview {
+    height: 165px;
+  }
+
+  .patient-media-item-image {
+    height: 165px !important;
+  }
+}
+
+
+@media (max-width: 576px) {
+  .patient-media-item-preview {
+    height: 190px;
+  }
+
+  .patient-media-item-image {
+    height: 190px !important;
+  }
+
+  .patient-media-item-card
+    .ant-card-body {
+    padding: 14px;
+  }
+
+  .patient-media-item-actions {
+    gap: 6px;
   }
 }

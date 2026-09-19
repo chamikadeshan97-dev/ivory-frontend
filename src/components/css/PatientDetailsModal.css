@@ -1,66 +1,235 @@
+/* ========================================================
+   PATIENT DETAILS MODAL
+   Light / Dark Theme
+======================================================== */
+
 /* --------------------------------------------------------
-   Modal container
+   Theme variables
 -------------------------------------------------------- */
+
+.patient-details-modal {
+  --pd-bg: #f4f7fb;
+  --pd-surface: #ffffff;
+  --pd-surface-secondary: #f8fafc;
+  --pd-surface-hover: #f8fafc;
+
+  --pd-border: #e8edf5;
+  --pd-border-strong: #dbe3ee;
+
+  --pd-text-primary: #172033;
+  --pd-text-secondary: #64748b;
+  --pd-text-muted: #94a3b8;
+
+  --pd-primary: #2563eb;
+  --pd-primary-soft: #eff6ff;
+
+  --pd-purple: #7c3aed;
+  --pd-purple-soft: #f5f3ff;
+
+  --pd-green: #16a34a;
+  --pd-green-strong: #15803d;
+  --pd-green-soft: #f0fdf4;
+
+  --pd-orange: #f59e0b;
+  --pd-orange-strong: #d97706;
+  --pd-orange-soft: #fffbeb;
+
+  --pd-cyan: #0891b2;
+  --pd-cyan-soft: #ecfeff;
+
+  --pd-red: #dc2626;
+  --pd-red-soft: #fef2f2;
+
+  --pd-shadow-modal:
+    0 24px 60px
+    rgba(15, 23, 42, 0.22);
+
+  --pd-shadow-card:
+    0 7px 22px
+    rgba(15, 23, 42, 0.04);
+
+  --pd-shadow-summary:
+    0 7px 20px
+    rgba(15, 23, 42, 0.04);
+}
+
+/* --------------------------------------------------------
+   Dark theme variables
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .patient-details-modal {
+  --pd-bg: #0f172a;
+  --pd-surface: #111c2f;
+  --pd-surface-secondary: #162235;
+  --pd-surface-hover: #1a2940;
+
+  --pd-border: #26364d;
+  --pd-border-strong: #33445d;
+
+  --pd-text-primary: #e8eef8;
+  --pd-text-secondary: #a9b7ca;
+  --pd-text-muted: #7f91aa;
+
+  --pd-primary: #60a5fa;
+  --pd-primary-soft: rgba(
+    59,
+    130,
+    246,
+    0.13
+  );
+
+  --pd-purple: #a78bfa;
+  --pd-purple-soft: rgba(
+    139,
+    92,
+    246,
+    0.13
+  );
+
+  --pd-green: #4ade80;
+  --pd-green-strong: #4ade80;
+  --pd-green-soft: rgba(
+    34,
+    197,
+    94,
+    0.13
+  );
+
+  --pd-orange: #fbbf24;
+  --pd-orange-strong: #fbbf24;
+  --pd-orange-soft: rgba(
+    245,
+    158,
+    11,
+    0.13
+  );
+
+  --pd-cyan: #22d3ee;
+  --pd-cyan-soft: rgba(
+    6,
+    182,
+    212,
+    0.13
+  );
+
+  --pd-red: #fb7185;
+  --pd-red-soft: rgba(
+    239,
+    68,
+    68,
+    0.14
+  );
+
+  --pd-shadow-modal:
+    0 26px 70px
+    rgba(0, 0, 0, 0.52);
+
+  --pd-shadow-card:
+    0 8px 24px
+    rgba(0, 0, 0, 0.18);
+
+  --pd-shadow-summary:
+    0 8px 22px
+    rgba(0, 0, 0, 0.17);
+}
+
+/* ========================================================
+   Modal container
+======================================================== */
 
 .patient-details-modal
   .ant-modal-content {
   overflow: hidden;
   padding: 0;
+
+  border: 1px solid
+    var(--pd-border);
+
   border-radius: 20px;
+
+  background:
+    var(--pd-surface);
+
   box-shadow:
-    0 24px 60px rgba(15, 23, 42, 0.22);
+    var(--pd-shadow-modal);
 }
 
 .patient-details-modal
   .ant-modal-close {
   top: 16px;
   right: 16px;
+
   color: #ffffff;
+
   background: rgba(
     255,
     255,
     255,
     0.16
   );
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .patient-details-modal
   .ant-modal-close:hover {
   color: #ffffff;
+
   background: rgba(
     255,
     255,
     255,
     0.25
   );
+
+  transform: scale(1.04);
+}
+
+.patient-details-modal
+  .ant-modal-close-x {
+  color: inherit;
 }
 
 .patient-details-modal
   .ant-modal-body {
   padding: 0;
-  background: #f4f7fb;
+  color: var(--pd-text-primary);
+  background: var(--pd-bg);
 }
 
 .patient-details-modal
   .ant-modal-footer {
   margin-top: 0;
   padding: 15px 22px;
-  border-top: 1px solid #e8edf5;
-  background: #ffffff;
+
+  border-top: 1px solid
+    var(--pd-border);
+
+  background:
+    var(--pd-surface);
 }
 
-/* --------------------------------------------------------
+/* ========================================================
    Header
--------------------------------------------------------- */
+======================================================== */
 
 .patient-details-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 22px;
+
   min-height: 145px;
+
   padding: 27px 32px;
+
   color: #ffffff;
+
   background:
     radial-gradient(
       circle at top right,
@@ -73,6 +242,28 @@
       #0284c7
     );
 }
+
+/* Dark mode keeps the header vivid,
+   but slightly deeper */
+
+html[data-theme="dark"]
+  .patient-details-header {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.12),
+      transparent 260px
+    ),
+    linear-gradient(
+      135deg,
+      #1d4ed8,
+      #0369a1
+    );
+}
+
+/* --------------------------------------------------------
+   Allergy header
+-------------------------------------------------------- */
 
 .patient-details-modal--allergy
   .patient-details-header {
@@ -90,25 +281,53 @@
     );
 }
 
+html[data-theme="dark"]
+  .patient-details-modal--allergy
+  .patient-details-header {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.13),
+      transparent 260px
+    ),
+    linear-gradient(
+      135deg,
+      #991b1b,
+      #b91c1c 60%,
+      #be123c
+    );
+}
+
+/* --------------------------------------------------------
+   Patient identity
+-------------------------------------------------------- */
+
 .patient-details-header__patient {
   display: flex;
   align-items: center;
+
   min-width: 0;
+
   gap: 16px;
 }
 
 .patient-details-header__avatar {
   flex: 0 0 auto;
+
   color: #2563eb;
+
   border: 4px solid rgba(
     255,
     255,
     255,
     0.45
   );
+
   background: #ffffff;
+
   box-shadow:
-    0 10px 25px rgba(15, 23, 42, 0.2);
+    0 10px 25px
+    rgba(15, 23, 42, 0.2);
 }
 
 .patient-details-header__avatar--allergy {
@@ -122,58 +341,79 @@
 .patient-details-header__identity
   h3.ant-typography {
   margin: 0;
+
   color: #ffffff;
+
   font-weight: 750;
 }
 
 .patient-details-header__meta {
   display: flex;
   align-items: center;
-  gap: 9px 18px;
-  margin-top: 9px;
   flex-wrap: wrap;
+
+  gap: 9px 18px;
+
+  margin-top: 9px;
 }
 
 .patient-details-header__meta
   span {
   display: inline-flex;
   align-items: center;
+
   gap: 7px;
+
   color: rgba(
     255,
     255,
     255,
     0.86
   );
+
   font-size: 13px;
 }
+
+/* --------------------------------------------------------
+   Allergy box
+-------------------------------------------------------- */
 
 .patient-details-header__allergy {
   display: flex;
   flex: 0 0 auto;
   align-items: flex-start;
+
   max-width: 300px;
+
   gap: 11px;
+
   padding: 13px 15px;
+
   border: 1px solid rgba(
     255,
     255,
     255,
     0.28
   );
+
   border-radius: 13px;
+
   background: rgba(
     255,
     255,
     255,
     0.16
   );
+
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter:
+    blur(8px);
 }
 
 .patient-details-header__allergy
   > .anticon {
   margin-top: 2px;
+
   font-size: 21px;
 }
 
@@ -182,38 +422,63 @@
   display: flex;
   min-width: 0;
   flex-direction: column;
+
   gap: 2px;
 }
 
 .patient-details-header__allergy
   .ant-typography {
   overflow: hidden;
+
   margin: 0;
+
   color: #ffffff;
+
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-/* --------------------------------------------------------
+/* ========================================================
    Tabs
--------------------------------------------------------- */
+======================================================== */
 
 .patient-details-tabs-wrapper {
   padding: 0 24px 24px;
+
+  color: var(--pd-text-primary);
+  background: var(--pd-bg);
 }
 
 .patient-details-tabs
   > .ant-tabs-nav {
   margin: 0 -24px 22px;
   padding: 0 24px;
-  border-bottom: 1px solid #e8edf5;
-  background: #ffffff;
+
+  border-bottom: 1px solid
+    var(--pd-border);
+
+  background:
+    var(--pd-surface);
+}
+
+.patient-details-tabs
+  > .ant-tabs-nav::before {
+  border-bottom-color:
+    var(--pd-border);
 }
 
 .patient-details-tabs
   .ant-tabs-tab {
   padding-top: 17px;
   padding-bottom: 17px;
+
+  color:
+    var(--pd-text-secondary);
+}
+
+.patient-details-tabs
+  .ant-tabs-tab:hover {
+  color: var(--pd-primary);
 }
 
 .patient-details-tabs
@@ -221,20 +486,64 @@
   font-weight: 600;
 }
 
+.patient-details-tabs
+  .ant-tabs-tab-active
+  .ant-tabs-tab-btn {
+  color: var(--pd-primary);
+}
+
+.patient-details-tabs
+  .ant-tabs-ink-bar {
+  background: var(--pd-primary);
+}
+
 .patient-tab-count {
   min-width: 25px;
+
   margin-inline-end: 0;
   padding-inline: 7px;
+
   text-align: center;
 }
 
-/* --------------------------------------------------------
+/* ========================================================
+   Global typography inside modal
+======================================================== */
+
+.patient-details-modal
+  .ant-typography {
+  color: var(--pd-text-primary);
+}
+
+.patient-details-modal
+  .ant-typography-secondary {
+  color:
+    var(--pd-text-secondary);
+}
+
+.patient-details-modal
+  .ant-typography
+  strong {
+  color: var(--pd-text-primary);
+}
+
+/* Don't override white header text */
+
+.patient-details-header
+  .ant-typography,
+.patient-details-header
+  .ant-typography-secondary {
+  color: #ffffff;
+}
+
+/* ========================================================
    Overview
--------------------------------------------------------- */
+======================================================== */
 
 .patient-overview {
   display: flex;
   flex-direction: column;
+
   gap: 16px;
 }
 
@@ -242,23 +551,44 @@
   border-radius: 13px;
 }
 
+/* ========================================================
+   Patient information card
+======================================================== */
+
 .patient-information-card {
-  border: 1px solid #e8edf5;
+  overflow: hidden;
+
+  border: 1px solid
+    var(--pd-border);
+
   border-radius: 16px;
+
+  background:
+    var(--pd-surface);
+
   box-shadow:
-    0 7px 22px rgba(15, 23, 42, 0.04);
+    var(--pd-shadow-card);
 }
 
 .patient-information-card
   .ant-card-body {
   padding: 20px;
+
+  color: var(--pd-text-primary);
+  background: var(--pd-surface);
 }
+
+/* --------------------------------------------------------
+   Section headings
+-------------------------------------------------------- */
 
 .patient-details-section-heading {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 15px;
+
   margin-bottom: 18px;
 }
 
@@ -266,6 +596,8 @@
   .ant-typography {
   margin-top: 0;
   margin-bottom: 2px;
+
+  color: var(--pd-text-primary);
 }
 
 .patient-details-section-heading--summary {
@@ -273,39 +605,100 @@
   margin-bottom: 0;
 }
 
+/* ========================================================
+   Patient information descriptions
+======================================================== */
+
+.patient-information-descriptions
+  .ant-descriptions-view {
+  overflow: hidden;
+
+  border-color:
+    var(--pd-border);
+
+  background:
+    var(--pd-surface);
+}
+
+.patient-information-descriptions
+  .ant-descriptions-row {
+  border-color:
+    var(--pd-border);
+}
+
 .patient-information-descriptions
   .ant-descriptions-item-label {
   width: 155px;
-  color: #64748b;
+
+  color:
+    var(--pd-text-secondary) !important;
+
+  border-color:
+    var(--pd-border) !important;
+
   font-weight: 600;
-  background: #f8fafc !important;
+
+  background:
+    var(--pd-surface-secondary) !important;
 }
 
 .patient-information-descriptions
   .ant-descriptions-item-content {
-  background: #ffffff;
+  color:
+    var(--pd-text-primary) !important;
+
+  border-color:
+    var(--pd-border) !important;
+
+  background:
+    var(--pd-surface) !important;
 }
 
-/* --------------------------------------------------------
+/* ========================================================
    Summary cards
--------------------------------------------------------- */
+======================================================== */
 
 .patient-history-summary-card {
   position: relative;
+
   height: 100%;
+
   overflow: hidden;
-  border: 1px solid #e8edf5;
+
+  border: 1px solid
+    var(--pd-border);
+
   border-radius: 15px;
+
+  background:
+    var(--pd-surface);
+
   box-shadow:
-    0 7px 20px rgba(15, 23, 42, 0.04);
+    var(--pd-shadow-summary);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.patient-history-summary-card:hover {
+  border-color:
+    var(--pd-border-strong);
+
+  transform:
+    translateY(-2px);
 }
 
 .patient-history-summary-card::before {
   position: absolute;
+
   top: 0;
   left: 0;
+
   width: 4px;
   height: 100%;
+
   content: "";
 }
 
@@ -336,127 +729,442 @@
 .patient-history-summary-card
   .ant-card-body {
   padding: 18px;
+
+  color: var(--pd-text-primary);
+
+  background:
+    var(--pd-surface);
 }
 
 .patient-history-summary-card__content {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 12px;
 }
 
 .patient-history-summary-card
   .ant-statistic-title {
-  color: #64748b;
+  color:
+    var(--pd-text-secondary);
+
   font-size: 13px;
   font-weight: 600;
 }
 
 .patient-history-summary-card
   .ant-statistic-content {
-  color: #172033;
+  color:
+    var(--pd-text-primary);
+
   font-size: 24px;
   font-weight: 750;
 }
+
+/* --------------------------------------------------------
+   Summary icons
+-------------------------------------------------------- */
 
 .patient-history-summary-card__icon {
   display: flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+
   width: 43px;
   height: 43px;
+
   border-radius: 13px;
+
   font-size: 19px;
 }
 
 .patient-history-summary-card--blue
   .patient-history-summary-card__icon {
-  color: #2563eb;
-  background: #eff6ff;
+  color: var(--pd-primary);
+  background:
+    var(--pd-primary-soft);
 }
 
 .patient-history-summary-card--purple
   .patient-history-summary-card__icon {
-  color: #7c3aed;
-  background: #f5f3ff;
+  color: var(--pd-purple);
+  background:
+    var(--pd-purple-soft);
 }
 
 .patient-history-summary-card--green
   .patient-history-summary-card__icon {
-  color: #16a34a;
-  background: #f0fdf4;
+  color: var(--pd-green);
+  background:
+    var(--pd-green-soft);
 }
 
 .patient-history-summary-card--orange
   .patient-history-summary-card__icon {
-  color: #d97706;
-  background: #fffbeb;
+  color:
+    var(--pd-orange-strong);
+
+  background:
+    var(--pd-orange-soft);
 }
 
 .patient-history-summary-card--cyan
   .patient-history-summary-card__icon {
-  color: #0891b2;
-  background: #ecfeff;
+  color: var(--pd-cyan);
+  background:
+    var(--pd-cyan-soft);
 }
 
 .patient-history-summary-card--red
   .patient-history-summary-card__icon {
-  color: #dc2626;
-  background: #fef2f2;
+  color: var(--pd-red);
+  background:
+    var(--pd-red-soft);
 }
 
-/* --------------------------------------------------------
-   History sections and tables
--------------------------------------------------------- */
+/* ========================================================
+   History sections
+======================================================== */
 
 .patient-history-section {
   padding: 2px 0;
 }
 
+/* ========================================================
+   History tables
+======================================================== */
+
 .patient-history-table {
   overflow: hidden;
-  border: 1px solid #e8edf5;
+
+  border: 1px solid
+    var(--pd-border);
+
   border-radius: 14px;
+
+  background:
+    var(--pd-surface);
 }
+
+.patient-history-table
+  .ant-table {
+  color: var(--pd-text-primary);
+
+  background:
+    var(--pd-surface);
+}
+
+.patient-history-table
+  .ant-table-container {
+  border-color:
+    var(--pd-border);
+}
+
+.patient-history-table
+  .ant-table-thead
+  > tr
+  > th {
+  color:
+    var(--pd-text-secondary);
+
+  border-bottom-color:
+    var(--pd-border);
+
+  font-weight: 650;
+
+  background:
+    var(--pd-surface-secondary);
+}
+
+.patient-history-table
+  .ant-table-thead
+  > tr
+  > th::before {
+  background:
+    var(--pd-border-strong) !important;
+}
+
+.patient-history-table
+  .ant-table-tbody
+  > tr
+  > td {
+  color:
+    var(--pd-text-primary);
+
+  border-bottom-color:
+    var(--pd-border);
+
+  background:
+    var(--pd-surface);
+}
+
+.patient-history-table
+  .ant-table-tbody
+  > tr:hover
+  > td {
+  background:
+    var(--pd-surface-hover) !important;
+}
+
+.patient-history-table
+  .ant-table-cell-row-hover {
+  background:
+    var(--pd-surface-hover) !important;
+}
+
+.patient-history-table
+  .ant-table-placeholder
+  > td {
+  background:
+    var(--pd-surface) !important;
+}
+
+/* --------------------------------------------------------
+   Pagination
+-------------------------------------------------------- */
+
+.patient-history-table
+  .ant-pagination {
+  color:
+    var(--pd-text-secondary);
+}
+
+.patient-history-table
+  .ant-pagination-item {
+  border-color:
+    var(--pd-border);
+
+  background:
+    var(--pd-surface);
+}
+
+.patient-history-table
+  .ant-pagination-item
+  a {
+  color:
+    var(--pd-text-primary);
+}
+
+.patient-history-table
+  .ant-pagination-item:hover {
+  border-color:
+    var(--pd-primary);
+}
+
+.patient-history-table
+  .ant-pagination-item:hover
+  a {
+  color:
+    var(--pd-primary);
+}
+
+.patient-history-table
+  .ant-pagination-item-active {
+  border-color:
+    var(--pd-primary);
+
+  background:
+    var(--pd-primary-soft);
+}
+
+.patient-history-table
+  .ant-pagination-item-active
+  a {
+  color:
+    var(--pd-primary);
+}
+
+.patient-history-table
+  .ant-pagination-prev
+  .ant-pagination-item-link,
+.patient-history-table
+  .ant-pagination-next
+  .ant-pagination-item-link {
+  color:
+    var(--pd-text-secondary);
+
+  border-color:
+    var(--pd-border);
+
+  background:
+    var(--pd-surface);
+}
+
+/* ========================================================
+   History IDs
+======================================================== */
 
 .patient-history-id {
   display: inline-flex;
   align-items: center;
+
   min-height: 32px;
+
   padding: 4px 9px;
+
   border-radius: 8px;
-  color: #2563eb;
+
+  color:
+    var(--pd-primary);
+
   font-size: 12px;
   font-weight: 700;
-  background: #eff6ff;
+
+  background:
+    var(--pd-primary-soft);
 }
 
 .patient-history-id--purple {
-  color: #7c3aed;
-  background: #f5f3ff;
+  color:
+    var(--pd-purple);
+
+  background:
+    var(--pd-purple-soft);
 }
 
 .patient-history-id--green {
-  color: #15803d;
-  background: #f0fdf4;
+  color:
+    var(--pd-green-strong);
+
+  background:
+    var(--pd-green-soft);
 }
 
-/* --------------------------------------------------------
-   Empty state
--------------------------------------------------------- */
+/* ========================================================
+   Empty states
+======================================================== */
 
 .patient-details-empty {
   display: flex;
   align-items: center;
   justify-content: center;
+
   min-height: 420px;
+
   padding: 40px;
+
+  color:
+    var(--pd-text-secondary);
+
+  background:
+    var(--pd-bg);
 }
 
-/* --------------------------------------------------------
+.patient-details-modal
+  .ant-empty-description {
+  color:
+    var(--pd-text-secondary);
+}
+
+/* ========================================================
+   Tags
+======================================================== */
+
+.patient-details-modal
+  .ant-tag {
+  border-color:
+    var(--pd-border);
+}
+
+/* ========================================================
+   Buttons
+======================================================== */
+
+html[data-theme="dark"]
+  .patient-details-modal
+  .ant-btn-default {
+  color:
+    var(--pd-text-primary);
+
+  border-color:
+    var(--pd-border-strong);
+
+  background:
+    var(--pd-surface-secondary);
+}
+
+html[data-theme="dark"]
+  .patient-details-modal
+  .ant-btn-default:hover {
+  color:
+    var(--pd-primary);
+
+  border-color:
+    var(--pd-primary);
+
+  background:
+    var(--pd-surface-hover);
+}
+
+/* ========================================================
+   Alert adjustments
+======================================================== */
+
+html[data-theme="dark"]
+  .patient-details-modal
+  .ant-alert-error {
+  border-color:
+    rgba(248, 113, 113, 0.3);
+
+  background:
+    rgba(127, 29, 29, 0.22);
+}
+
+html[data-theme="dark"]
+  .patient-details-modal
+  .ant-alert-error
+  .ant-alert-message {
+  color: #fecaca;
+}
+
+html[data-theme="dark"]
+  .patient-details-modal
+  .ant-alert-error
+  .ant-alert-description {
+  color: #fca5a5;
+}
+
+/* ========================================================
+   Scrollbar
+======================================================== */
+
+.patient-details-modal
+  *::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.patient-details-modal
+  *::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.patient-details-modal
+  *::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+
+  background:
+    var(--pd-border-strong);
+
+  background-clip:
+    padding-box;
+}
+
+.patient-details-modal
+  *::-webkit-scrollbar-thumb:hover {
+  background:
+    var(--pd-text-muted);
+
+  background-clip:
+    padding-box;
+}
+
+/* ========================================================
    Responsive
--------------------------------------------------------- */
+======================================================== */
 
 @media (max-width: 850px) {
   .patient-details-header {
@@ -482,12 +1190,14 @@
   .patient-details-header__avatar {
     width: 58px !important;
     height: 58px !important;
+
     font-size: 23px !important;
   }
 
   .patient-details-header__meta {
     align-items: flex-start;
     flex-direction: column;
+
     gap: 6px;
   }
 
@@ -499,6 +1209,7 @@
     > .ant-tabs-nav {
     margin-right: -15px;
     margin-left: -15px;
+
     padding-right: 15px;
     padding-left: 15px;
   }

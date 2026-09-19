@@ -1,52 +1,198 @@
+/* ========================================================
+   RECEIVE PAYMENT MODAL
+   Light / Dark Theme
+======================================================== */
+
 /* --------------------------------------------------------
-   Receive payment modal
+   Theme variables
 -------------------------------------------------------- */
+
+.receive-payment-modal,
+.payment-history-modal {
+  --rp-bg: #f4f7fb;
+  --rp-surface: #ffffff;
+  --rp-surface-secondary: #f8fafc;
+  --rp-surface-hover: #f8fafc;
+
+  --rp-border: #e8edf5;
+  --rp-border-strong: #d9e2ef;
+
+  --rp-text-primary: #172033;
+  --rp-text-secondary: #64748b;
+  --rp-text-muted: #94a3b8;
+
+  --rp-primary: #2563eb;
+  --rp-primary-soft: #eff6ff;
+
+  --rp-green: #16a34a;
+  --rp-green-strong: #15803d;
+  --rp-green-soft: #f0fdf4;
+
+  --rp-orange: #f59e0b;
+  --rp-orange-strong: #d97706;
+  --rp-orange-soft: #fffbeb;
+
+  --rp-red: #dc2626;
+  --rp-red-soft: #fef2f2;
+
+  --rp-shadow-modal:
+    0 24px 60px rgba(15, 23, 42, 0.22);
+
+  --rp-shadow-card:
+    0 7px 22px rgba(15, 23, 42, 0.04);
+
+  --rp-shadow-summary:
+    0 7px 20px rgba(15, 23, 42, 0.04);
+}
+
+/* --------------------------------------------------------
+   Dark theme variables
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .receive-payment-modal,
+html[data-theme="dark"]
+  .payment-history-modal {
+  --rp-bg: #0f172a;
+  --rp-surface: #111c2f;
+  --rp-surface-secondary: #162235;
+  --rp-surface-hover: #1a2940;
+
+  --rp-border: #26364d;
+  --rp-border-strong: #33445d;
+
+  --rp-text-primary: #e8eef8;
+  --rp-text-secondary: #a9b7ca;
+  --rp-text-muted: #7f91aa;
+
+  --rp-primary: #60a5fa;
+
+  --rp-primary-soft: rgba(
+    59,
+    130,
+    246,
+    0.14
+  );
+
+  --rp-green: #4ade80;
+  --rp-green-strong: #4ade80;
+
+  --rp-green-soft: rgba(
+    34,
+    197,
+    94,
+    0.14
+  );
+
+  --rp-orange: #fbbf24;
+  --rp-orange-strong: #fbbf24;
+
+  --rp-orange-soft: rgba(
+    245,
+    158,
+    11,
+    0.14
+  );
+
+  --rp-red: #fb7185;
+
+  --rp-red-soft: rgba(
+    239,
+    68,
+    68,
+    0.14
+  );
+
+  --rp-shadow-modal:
+    0 26px 70px rgba(0, 0, 0, 0.52);
+
+  --rp-shadow-card:
+    0 8px 24px rgba(0, 0, 0, 0.18);
+
+  --rp-shadow-summary:
+    0 8px 22px rgba(0, 0, 0, 0.17);
+}
+
+/* ========================================================
+   Receive payment modal
+======================================================== */
 
 .receive-payment-modal
   .ant-modal-content {
   overflow: hidden;
   padding: 0;
+
+  border: 1px solid
+    var(--rp-border);
+
   border-radius: 20px;
+
+  background:
+    var(--rp-surface);
+
   box-shadow:
-    0 24px 60px rgba(15, 23, 42, 0.22);
+    var(--rp-shadow-modal);
 }
 
 .receive-payment-modal
   .ant-modal-body {
   padding: 0;
-  background: #f4f7fb;
+
+  color:
+    var(--rp-text-primary);
+
+  background:
+    var(--rp-bg);
 }
 
 .receive-payment-modal
   .ant-modal-footer {
   margin-top: 0;
   padding: 15px 22px;
-  border-top: 1px solid #e8edf5;
-  background: #ffffff;
+
+  border-top: 1px solid
+    var(--rp-border);
+
+  background:
+    var(--rp-surface);
 }
 
 .receive-payment-modal
   .ant-modal-close {
   top: 16px;
   right: 16px;
+
   color: #ffffff;
+
   background: rgba(
     255,
     255,
     255,
     0.16
   );
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .receive-payment-modal
   .ant-modal-close:hover {
   color: #ffffff;
+
   background: rgba(
     255,
     255,
     255,
     0.26
   );
+
+  transform: scale(1.04);
+}
+
+.receive-payment-modal
+  .ant-modal-close-x {
+  color: inherit;
 }
 
 .receive-payment-save-button {
@@ -54,33 +200,52 @@
   font-weight: 650;
 }
 
-/* --------------------------------------------------------
+/* ========================================================
    Loading
--------------------------------------------------------- */
+======================================================== */
 
 .receive-payment-loading {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 460px;
-  padding: 40px;
   flex-direction: column;
+
+  min-height: 460px;
+
+  padding: 40px;
+
   gap: 14px;
-  background: #ffffff;
+
+  color:
+    var(--rp-text-primary);
+
+  background:
+    var(--rp-surface);
 }
 
-/* --------------------------------------------------------
+.receive-payment-loading
+  .ant-typography {
+  color:
+    var(--rp-text-secondary);
+}
+
+/* ========================================================
    Header
--------------------------------------------------------- */
+======================================================== */
 
 .receive-payment-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   min-height: 155px;
+
   gap: 22px;
+
   padding: 29px 32px;
+
   color: #ffffff;
+
   background:
     radial-gradient(
       circle at top right,
@@ -93,6 +258,27 @@
       #0284c7
     );
 }
+
+/* Slightly deeper gradient in dark mode */
+
+html[data-theme="dark"]
+  .receive-payment-header {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.13),
+      transparent 280px
+    ),
+    linear-gradient(
+      135deg,
+      #1d4ed8,
+      #0369a1
+    );
+}
+
+/* --------------------------------------------------------
+   Paid state
+-------------------------------------------------------- */
 
 .receive-payment-header--paid {
   background:
@@ -108,23 +294,48 @@
     );
 }
 
+html[data-theme="dark"]
+  .receive-payment-header--paid {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.13),
+      transparent 280px
+    ),
+    linear-gradient(
+      135deg,
+      #166534,
+      #115e59
+    );
+}
+
+/* --------------------------------------------------------
+   Patient
+-------------------------------------------------------- */
+
 .receive-payment-header__patient {
   display: flex;
   align-items: center;
+
   min-width: 0;
+
   gap: 16px;
 }
 
 .receive-payment-header__avatar {
   flex: 0 0 auto;
+
   color: #2563eb;
+
   border: 4px solid rgba(
     255,
     255,
     255,
     0.45
   );
+
   background: #ffffff;
+
   box-shadow:
     0 10px 25px rgba(15, 23, 42, 0.2);
 }
@@ -140,75 +351,103 @@
 
 .receive-payment-header__eyebrow {
   display: block;
+
   margin-bottom: 3px;
+
   color: rgba(
     255,
     255,
     255,
     0.75
   );
+
   font-size: 12px;
   font-weight: 700;
+
   text-transform: uppercase;
+
   letter-spacing: 0.7px;
 }
 
 .receive-payment-header__identity
   h3.ant-typography {
   margin: 0;
+
   color: #ffffff;
+
   font-weight: 750;
 }
 
 .receive-payment-header__status {
   margin-inline-end: 0;
+
   padding: 4px 11px;
+
   font-weight: 700;
 }
 
 .receive-payment-header__meta {
   display: flex;
   align-items: center;
-  gap: 8px 17px;
-  margin-top: 10px;
   flex-wrap: wrap;
+
+  gap: 8px 17px;
+
+  margin-top: 10px;
 }
 
 .receive-payment-header__meta
   span {
   display: inline-flex;
   align-items: center;
+
   gap: 7px;
+
   color: rgba(
     255,
     255,
     255,
     0.88
   );
+
   font-size: 13px;
 }
+
+/* --------------------------------------------------------
+   Treatment box
+-------------------------------------------------------- */
 
 .receive-payment-header__treatment {
   display: flex;
   flex: 0 0 auto;
   align-items: center;
+
   max-width: 300px;
+
   gap: 12px;
+
   padding: 14px 16px;
+
   border: 1px solid rgba(
     255,
     255,
     255,
     0.28
   );
+
   border-radius: 14px;
+
   background: rgba(
     255,
     255,
     255,
     0.14
   );
+
   backdrop-filter: blur(8px);
+
+  -webkit-backdrop-filter:
+    blur(8px);
 }
 
 .receive-payment-header__treatment-icon {
@@ -216,11 +455,16 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+
   width: 43px;
   height: 43px;
+
   border-radius: 12px;
+
   color: #2563eb;
+
   font-size: 19px;
+
   background: #ffffff;
 }
 
@@ -234,27 +478,39 @@
   display: flex;
   min-width: 0;
   flex-direction: column;
+
   gap: 1px;
 }
 
 .receive-payment-header__treatment
   .ant-typography {
   overflow: hidden;
+
   margin: 0;
+
   color: #ffffff;
+
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-/* --------------------------------------------------------
+/* ========================================================
    Main content
--------------------------------------------------------- */
+======================================================== */
 
 .receive-payment-content {
   display: flex;
-  padding: 22px;
   flex-direction: column;
+
+  padding: 22px;
+
   gap: 16px;
+
+  color:
+    var(--rp-text-primary);
+
+  background:
+    var(--rp-bg);
 }
 
 .receive-payment-alert,
@@ -262,26 +518,84 @@
   border-radius: 13px;
 }
 
-/* --------------------------------------------------------
+/* ========================================================
+   Typography
+======================================================== */
+
+.receive-payment-modal
+  .ant-typography,
+.payment-history-modal
+  .ant-typography {
+  color:
+    var(--rp-text-primary);
+}
+
+.receive-payment-modal
+  .ant-typography-secondary,
+.payment-history-modal
+  .ant-typography-secondary {
+  color:
+    var(--rp-text-secondary);
+}
+
+/* Preserve white header typography */
+
+.receive-payment-header
+  .ant-typography,
+.receive-payment-header
+  .ant-typography-secondary,
+.payment-history-header
+  .ant-typography,
+.payment-history-header
+  .ant-typography-secondary {
+  color: #ffffff;
+}
+
+/* ========================================================
    Summary cards
--------------------------------------------------------- */
+======================================================== */
 
 .receive-payment-summary-card {
   position: relative;
+
   height: 100%;
+
   overflow: hidden;
-  border: 1px solid #e8edf5;
+
+  border: 1px solid
+    var(--rp-border);
+
   border-radius: 15px;
+
+  background:
+    var(--rp-surface);
+
   box-shadow:
-    0 7px 20px rgba(15, 23, 42, 0.04);
+    var(--rp-shadow-summary);
+
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.receive-payment-summary-card:hover {
+  border-color:
+    var(--rp-border-strong);
+
+  transform:
+    translateY(-2px);
 }
 
 .receive-payment-summary-card::before {
   position: absolute;
+
   top: 0;
   left: 0;
+
   width: 4px;
   height: 100%;
+
   content: "";
 }
 
@@ -300,25 +614,36 @@
 .receive-payment-summary-card
   .ant-card-body {
   padding: 18px;
+
+  color:
+    var(--rp-text-primary);
+
+  background:
+    var(--rp-surface);
 }
 
 .receive-payment-summary-card__content {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 12px;
 }
 
 .receive-payment-summary-card
   .ant-statistic-title {
-  color: #64748b;
+  color:
+    var(--rp-text-secondary);
+
   font-size: 13px;
   font-weight: 600;
 }
 
 .receive-payment-summary-card
   .ant-statistic-content {
-  color: #172033;
+  color:
+    var(--rp-text-primary);
+
   font-size: 22px;
   font-weight: 750;
 }
@@ -328,51 +653,77 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+
   width: 43px;
   height: 43px;
+
   border-radius: 13px;
+
   font-size: 19px;
 }
 
 .receive-payment-summary-card--blue
   .receive-payment-summary-card__icon {
-  color: #2563eb;
-  background: #eff6ff;
+  color:
+    var(--rp-primary);
+
+  background:
+    var(--rp-primary-soft);
 }
 
 .receive-payment-summary-card--green
   .receive-payment-summary-card__icon {
-  color: #16a34a;
-  background: #f0fdf4;
+  color:
+    var(--rp-green);
+
+  background:
+    var(--rp-green-soft);
 }
 
 .receive-payment-summary-card--orange
   .receive-payment-summary-card__icon {
-  color: #d97706;
-  background: #fffbeb;
+  color:
+    var(--rp-orange-strong);
+
+  background:
+    var(--rp-orange-soft);
 }
 
-/* --------------------------------------------------------
-   Progress
--------------------------------------------------------- */
+/* ========================================================
+   Progress card
+======================================================== */
 
 .receive-payment-progress-card {
-  border: 1px solid #e8edf5;
+  border: 1px solid
+    var(--rp-border);
+
   border-radius: 15px;
+
+  background:
+    var(--rp-surface);
+
   box-shadow:
-    0 7px 20px rgba(15, 23, 42, 0.04);
+    var(--rp-shadow-summary);
 }
 
 .receive-payment-progress-card
   .ant-card-body {
   padding: 17px 19px;
+
+  color:
+    var(--rp-text-primary);
+
+  background:
+    var(--rp-surface);
 }
 
 .receive-payment-progress-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 14px;
+
   margin-bottom: 11px;
 }
 
@@ -380,20 +731,39 @@
   > div {
   display: flex;
   flex-direction: column;
+
   gap: 2px;
 }
 
 /* --------------------------------------------------------
-   Information and form cards
+   Progress bar
 -------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .receive-payment-progress-card
+  .ant-progress-inner {
+  background:
+    var(--rp-surface-secondary);
+}
+
+/* ========================================================
+   Information and form cards
+======================================================== */
 
 .receive-payment-information-card,
 .receive-payment-form-card {
   height: 100%;
-  border: 1px solid #e8edf5;
+
+  border: 1px solid
+    var(--rp-border);
+
   border-radius: 16px;
+
+  background:
+    var(--rp-surface);
+
   box-shadow:
-    0 7px 22px rgba(15, 23, 42, 0.04);
+    var(--rp-shadow-card);
 }
 
 .receive-payment-information-card
@@ -401,13 +771,25 @@
 .receive-payment-form-card
   .ant-card-body {
   padding: 20px;
+
+  color:
+    var(--rp-text-primary);
+
+  background:
+    var(--rp-surface);
 }
+
+/* --------------------------------------------------------
+   Section heading
+-------------------------------------------------------- */
 
 .receive-payment-section-heading {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 14px;
+
   margin-bottom: 18px;
 }
 
@@ -415,6 +797,9 @@
   .ant-typography {
   margin-top: 0;
   margin-bottom: 2px;
+
+  color:
+    var(--rp-text-primary);
 }
 
 .receive-payment-section-icon {
@@ -422,46 +807,101 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+
   width: 43px;
   height: 43px;
+
   border-radius: 13px;
-  color: #2563eb;
+
+  color:
+    var(--rp-primary);
+
   font-size: 19px;
-  background: #eff6ff;
+
+  background:
+    var(--rp-primary-soft);
 }
 
 .receive-payment-section-icon--payment {
-  color: #15803d;
-  background: #f0fdf4;
+  color:
+    var(--rp-green-strong);
+
+  background:
+    var(--rp-green-soft);
+}
+
+/* ========================================================
+   Descriptions
+======================================================== */
+
+.receive-payment-descriptions
+  .ant-descriptions-view {
+  overflow: hidden;
+
+  border-color:
+    var(--rp-border);
+
+  background:
+    var(--rp-surface);
+}
+
+.receive-payment-descriptions
+  .ant-descriptions-row {
+  border-color:
+    var(--rp-border);
 }
 
 .receive-payment-descriptions
   .ant-descriptions-item-label {
   width: 120px;
-  color: #64748b;
+
+  color:
+    var(--rp-text-secondary) !important;
+
+  border-color:
+    var(--rp-border) !important;
+
   font-weight: 600;
-  background: #f8fafc !important;
+
+  background:
+    var(--rp-surface-secondary) !important;
 }
 
 .receive-payment-descriptions
   .ant-descriptions-item-content {
-  background: #ffffff;
+  color:
+    var(--rp-text-primary) !important;
+
+  border-color:
+    var(--rp-border) !important;
+
+  background:
+    var(--rp-surface) !important;
 }
+
+/* ========================================================
+   History button
+======================================================== */
 
 .receive-payment-history-button {
   display: flex;
   align-items: center;
   justify-content: center;
+
   height: 48px;
+
   gap: 8px;
+
   margin-top: 17px;
+
   border-radius: 11px;
+
   font-weight: 650;
 }
 
-/* --------------------------------------------------------
+/* ========================================================
    Amount form
--------------------------------------------------------- */
+======================================================== */
 
 .receive-payment-amount-input {
   width: 100%;
@@ -470,16 +910,80 @@
 .receive-payment-amount-input
   .ant-input-number-input {
   height: 48px;
+
+  color:
+    var(--rp-text-primary);
+
   font-size: 18px;
   font-weight: 700;
 }
 
 .receive-payment-field-label {
   display: block;
+
   margin-bottom: 9px;
-  color: #172033;
+
+  color:
+    var(--rp-text-primary);
+
   font-weight: 600;
 }
+
+/* --------------------------------------------------------
+   Input number
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-input-number {
+  color:
+    var(--rp-text-primary);
+
+  border-color:
+    var(--rp-border-strong);
+
+  background:
+    var(--rp-surface-secondary);
+}
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-input-number:hover {
+  border-color:
+    var(--rp-primary);
+}
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-input-number-focused {
+  border-color:
+    var(--rp-primary);
+
+  box-shadow:
+    0 0 0 2px
+    rgba(59, 130, 246, 0.12);
+}
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-input-number-handler-wrap {
+  border-inline-start-color:
+    var(--rp-border);
+
+  background:
+    var(--rp-surface-secondary);
+}
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-input-number-handler {
+  border-block-end-color:
+    var(--rp-border);
+}
+
+/* ========================================================
+   Quick payment
+======================================================== */
 
 .receive-payment-quick-section {
   margin-bottom: 18px;
@@ -487,8 +991,9 @@
 
 .receive-payment-quick-buttons {
   display: flex;
-  gap: 8px;
   flex-wrap: wrap;
+
+  gap: 8px;
 }
 
 .receive-payment-quick-buttons
@@ -506,68 +1011,286 @@
 
 .receive-payment-method-button {
   height: 51px;
+
   border-radius: 11px;
+
   font-weight: 650;
 }
 
-/* --------------------------------------------------------
-   History modal
--------------------------------------------------------- */
+/* ========================================================
+   Default button dark mode
+======================================================== */
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-btn-default,
+html[data-theme="dark"]
+  .payment-history-modal
+  .ant-btn-default {
+  color:
+    var(--rp-text-primary);
+
+  border-color:
+    var(--rp-border-strong);
+
+  background:
+    var(--rp-surface-secondary);
+}
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-btn-default:hover,
+html[data-theme="dark"]
+  .payment-history-modal
+  .ant-btn-default:hover {
+  color:
+    var(--rp-primary);
+
+  border-color:
+    var(--rp-primary);
+
+  background:
+    var(--rp-surface-hover);
+}
+
+/* ========================================================
+   Select fields
+======================================================== */
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-select-selector {
+  color:
+    var(--rp-text-primary) !important;
+
+  border-color:
+    var(--rp-border-strong) !important;
+
+  background:
+    var(--rp-surface-secondary) !important;
+}
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-select-selection-item {
+  color:
+    var(--rp-text-primary) !important;
+}
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-select-selection-placeholder {
+  color:
+    var(--rp-text-muted) !important;
+}
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-select-arrow {
+  color:
+    var(--rp-text-secondary);
+}
+
+/* ========================================================
+   Alert adjustments
+======================================================== */
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-alert-info {
+  border-color:
+    rgba(96, 165, 250, 0.28);
+
+  background:
+    rgba(30, 64, 175, 0.2);
+}
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-alert-info
+  .ant-alert-message {
+  color: #bfdbfe;
+}
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-alert-info
+  .ant-alert-description {
+  color: #93c5fd;
+}
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-alert-success {
+  border-color:
+    rgba(74, 222, 128, 0.28);
+
+  background:
+    rgba(22, 101, 52, 0.2);
+}
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-alert-success
+  .ant-alert-message {
+  color: #bbf7d0;
+}
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-alert-success
+  .ant-alert-description {
+  color: #86efac;
+}
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-alert-warning {
+  border-color:
+    rgba(251, 191, 36, 0.28);
+
+  background:
+    rgba(120, 53, 15, 0.22);
+}
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-alert-warning
+  .ant-alert-message {
+  color: #fde68a;
+}
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-alert-warning
+  .ant-alert-description {
+  color: #fcd34d;
+}
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-alert-error {
+  border-color:
+    rgba(248, 113, 113, 0.28);
+
+  background:
+    rgba(127, 29, 29, 0.22);
+}
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-alert-error
+  .ant-alert-message {
+  color: #fecaca;
+}
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-alert-error
+  .ant-alert-description {
+  color: #fca5a5;
+}
+
+/* ========================================================
+   PAYMENT HISTORY MODAL
+======================================================== */
 
 .payment-history-modal
   .ant-modal-content {
   overflow: hidden;
+
   padding: 0;
+
+  border: 1px solid
+    var(--rp-border);
+
   border-radius: 20px;
+
+  background:
+    var(--rp-surface);
+
   box-shadow:
-    0 24px 60px rgba(15, 23, 42, 0.22);
+    var(--rp-shadow-modal);
 }
 
 .payment-history-modal
   .ant-modal-body {
   padding: 0;
-  background: #f4f7fb;
+
+  color:
+    var(--rp-text-primary);
+
+  background:
+    var(--rp-bg);
 }
 
 .payment-history-modal
   .ant-modal-footer {
   margin-top: 0;
+
   padding: 15px 22px;
-  border-top: 1px solid #e8edf5;
-  background: #ffffff;
+
+  border-top: 1px solid
+    var(--rp-border);
+
+  background:
+    var(--rp-surface);
 }
 
 .payment-history-modal
   .ant-modal-close {
   top: 16px;
   right: 16px;
+
   color: #ffffff;
+
   background: rgba(
     255,
     255,
     255,
     0.16
   );
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .payment-history-modal
   .ant-modal-close:hover {
   color: #ffffff;
+
   background: rgba(
     255,
     255,
     255,
     0.25
   );
+
+  transform: scale(1.04);
 }
+
+.payment-history-modal
+  .ant-modal-close-x {
+  color: inherit;
+}
+
+/* ========================================================
+   History header
+======================================================== */
 
 .payment-history-header {
   display: flex;
   align-items: center;
+
   min-height: 125px;
+
   gap: 14px;
+
   padding: 25px 30px;
+
   color: #ffffff;
+
   background:
     radial-gradient(
       circle at top right,
@@ -581,21 +1304,41 @@
     );
 }
 
+html[data-theme="dark"]
+  .payment-history-header {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.12),
+      transparent 260px
+    ),
+    linear-gradient(
+      135deg,
+      #166534,
+      #115e59
+    );
+}
+
 .payment-history-header__icon {
   display: flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+
   width: 55px;
   height: 55px;
+
   border: 1px solid rgba(
     255,
     255,
     255,
     0.34
   );
+
   border-radius: 16px;
+
   font-size: 24px;
+
   background: rgba(
     255,
     255,
@@ -607,42 +1350,164 @@
 .payment-history-header
   .ant-typography {
   margin: 0;
+
   color: #ffffff;
 }
 
+/* ========================================================
+   History content
+======================================================== */
+
 .payment-history-content {
   padding: 22px;
+
+  color:
+    var(--rp-text-primary);
+
+  background:
+    var(--rp-bg);
 }
 
 .payment-history-summary {
   margin-bottom: 16px;
 }
 
+/* ========================================================
+   History summary
+======================================================== */
+
 .payment-history-summary__item {
   display: flex;
-  min-height: 72px;
-  padding: 13px 15px;
-  border: 1px solid #e8edf5;
-  border-radius: 12px;
-  background: #ffffff;
   flex-direction: column;
+
+  min-height: 72px;
+
+  padding: 13px 15px;
+
+  border: 1px solid
+    var(--rp-border);
+
+  border-radius: 12px;
+
   gap: 4px;
+
+  color:
+    var(--rp-text-primary);
+
+  background:
+    var(--rp-surface);
 }
+
+.payment-history-summary__item
+  .ant-typography {
+  color:
+    var(--rp-text-primary);
+}
+
+.payment-history-summary__item
+  .ant-typography-secondary {
+  color:
+    var(--rp-text-secondary);
+}
+
+/* ========================================================
+   History table
+======================================================== */
 
 .payment-history-table {
   overflow: hidden;
-  border: 1px solid #e8edf5;
+
+  border: 1px solid
+    var(--rp-border);
+
   border-radius: 14px;
-  background: #ffffff;
+
+  background:
+    var(--rp-surface);
 }
 
-/* --------------------------------------------------------
+.payment-history-table
+  .ant-table {
+  color:
+    var(--rp-text-primary);
+
+  background:
+    var(--rp-surface);
+}
+
+.payment-history-table
+  .ant-table-container {
+  border-color:
+    var(--rp-border);
+}
+
+.payment-history-table
+  .ant-table-thead
+  > tr
+  > th {
+  color:
+    var(--rp-text-secondary);
+
+  border-bottom-color:
+    var(--rp-border);
+
+  font-weight: 650;
+
+  background:
+    var(--rp-surface-secondary);
+}
+
+.payment-history-table
+  .ant-table-thead
+  > tr
+  > th::before {
+  background:
+    var(--rp-border-strong) !important;
+}
+
+.payment-history-table
+  .ant-table-tbody
+  > tr
+  > td {
+  color:
+    var(--rp-text-primary);
+
+  border-bottom-color:
+    var(--rp-border);
+
+  background:
+    var(--rp-surface);
+}
+
+.payment-history-table
+  .ant-table-tbody
+  > tr:hover
+  > td {
+  background:
+    var(--rp-surface-hover) !important;
+}
+
+.payment-history-table
+  .ant-table-cell-row-hover {
+  background:
+    var(--rp-surface-hover) !important;
+}
+
+.payment-history-table
+  .ant-table-placeholder
+  > td {
+  background:
+    var(--rp-surface) !important;
+}
+
+/* ========================================================
    History table cells
--------------------------------------------------------- */
+======================================================== */
 
 .receive-payment-installment-cell {
   display: flex;
   flex-direction: column;
+
   gap: 4px;
 }
 
@@ -650,52 +1515,222 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   width: 39px;
   height: 35px;
+
   border-radius: 10px;
-  color: #2563eb;
+
+  color:
+    var(--rp-primary);
+
   font-weight: 750;
-  background: #eff6ff;
+
+  background:
+    var(--rp-primary-soft);
 }
 
 .receive-payment-installment-cell
   .ant-typography-secondary {
+  color:
+    var(--rp-text-secondary);
+
   font-size: 11px;
 }
 
 .receive-payment-value {
+  color:
+    var(--rp-text-primary);
+
   font-weight: 700;
 }
 
 .receive-payment-value--primary {
-  color: #2563eb;
+  color:
+    var(--rp-primary);
 }
 
 .receive-payment-value--paid {
-  color: #15803d;
+  color:
+    var(--rp-green-strong);
 }
 
 .receive-payment-value--balance {
-  color: #d97706;
+  color:
+    var(--rp-orange-strong);
 }
 
 .receive-payment-method-tag {
   margin: 0;
+
   border-radius: 16px;
+
   white-space: normal;
 }
 
 .receive-payment-status-tag {
   min-width: 75px;
+
   margin: 0;
+
   border-radius: 16px;
+
   text-align: center;
+
   font-weight: 600;
 }
 
-/* --------------------------------------------------------
+/* ========================================================
+   Pagination
+======================================================== */
+
+.payment-history-table
+  .ant-pagination {
+  color:
+    var(--rp-text-secondary);
+}
+
+.payment-history-table
+  .ant-pagination-item {
+  border-color:
+    var(--rp-border);
+
+  background:
+    var(--rp-surface);
+}
+
+.payment-history-table
+  .ant-pagination-item
+  a {
+  color:
+    var(--rp-text-primary);
+}
+
+.payment-history-table
+  .ant-pagination-item:hover {
+  border-color:
+    var(--rp-primary);
+}
+
+.payment-history-table
+  .ant-pagination-item:hover
+  a {
+  color:
+    var(--rp-primary);
+}
+
+.payment-history-table
+  .ant-pagination-item-active {
+  border-color:
+    var(--rp-primary);
+
+  background:
+    var(--rp-primary-soft);
+}
+
+.payment-history-table
+  .ant-pagination-item-active
+  a {
+  color:
+    var(--rp-primary);
+}
+
+.payment-history-table
+  .ant-pagination-prev
+  .ant-pagination-item-link,
+.payment-history-table
+  .ant-pagination-next
+  .ant-pagination-item-link {
+  color:
+    var(--rp-text-secondary);
+
+  border-color:
+    var(--rp-border);
+
+  background:
+    var(--rp-surface);
+}
+
+/* ========================================================
+   Empty state
+======================================================== */
+
+.receive-payment-modal
+  .ant-empty-description,
+.payment-history-modal
+  .ant-empty-description {
+  color:
+    var(--rp-text-secondary);
+}
+
+/* ========================================================
+   Tags
+======================================================== */
+
+html[data-theme="dark"]
+  .receive-payment-modal
+  .ant-tag:not(.ant-tag-has-color),
+html[data-theme="dark"]
+  .payment-history-modal
+  .ant-tag:not(.ant-tag-has-color) {
+  color:
+    var(--rp-text-primary);
+
+  border-color:
+    var(--rp-border-strong);
+
+  background:
+    var(--rp-surface-secondary);
+}
+
+/* ========================================================
+   Scrollbars
+======================================================== */
+
+.receive-payment-modal
+  *::-webkit-scrollbar,
+.payment-history-modal
+  *::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.receive-payment-modal
+  *::-webkit-scrollbar-track,
+.payment-history-modal
+  *::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.receive-payment-modal
+  *::-webkit-scrollbar-thumb,
+.payment-history-modal
+  *::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+
+  border-radius: 999px;
+
+  background:
+    var(--rp-border-strong);
+
+  background-clip:
+    padding-box;
+}
+
+.receive-payment-modal
+  *::-webkit-scrollbar-thumb:hover,
+.payment-history-modal
+  *::-webkit-scrollbar-thumb:hover {
+  background:
+    var(--rp-text-muted);
+
+  background-clip:
+    padding-box;
+}
+
+/* ========================================================
    Responsive
--------------------------------------------------------- */
+======================================================== */
 
 @media (max-width: 880px) {
   .receive-payment-header {
@@ -721,12 +1756,14 @@
   .receive-payment-header__avatar {
     width: 59px !important;
     height: 59px !important;
+
     font-size: 23px !important;
   }
 
   .receive-payment-header__meta {
     align-items: flex-start;
     flex-direction: column;
+
     gap: 6px;
   }
 
@@ -791,6 +1828,7 @@
 
   .receive-payment-quick-buttons {
     display: grid;
+
     grid-template-columns:
       repeat(2, 1fr);
   }

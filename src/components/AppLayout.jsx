@@ -11,7 +11,11 @@ import {
   Typography,
   message,
 } from "antd";
+import { MoonOutlined, SunOutlined } from "@ant-design/icons";
 
+import { Switch, Tooltip } from "antd";
+
+import { useTheme } from "../context/ThemeContext";
 import {
   CalendarOutlined,
   CarryOutOutlined,
@@ -187,8 +191,7 @@ const MENU_CONFIG = [
         icon: <MedicineBoxOutlined />,
         roles: DOCTOR_ROLES,
       },
-    
-      
+
       // {
       //   key: "/payments",
       //   title: "Payments",
@@ -374,7 +377,7 @@ const AppLayout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const screens = useBreakpoint();
-
+  const { isDark, toggleTheme } = useTheme();
   const { user: currentUser, logout } = useAuth();
 
   const [collapsed, setCollapsed] = useState(false);
@@ -598,7 +601,14 @@ const AppLayout = ({ children }) => {
               }
               onClick={handleMenuToggle}
             />
-
+            <Tooltip title={isDark ? "Light Mode" : "Dark Mode"}>
+              <Button
+                type="text"
+                shape="circle"
+                icon={isDark ? <SunOutlined /> : <MoonOutlined />}
+                onClick={toggleTheme}
+              />
+            </Tooltip>
             <div className="clinic-header-information">
               <Text className="clinic-header-title">Clinic Administration</Text>
 

@@ -2149,7 +2149,7 @@ const Patients = () => {
                 >
                   {showMoreOptions
                     ? "Hide additional information"
-                    : "+ Add more information"}
+                    : "+ Add more"}
                 </Button>
               </div>
             </Col>

@@ -792,3 +792,2087 @@
     font-size: 17px;
   }
 }
+
+/* ========================================================
+   PATIENT FOLLOW-UPS
+======================================================== */
+
+.follow-up-reminder-alert {
+  margin-bottom: 20px;
+  border-radius: 14px;
+}
+
+.follow-up-reminder-alert .ant-alert-message {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.follow-up-reminder-alert .ant-alert-description {
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* ========================================================
+   DATE CONTROL
+======================================================== */
+
+.follow-up-date-control {
+  display: flex;
+  align-items: center;
+
+  min-height: 40px;
+
+  overflow: hidden;
+
+  border: 1px solid #d9e2ec;
+  border-radius: 9px;
+
+  background: #ffffff;
+}
+
+.follow-up-date-control__icon {
+  display: flex;
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+
+  width: 42px;
+
+  color: #1677ff;
+
+  border-right: 1px solid #d9e2ec;
+
+  background: #e6f4ff;
+}
+
+.follow-up-date-picker {
+  width: 150px;
+
+  border: none !important;
+
+  box-shadow: none !important;
+}
+
+.follow-up-date-picker:hover,
+.follow-up-date-picker:focus,
+.follow-up-date-picker.ant-picker-focused {
+  border: none !important;
+
+  box-shadow: none !important;
+}
+
+/* ========================================================
+   SUMMARY CARDS
+======================================================== */
+
+.follow-up-summary-row {
+  margin-bottom: 20px;
+}
+
+.follow-up-summary-card {
+  height: 100%;
+
+  overflow: hidden;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.06);
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.follow-up-summary-card:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 28px rgba(15, 23, 42, 0.09);
+}
+
+.follow-up-summary-card__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 18px;
+}
+
+.follow-up-summary-card__title {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #526476;
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.follow-up-summary-card__value {
+  margin-bottom: 4px;
+
+  color: #102a43;
+
+  font-size: 31px;
+  font-weight: 850;
+  line-height: 1.1;
+}
+
+.follow-up-summary-card__helper {
+  color: #718096;
+
+  font-size: 13px;
+}
+
+.follow-up-summary-card__icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+
+  width: 56px;
+  height: 56px;
+
+  border-radius: 17px;
+
+  font-size: 25px;
+}
+
+/* --------------------------------------------------------
+   Blue
+-------------------------------------------------------- */
+
+.follow-up-summary-card--blue {
+  border-top: 4px solid #1677ff;
+}
+
+.follow-up-summary-card--blue
+  .follow-up-summary-card__icon {
+  color: #1677ff;
+
+  background: #e6f4ff;
+}
+
+/* --------------------------------------------------------
+   Green
+-------------------------------------------------------- */
+
+.follow-up-summary-card--green {
+  border-top: 4px solid #16a34a;
+}
+
+.follow-up-summary-card--green
+  .follow-up-summary-card__icon {
+  color: #15803d;
+
+  background: #dcfce7;
+}
+
+/* --------------------------------------------------------
+   Orange
+-------------------------------------------------------- */
+
+.follow-up-summary-card--orange {
+  border-top: 4px solid #d97706;
+}
+
+.follow-up-summary-card--orange
+  .follow-up-summary-card__icon {
+  color: #c35e00;
+
+  background: #fff3d6;
+}
+
+/* --------------------------------------------------------
+   Red
+-------------------------------------------------------- */
+
+.follow-up-summary-card--red {
+  border-top: 4px solid #dc2626;
+}
+
+.follow-up-summary-card--red
+  .follow-up-summary-card__icon {
+  color: #dc2626;
+
+  background: #fee2e2;
+}
+
+/* ========================================================
+   CALENDAR CONTAINER
+======================================================== */
+
+.follow-up-calendar-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 10px 30px rgba(15, 23, 42, 0.07);
+}
+
+.follow-up-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 22px;
+
+  padding-bottom: 18px;
+
+  border-bottom: 1px solid #edf2f7;
+}
+
+.follow-up-calendar-header h4 {
+  margin: 0 0 3px !important;
+
+  color: #102a43;
+
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.follow-up-calendar-header__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+
+  gap: 8px;
+}
+
+/* ========================================================
+   SEVEN-DAY CALENDAR GRID
+======================================================== */
+
+.follow-up-calendar-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(7, minmax(170px, 1fr));
+
+  gap: 14px;
+
+  overflow-x: auto;
+
+  padding: 2px 2px 10px;
+}
+
+.follow-up-calendar-grid--loading {
+  opacity: 0.75;
+}
+
+/* ========================================================
+   DAY CARD
+======================================================== */
+
+.follow-up-day-card {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  min-width: 170px;
+  min-height: 330px;
+
+  padding: 17px;
+
+  overflow: hidden;
+
+  color: inherit;
+
+  text-align: left;
+
+  font: inherit;
+
+  cursor: pointer;
+
+  outline: none;
+
+  border: 1px solid #dbe5ef;
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #f8fbff 100%
+    );
+
+  box-shadow:
+    0 5px 18px rgba(15, 23, 42, 0.05);
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.follow-up-day-card:hover {
+  z-index: 2;
+
+  transform: translateY(-4px);
+
+  border-color: #69b1ff;
+
+  box-shadow:
+    0 13px 28px rgba(22, 119, 255, 0.16);
+}
+
+.follow-up-day-card:focus-visible {
+  border-color: #1677ff;
+
+  box-shadow:
+    0 0 0 3px rgba(22, 119, 255, 0.18),
+    0 13px 28px rgba(22, 119, 255, 0.14);
+}
+
+.follow-up-day-card--today {
+  border: 2px solid #1677ff;
+
+  background:
+    linear-gradient(
+      180deg,
+      #eef7ff 0%,
+      #ffffff 100%
+    );
+}
+
+.follow-up-day-card--has-patients::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+
+  height: 5px;
+
+  content: "";
+
+  background: #1677ff;
+}
+
+.follow-up-day-card--allergy::before {
+  background:
+    linear-gradient(
+      90deg,
+      #1677ff 0%,
+      #1677ff 70%,
+      #dc2626 70%,
+      #dc2626 100%
+    );
+}
+
+/* --------------------------------------------------------
+   Day top
+-------------------------------------------------------- */
+
+.follow-up-day-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  min-height: 52px;
+
+  gap: 8px;
+}
+
+.follow-up-day-card__weekday {
+  display: block;
+
+  color: #102a43;
+
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.follow-up-day-card__full-date {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #718096;
+
+  font-size: 13px;
+}
+
+.follow-up-day-card__status {
+  flex: 0 0 auto;
+
+  margin: 0;
+
+  font-size: 11px;
+}
+
+/* --------------------------------------------------------
+   Date
+-------------------------------------------------------- */
+
+.follow-up-day-card__date-section {
+  display: flex;
+  align-items: baseline;
+
+  gap: 7px;
+
+  margin-top: 20px;
+}
+
+.follow-up-day-card__date-number {
+  color: #102a43;
+
+  font-size: 42px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.follow-up-day-card__month {
+  color: #627d98;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------
+   Count
+-------------------------------------------------------- */
+
+.follow-up-day-card__count-section {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 22px;
+
+  padding: 15px;
+
+  border: 1px solid #cfe4ff;
+  border-radius: 14px;
+
+  background: #eaf4ff;
+}
+
+.follow-up-day-card__count {
+  color: #0958d9;
+
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.follow-up-day-card__count-label {
+  color: #285b8f;
+
+  font-size: 14px;
+  font-weight: 750;
+}
+
+/* --------------------------------------------------------
+   Details
+-------------------------------------------------------- */
+
+.follow-up-day-card__details {
+  display: flex;
+  flex-direction: column;
+
+  gap: 9px;
+
+  margin-top: 15px;
+}
+
+.follow-up-day-card__details > div {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  color: #526476;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.follow-up-day-card__details
+  .anticon {
+  color: #1677ff;
+}
+
+.follow-up-day-card__details
+  > div:last-child
+  .anticon {
+  color: #dc2626;
+}
+
+/* --------------------------------------------------------
+   Footer
+-------------------------------------------------------- */
+
+.follow-up-day-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 8px;
+
+  margin-top: auto;
+
+  padding-top: 16px;
+
+  color: #526476;
+
+  border-top: 1px solid #e2e8f0;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.follow-up-day-card__footer
+  .anticon {
+  color: #1677ff;
+}
+
+/* ========================================================
+   MODAL
+======================================================== */
+
+.follow-up-details-modal {
+  top: 26px;
+}
+
+.follow-up-details-modal
+  .ant-modal-content {
+  overflow: hidden;
+
+  border-radius: 20px;
+
+  background: #ffffff;
+}
+
+.follow-up-details-modal
+  .ant-modal-header {
+  padding: 21px 24px;
+
+  border-bottom: 1px solid #e2e8f0;
+
+  background: #ffffff;
+}
+
+.follow-up-details-modal
+  .ant-modal-body {
+  max-height: calc(100vh - 170px);
+
+  padding: 22px 24px 26px;
+
+  overflow-y: auto;
+
+  background: #ffffff;
+}
+
+/* ========================================================
+   MODAL TITLE
+======================================================== */
+
+.follow-up-modal-title {
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  padding-right: 30px;
+}
+
+.follow-up-modal-title h4 {
+  margin: 0 0 2px !important;
+
+  color: #102a43;
+
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.follow-up-modal-title__icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+
+  width: 45px;
+  height: 45px;
+
+  color: #1677ff;
+
+  border-radius: 13px;
+
+  background: #e6f4ff;
+
+  font-size: 21px;
+}
+
+/* ========================================================
+   MODAL SUMMARY
+======================================================== */
+
+.follow-up-modal-summary {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(150px, 1fr)
+    );
+
+  gap: 12px;
+
+  margin-bottom: 18px;
+}
+
+.follow-up-modal-summary__item {
+  padding: 14px 16px;
+
+  border: 1px solid #cfe4ff;
+  border-radius: 13px;
+
+  background: #eef7ff;
+}
+
+.follow-up-modal-summary__item
+  .ant-typography {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #526476;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.follow-up-modal-summary__item
+  strong {
+  color: #0958d9;
+
+  font-size: 25px;
+  font-weight: 900;
+}
+
+/* --------------------------------------------------------
+   Green summary
+-------------------------------------------------------- */
+
+.follow-up-modal-summary__item--green {
+  border-color: #b7ebc6;
+
+  background: #edfff2;
+}
+
+.follow-up-modal-summary__item--green
+  strong {
+  color: #15803d;
+}
+
+/* --------------------------------------------------------
+   Orange summary
+-------------------------------------------------------- */
+
+.follow-up-modal-summary__item--orange {
+  border-color: #ffd591;
+
+  background: #fff8e8;
+}
+
+.follow-up-modal-summary__item--orange
+  strong {
+  color: #c35e00;
+}
+
+/* --------------------------------------------------------
+   Red summary
+-------------------------------------------------------- */
+
+.follow-up-modal-summary__item--red {
+  border-color: #ffb3b3;
+
+  background: #fff1f0;
+}
+
+.follow-up-modal-summary__item--red
+  strong {
+  color: #cf1322;
+}
+
+/* ========================================================
+   MODAL TOOLBAR
+======================================================== */
+
+.follow-up-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 14px;
+
+  margin-bottom: 18px;
+
+  padding: 14px;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+
+  background: #f8fafc;
+}
+
+.follow-up-search-input {
+  width: min(100%, 530px);
+
+  min-height: 40px;
+
+  font-size: 14px;
+}
+
+.follow-up-filter {
+  flex: 0 0 auto;
+}
+
+.follow-up-filter
+  .ant-segmented-item-label {
+  min-height: 34px;
+
+  padding: 6px 11px;
+
+  font-size: 13px;
+  font-weight: 650;
+}
+
+/* ========================================================
+   TABLE CELLS
+======================================================== */
+
+.follow-up-patient-avatar {
+  color: #1677ff;
+
+  border: 1px solid #b7dcff;
+
+  background: #e6f4ff;
+}
+
+.follow-up-patient-avatar--allergy {
+  color: #dc2626;
+
+  border-color: #fecaca;
+
+  background: #fee2e2;
+}
+
+.follow-up-patient-cell {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+
+  gap: 5px;
+}
+
+.follow-up-patient-cell
+  > .ant-typography {
+  font-size: 13px;
+}
+
+.follow-up-patient-cell
+  .ant-space
+  .ant-typography {
+  color: #102a43;
+
+  font-size: 15px;
+}
+
+.follow-up-allergy-tag {
+  margin-inline-end: 0;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------
+   Contact
+-------------------------------------------------------- */
+
+.follow-up-contact-cell {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.follow-up-contact-cell
+  > .ant-typography {
+  color: #243b53;
+
+  font-size: 14px;
+}
+
+.follow-up-missing-phone {
+  color: #c35e00 !important;
+}
+
+/* --------------------------------------------------------
+   Treatment
+-------------------------------------------------------- */
+
+.follow-up-treatment-cell
+  .ant-space {
+  width: 100%;
+}
+
+.follow-up-treatment-cell
+  .ant-space-item:last-child {
+  min-width: 0;
+}
+
+.follow-up-treatment-cell
+  .ant-space-item:last-child
+  > .ant-typography {
+  display: block;
+
+  margin-bottom: 5px;
+
+  font-size: 13px;
+}
+
+.follow-up-treatment-cell
+  .ant-space-item:last-child
+  > .ant-typography:first-child {
+  color: #102a43;
+
+  font-size: 14px;
+}
+
+.follow-up-treatment-icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+
+  width: 35px;
+  height: 35px;
+
+  color: #1677ff;
+
+  border-radius: 10px;
+
+  background: #e6f4ff;
+
+  font-size: 17px;
+}
+
+.follow-up-doctor-notes {
+  margin: 0 !important;
+
+  color: #334e68;
+
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.follow-up-date-tag {
+  margin: 0;
+
+  padding: 4px 9px;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ========================================================
+   TABLE ROW ALERTS
+======================================================== */
+
+.follow-up-row td {
+  transition:
+    background-color 0.2s ease;
+}
+
+.follow-up-row:hover td {
+  background:
+    #f5faff !important;
+}
+
+.follow-up-row--allergy td {
+  background: #fff7f7;
+}
+
+.follow-up-row--allergy:hover td {
+  background:
+    #ffefef !important;
+}
+
+.follow-up-row--missing-phone td {
+  background: #fffbf2;
+}
+
+.follow-up-row--missing-phone:hover td {
+  background:
+    #fff5dd !important;
+}
+
+/* ========================================================
+   EMPTY STATE
+======================================================== */
+
+.follow-up-empty-content {
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+
+  padding: 8px 0;
+}
+
+.follow-up-empty-content
+  .ant-typography:first-child {
+  color: #243b53;
+
+  font-size: 15px;
+}
+
+/* ========================================================
+   DARK MODE
+======================================================== */
+
+/* ========================================================
+   REMINDER ALERT - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .follow-up-reminder-alert {
+  border-color:
+    rgba(59, 130, 246, 0.28);
+
+  background:
+    rgba(37, 99, 235, 0.1);
+}
+
+html[data-theme="dark"]
+  .follow-up-reminder-alert
+  .ant-alert-message {
+  color: #dbeafe;
+}
+
+html[data-theme="dark"]
+  .follow-up-reminder-alert
+  .ant-alert-description {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"]
+  .follow-up-reminder-alert
+  .ant-alert-icon {
+  color: #60a5fa;
+}
+
+/* ========================================================
+   DATE CONTROL - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .follow-up-date-control {
+  border-color: #334155;
+
+  background: #111827;
+}
+
+html[data-theme="dark"]
+  .follow-up-date-control__icon {
+  color: #60a5fa;
+
+  border-right-color: #334155;
+
+  background:
+    rgba(37, 99, 235, 0.16);
+}
+
+html[data-theme="dark"]
+  .follow-up-date-picker {
+  background: #111827;
+}
+
+html[data-theme="dark"]
+  .follow-up-date-picker
+  .ant-picker-input
+  > input {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"]
+  .follow-up-date-picker
+  .ant-picker-input
+  > input::placeholder {
+  color: #64748b;
+}
+
+html[data-theme="dark"]
+  .follow-up-date-picker
+  .ant-picker-suffix,
+html[data-theme="dark"]
+  .follow-up-date-picker
+  .ant-picker-clear {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .follow-up-date-picker
+  .ant-picker-clear {
+  background: #111827;
+}
+
+/* ========================================================
+   SUMMARY CARDS - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .follow-up-summary-card {
+  border-color: #27364a;
+
+  background: #162033;
+
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+html[data-theme="dark"]
+  .follow-up-summary-card:hover {
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.28);
+}
+
+html[data-theme="dark"]
+  .follow-up-summary-card__title {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .follow-up-summary-card__value {
+  color: #f1f5f9;
+}
+
+html[data-theme="dark"]
+  .follow-up-summary-card__helper {
+  color: #64748b;
+}
+
+/* --------------------------------------------------------
+   Blue
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .follow-up-summary-card--blue
+  .follow-up-summary-card__icon {
+  color: #60a5fa;
+
+  background:
+    rgba(37, 99, 235, 0.16);
+}
+
+/* --------------------------------------------------------
+   Green
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .follow-up-summary-card--green
+  .follow-up-summary-card__icon {
+  color: #4ade80;
+
+  background:
+    rgba(22, 163, 74, 0.15);
+}
+
+/* --------------------------------------------------------
+   Orange
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .follow-up-summary-card--orange
+  .follow-up-summary-card__icon {
+  color: #fbbf24;
+
+  background:
+    rgba(245, 158, 11, 0.15);
+}
+
+/* --------------------------------------------------------
+   Red
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .follow-up-summary-card--red
+  .follow-up-summary-card__icon {
+  color: #fb7185;
+
+  background:
+    rgba(239, 68, 68, 0.15);
+}
+
+/* ========================================================
+   CALENDAR CARD - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .follow-up-calendar-card {
+  border-color: #27364a;
+
+  background: #162033;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.22);
+}
+
+html[data-theme="dark"]
+  .follow-up-calendar-header {
+  border-bottom-color: #27364a;
+}
+
+html[data-theme="dark"]
+  .follow-up-calendar-header
+  h4 {
+  color: #f1f5f9;
+}
+
+html[data-theme="dark"]
+  .follow-up-calendar-header
+  .ant-typography-secondary {
+  color: #94a3b8;
+}
+
+/* ========================================================
+   DAY CARDS - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .follow-up-day-card {
+  color: #cbd5e1;
+
+  border-color: #2a394d;
+
+  background:
+    linear-gradient(
+      180deg,
+      #162033 0%,
+      #111b2c 100%
+    );
+
+  box-shadow:
+    0 5px 18px rgba(0, 0, 0, 0.2);
+}
+
+html[data-theme="dark"]
+  .follow-up-day-card:hover {
+  border-color: #3b82f6;
+
+  box-shadow:
+    0 13px 28px rgba(37, 99, 235, 0.2);
+}
+
+html[data-theme="dark"]
+  .follow-up-day-card:focus-visible {
+  border-color: #60a5fa;
+
+  box-shadow:
+    0 0 0 3px rgba(59, 130, 246, 0.18),
+    0 13px 28px rgba(0, 0, 0, 0.25);
+}
+
+html[data-theme="dark"]
+  .follow-up-day-card--today {
+  border-color: #3b82f6;
+
+  background:
+    linear-gradient(
+      180deg,
+      #172a46 0%,
+      #162033 100%
+    );
+}
+
+html[data-theme="dark"]
+  .follow-up-day-card__weekday {
+  color: #f1f5f9;
+}
+
+html[data-theme="dark"]
+  .follow-up-day-card__full-date {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .follow-up-day-card__date-number {
+  color: #f8fafc;
+}
+
+html[data-theme="dark"]
+  .follow-up-day-card__month {
+  color: #94a3b8;
+}
+
+/* --------------------------------------------------------
+   Count block - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .follow-up-day-card__count-section {
+  border-color:
+    rgba(59, 130, 246, 0.28);
+
+  background:
+    rgba(37, 99, 235, 0.13);
+}
+
+html[data-theme="dark"]
+  .follow-up-day-card__count {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"]
+  .follow-up-day-card__count-label {
+  color: #93c5fd;
+}
+
+/* --------------------------------------------------------
+   Details - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .follow-up-day-card__details
+  > div {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .follow-up-day-card__details
+  .anticon {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"]
+  .follow-up-day-card__details
+  > div:last-child
+  .anticon {
+  color: #fb7185;
+}
+
+/* --------------------------------------------------------
+   Footer - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .follow-up-day-card__footer {
+  color: #94a3b8;
+
+  border-top-color: #2a394d;
+}
+
+html[data-theme="dark"]
+  .follow-up-day-card__footer
+  .anticon {
+  color: #60a5fa;
+}
+
+/* ========================================================
+   MODAL - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-modal-content {
+  border: 1px solid #2a394d;
+
+  background: #111b2c;
+
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-modal-header {
+  border-bottom-color: #2a394d;
+
+  background: #111b2c;
+}
+
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-modal-body {
+  background: #0d1625;
+}
+
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-modal-close {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-modal-close:hover {
+  color: #f1f5f9;
+
+  background: #1e293b;
+}
+
+/* ========================================================
+   MODAL TITLE - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .follow-up-modal-title
+  h4 {
+  color: #f1f5f9;
+}
+
+html[data-theme="dark"]
+  .follow-up-modal-title
+  .ant-typography-secondary {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .follow-up-modal-title__icon {
+  color: #60a5fa;
+
+  background:
+    rgba(37, 99, 235, 0.16);
+}
+
+/* ========================================================
+   MODAL SUMMARY - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .follow-up-modal-summary__item {
+  border-color:
+    rgba(59, 130, 246, 0.28);
+
+  background:
+    rgba(37, 99, 235, 0.12);
+}
+
+html[data-theme="dark"]
+  .follow-up-modal-summary__item
+  .ant-typography {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .follow-up-modal-summary__item
+  strong {
+  color: #60a5fa;
+}
+
+/* --------------------------------------------------------
+   Green
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .follow-up-modal-summary__item--green {
+  border-color:
+    rgba(74, 222, 128, 0.28);
+
+  background:
+    rgba(22, 163, 74, 0.12);
+}
+
+html[data-theme="dark"]
+  .follow-up-modal-summary__item--green
+  strong {
+  color: #4ade80;
+}
+
+/* --------------------------------------------------------
+   Orange
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .follow-up-modal-summary__item--orange {
+  border-color:
+    rgba(251, 191, 36, 0.28);
+
+  background:
+    rgba(245, 158, 11, 0.12);
+}
+
+html[data-theme="dark"]
+  .follow-up-modal-summary__item--orange
+  strong {
+  color: #fbbf24;
+}
+
+/* --------------------------------------------------------
+   Red
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .follow-up-modal-summary__item--red {
+  border-color:
+    rgba(251, 113, 133, 0.28);
+
+  background:
+    rgba(239, 68, 68, 0.12);
+}
+
+html[data-theme="dark"]
+  .follow-up-modal-summary__item--red
+  strong {
+  color: #fb7185;
+}
+
+/* ========================================================
+   TOOLBAR - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .follow-up-toolbar {
+  border-color: #2a394d;
+
+  background: #111b2c;
+}
+
+/* ========================================================
+   SEARCH INPUT - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .follow-up-search-input.ant-input-affix-wrapper {
+  color: #e2e8f0;
+
+  border-color: #334155;
+
+  background: #111827;
+}
+
+html[data-theme="dark"]
+  .follow-up-search-input.ant-input-affix-wrapper:hover {
+  border-color: #3b82f6;
+}
+
+html[data-theme="dark"]
+  .follow-up-search-input.ant-input-affix-wrapper-focused,
+html[data-theme="dark"]
+  .follow-up-search-input.ant-input-affix-wrapper:focus-within {
+  border-color: #3b82f6;
+
+  box-shadow:
+    0 0 0 2px rgba(59, 130, 246, 0.14);
+}
+
+html[data-theme="dark"]
+  .follow-up-search-input
+  input {
+  color: #e2e8f0;
+
+  background: transparent;
+}
+
+html[data-theme="dark"]
+  .follow-up-search-input
+  input::placeholder {
+  color: #64748b;
+}
+
+html[data-theme="dark"]
+  .follow-up-search-input
+  .ant-input-prefix,
+html[data-theme="dark"]
+  .follow-up-search-input
+  .ant-input-suffix {
+  color: #64748b;
+}
+
+html[data-theme="dark"]
+  .follow-up-search-input
+  .ant-input-clear-icon {
+  color: #64748b;
+}
+
+/* ========================================================
+   SEGMENTED FILTER - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .follow-up-filter.ant-segmented {
+  border: 1px solid #334155;
+
+  background: #0f1725;
+}
+
+html[data-theme="dark"]
+  .follow-up-filter
+  .ant-segmented-item {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .follow-up-filter
+  .ant-segmented-item:hover {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"]
+  .follow-up-filter
+  .ant-segmented-item-selected {
+  color: #60a5fa;
+
+  background: #1e293b;
+}
+
+html[data-theme="dark"]
+  .follow-up-filter
+  .ant-segmented-thumb {
+  background: #1e293b;
+}
+
+/* ========================================================
+   TABLE - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-table {
+  color: #cbd5e1;
+
+  background: #162033;
+}
+
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-table-container,
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-table-content {
+  background: #162033;
+}
+
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-table-thead
+  > tr
+  > th {
+  color: #94a3b8;
+
+  border-bottom-color:
+    #2a394d !important;
+
+  background:
+    #111b2c !important;
+}
+
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-table-thead
+  > tr
+  > th::before {
+  background-color:
+    #334155 !important;
+}
+
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-table-tbody
+  > tr
+  > td {
+  color: #cbd5e1;
+
+  border-bottom-color: #27364a;
+
+  background: #162033;
+}
+
+/* ========================================================
+   PATIENT CELL - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .follow-up-patient-avatar {
+  color: #60a5fa;
+
+  border-color:
+    rgba(96, 165, 250, 0.28);
+
+  background:
+    rgba(37, 99, 235, 0.15);
+}
+
+html[data-theme="dark"]
+  .follow-up-patient-avatar--allergy {
+  color: #fb7185;
+
+  border-color:
+    rgba(251, 113, 133, 0.3);
+
+  background:
+    rgba(239, 68, 68, 0.15);
+}
+
+html[data-theme="dark"]
+  .follow-up-patient-cell
+  .ant-space
+  .ant-typography {
+  color: #f1f5f9;
+}
+
+html[data-theme="dark"]
+  .follow-up-patient-cell
+  > .ant-typography {
+  color: #94a3b8;
+}
+
+/* ========================================================
+   CONTACT CELL - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .follow-up-contact-cell
+  > .ant-typography {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"]
+  .follow-up-missing-phone {
+  color: #fbbf24 !important;
+}
+
+/* ========================================================
+   TREATMENT CELL - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .follow-up-treatment-cell
+  .ant-space-item:last-child
+  > .ant-typography {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .follow-up-treatment-cell
+  .ant-space-item:last-child
+  > .ant-typography:first-child {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"]
+  .follow-up-treatment-icon {
+  color: #60a5fa;
+
+  background:
+    rgba(37, 99, 235, 0.16);
+}
+
+html[data-theme="dark"]
+  .follow-up-doctor-notes {
+  color: #cbd5e1;
+}
+
+/* ========================================================
+   ROW ALERTS - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .follow-up-row
+  td {
+  background: #162033;
+}
+
+html[data-theme="dark"]
+  .follow-up-row:hover
+  td {
+  background:
+    #1b2940 !important;
+}
+
+/* --------------------------------------------------------
+   Allergy
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .follow-up-row--allergy
+  td {
+  background:
+    rgba(127, 29, 29, 0.16);
+}
+
+html[data-theme="dark"]
+  .follow-up-row--allergy:hover
+  td {
+  background:
+    rgba(127, 29, 29, 0.26) !important;
+}
+
+/* --------------------------------------------------------
+   Missing phone
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .follow-up-row--missing-phone
+  td {
+  background:
+    rgba(120, 53, 15, 0.15);
+}
+
+html[data-theme="dark"]
+  .follow-up-row--missing-phone:hover
+  td {
+  background:
+    rgba(120, 53, 15, 0.25) !important;
+}
+
+/* ========================================================
+   EMPTY STATE - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .follow-up-empty-content
+  .ant-typography:first-child {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"]
+  .follow-up-empty-content
+  .ant-typography-secondary {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-empty-description {
+  color: #94a3b8;
+}
+
+/* ========================================================
+   PAGINATION - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-pagination-total-text {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-pagination-item {
+  border-color: #334155;
+
+  background: #111b2c;
+}
+
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-pagination-item
+  a {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-pagination-item:hover {
+  border-color: #3b82f6;
+}
+
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-pagination-item:hover
+  a {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-pagination-item-active {
+  border-color: #3b82f6;
+
+  background:
+    rgba(37, 99, 235, 0.16);
+}
+
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-pagination-item-active
+  a {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-pagination-prev
+  button,
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-pagination-next
+  button {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-pagination-disabled
+  button {
+  color: #475569;
+}
+
+/* ========================================================
+   DATE PICKER POPUP - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .ant-picker-dropdown
+  .ant-picker-panel-container {
+  border: 1px solid #334155;
+
+  background: #162033;
+
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.42);
+}
+
+html[data-theme="dark"]
+  .ant-picker-dropdown
+  .ant-picker-panel {
+  border-color: #334155;
+
+  background: #162033;
+}
+
+html[data-theme="dark"]
+  .ant-picker-dropdown
+  .ant-picker-header {
+  color: #e2e8f0;
+
+  border-bottom-color: #334155;
+}
+
+html[data-theme="dark"]
+  .ant-picker-dropdown
+  .ant-picker-header
+  button {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .ant-picker-dropdown
+  .ant-picker-header
+  button:hover {
+  color: #f1f5f9;
+}
+
+html[data-theme="dark"]
+  .ant-picker-dropdown
+  .ant-picker-content
+  th {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .ant-picker-dropdown
+  .ant-picker-cell {
+  color: #64748b;
+}
+
+html[data-theme="dark"]
+  .ant-picker-dropdown
+  .ant-picker-cell-in-view {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"]
+  .ant-picker-dropdown
+  .ant-picker-cell-inner:hover {
+  background: #243247;
+}
+
+html[data-theme="dark"]
+  .ant-picker-dropdown
+  .ant-picker-cell-selected
+  .ant-picker-cell-inner {
+  color: #ffffff;
+
+  background: #1677ff;
+}
+
+html[data-theme="dark"]
+  .ant-picker-dropdown
+  .ant-picker-cell-today
+  .ant-picker-cell-inner::before {
+  border-color: #60a5fa;
+}
+
+html[data-theme="dark"]
+  .ant-picker-dropdown
+  .ant-picker-footer {
+  border-top-color: #334155;
+}
+
+/* ========================================================
+   TABLE / MODAL SCROLLBARS - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .follow-up-calendar-grid::-webkit-scrollbar,
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-modal-body::-webkit-scrollbar,
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-table-content::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html[data-theme="dark"]
+  .follow-up-calendar-grid::-webkit-scrollbar-track,
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-modal-body::-webkit-scrollbar-track,
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-table-content::-webkit-scrollbar-track {
+  background: #0d1625;
+}
+
+html[data-theme="dark"]
+  .follow-up-calendar-grid::-webkit-scrollbar-thumb,
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-modal-body::-webkit-scrollbar-thumb,
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-table-content::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+
+  background: #334155;
+}
+
+html[data-theme="dark"]
+  .follow-up-calendar-grid::-webkit-scrollbar-thumb:hover,
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-modal-body::-webkit-scrollbar-thumb:hover,
+html[data-theme="dark"]
+  .follow-up-details-modal
+  .ant-table-content::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* ========================================================
+   RESPONSIVE
+======================================================== */
+
+@media (max-width: 1400px) {
+  .follow-up-calendar-grid {
+    grid-template-columns:
+      repeat(
+        4,
+        minmax(190px, 1fr)
+      );
+  }
+}
+
+@media (max-width: 1050px) {
+  .follow-up-calendar-grid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(190px, 1fr)
+      );
+  }
+
+  .follow-up-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .follow-up-search-input {
+    width: 100%;
+  }
+
+  .follow-up-filter {
+    width: 100%;
+
+    overflow-x: auto;
+  }
+
+  .follow-up-modal-summary {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(150px, 1fr)
+      );
+  }
+}
+
+@media (max-width: 760px) {
+  .follow-up-calendar-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .follow-up-calendar-header__meta {
+    justify-content: flex-start;
+  }
+
+  .follow-up-calendar-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(180px, 1fr)
+      );
+  }
+
+  .follow-up-day-card {
+    min-height: 305px;
+  }
+}
+
+@media (max-width: 520px) {
+  .follow-up-calendar-grid {
+    display: flex;
+
+    padding-bottom: 14px;
+
+    overflow-x: auto;
+
+    scroll-snap-type: x mandatory;
+  }
+
+  .follow-up-day-card {
+    min-width: 86%;
+
+    scroll-snap-align: start;
+  }
+
+  .follow-up-modal-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .follow-up-details-modal
+    .ant-modal-body {
+    padding: 17px 14px 22px;
+  }
+
+  .follow-up-modal-title__icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .follow-up-modal-title
+    h4 {
+    font-size: 17px;
+  }
+}

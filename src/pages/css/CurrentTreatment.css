@@ -2155,3 +2155,1431 @@
 .dark .current-treatment-payment-paid {
   color: #73d13d !important;
 }
+/* =========================================================
+   CURRENT TREATMENT - COMPLETE DARK THEME
+========================================================= */
+
+/* =========================================================
+   PAGE / GENERAL
+========================================================= */
+
+[data-theme="dark"] .current-treatment-page,
+.dark .current-treatment-page {
+  color: #e5e7eb;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+[data-theme="dark"] .current-treatment-empty-card,
+.dark .current-treatment-empty-card {
+  border-color: #303030;
+  background: #141414;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.24);
+}
+
+[data-theme="dark"]
+  .current-treatment-empty-content
+  .ant-typography,
+.dark
+  .current-treatment-empty-content
+  .ant-typography {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"]
+  .current-treatment-empty-content
+  .ant-typography-secondary,
+.dark
+  .current-treatment-empty-content
+  .ant-typography-secondary {
+  color: #94a3b8 !important;
+}
+
+
+/* =========================================================
+   CURRENT PATIENT SUMMARY
+========================================================= */
+
+[data-theme="dark"] .current-treatment-patient,
+.dark .current-treatment-patient {
+  border-color: #1e3a5f;
+  border-left-color: #3b82f6;
+
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(59, 130, 246, 0.13),
+      transparent 260px
+    ),
+    linear-gradient(
+      135deg,
+      #141414,
+      #172033
+    );
+
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.22);
+}
+
+[data-theme="dark"] .current-treatment-patient--allergy,
+.dark .current-treatment-patient--allergy {
+  border-color: #5c2525;
+  border-left-color: #ef4444;
+
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(239, 68, 68, 0.13),
+      transparent 260px
+    ),
+    linear-gradient(
+      135deg,
+      #141414,
+      #231616
+    );
+}
+
+
+/* =========================================================
+   PATIENT AVATAR
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-patient__avatar,
+.dark
+  .current-treatment-patient__avatar {
+  color: #69b1ff;
+  border-color: #1e3a5f;
+
+  background:
+    linear-gradient(
+      135deg,
+      #172554,
+      #1e3a5f
+    );
+}
+
+[data-theme="dark"]
+  .current-treatment-patient__avatar--allergy,
+.dark
+  .current-treatment-patient__avatar--allergy {
+  color: #ff7875;
+  border-color: #5c2525;
+
+  background:
+    linear-gradient(
+      135deg,
+      #3a1717,
+      #451a1a
+    );
+}
+
+
+/* =========================================================
+   PATIENT TEXT
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-patient__eyebrow,
+.dark
+  .current-treatment-patient__eyebrow {
+  color: #94a3b8;
+}
+
+[data-theme="dark"]
+  .current-treatment-patient__details
+  h3.ant-typography,
+.dark
+  .current-treatment-patient__details
+  h3.ant-typography {
+  color: #f8fafc;
+}
+
+[data-theme="dark"]
+  .current-treatment-patient__meta
+  span,
+.dark
+  .current-treatment-patient__meta
+  span {
+  color: #94a3b8;
+}
+
+
+/* =========================================================
+   WORKSPACE
+========================================================= */
+
+[data-theme="dark"] .current-treatment-workspace,
+.dark .current-treatment-workspace {
+  border-color: #303030;
+  background: #141414;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"]
+  .current-treatment-workspace
+  > .ant-card-body,
+.dark
+  .current-treatment-workspace
+  > .ant-card-body {
+  background: #141414;
+}
+
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+[data-theme="dark"] .current-treatment-progress,
+.dark .current-treatment-progress {
+  border-bottom-color: #303030;
+
+  background:
+    linear-gradient(
+      135deg,
+      #1f1f1f,
+      #141414
+    );
+}
+
+
+/* =========================================================
+   STEP AREA
+========================================================= */
+
+[data-theme="dark"] .current-treatment-step,
+.dark .current-treatment-step {
+  background: #141414;
+}
+
+
+/* =========================================================
+   SECTION HEADINGS
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-section-heading
+  .ant-typography,
+.dark
+  .current-treatment-section-heading
+  .ant-typography {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"]
+  .current-treatment-section-heading
+  .ant-typography-secondary,
+.dark
+  .current-treatment-section-heading
+  .ant-typography-secondary {
+  color: #94a3b8 !important;
+}
+
+
+/* =========================================================
+   SECTION ICON
+========================================================= */
+
+[data-theme="dark"] .current-treatment-section-icon,
+.dark .current-treatment-section-icon {
+  color: #69b1ff;
+  background: rgba(22, 119, 255, 0.16);
+}
+
+[data-theme="dark"]
+  .current-treatment-section-icon--green,
+.dark
+  .current-treatment-section-icon--green {
+  color: #73d13d;
+  background: rgba(82, 196, 26, 0.14);
+}
+
+
+/* =========================================================
+   TREATMENT FORM
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-name-input--locked
+  .ant-input,
+.dark
+  .current-treatment-name-input--locked
+  .ant-input {
+  color: #e2e8f0;
+  border-color: #424242;
+  background: #1f1f1f;
+}
+
+[data-theme="dark"]
+  .current-treatment-name-input
+  .ant-input-group-addon,
+.dark
+  .current-treatment-name-input
+  .ant-input-group-addon {
+  color: #e2e8f0;
+  border-color: #424242;
+  background: #262626;
+}
+
+[data-theme="dark"]
+  .current-treatment-details-input,
+.dark
+  .current-treatment-details-input {
+  color: #e2e8f0;
+  background: #141414;
+}
+
+
+/* =========================================================
+   EXTRA CLINICAL DETAILS
+========================================================= */
+
+[data-theme="dark"] .current-treatment-extra-details,
+.dark .current-treatment-extra-details {
+  border-color: #303030;
+  background: #1f1f1f;
+}
+
+[data-theme="dark"]
+  .current-treatment-extra-details
+  .ant-collapse-item,
+.dark
+  .current-treatment-extra-details
+  .ant-collapse-item {
+  border-color: #303030;
+}
+
+[data-theme="dark"]
+  .current-treatment-extra-details
+  .ant-collapse-header,
+.dark
+  .current-treatment-extra-details
+  .ant-collapse-header {
+  color: #e2e8f0;
+  background: #1f1f1f;
+}
+
+[data-theme="dark"]
+  .current-treatment-extra-details
+  .ant-collapse-content,
+.dark
+  .current-treatment-extra-details
+  .ant-collapse-content {
+  border-top-color: #303030;
+  background: #141414;
+}
+
+[data-theme="dark"]
+  .current-treatment-extra-details
+  .ant-collapse-content-box,
+.dark
+  .current-treatment-extra-details
+  .ant-collapse-content-box {
+  background: #141414;
+}
+
+
+/* =========================================================
+   FINISH CARDS
+========================================================= */
+
+[data-theme="dark"] .current-treatment-finish-card,
+.dark .current-treatment-finish-card {
+  border-color: #303030;
+  background: #141414;
+
+  box-shadow:
+    0 7px 22px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"]
+  .current-treatment-finish-card--fee,
+.dark
+  .current-treatment-finish-card--fee {
+  background:
+    linear-gradient(
+      145deg,
+      #141414,
+      #172033
+    );
+}
+
+[data-theme="dark"]
+  .current-treatment-finish-card--follow-up,
+.dark
+  .current-treatment-finish-card--follow-up {
+  background:
+    linear-gradient(
+      145deg,
+      #141414,
+      #15231a
+    );
+}
+
+
+/* =========================================================
+   FINISH HEADING
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-finish-heading
+  .ant-typography,
+.dark
+  .current-treatment-finish-heading
+  .ant-typography {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"]
+  .current-treatment-finish-heading
+  .ant-typography-secondary,
+.dark
+  .current-treatment-finish-heading
+  .ant-typography-secondary {
+  color: #94a3b8 !important;
+}
+
+
+/* =========================================================
+   FINISH ICONS
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-finish-icon--fee,
+.dark
+  .current-treatment-finish-icon--fee {
+  color: #69b1ff;
+  background: rgba(22, 119, 255, 0.16);
+}
+
+[data-theme="dark"]
+  .current-treatment-finish-icon--follow-up,
+.dark
+  .current-treatment-finish-icon--follow-up {
+  color: #73d13d;
+  background: rgba(82, 196, 26, 0.14);
+}
+
+
+/* =========================================================
+   FOLLOW-UP
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-follow-up-button--none-selected,
+.dark
+  .current-treatment-follow-up-button--none-selected {
+  color: #ffffff !important;
+  border-color: #475569 !important;
+  background: #475569 !important;
+}
+
+[data-theme="dark"]
+  .current-treatment-follow-up-button--none-selected:hover,
+.dark
+  .current-treatment-follow-up-button--none-selected:hover {
+  border-color: #64748b !important;
+  background: #64748b !important;
+}
+
+
+/* =========================================================
+   STICKY ACTION AREA
+========================================================= */
+
+[data-theme="dark"] .current-treatment-actions,
+.dark .current-treatment-actions {
+  border-top-color: #303030;
+
+  background: rgba(20, 20, 20, 0.96);
+
+  box-shadow:
+    0 -8px 24px rgba(0, 0, 0, 0.12);
+
+  backdrop-filter: blur(12px);
+}
+
+
+/* =========================================================
+   PATIENT DETAILS MODAL
+========================================================= */
+
+[data-theme="dark"]
+  .current-patient-details-modal
+  .ant-modal-content,
+.dark
+  .current-patient-details-modal
+  .ant-modal-content {
+  background: #141414;
+
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+[data-theme="dark"]
+  .current-patient-details-modal
+  .ant-modal-body,
+.dark
+  .current-patient-details-modal
+  .ant-modal-body {
+  background: #111827;
+}
+
+[data-theme="dark"]
+  .current-patient-details-modal
+  .ant-modal-footer,
+.dark
+  .current-patient-details-modal
+  .ant-modal-footer {
+  border-top-color: #303030;
+  background: #141414;
+}
+
+
+/* =========================================================
+   PATIENT DETAILS DESCRIPTION
+========================================================= */
+
+[data-theme="dark"]
+  .current-patient-descriptions
+  .ant-descriptions-view,
+.dark
+  .current-patient-descriptions
+  .ant-descriptions-view {
+  border-color: #303030;
+}
+
+[data-theme="dark"]
+  .current-patient-descriptions
+  .ant-descriptions-row,
+.dark
+  .current-patient-descriptions
+  .ant-descriptions-row {
+  border-color: #303030;
+}
+
+[data-theme="dark"]
+  .current-patient-descriptions
+  .ant-descriptions-item-label,
+.dark
+  .current-patient-descriptions
+  .ant-descriptions-item-label {
+  color: #94a3b8;
+  border-color: #303030;
+  background: #1f1f1f !important;
+}
+
+[data-theme="dark"]
+  .current-patient-descriptions
+  .ant-descriptions-item-content,
+.dark
+  .current-patient-descriptions
+  .ant-descriptions-item-content {
+  color: #e2e8f0;
+  border-color: #303030;
+  background: #141414;
+}
+
+
+/* =========================================================
+   TREATMENT INFORMATION CARD
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-information-card,
+.dark
+  .current-treatment-information-card {
+  border-color: #303030;
+  background: #141414;
+}
+
+[data-theme="dark"]
+  .current-treatment-information-card
+  .current-treatment-section-heading,
+.dark
+  .current-treatment-information-card
+  .current-treatment-section-heading {
+  border-bottom-color: #303030;
+}
+
+
+/* =========================================================
+   TREATMENT INFORMATION TABS
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-information-tabs
+  > .ant-tabs-nav,
+.dark
+  .current-treatment-information-tabs
+  > .ant-tabs-nav {
+  border-bottom-color: #303030;
+  background: #1f1f1f;
+}
+
+[data-theme="dark"]
+  .current-treatment-information-tabs
+  .ant-tabs-tab-btn,
+.dark
+  .current-treatment-information-tabs
+  .ant-tabs-tab-btn {
+  color: #94a3b8;
+}
+
+[data-theme="dark"]
+  .current-treatment-information-tabs
+  .ant-tabs-tab:hover
+  .ant-tabs-tab-btn,
+.dark
+  .current-treatment-information-tabs
+  .ant-tabs-tab:hover
+  .ant-tabs-tab-btn {
+  color: #69b1ff;
+}
+
+[data-theme="dark"]
+  .current-treatment-information-tabs
+  .ant-tabs-tab-active
+  .ant-tabs-tab-btn,
+.dark
+  .current-treatment-information-tabs
+  .ant-tabs-tab-active
+  .ant-tabs-tab-btn {
+  color: #69b1ff !important;
+}
+
+
+/* =========================================================
+   TAB CONTENT
+========================================================= */
+
+[data-theme="dark"] .current-treatment-tab-content,
+.dark .current-treatment-tab-content {
+  background: #141414;
+}
+
+
+/* =========================================================
+   PRESCRIPTION CARD INSIDE TREATMENT FORM
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-prescription-card,
+.dark
+  .current-treatment-prescription-card {
+  border-color: #30445c;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(22, 119, 255, 0.1),
+      rgba(19, 194, 194, 0.05)
+    );
+}
+
+[data-theme="dark"]
+  .current-treatment-prescription-heading
+  .ant-typography,
+.dark
+  .current-treatment-prescription-heading
+  .ant-typography {
+  color: #f1f5f9;
+}
+
+
+/* =========================================================
+   PRESCRIPTION ICON
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-prescription-icon,
+.dark
+  .current-treatment-prescription-icon {
+  color: #69b1ff;
+  border-color: #1e5e91;
+  background: rgba(22, 119, 255, 0.16);
+}
+
+
+/* =========================================================
+   DRUG LIST
+========================================================= */
+
+[data-theme="dark"] .current-treatment-drug-list,
+.dark .current-treatment-drug-list {
+  border-color: #303030;
+  background: #1f1f1f;
+}
+
+[data-theme="dark"] .current-treatment-drug-button,
+.dark .current-treatment-drug-button {
+  color: #d1d5db;
+  border-color: #424242;
+  background: #141414;
+}
+
+[data-theme="dark"]
+  .current-treatment-drug-button:hover,
+.dark
+  .current-treatment-drug-button:hover {
+  color: #69b1ff;
+  border-color: #4096ff;
+  background: rgba(22, 119, 255, 0.12);
+}
+
+[data-theme="dark"]
+  .current-treatment-drug-button--selected,
+.dark
+  .current-treatment-drug-button--selected {
+  color: #ffffff;
+  border-color: #1677ff;
+  background: #1677ff;
+
+  box-shadow:
+    0 5px 13px rgba(22, 119, 255, 0.28);
+}
+
+[data-theme="dark"]
+  .current-treatment-drug-button--selected:hover,
+.dark
+  .current-treatment-drug-button--selected:hover {
+  color: #ffffff;
+  border-color: #4096ff;
+  background: #4096ff;
+}
+
+
+/* =========================================================
+   PRESCRIPTION TABLE
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-prescription-table
+  .ant-table,
+.dark
+  .current-treatment-prescription-table
+  .ant-table {
+  color: #e2e8f0;
+  background: #141414;
+}
+
+[data-theme="dark"]
+  .current-treatment-prescription-table
+  .ant-table-container,
+.dark
+  .current-treatment-prescription-table
+  .ant-table-container {
+  border-color: #303030;
+}
+
+[data-theme="dark"]
+  .current-treatment-prescription-table
+  .ant-table-thead
+  > tr
+  > th,
+.dark
+  .current-treatment-prescription-table
+  .ant-table-thead
+  > tr
+  > th {
+  color: #cbd5e1;
+  border-bottom-color: #303030;
+  background: #1f1f1f;
+}
+
+[data-theme="dark"]
+  .current-treatment-prescription-table
+  .ant-table-tbody
+  > tr
+  > td,
+.dark
+  .current-treatment-prescription-table
+  .ant-table-tbody
+  > tr
+  > td {
+  color: #e2e8f0;
+  border-bottom-color: #303030;
+  background: #141414;
+}
+
+[data-theme="dark"]
+  .current-treatment-prescription-table
+  .ant-table-tbody
+  > tr:hover
+  > td,
+.dark
+  .current-treatment-prescription-table
+  .ant-table-tbody
+  > tr:hover
+  > td {
+  background: #1f1f1f !important;
+}
+
+[data-theme="dark"]
+  .current-treatment-prescription-table-description,
+.dark
+  .current-treatment-prescription-table-description {
+  color: #94a3b8;
+}
+
+
+/* =========================================================
+   INPUTS INSIDE PRESCRIPTION TABLE
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-prescription-table
+  .ant-input,
+.dark
+  .current-treatment-prescription-table
+  .ant-input,
+[data-theme="dark"]
+  .current-treatment-prescription-table
+  .ant-input-number,
+.dark
+  .current-treatment-prescription-table
+  .ant-input-number,
+[data-theme="dark"]
+  .current-treatment-prescription-table
+  .ant-select-selector,
+.dark
+  .current-treatment-prescription-table
+  .ant-select-selector {
+  color: #e2e8f0 !important;
+  border-color: #424242 !important;
+  background: #1f1f1f !important;
+}
+
+
+/* =========================================================
+   FINISH TABS
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-finish-tabs
+  > .ant-tabs-nav::before,
+.dark
+  .current-treatment-finish-tabs
+  > .ant-tabs-nav::before {
+  border-bottom-color: #303030;
+}
+
+[data-theme="dark"]
+  .current-treatment-finish-tabs
+  .ant-tabs-tab-btn,
+.dark
+  .current-treatment-finish-tabs
+  .ant-tabs-tab-btn {
+  color: #94a3b8;
+}
+
+[data-theme="dark"]
+  .current-treatment-finish-tabs
+  .ant-tabs-tab:hover
+  .ant-tabs-tab-btn,
+.dark
+  .current-treatment-finish-tabs
+  .ant-tabs-tab:hover
+  .ant-tabs-tab-btn {
+  color: #69b1ff;
+}
+
+[data-theme="dark"]
+  .current-treatment-finish-tabs
+  .ant-tabs-tab-active
+  .ant-tabs-tab-btn,
+.dark
+  .current-treatment-finish-tabs
+  .ant-tabs-tab-active
+  .ant-tabs-tab-btn {
+  color: #69b1ff !important;
+}
+
+
+/* =========================================================
+   PAYMENT CARD
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-payment-card,
+.dark
+  .current-treatment-payment-card {
+  border-color: #303030 !important;
+  background: #141414;
+}
+
+[data-theme="dark"]
+  .current-treatment-finish-icon--payment,
+.dark
+  .current-treatment-finish-icon--payment {
+  color: #69b1ff;
+  background: rgba(22, 119, 255, 0.16);
+}
+
+
+/* =========================================================
+   PAYMENT SUMMARY
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-payment-stat,
+.dark
+  .current-treatment-payment-stat {
+  border-color: #303030;
+  background: #1f1f1f;
+}
+
+[data-theme="dark"]
+  .current-treatment-payment-stat
+  .ant-typography,
+.dark
+  .current-treatment-payment-stat
+  .ant-typography {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"]
+  .current-treatment-payment-stat
+  .ant-typography-secondary,
+.dark
+  .current-treatment-payment-stat
+  .ant-typography-secondary {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"]
+  .current-treatment-payment-paid,
+.dark
+  .current-treatment-payment-paid {
+  color: #73d13d !important;
+}
+
+
+/* =========================================================
+   SIMPLE PAYMENT PANELS
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-payment-panel,
+.dark
+  .current-treatment-payment-panel {
+  color: #e2e8f0;
+  border-color: #303030;
+  background: #1f1f1f;
+}
+
+[data-theme="dark"]
+  .current-treatment-payment-actions-panel,
+.dark
+  .current-treatment-payment-actions-panel {
+  background: #141414;
+}
+
+[data-theme="dark"]
+  .current-treatment-payment-panel-title,
+.dark
+  .current-treatment-payment-panel-title {
+  color: #f1f5f9;
+  border-bottom-color: #303030;
+}
+
+
+/* =========================================================
+   PAYMENT TREATMENT DETAILS
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-payment-treatment
+  .ant-typography,
+.dark
+  .current-treatment-payment-treatment
+  .ant-typography {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"]
+  .current-treatment-payment-treatment
+  .ant-typography-secondary,
+.dark
+  .current-treatment-payment-treatment
+  .ant-typography-secondary {
+  color: #94a3b8 !important;
+}
+
+
+/* =========================================================
+   STANDARD FEE
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-payment-standard,
+.dark
+  .current-treatment-payment-standard {
+  border: 1px solid rgba(82, 196, 26, 0.18);
+  background: rgba(82, 196, 26, 0.1);
+}
+
+[data-theme="dark"]
+  .current-treatment-payment-standard
+  .ant-typography,
+.dark
+  .current-treatment-payment-standard
+  .ant-typography {
+  color: #d9f7be;
+}
+
+[data-theme="dark"]
+  .current-treatment-payment-standard
+  .ant-typography-secondary,
+.dark
+  .current-treatment-payment-standard
+  .ant-typography-secondary {
+  color: #95de64 !important;
+}
+
+
+/* =========================================================
+   SIMPLE PAYMENT SUMMARY
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-simple-summary,
+.dark
+  .current-treatment-simple-summary {
+  border-color: #303030;
+  background: #141414;
+}
+
+[data-theme="dark"]
+  .current-treatment-simple-summary
+  > div,
+.dark
+  .current-treatment-simple-summary
+  > div {
+  border-right-color: #303030;
+}
+
+[data-theme="dark"]
+  .current-treatment-simple-summary
+  .ant-typography,
+.dark
+  .current-treatment-simple-summary
+  .ant-typography {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"]
+  .current-treatment-simple-summary
+  .ant-typography-secondary,
+.dark
+  .current-treatment-simple-summary
+  .ant-typography-secondary {
+  color: #94a3b8 !important;
+}
+
+
+/* =========================================================
+   DARK MOBILE PAYMENT SUMMARY
+========================================================= */
+
+@media (max-width: 575px) {
+  [data-theme="dark"]
+    .current-treatment-simple-summary
+    > div,
+  .dark
+    .current-treatment-simple-summary
+    > div {
+    border-right: 0;
+    border-bottom-color: #303030;
+  }
+}
+
+
+/* =========================================================
+   IVORY PRESCRIPTION PREVIEW MODAL
+   Keep prescription paper itself LIGHT.
+========================================================= */
+
+[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-content,
+.dark
+  .ivory-prescription-preview-modal
+  .ant-modal-content {
+  background: #141414;
+}
+
+[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-header,
+.dark
+  .ivory-prescription-preview-modal
+  .ant-modal-header {
+  background: #141414;
+}
+
+[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-title,
+.dark
+  .ivory-prescription-preview-modal
+  .ant-modal-title {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-close,
+.dark
+  .ivory-prescription-preview-modal
+  .ant-modal-close {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-close:hover,
+.dark
+  .ivory-prescription-preview-modal
+  .ant-modal-close:hover {
+  color: #ffffff;
+  background: #262626;
+}
+
+[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-body,
+.dark
+  .ivory-prescription-preview-modal
+  .ant-modal-body {
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(47, 114, 84, 0.12),
+      transparent 420px
+    ),
+    #0f172a;
+}
+
+
+/* =========================================================
+   DO NOT DARKEN THE PRINTABLE PRESCRIPTION
+========================================================= */
+
+[data-theme="dark"] .ivory-prescription-sheet,
+.dark .ivory-prescription-sheet {
+  color: #26332c;
+
+  background:
+    linear-gradient(
+      rgba(248, 250, 244, 0.96),
+      rgba(248, 250, 244, 0.96)
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(64, 103, 79, 0.02) 3px
+    );
+
+  border-color: #cfd9cf;
+
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.38);
+}
+
+
+/* =========================================================
+   DARK SCROLLBARS
+========================================================= */
+
+[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-body,
+.dark
+  .ivory-prescription-preview-modal
+  .ant-modal-body {
+  scrollbar-color: #475569 #1e293b;
+}
+
+[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-body::-webkit-scrollbar,
+.dark
+  .ivory-prescription-preview-modal
+  .ant-modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-body::-webkit-scrollbar-track,
+.dark
+  .ivory-prescription-preview-modal
+  .ant-modal-body::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-body::-webkit-scrollbar-thumb,
+.dark
+  .ivory-prescription-preview-modal
+  .ant-modal-body::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #475569;
+}
+
+
+/* =========================================================
+   DARK INPUT / SELECT / DATE PICKER CONSISTENCY
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-input,
+.dark
+  .current-treatment-page
+  .ant-input {
+  color: #e2e8f0;
+  border-color: #424242;
+  background: #141414;
+}
+
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-input:hover,
+.dark
+  .current-treatment-page
+  .ant-input:hover {
+  border-color: #4096ff;
+}
+
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-input::placeholder,
+.dark
+  .current-treatment-page
+  .ant-input::placeholder {
+  color: #64748b;
+}
+
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-input-number,
+.dark
+  .current-treatment-page
+  .ant-input-number {
+  color: #e2e8f0;
+  border-color: #424242;
+  background: #141414;
+}
+
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-input-number-input,
+.dark
+  .current-treatment-page
+  .ant-input-number-input {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-select:not(.ant-select-customize-input)
+  .ant-select-selector,
+.dark
+  .current-treatment-page
+  .ant-select:not(.ant-select-customize-input)
+  .ant-select-selector {
+  color: #e2e8f0;
+  border-color: #424242;
+  background: #141414;
+}
+
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-select-selection-placeholder,
+.dark
+  .current-treatment-page
+  .ant-select-selection-placeholder {
+  color: #64748b;
+}
+
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-select-selection-item,
+.dark
+  .current-treatment-page
+  .ant-select-selection-item {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-picker,
+.dark
+  .current-treatment-page
+  .ant-picker {
+  color: #e2e8f0;
+  border-color: #424242;
+  background: #141414;
+}
+
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-picker-input
+  > input,
+.dark
+  .current-treatment-page
+  .ant-picker-input
+  > input {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-picker-input
+  > input::placeholder,
+.dark
+  .current-treatment-page
+  .ant-picker-input
+  > input::placeholder {
+  color: #64748b;
+}
+
+
+/* =========================================================
+   FORM LABELS
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-form-item-label
+  > label,
+.dark
+  .current-treatment-page
+  .ant-form-item-label
+  > label {
+  color: #cbd5e1;
+}
+
+
+/* =========================================================
+   TYPOGRAPHY SECONDARY
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-typography-secondary,
+.dark
+  .current-treatment-page
+  .ant-typography-secondary {
+  color: #94a3b8 !important;
+}
+
+
+/* =========================================================
+   ALERTS
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-alert-info,
+.dark
+  .current-treatment-page
+  .ant-alert-info {
+  border-color: #15395b;
+  background: #111d2c;
+}
+
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-alert-success,
+.dark
+  .current-treatment-page
+  .ant-alert-success {
+  border-color: #274916;
+  background: #162312;
+}
+
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-alert-warning,
+.dark
+  .current-treatment-page
+  .ant-alert-warning {
+  border-color: #594214;
+  background: #2b2111;
+}
+
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-alert-error,
+.dark
+  .current-treatment-page
+  .ant-alert-error {
+  border-color: #58181c;
+  background: #2a1215;
+}
+
+
+/* =========================================================
+   BUTTON DEFAULT DARK POLISH
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-btn-default,
+.dark
+  .current-treatment-page
+  .ant-btn-default {
+  color: #e2e8f0;
+  border-color: #424242;
+  background: #1f1f1f;
+}
+
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-btn-default:hover,
+.dark
+  .current-treatment-page
+  .ant-btn-default:hover {
+  color: #69b1ff;
+  border-color: #4096ff;
+  background: #172033;
+}
+
+
+/* =========================================================
+   DISABLED CONTROLS
+========================================================= */
+
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-input-disabled,
+.dark
+  .current-treatment-page
+  .ant-input-disabled,
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-input-number-disabled,
+.dark
+  .current-treatment-page
+  .ant-input-number-disabled,
+[data-theme="dark"]
+  .current-treatment-page
+  .ant-picker-disabled,
+.dark
+  .current-treatment-page
+  .ant-picker-disabled {
+  color: #64748b !important;
+  border-color: #303030 !important;
+  background: #191919 !important;
+}

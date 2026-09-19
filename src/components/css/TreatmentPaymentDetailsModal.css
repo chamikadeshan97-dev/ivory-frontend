@@ -1,82 +1,231 @@
-/* --------------------------------------------------------
-   Main modal
--------------------------------------------------------- */
+/* ========================================================
+   TREATMENT PAYMENT DETAILS MODAL
+   LIGHT + DARK THEME
+======================================================== */
+
+
+/* ========================================================
+   THEME VARIABLES
+======================================================== */
+
+:root,
+html[data-theme="light"] {
+  --tpd-surface: #ffffff;
+  --tpd-surface-secondary: #f8fafc;
+  --tpd-surface-soft: #f4f7fb;
+  --tpd-surface-hover: #f8fbff;
+
+  --tpd-text: #172033;
+  --tpd-text-secondary: #64748b;
+  --tpd-text-muted: #94a3b8;
+
+  --tpd-border: #e8edf5;
+  --tpd-border-soft: #edf1f7;
+  --tpd-border-strong: #dbe3ed;
+
+  --tpd-blue: #2563eb;
+  --tpd-blue-soft: #eff6ff;
+
+  --tpd-green: #16a34a;
+  --tpd-green-dark: #15803d;
+  --tpd-green-soft: #f0fdf4;
+
+  --tpd-orange: #f59e0b;
+  --tpd-orange-dark: #d97706;
+  --tpd-orange-soft: #fffbeb;
+
+  --tpd-red: #ef4444;
+  --tpd-red-soft: #fef2f2;
+
+  --tpd-shadow:
+    0 7px 22px rgba(15, 23, 42, 0.04);
+
+  --tpd-shadow-modal:
+    0 24px 60px rgba(15, 23, 42, 0.22);
+
+  --tpd-table-header: #f8fafc;
+  --tpd-table-row: #ffffff;
+  --tpd-table-hover: #f8fbff;
+}
+
+
+html[data-theme="dark"] {
+  --tpd-surface: #101a29;
+  --tpd-surface-secondary: #172338;
+  --tpd-surface-soft: #0c1624;
+  --tpd-surface-hover: #162337;
+
+  --tpd-text: #f8fafc;
+  --tpd-text-secondary: #c2ccda;
+  --tpd-text-muted: #8fa0b7;
+
+  --tpd-border: #27374b;
+  --tpd-border-soft: #223247;
+  --tpd-border-strong: #39495e;
+
+  --tpd-blue: #60a5fa;
+  --tpd-blue-soft:
+    rgba(59, 130, 246, 0.14);
+
+  --tpd-green: #4ade80;
+  --tpd-green-dark: #4ade80;
+  --tpd-green-soft:
+    rgba(34, 197, 94, 0.14);
+
+  --tpd-orange: #fbbf24;
+  --tpd-orange-dark: #fbbf24;
+  --tpd-orange-soft:
+    rgba(245, 158, 11, 0.14);
+
+  --tpd-red: #f87171;
+  --tpd-red-soft:
+    rgba(239, 68, 68, 0.14);
+
+  --tpd-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.22);
+
+  --tpd-shadow-modal:
+    0 26px 70px rgba(0, 0, 0, 0.48);
+
+  --tpd-table-header: #172338;
+  --tpd-table-row: #101a29;
+  --tpd-table-hover: #162337;
+}
+
+
+/* ========================================================
+   MAIN MODAL
+======================================================== */
 
 .treatment-payment-details-modal
   .ant-modal-content {
   overflow: hidden;
+
   padding: 0;
+
+  color: var(--tpd-text);
+
+  background:
+    var(--tpd-surface);
+
+  border:
+    1px solid
+    var(--tpd-border);
+
   border-radius: 20px;
+
   box-shadow:
-    0 24px 60px rgba(15, 23, 42, 0.22);
+    var(--tpd-shadow-modal);
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
 }
+
 
 .treatment-payment-details-modal
   .ant-modal-body {
   padding: 0;
-  background: #f4f7fb;
+
+  color: var(--tpd-text);
+
+  background:
+    var(--tpd-surface-soft);
 }
+
 
 .treatment-payment-details-modal
   .ant-modal-footer {
   margin-top: 0;
+
   padding: 15px 22px;
-  border-top: 1px solid #e8edf5;
-  background: #ffffff;
+
+  background:
+    var(--tpd-surface);
+
+  border-top:
+    1px solid
+    var(--tpd-border);
 }
+
+
+/* ========================================================
+   CLOSE BUTTON
+======================================================== */
 
 .treatment-payment-details-modal
   .ant-modal-close {
   top: 16px;
   right: 16px;
+
   color: #ffffff;
-  background: rgba(
-    255,
-    255,
-    255,
-    0.16
-  );
+
+  background:
+    rgba(255, 255, 255, 0.16);
+
+  border-radius: 10px;
 }
+
 
 .treatment-payment-details-modal
   .ant-modal-close:hover {
   color: #ffffff;
-  background: rgba(
-    255,
-    255,
-    255,
-    0.26
-  );
+
+  background:
+    rgba(255, 255, 255, 0.26);
 }
 
-/* --------------------------------------------------------
-   Loading and empty
--------------------------------------------------------- */
+
+/* ========================================================
+   LOADING / EMPTY
+======================================================== */
 
 .treatment-payment-loading,
 .treatment-payment-empty {
   display: flex;
   align-items: center;
   justify-content: center;
+
   min-height: 420px;
+
   padding: 40px;
+
   flex-direction: column;
+
   gap: 14px;
-  background: #ffffff;
+
+  color:
+    var(--tpd-text-secondary);
+
+  background:
+    var(--tpd-surface);
 }
 
-/* --------------------------------------------------------
-   Header
--------------------------------------------------------- */
+
+.treatment-payment-empty
+  .ant-empty-description {
+  color:
+    var(--tpd-text-secondary);
+}
+
+
+/* ========================================================
+   HEADER
+======================================================== */
 
 .treatment-payment-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   min-height: 155px;
+
   gap: 22px;
+
   padding: 29px 32px;
+
   color: #ffffff;
+
   background:
     radial-gradient(
       circle at top right,
@@ -89,6 +238,11 @@
       #0284c7
     );
 }
+
+
+/* --------------------------------------------------------
+   Paid state
+-------------------------------------------------------- */
 
 .treatment-payment-details-modal--paid
   .treatment-payment-header {
@@ -105,167 +259,279 @@
     );
 }
 
+
+/* ========================================================
+   HEADER PATIENT
+======================================================== */
+
 .treatment-payment-header__patient {
   display: flex;
   align-items: center;
+
   min-width: 0;
+
   gap: 16px;
 }
 
+
+/* ========================================================
+   HEADER AVATAR
+======================================================== */
+
 .treatment-payment-header__avatar {
   flex: 0 0 auto;
-  color: #2563eb;
-  border: 4px solid rgba(
-    255,
-    255,
-    255,
-    0.45
-  );
-  background: #ffffff;
+
+  color: #2563eb !important;
+
+  background:
+    #ffffff !important;
+
+  border:
+    4px solid
+    rgba(255, 255, 255, 0.45);
+
   box-shadow:
-    0 10px 25px rgba(15, 23, 42, 0.2);
+    0 10px 25px
+    rgba(15, 23, 42, 0.2);
 }
+
 
 .treatment-payment-details-modal--paid
   .treatment-payment-header__avatar {
-  color: #15803d;
+  color:
+    #15803d !important;
 }
+
+
+/* ========================================================
+   PATIENT IDENTITY
+======================================================== */
 
 .treatment-payment-header__identity {
   min-width: 0;
 }
 
+
 .treatment-payment-header__eyebrow {
   display: block;
+
   margin-bottom: 3px;
-  color: rgba(
-    255,
-    255,
-    255,
-    0.75
-  );
+
+  color:
+    rgba(255, 255, 255, 0.75);
+
   font-size: 12px;
   font-weight: 700;
+
   text-transform: uppercase;
+
   letter-spacing: 0.7px;
 }
+
 
 .treatment-payment-header__identity
   h3.ant-typography {
   margin: 0;
-  color: #ffffff;
+
+  color:
+    #ffffff !important;
+
   font-weight: 750;
 }
 
+
+/* ========================================================
+   HEADER STATUS
+======================================================== */
+
 .treatment-payment-header__status {
   margin-inline-end: 0;
-  padding: 4px 11px;
+
+  padding:
+    4px 11px;
+
+  border-radius: 999px;
+
   font-weight: 700;
 }
+
+
+/* ========================================================
+   HEADER META
+======================================================== */
 
 .treatment-payment-header__meta {
   display: flex;
   align-items: center;
-  gap: 8px 17px;
-  margin-top: 10px;
   flex-wrap: wrap;
+
+  gap:
+    8px 17px;
+
+  margin-top: 10px;
 }
+
 
 .treatment-payment-header__meta
   span {
   display: inline-flex;
   align-items: center;
+
   gap: 7px;
-  color: rgba(
-    255,
-    255,
-    255,
-    0.88
-  );
+
+  color:
+    rgba(255, 255, 255, 0.88);
+
   font-size: 13px;
 }
+
+
+.treatment-payment-header__meta
+  strong {
+  color: #ffffff;
+}
+
+
+/* ========================================================
+   HEADER TREATMENT
+======================================================== */
 
 .treatment-payment-header__treatment {
   display: flex;
   flex: 0 0 auto;
   align-items: center;
+
   max-width: 290px;
+
   gap: 12px;
-  padding: 14px 16px;
-  border: 1px solid rgba(
-    255,
-    255,
-    255,
-    0.28
-  );
+
+  padding:
+    14px 16px;
+
+  background:
+    rgba(255, 255, 255, 0.14);
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.28);
+
   border-radius: 14px;
-  background: rgba(
-    255,
-    255,
-    255,
-    0.14
-  );
-  backdrop-filter: blur(8px);
+
+  backdrop-filter:
+    blur(8px);
+
+  -webkit-backdrop-filter:
+    blur(8px);
 }
+
 
 .treatment-payment-header__treatment-icon {
   display: flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+
   width: 43px;
   height: 43px;
-  border-radius: 12px;
+
   color: #2563eb;
-  font-size: 19px;
+
   background: #ffffff;
+
+  border-radius: 12px;
+
+  font-size: 19px;
 }
+
 
 .treatment-payment-details-modal--paid
   .treatment-payment-header__treatment-icon {
   color: #15803d;
 }
 
+
 .treatment-payment-header__treatment
   > div:last-child {
   display: flex;
-  min-width: 0;
   flex-direction: column;
+
+  min-width: 0;
+
   gap: 1px;
 }
+
 
 .treatment-payment-header__treatment
   .ant-typography {
   overflow: hidden;
+
   margin: 0;
-  color: #ffffff;
+
+  color:
+    #ffffff !important;
+
   white-space: nowrap;
+
   text-overflow: ellipsis;
 }
 
-/* --------------------------------------------------------
-   Main content
--------------------------------------------------------- */
+
+.treatment-payment-header__treatment
+  .ant-typography-secondary {
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.72
+    ) !important;
+}
+
+
+/* ========================================================
+   MAIN CONTENT
+======================================================== */
 
 .treatment-payment-content {
   display: flex;
-  padding: 22px;
   flex-direction: column;
+
+  padding: 22px;
+
   gap: 16px;
 }
 
-/* --------------------------------------------------------
-   Information card
--------------------------------------------------------- */
+
+/* ========================================================
+   MAIN CARDS
+======================================================== */
 
 .treatment-payment-information-card,
 .treatment-payment-progress-card,
 .treatment-installment-card {
-  border: 1px solid #e8edf5;
-  border-radius: 16px;
+  overflow: hidden;
+
+  color:
+    var(--tpd-text);
+
+  background:
+    var(--tpd-surface);
+
+  border:
+    1px solid
+    var(--tpd-border) !important;
+
+  border-radius: 16px !important;
+
   box-shadow:
-    0 7px 22px rgba(15, 23, 42, 0.04);
+    var(--tpd-shadow);
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
+
 
 .treatment-payment-information-card
   .ant-card-body,
@@ -276,13 +542,21 @@
   padding: 20px;
 }
 
+
+/* ========================================================
+   SECTION HEADING
+======================================================== */
+
 .treatment-payment-section-heading {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 14px;
+
   margin-bottom: 18px;
 }
+
 
 .treatment-payment-section-heading
   .ant-typography {
@@ -290,245 +564,819 @@
   margin-bottom: 2px;
 }
 
+
+.treatment-payment-section-heading
+  .ant-typography:not(
+    .ant-typography-secondary
+  ) {
+  color:
+    var(--tpd-text);
+}
+
+
+.treatment-payment-section-heading
+  .ant-typography-secondary {
+  color:
+    var(--tpd-text-secondary);
+}
+
+
+/* ========================================================
+   DESCRIPTIONS
+======================================================== */
+
+.treatment-payment-descriptions
+  .ant-descriptions-view {
+  overflow: hidden;
+
+  border-color:
+    var(--tpd-border) !important;
+
+  border-radius: 11px;
+}
+
+
+.treatment-payment-descriptions
+  .ant-descriptions-row
+  > th,
+.treatment-payment-descriptions
+  .ant-descriptions-row
+  > td {
+  border-color:
+    var(--tpd-border) !important;
+}
+
+
 .treatment-payment-descriptions
   .ant-descriptions-item-label {
   width: 145px;
-  color: #64748b;
+
+  color:
+    var(--tpd-text-secondary) !important;
+
+  background:
+    var(--tpd-surface-secondary) !important;
+
   font-weight: 600;
-  background: #f8fafc !important;
 }
+
 
 .treatment-payment-descriptions
   .ant-descriptions-item-content {
-  background: #ffffff;
+  color:
+    var(--tpd-text) !important;
+
+  background:
+    var(--tpd-surface) !important;
 }
 
-/* --------------------------------------------------------
-   Summary cards
--------------------------------------------------------- */
+
+/* ========================================================
+   SUMMARY CARDS
+======================================================== */
 
 .treatment-payment-summary-card {
   position: relative;
+
   height: 100%;
+
   overflow: hidden;
-  border: 1px solid #e8edf5;
-  border-radius: 15px;
+
+  color:
+    var(--tpd-text);
+
+  background:
+    var(--tpd-surface);
+
+  border:
+    1px solid
+    var(--tpd-border) !important;
+
+  border-radius: 15px !important;
+
   box-shadow:
-    0 7px 20px rgba(15, 23, 42, 0.04);
+    var(--tpd-shadow);
+
+  transition:
+    transform 0.2s ease,
+    background-color 0.25s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
+
+
+.treatment-payment-summary-card:hover {
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    0 12px 28px
+    rgba(15, 23, 42, 0.08);
+}
+
+
+html[data-theme="dark"]
+  .treatment-payment-summary-card:hover {
+  box-shadow:
+    0 12px 30px
+    rgba(0, 0, 0, 0.3);
+}
+
 
 .treatment-payment-summary-card::before {
   position: absolute;
+
   top: 0;
+  bottom: 0;
   left: 0;
+
   width: 4px;
-  height: 100%;
+
   content: "";
 }
 
+
 .treatment-payment-summary-card--blue::before {
-  background: #2563eb;
+  background:
+    var(--tpd-blue);
 }
+
 
 .treatment-payment-summary-card--green::before {
-  background: #16a34a;
+  background:
+    var(--tpd-green);
 }
 
+
 .treatment-payment-summary-card--orange::before {
-  background: #f59e0b;
+  background:
+    var(--tpd-orange);
 }
+
 
 .treatment-payment-summary-card
   .ant-card-body {
   padding: 18px;
 }
 
+
+/* ========================================================
+   SUMMARY CONTENT
+======================================================== */
+
 .treatment-payment-summary-card__content {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 12px;
 }
 
+
 .treatment-payment-summary-card
   .ant-statistic-title {
-  color: #64748b;
+  color:
+    var(--tpd-text-secondary);
+
   font-size: 13px;
   font-weight: 600;
 }
 
+
 .treatment-payment-summary-card
   .ant-statistic-content {
-  color: #172033;
+  color:
+    var(--tpd-text);
+
   font-size: 22px;
   font-weight: 750;
 }
+
+
+/* ========================================================
+   SUMMARY ICONS
+======================================================== */
 
 .treatment-payment-summary-card__icon {
   display: flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+
   width: 43px;
   height: 43px;
+
   border-radius: 13px;
+
   font-size: 19px;
 }
 
+
 .treatment-payment-summary-card--blue
   .treatment-payment-summary-card__icon {
-  color: #2563eb;
-  background: #eff6ff;
+  color:
+    var(--tpd-blue);
+
+  background:
+    var(--tpd-blue-soft);
 }
+
 
 .treatment-payment-summary-card--green
   .treatment-payment-summary-card__icon {
-  color: #16a34a;
-  background: #f0fdf4;
+  color:
+    var(--tpd-green);
+
+  background:
+    var(--tpd-green-soft);
 }
+
 
 .treatment-payment-summary-card--orange
   .treatment-payment-summary-card__icon {
-  color: #d97706;
-  background: #fffbeb;
+  color:
+    var(--tpd-orange);
+
+  background:
+    var(--tpd-orange-soft);
 }
 
-/* --------------------------------------------------------
-   Payment progress
--------------------------------------------------------- */
+
+/* ========================================================
+   PAYMENT PROGRESS
+======================================================== */
 
 .treatment-payment-progress-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 14px;
+
   margin-bottom: 12px;
 }
+
 
 .treatment-payment-progress-header
   > div {
   display: flex;
   flex-direction: column;
+
   gap: 2px;
 }
 
-/* --------------------------------------------------------
-   Payment alerts
--------------------------------------------------------- */
+
+.treatment-payment-progress-header
+  .ant-typography-secondary {
+  color:
+    var(--tpd-text-secondary);
+}
+
+
+.treatment-payment-progress-card
+  .ant-progress-text {
+  color:
+    var(--tpd-text);
+}
+
+
+.treatment-payment-progress-card
+  .ant-progress-inner {
+  background:
+    var(--tpd-surface-secondary);
+}
+
+
+/* ========================================================
+   PAYMENT ALERTS
+======================================================== */
 
 .treatment-payment-alert {
   border-radius: 14px;
 }
 
+
 .treatment-payment-warning-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 14px;
 }
 
-/* --------------------------------------------------------
-   Installment table
--------------------------------------------------------- */
+
+/* ========================================================
+   INSTALLMENT TABLE CONTAINER
+======================================================== */
 
 .treatment-installment-table {
   overflow: hidden;
-  border: 1px solid #e8edf5;
+
+  border:
+    1px solid
+    var(--tpd-border);
+
   border-radius: 14px;
+
+  background:
+    var(--tpd-surface);
 }
+
+
+/* ========================================================
+   INSTALLMENT TABLE
+======================================================== */
+
+.treatment-installment-table
+  .ant-table {
+  color:
+    var(--tpd-text);
+
+  background:
+    var(--tpd-surface);
+
+  font-size: 13px;
+}
+
+
+.treatment-installment-table
+  .ant-table-thead
+  > tr
+  > th {
+  color:
+    var(--tpd-text) !important;
+
+  background:
+    var(--tpd-table-header) !important;
+
+  border-bottom:
+    1px solid
+    var(--tpd-border) !important;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+
+.treatment-installment-table
+  .ant-table-thead
+  > tr
+  > th::before {
+  background:
+    var(--tpd-border) !important;
+}
+
+
+.treatment-installment-table
+  .ant-table-tbody
+  > tr
+  > td {
+  color:
+    var(--tpd-text);
+
+  background:
+    var(--tpd-table-row);
+
+  border-bottom:
+    1px solid
+    var(--tpd-border-soft);
+
+  vertical-align: middle;
+
+  transition:
+    background-color 0.2s ease;
+}
+
+
+.treatment-installment-table
+  .ant-table-tbody
+  > tr:hover
+  > td {
+  background:
+    var(--tpd-table-hover) !important;
+}
+
+
+/* ========================================================
+   INSTALLMENT NUMBER
+======================================================== */
 
 .treatment-installment-number {
   display: flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+
   width: 40px;
   height: 40px;
+
+  color:
+    var(--tpd-blue);
+
+  background:
+    var(--tpd-blue-soft);
+
   border-radius: 11px;
-  color: #2563eb;
+
   font-size: 13px;
   font-weight: 750;
-  background: #eff6ff;
 }
+
+
+/* ========================================================
+   DATE / BALANCE CELLS
+======================================================== */
 
 .treatment-payment-date-cell,
 .treatment-payment-balance-cell {
   display: flex;
-  min-width: 0;
   flex-direction: column;
+
+  min-width: 0;
+
   gap: 3px;
 }
 
+
 .treatment-payment-date-cell
   .ant-typography-secondary {
+  color:
+    var(--tpd-text-secondary) !important;
+
   font-size: 11px;
 }
+
 
 .treatment-payment-balance-cell {
   align-items: flex-end;
 }
 
+
+/* ========================================================
+   PAYMENT ID
+======================================================== */
+
 .treatment-payment-id {
   display: inline-flex;
   align-items: center;
+
   min-height: 32px;
-  padding: 4px 9px;
+
+  padding:
+    4px 9px;
+
+  color:
+    var(--tpd-green-dark);
+
+  background:
+    var(--tpd-green-soft);
+
   border-radius: 8px;
-  color: #15803d;
+
   font-size: 12px;
   font-weight: 700;
-  background: #f0fdf4;
 }
+
+
+/* ========================================================
+   PAYMENT AMOUNTS
+======================================================== */
 
 .treatment-payment-amount {
   font-weight: 700;
 }
 
+
 .treatment-payment-amount--primary {
-  color: #2563eb;
+  color:
+    var(--tpd-blue);
 }
+
 
 .treatment-payment-amount--paid {
-  color: #15803d;
+  color:
+    var(--tpd-green-dark);
 }
 
+
 .treatment-payment-amount--balance {
-  color: #d97706;
+  color:
+    var(--tpd-orange-dark);
 }
+
+
+/* ========================================================
+   STATUS / METHOD TAGS
+======================================================== */
 
 .treatment-payment-status-tag {
   min-width: 72px;
+
   margin: 0;
+
   border-radius: 16px;
+
   text-align: center;
+
   font-weight: 600;
 }
 
+
 .treatment-payment-method-tag {
   margin: 0;
+
   border-radius: 16px;
+
   white-space: normal;
 }
 
-/* --------------------------------------------------------
-   Responsive
--------------------------------------------------------- */
+
+/* ========================================================
+   TYPOGRAPHY
+======================================================== */
+
+.treatment-payment-content
+  .ant-typography:not(
+    .ant-typography-secondary
+  ) {
+  color:
+    var(--tpd-text);
+}
+
+
+.treatment-payment-content
+  .ant-typography-secondary {
+  color:
+    var(--tpd-text-secondary);
+}
+
+
+/* ========================================================
+   EMPTY TABLE
+======================================================== */
+
+.treatment-installment-table
+  .ant-table-placeholder
+  > td {
+  background:
+    var(--tpd-surface) !important;
+}
+
+
+.treatment-installment-table
+  .ant-empty-description {
+  color:
+    var(--tpd-text-secondary);
+}
+
+
+/* ========================================================
+   PAGINATION
+======================================================== */
+
+.treatment-installment-table
+  .ant-pagination {
+  color:
+    var(--tpd-text-secondary);
+}
+
+
+.treatment-installment-table
+  .ant-pagination-item {
+  background: transparent;
+
+  border-radius: 8px;
+}
+
+
+.treatment-installment-table
+  .ant-pagination-item
+  a {
+  color:
+    var(--tpd-text-secondary);
+}
+
+
+.treatment-installment-table
+  .ant-pagination-item-active {
+  background:
+    var(--tpd-blue-soft);
+
+  border-color:
+    var(--tpd-blue);
+}
+
+
+.treatment-installment-table
+  .ant-pagination-item-active
+  a {
+  color:
+    var(--tpd-blue);
+}
+
+
+/* ========================================================
+   TABLE SCROLLBAR
+======================================================== */
+
+.treatment-installment-table
+  .ant-table-content,
+.treatment-installment-table
+  .ant-table-body {
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    var(--tpd-border-strong)
+    transparent;
+}
+
+
+.treatment-installment-table
+  .ant-table-content::-webkit-scrollbar,
+.treatment-installment-table
+  .ant-table-body::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+
+.treatment-installment-table
+  .ant-table-content::-webkit-scrollbar-track,
+.treatment-installment-table
+  .ant-table-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+.treatment-installment-table
+  .ant-table-content::-webkit-scrollbar-thumb,
+.treatment-installment-table
+  .ant-table-body::-webkit-scrollbar-thumb {
+  background:
+    var(--tpd-border-strong);
+
+  border-radius: 20px;
+}
+
+
+/* ========================================================
+   DARK MODE - ANT CARD FIX
+======================================================== */
+
+html[data-theme="dark"]
+  .treatment-payment-details-modal
+  .ant-card {
+  color:
+    var(--tpd-text);
+
+  background:
+    var(--tpd-surface);
+}
+
+
+/* ========================================================
+   DARK MODE - BUTTON / FOOTER
+======================================================== */
+
+html[data-theme="dark"]
+  .treatment-payment-details-modal
+  .ant-modal-footer
+  .ant-btn-default {
+  color:
+    var(--tpd-text);
+
+  background:
+    var(--tpd-surface-secondary);
+
+  border-color:
+    var(--tpd-border-strong);
+}
+
+
+html[data-theme="dark"]
+  .treatment-payment-details-modal
+  .ant-modal-footer
+  .ant-btn-default:hover {
+  color:
+    var(--tpd-blue);
+
+  border-color:
+    var(--tpd-blue);
+}
+
+
+/* ========================================================
+   DARK MODE - ALERTS
+======================================================== */
+
+html[data-theme="dark"]
+  .treatment-payment-details-modal
+  .ant-alert-info {
+  background:
+    rgba(59, 130, 246, 0.1);
+
+  border-color:
+    rgba(59, 130, 246, 0.22);
+}
+
+
+html[data-theme="dark"]
+  .treatment-payment-details-modal
+  .ant-alert-warning {
+  background:
+    rgba(245, 158, 11, 0.1);
+
+  border-color:
+    rgba(245, 158, 11, 0.22);
+}
+
+
+html[data-theme="dark"]
+  .treatment-payment-details-modal
+  .ant-alert-success {
+  background:
+    rgba(34, 197, 94, 0.1);
+
+  border-color:
+    rgba(34, 197, 94, 0.22);
+}
+
+
+html[data-theme="dark"]
+  .treatment-payment-details-modal
+  .ant-alert-message {
+  color:
+    var(--tpd-text);
+}
+
+
+html[data-theme="dark"]
+  .treatment-payment-details-modal
+  .ant-alert-description {
+  color:
+    var(--tpd-text-secondary);
+}
+
+
+/* ========================================================
+   TRANSITIONS
+======================================================== */
+
+.treatment-payment-details-modal
+  .ant-modal-content,
+.treatment-payment-information-card,
+.treatment-payment-progress-card,
+.treatment-installment-card,
+.treatment-payment-summary-card,
+.treatment-installment-table
+  .ant-table,
+.treatment-installment-table
+  .ant-table-thead
+  > tr
+  > th,
+.treatment-installment-table
+  .ant-table-tbody
+  > tr
+  > td {
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+/* ========================================================
+   RESPONSIVE - TABLET
+======================================================== */
 
 @media (max-width: 850px) {
   .treatment-payment-header {
     align-items: flex-start;
+
     flex-direction: column;
   }
 
   .treatment-payment-header__treatment {
     width: 100%;
+
     max-width: none;
   }
 }
 
+
+/* ========================================================
+   RESPONSIVE - MOBILE TABLET
+======================================================== */
+
 @media (max-width: 768px) {
   .treatment-payment-header {
-    padding: 25px 21px;
+    min-height: auto;
+
+    padding:
+      25px 21px;
   }
 
   .treatment-payment-header__patient {
@@ -538,12 +1386,18 @@
   .treatment-payment-header__avatar {
     width: 59px !important;
     height: 59px !important;
+
     font-size: 23px !important;
+
+    line-height:
+      59px !important;
   }
 
   .treatment-payment-header__meta {
     align-items: flex-start;
+
     flex-direction: column;
+
     gap: 6px;
   }
 
@@ -554,6 +1408,7 @@
   .treatment-payment-section-heading,
   .treatment-payment-warning-content {
     align-items: flex-start;
+
     flex-direction: column;
   }
 
@@ -572,7 +1427,17 @@
   }
 }
 
+
+/* ========================================================
+   RESPONSIVE - SMALL MOBILE
+======================================================== */
+
 @media (max-width: 520px) {
+  .treatment-payment-header {
+    padding:
+      22px 17px;
+  }
+
   .treatment-payment-header__patient {
     flex-direction: column;
   }
@@ -582,15 +1447,27 @@
     font-size: 21px;
   }
 
+  .treatment-payment-header__treatment {
+    padding:
+      12px 13px;
+  }
+
   .treatment-payment-details-modal
     .ant-modal-footer {
     display: flex;
+
+    gap: 8px;
+
+    padding:
+      13px 16px;
   }
 
   .treatment-payment-details-modal
     .ant-modal-footer
     .ant-btn {
     flex: 1;
+
+    margin-inline-start: 0;
   }
 
   .treatment-payment-summary-card
@@ -601,5 +1478,11 @@
   .treatment-payment-warning-content
     .ant-btn {
     width: 100%;
+  }
+
+  .treatment-payment-content {
+    padding: 12px;
+
+    gap: 12px;
   }
 }

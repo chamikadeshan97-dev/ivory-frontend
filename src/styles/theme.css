@@ -1,0 +1,94 @@
+/* src/styles/theme.css */
+
+/* ========================================================
+   LIGHT THEME
+======================================================== */
+
+:root,
+[data-theme="light"] {
+  --bg-page: #f5f7fb;
+  --bg-content: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-secondary: #f8fafc;
+  --bg-hover: #f1f5f9;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+
+  --border-color: #e2e8f0;
+  --border-soft: #edf1f7;
+
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+
+  --success: #16a34a;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+
+  --shadow-sm:
+    0 4px 12px rgba(15, 23, 42, 0.04);
+
+  --shadow-md:
+    0 8px 24px rgba(15, 23, 42, 0.07);
+
+  --shadow-lg:
+    0 16px 40px rgba(15, 23, 42, 0.12);
+}
+
+
+/* ========================================================
+   DARK THEME
+======================================================== */
+
+[data-theme="dark"] {
+  --bg-page: #0b1120;
+  --bg-content: #0f172a;
+  --bg-card: #111827;
+  --bg-card-secondary: #172033;
+  --bg-hover: #1e293b;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+
+  --border-color: #263244;
+  --border-soft: #1f2a3a;
+
+  --primary: #3b82f6;
+  --primary-hover: #60a5fa;
+
+  --success: #22c55e;
+  --warning: #fbbf24;
+  --danger: #f87171;
+
+  --shadow-sm:
+    0 4px 12px rgba(0, 0, 0, 0.2);
+
+  --shadow-md:
+    0 8px 24px rgba(0, 0, 0, 0.3);
+
+  --shadow-lg:
+    0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+
+/* ========================================================
+   GLOBAL
+======================================================== */
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-page);
+  color: var(--text-primary);
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}

@@ -1,10 +1,105 @@
 /* ========================================================
    LOGIN PAGE
+   LIGHT + DARK THEME
+======================================================== */
+
+
+/* ========================================================
+   THEME VARIABLES
+======================================================== */
+
+/* --------------------------------------------------------
+   Light Theme
+-------------------------------------------------------- */
+
+:root,
+html[data-theme="light"] {
+  --login-page-start: #eef7ff;
+  --login-page-middle: #f8fbff;
+  --login-page-end: #eef6ff;
+
+  --login-surface: #ffffff;
+  --login-surface-secondary: #f8fafc;
+
+  --login-text-primary: #0f172a;
+  --login-text-secondary: #475569;
+  --login-text-muted: #64748b;
+  --login-text-soft: #94a3b8;
+
+  --login-border: #dbe3ee;
+  --login-border-soft: #edf2f7;
+
+  --login-input-bg: #ffffff;
+
+  --login-shadow:
+    0 25px 70px
+    rgba(15, 23, 42, 0.14);
+
+  --login-input-focus-shadow:
+    0 0 0 3px
+    rgba(22, 119, 255, 0.1);
+
+  --login-circle-one:
+    rgba(24, 144, 255, 0.07);
+
+  --login-circle-two:
+    rgba(22, 119, 255, 0.08);
+
+  --login-circle-three:
+    rgba(24, 144, 255, 0.05);
+}
+
+
+/* --------------------------------------------------------
+   Dark Theme
+-------------------------------------------------------- */
+
+html[data-theme="dark"] {
+  --login-page-start: #080f1c;
+  --login-page-middle: #0b1220;
+  --login-page-end: #0a1322;
+
+  --login-surface: #111827;
+  --login-surface-secondary: #172033;
+
+  --login-text-primary: #f8fafc;
+  --login-text-secondary: #cbd5e1;
+  --login-text-muted: #94a3b8;
+  --login-text-soft: #64748b;
+
+  --login-border: #334155;
+  --login-border-soft: #263244;
+
+  --login-input-bg: #172033;
+
+  --login-shadow:
+    0 28px 75px
+    rgba(0, 0, 0, 0.42);
+
+  --login-input-focus-shadow:
+    0 0 0 3px
+    rgba(59, 130, 246, 0.16);
+
+  --login-circle-one:
+    rgba(59, 130, 246, 0.1);
+
+  --login-circle-two:
+    rgba(37, 99, 235, 0.11);
+
+  --login-circle-three:
+    rgba(96, 165, 250, 0.07);
+}
+
+
+/* ========================================================
+   PAGE
 ======================================================== */
 
 .clinic-login-page {
   position: relative;
+
   width: 100%;
+
   min-height: 100vh;
 
   display: flex;
@@ -15,14 +110,22 @@
 
   overflow: hidden;
 
+  color:
+    var(--login-text-primary);
+
   background:
     linear-gradient(
       135deg,
-      #eef7ff 0%,
-      #f8fbff 45%,
-      #eef6ff 100%
+      var(--login-page-start) 0%,
+      var(--login-page-middle) 45%,
+      var(--login-page-end) 100%
     );
+
+  transition:
+    background-color 0.3s ease,
+    color 0.25s ease;
 }
+
 
 /* ========================================================
    BACKGROUND DECORATIONS
@@ -30,6 +133,7 @@
 
 .clinic-login-background {
   position: absolute;
+
   inset: 0;
 
   overflow: hidden;
@@ -42,7 +146,11 @@
 
   border-radius: 50%;
 
-  background: rgba(24, 144, 255, 0.07);
+  background:
+    var(--login-circle-one);
+
+  transition:
+    background-color 0.3s ease;
 }
 
 .clinic-login-circle-one {
@@ -60,18 +168,21 @@
   right: -100px;
   bottom: -80px;
 
-  background: rgba(22, 119, 255, 0.08);
+  background:
+    var(--login-circle-two);
 }
 
 .clinic-login-circle-three {
   width: 180px;
   height: 180px;
 
-  right: 12%;
   top: 8%;
+  right: 12%;
 
-  background: rgba(24, 144, 255, 0.05);
+  background:
+    var(--login-circle-three);
 }
+
 
 /* ========================================================
    MAIN CONTAINER
@@ -79,24 +190,40 @@
 
 .clinic-login-container {
   position: relative;
+
   z-index: 2;
 
   width: 100%;
+
   max-width: 1100px;
+
   min-height: 620px;
 
   display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
 
-  border-radius: 28px;
+  grid-template-columns:
+    1.05fr 0.95fr;
 
   overflow: hidden;
 
-  background: #ffffff;
+  background:
+    var(--login-surface);
+
+  border:
+    1px solid
+    var(--login-border-soft);
+
+  border-radius: 28px;
 
   box-shadow:
-    0 25px 70px rgba(15, 23, 42, 0.14);
+    var(--login-shadow);
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
+
 
 /* ========================================================
    LEFT IMAGE PANEL
@@ -105,11 +232,11 @@
 .clinic-login-brand-panel {
   position: relative;
 
+  min-height: 620px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-
-  min-height: 620px;
 
   overflow: hidden;
 
@@ -122,39 +249,55 @@
     );
 }
 
-/* subtle decoration */
+
+/* --------------------------------------------------------
+   Brand decorations
+-------------------------------------------------------- */
 
 .clinic-login-brand-panel::before {
-  content: "";
-
   position: absolute;
-
-  width: 420px;
-  height: 420px;
-
-  border-radius: 50%;
 
   top: -180px;
   right: -180px;
 
-  background: rgba(255, 255, 255, 0.07);
+  width: 420px;
+  height: 420px;
+
+  content: "";
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.07
+    );
+
+  border-radius: 50%;
 }
 
 .clinic-login-brand-panel::after {
-  content: "";
-
   position: absolute;
-
-  width: 300px;
-  height: 300px;
-
-  border-radius: 50%;
 
   bottom: -130px;
   left: -120px;
 
-  background: rgba(255, 255, 255, 0.06);
+  width: 300px;
+  height: 300px;
+
+  content: "";
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.06
+    );
+
+  border-radius: 50%;
 }
+
 
 /* ========================================================
    IMAGE
@@ -162,6 +305,7 @@
 
 .clinic-login-image-wrapper {
   position: relative;
+
   z-index: 2;
 
   width: 100%;
@@ -178,9 +322,11 @@
   display: block;
 
   width: 100%;
+
   max-width: 500px;
 
   height: auto;
+
   max-height: 520px;
 
   object-fit: contain;
@@ -189,6 +335,7 @@
 
   -webkit-user-drag: none;
 }
+
 
 /* ========================================================
    LOGIN CARD
@@ -200,18 +347,31 @@
   display: flex;
   align-items: center;
 
-  border-radius: 0 !important;
+  color:
+    var(--login-text-primary);
 
-  box-shadow: none !important;
+  background:
+    var(--login-surface) !important;
 
-  background: #ffffff !important;
+  border-radius:
+    0 !important;
+
+  box-shadow:
+    none !important;
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
 
-.clinic-login-card .ant-card-body {
+.clinic-login-card
+  .ant-card-body {
   width: 100%;
 
-  padding: 60px 55px;
+  padding:
+    60px 55px;
 }
+
 
 /* ========================================================
    LOGIN HEADING
@@ -223,26 +383,36 @@
   margin-bottom: 32px;
 }
 
-.clinic-login-heading .ant-typography {
+.clinic-login-heading
+  .ant-typography {
   margin: 0;
 }
 
-.clinic-login-heading h2.ant-typography {
-  color: #0f172a;
+.clinic-login-heading
+  h2.ant-typography {
+  color:
+    var(--login-text-primary);
 
   font-size: 32px;
 
   font-weight: 700;
 
   letter-spacing: -0.5px;
+
+  transition:
+    color 0.25s ease;
 }
 
 .clinic-login-heading
   .ant-typography-secondary {
+  color:
+    var(--login-text-muted) !important;
+
   font-size: 14px;
 
   line-height: 1.6;
 }
+
 
 /* ========================================================
    ALERT
@@ -254,62 +424,195 @@
   border-radius: 10px;
 }
 
+html[data-theme="dark"]
+  .clinic-login-alert.ant-alert-error {
+  background:
+    rgba(
+      220,
+      38,
+      38,
+      0.12
+    );
+
+  border-color:
+    rgba(
+      248,
+      113,
+      113,
+      0.3
+    );
+}
+
+html[data-theme="dark"]
+  .clinic-login-alert
+  .ant-alert-message {
+  color: #fca5a5;
+}
+
+html[data-theme="dark"]
+  .clinic-login-alert
+  .ant-alert-description {
+  color:
+    var(--login-text-secondary);
+}
+
+
 /* ========================================================
    FORM
 ======================================================== */
 
-.clinic-login-card .ant-form-item {
+.clinic-login-card
+  .ant-form-item {
   margin-bottom: 22px;
 }
 
 .clinic-login-card
   .ant-form-item-label
   > label {
-  color: #334155;
-
-  font-weight: 600;
+  color:
+    var(--login-text-secondary);
 
   font-size: 14px;
+  font-weight: 600;
+
+  transition:
+    color 0.25s ease;
 }
+
 
 /* ========================================================
    INPUTS
 ======================================================== */
 
-.clinic-login-card .ant-input-affix-wrapper {
+.clinic-login-card
+  .ant-input-affix-wrapper {
   min-height: 48px;
 
   padding-left: 14px;
   padding-right: 14px;
 
+  color:
+    var(--login-text-primary);
+
+  background:
+    var(--login-input-bg);
+
+  border-color:
+    var(--login-border);
+
   border-radius: 10px;
 
-  border-color: #dbe3ee;
-
   transition:
+    background-color 0.25s ease,
     border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    color 0.25s ease;
 }
+
+
+/* --------------------------------------------------------
+   Input hover
+-------------------------------------------------------- */
 
 .clinic-login-card
   .ant-input-affix-wrapper:hover {
   border-color: #1677ff;
 }
 
+
+/* --------------------------------------------------------
+   Input focus
+-------------------------------------------------------- */
+
 .clinic-login-card
   .ant-input-affix-wrapper-focused {
   border-color: #1677ff;
 
   box-shadow:
-    0 0 0 3px rgba(22, 119, 255, 0.1);
+    var(--login-input-focus-shadow);
 }
+
+
+/* --------------------------------------------------------
+   Actual input
+-------------------------------------------------------- */
+
+.clinic-login-card
+  .ant-input-affix-wrapper
+  .ant-input {
+  color:
+    var(--login-text-primary);
+
+  background: transparent;
+}
+
+.clinic-login-card
+  .ant-input::placeholder {
+  color:
+    var(--login-text-soft);
+}
+
+
+/* --------------------------------------------------------
+   Input icon
+-------------------------------------------------------- */
 
 .clinic-login-card
   .ant-input-prefix {
   margin-right: 10px;
 
-  color: #64748b;
+  color:
+    var(--login-text-muted);
 }
+
+
+/* --------------------------------------------------------
+   Password visibility icon
+-------------------------------------------------------- */
+
+.clinic-login-card
+  .ant-input-password-icon {
+  color:
+    var(--login-text-muted);
+}
+
+.clinic-login-card
+  .ant-input-password-icon:hover {
+  color:
+    #1677ff;
+}
+
+
+/* ========================================================
+   AUTOFILL FIX
+======================================================== */
+
+html[data-theme="dark"]
+  .clinic-login-card
+  input:-webkit-autofill,
+html[data-theme="dark"]
+  .clinic-login-card
+  input:-webkit-autofill:hover,
+html[data-theme="dark"]
+  .clinic-login-card
+  input:-webkit-autofill:focus {
+  -webkit-text-fill-color:
+    var(--login-text-primary);
+
+  -webkit-box-shadow:
+    0 0 0 1000px
+    var(--login-input-bg)
+    inset;
+
+  caret-color:
+    var(--login-text-primary);
+
+  transition:
+    background-color
+    5000s ease-in-out
+    0s;
+}
+
 
 /* ========================================================
    REMEMBER USERNAME
@@ -318,36 +621,76 @@
 .clinic-login-remember {
   margin-top: -4px;
 
-  margin-bottom: 24px !important;
+  margin-bottom:
+    24px !important;
 }
 
 .clinic-login-remember
   .ant-checkbox-wrapper {
-  color: #475569;
+  color:
+    var(--login-text-secondary);
 
   font-size: 14px;
 }
+
+.clinic-login-remember
+  .ant-checkbox-inner {
+  background:
+    var(--login-input-bg);
+
+  border-color:
+    var(--login-border);
+}
+
+
+/* Checked state */
+
+.clinic-login-remember
+  .ant-checkbox-checked
+  .ant-checkbox-inner {
+  background: #1677ff;
+
+  border-color: #1677ff;
+}
+
 
 /* ========================================================
    LOGIN BUTTON
 ======================================================== */
 
 .clinic-login-button {
-  height: 50px !important;
+  height:
+    50px !important;
 
-  border-radius: 10px !important;
+  border-radius:
+    10px !important;
 
-  font-size: 15px !important;
+  font-size:
+    15px !important;
 
-  font-weight: 600 !important;
+  font-weight:
+    600 !important;
 
   box-shadow:
-    0 8px 18px rgba(22, 119, 255, 0.2);
+    0 8px 18px
+    rgba(22, 119, 255, 0.2);
+
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .clinic-login-button:hover {
-  transform: translateY(-1px);
+  transform:
+    translateY(-1px);
+
+  box-shadow:
+    0 10px 22px
+    rgba(22, 119, 255, 0.28);
 }
+
 
 /* ========================================================
    FOOTER
@@ -364,21 +707,83 @@
 
   padding-top: 22px;
 
-  border-top: 1px solid #edf2f7;
+  border-top:
+    1px solid
+    var(--login-border-soft);
 
   text-align: center;
+
+  transition:
+    border-color 0.25s ease;
 }
 
-.clinic-login-footer > span:first-child {
-  color: #94a3b8;
+.clinic-login-footer
+  > span:first-child {
+  color:
+    var(--login-text-soft);
 }
 
 .clinic-login-footer
   .ant-typography {
   margin: 0;
 
+  color:
+    var(--login-text-secondary);
+
   font-size: 12px;
 }
+
+
+/* ========================================================
+   DARK MODE SMALL IMPROVEMENTS
+======================================================== */
+
+html[data-theme="dark"]
+  .clinic-login-container {
+  box-shadow:
+    0 28px 80px
+    rgba(0, 0, 0, 0.48);
+}
+
+html[data-theme="dark"]
+  .clinic-login-card
+  .ant-input-affix-wrapper:hover {
+  border-color: #4096ff;
+}
+
+html[data-theme="dark"]
+  .clinic-login-card
+  .ant-input-affix-wrapper-focused {
+  border-color: #4096ff;
+}
+
+html[data-theme="dark"]
+  .clinic-login-card
+  .ant-checkbox-wrapper:hover
+  .ant-checkbox-inner {
+  border-color: #4096ff;
+}
+
+
+/* ========================================================
+   TRANSITIONS
+======================================================== */
+
+.clinic-login-page,
+.clinic-login-container,
+.clinic-login-card,
+.clinic-login-card
+  .ant-input-affix-wrapper,
+.clinic-login-heading
+  h2.ant-typography,
+.clinic-login-footer {
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
 
 /* ========================================================
    TABLET
@@ -392,9 +797,10 @@
   .clinic-login-container {
     max-width: 760px;
 
-    grid-template-columns: 0.9fr 1.1fr;
-
     min-height: 560px;
+
+    grid-template-columns:
+      0.9fr 1.1fr;
   }
 
   .clinic-login-brand-panel {
@@ -405,10 +811,13 @@
     padding: 30px;
   }
 
-  .clinic-login-card .ant-card-body {
-    padding: 45px 35px;
+  .clinic-login-card
+    .ant-card-body {
+    padding:
+      45px 35px;
   }
 }
+
 
 /* ========================================================
    MOBILE
@@ -422,23 +831,21 @@
   }
 
   .clinic-login-container {
-    display: flex;
-    flex-direction: column;
-
     max-width: 480px;
 
     min-height: auto;
 
+    display: flex;
+    flex-direction: column;
+
     border-radius: 22px;
   }
-
-  /* image panel on top */
 
   .clinic-login-brand-panel {
     width: 100%;
 
-    min-height: 230px;
     height: 230px;
+    min-height: 230px;
   }
 
   .clinic-login-image-wrapper {
@@ -453,18 +860,22 @@
     max-height: 200px;
   }
 
-  .clinic-login-card .ant-card-body {
-    padding: 35px 28px;
+  .clinic-login-card
+    .ant-card-body {
+    padding:
+      35px 28px;
   }
 
   .clinic-login-heading {
     margin-bottom: 26px;
   }
 
-  .clinic-login-heading h2.ant-typography {
+  .clinic-login-heading
+    h2.ant-typography {
     font-size: 27px;
   }
 }
+
 
 /* ========================================================
    SMALL MOBILE
@@ -480,20 +891,24 @@
   }
 
   .clinic-login-brand-panel {
-    min-height: 190px;
     height: 190px;
+    min-height: 190px;
   }
 
   .clinic-login-image {
     max-width: 230px;
+
     max-height: 165px;
   }
 
-  .clinic-login-card .ant-card-body {
-    padding: 30px 22px;
+  .clinic-login-card
+    .ant-card-body {
+    padding:
+      30px 22px;
   }
 
-  .clinic-login-heading h2.ant-typography {
+  .clinic-login-heading
+    h2.ant-typography {
     font-size: 25px;
   }
 

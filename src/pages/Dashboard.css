@@ -1,33 +1,167 @@
+/* ========================================================
+   DASHBOARD THEME VARIABLES
+======================================================== */
+
+/* --------------------------------------------------------
+   Light Theme
+-------------------------------------------------------- */
+
+:root,
+html[data-theme="light"] {
+  --dashboard-card-bg: #ffffff;
+  --dashboard-card-secondary: #f8fafc;
+
+  --dashboard-border: #edf1f7;
+  --dashboard-border-strong: #e8edf5;
+
+  --dashboard-text-primary: #0f172a;
+  --dashboard-text-secondary: #64748b;
+  --dashboard-text-muted: #94a3b8;
+
+  --dashboard-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.05);
+
+  --dashboard-shadow-hover:
+    0 14px 32px rgba(15, 23, 42, 0.09);
+
+  /* Soft accent backgrounds */
+
+  --dashboard-blue-soft: #eff6ff;
+  --dashboard-cyan-soft: #ecfeff;
+  --dashboard-purple-soft: #f5f3ff;
+  --dashboard-orange-soft: #fffbeb;
+  --dashboard-green-soft: #f0fdf4;
+  --dashboard-red-soft: #fef2f2;
+
+  /* Table row backgrounds */
+
+  --dashboard-next-row: #eff6ff;
+  --dashboard-treatment-row: #f5f3ff;
+  --dashboard-allergy-row: #fff7f7;
+
+  /* Gradient */
+  --dashboard-quick-start: #ffffff;
+  --dashboard-quick-end: #f8fbff;
+}
+
+
+/* --------------------------------------------------------
+   Dark Theme
+-------------------------------------------------------- */
+
+html[data-theme="dark"] {
+  --dashboard-card-bg: #111827;
+  --dashboard-card-secondary: #172033;
+
+  --dashboard-border: #263244;
+  --dashboard-border-strong: #2b3748;
+
+  --dashboard-text-primary: #f8fafc;
+  --dashboard-text-secondary: #cbd5e1;
+  --dashboard-text-muted: #94a3b8;
+
+  --dashboard-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.26);
+
+  --dashboard-shadow-hover:
+    0 16px 36px rgba(0, 0, 0, 0.36);
+
+  /* Soft accent backgrounds */
+
+  --dashboard-blue-soft:
+    rgba(37, 99, 235, 0.14);
+
+  --dashboard-cyan-soft:
+    rgba(8, 145, 178, 0.14);
+
+  --dashboard-purple-soft:
+    rgba(124, 58, 237, 0.14);
+
+  --dashboard-orange-soft:
+    rgba(245, 158, 11, 0.14);
+
+  --dashboard-green-soft:
+    rgba(22, 163, 74, 0.14);
+
+  --dashboard-red-soft:
+    rgba(220, 38, 38, 0.14);
+
+  /* Table row backgrounds */
+
+  --dashboard-next-row:
+    rgba(37, 99, 235, 0.09);
+
+  --dashboard-treatment-row:
+    rgba(124, 58, 237, 0.09);
+
+  --dashboard-allergy-row:
+    rgba(220, 38, 38, 0.08);
+
+  /* Gradient */
+
+  --dashboard-quick-start: #111827;
+  --dashboard-quick-end: #131d2d;
+}
+
+
+/* ========================================================
+   SUMMARY CARDS
+======================================================== */
+
 .dashboard-summary-row {
   margin-bottom: 16px;
 }
 
 .dashboard-summary-card {
+  position: relative;
+
   height: 100%;
+
   overflow: hidden;
+
   cursor: pointer;
-  border: 1px solid #edf1f7;
+
+  background:
+    var(--dashboard-card-bg);
+
+  border:
+    1px solid
+    var(--dashboard-border);
+
   box-shadow:
-    0 8px 24px rgba(15, 23, 42, 0.05);
+    var(--dashboard-shadow);
+
   transition:
     transform 0.2s ease,
+    background-color 0.25s ease,
     box-shadow 0.2s ease,
     border-color 0.2s ease;
 }
 
 .dashboard-summary-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(37, 99, 235, 0.2);
+
+  border-color:
+    rgba(37, 99, 235, 0.35);
+
   box-shadow:
-    0 14px 32px rgba(15, 23, 42, 0.09);
+    var(--dashboard-shadow-hover);
 }
+
+
+/* --------------------------------------------------------
+   Accent line
+-------------------------------------------------------- */
 
 .dashboard-summary-card::before {
   position: absolute;
+
   top: 0;
   left: 0;
+
   width: 5px;
   height: 100%;
+
   content: "";
 }
 
@@ -55,100 +189,203 @@
   background: #dc2626;
 }
 
+
+/* --------------------------------------------------------
+   Content
+-------------------------------------------------------- */
+
 .dashboard-summary-card__content {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 14px;
 }
 
 .dashboard-summary-card__title {
   display: block;
+
   margin-bottom: 5px;
-  color: #64748b;
+
+  color:
+    var(--dashboard-text-secondary);
+
   font-size: 13px;
   font-weight: 600;
 }
 
 .dashboard-summary-card__helper {
   display: block;
+
   margin-top: 2px;
-  color: #94a3b8;
+
+  color:
+    var(--dashboard-text-muted);
+
   font-size: 12px;
 }
 
+
+/* --------------------------------------------------------
+   Statistic values
+-------------------------------------------------------- */
+
+.dashboard-summary-card
+  .ant-statistic-content {
+  color:
+    var(--dashboard-text-primary);
+}
+
+.dashboard-summary-card
+  .ant-statistic-content-value {
+  color:
+    var(--dashboard-text-primary);
+}
+
+
+/* ========================================================
+   SUMMARY ICONS
+======================================================== */
+
 .dashboard-summary-card__icon {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
   width: 46px;
   height: 46px;
+
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   border-radius: 14px;
+
   font-size: 21px;
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
+
+
+/* Blue */
 
 .dashboard-summary-card--blue
   .dashboard-summary-card__icon {
   color: #2563eb;
-  background: #eff6ff;
+
+  background:
+    var(--dashboard-blue-soft);
 }
+
+
+/* Cyan */
 
 .dashboard-summary-card--cyan
   .dashboard-summary-card__icon {
   color: #0891b2;
-  background: #ecfeff;
+
+  background:
+    var(--dashboard-cyan-soft);
 }
+
+
+/* Purple */
 
 .dashboard-summary-card--purple
   .dashboard-summary-card__icon {
   color: #7c3aed;
-  background: #f5f3ff;
+
+  background:
+    var(--dashboard-purple-soft);
 }
+
+
+/* Orange */
 
 .dashboard-summary-card--orange
   .dashboard-summary-card__icon {
   color: #d97706;
-  background: #fffbeb;
+
+  background:
+    var(--dashboard-orange-soft);
 }
+
+
+/* Green */
 
 .dashboard-summary-card--green
   .dashboard-summary-card__icon {
   color: #16a34a;
-  background: #f0fdf4;
+
+  background:
+    var(--dashboard-green-soft);
 }
+
+
+/* Red */
 
 .dashboard-summary-card--red
   .dashboard-summary-card__icon {
   color: #dc2626;
-  background: #fef2f2;
+
+  background:
+    var(--dashboard-red-soft);
 }
+
+
+/* ========================================================
+   GENERAL DASHBOARD CARD
+======================================================== */
 
 .dashboard-card {
   margin-bottom: 16px;
-  border: 1px solid #e8edf5;
+
+  background:
+    var(--dashboard-card-bg);
+
+  border:
+    1px solid
+    var(--dashboard-border-strong);
+
   box-shadow:
-    0 8px 24px rgba(15, 23, 42, 0.045);
+    var(--dashboard-shadow);
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .dashboard-card .ant-card-body {
   padding: 22px;
 }
 
+
+/* ========================================================
+   QUICK ACTIONS
+======================================================== */
+
 .dashboard-quick-actions {
   background:
     linear-gradient(
       110deg,
-      #ffffff 0%,
-      #f8fbff 100%
+      var(--dashboard-quick-start) 0%,
+      var(--dashboard-quick-end) 100%
     );
 }
+
+
+/* ========================================================
+   SECTION HEADING
+======================================================== */
 
 .dashboard-section-heading {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 14px;
+
   margin-bottom: 20px;
 }
 
@@ -158,40 +395,79 @@
   margin-bottom: 0;
 }
 
+.dashboard-section-heading
+  .ant-typography:not(.ant-typography-secondary) {
+  color:
+    var(--dashboard-text-primary);
+}
+
+.dashboard-section-heading
+  .ant-typography-secondary {
+  color:
+    var(--dashboard-text-secondary);
+}
+
+
+/* ========================================================
+   SECTION ICONS
+======================================================== */
+
 .dashboard-section-icon {
+  width: 42px;
+  height: 42px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
+
   border-radius: 13px;
+
   font-size: 19px;
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
 
 .dashboard-section-icon--blue {
   color: #2563eb;
-  background: #eff6ff;
+
+  background:
+    var(--dashboard-blue-soft);
 }
 
 .dashboard-section-icon--purple {
   color: #7c3aed;
-  background: #f5f3ff;
+
+  background:
+    var(--dashboard-purple-soft);
 }
 
 .dashboard-section-icon--orange {
   color: #d97706;
-  background: #fffbeb;
+
+  background:
+    var(--dashboard-orange-soft);
 }
 
 .dashboard-section-icon--red {
   color: #dc2626;
-  background: #fef2f2;
+
+  background:
+    var(--dashboard-red-soft);
 }
 
 .dashboard-section-icon--green {
   color: #16a34a;
-  background: #f0fdf4;
+
+  background:
+    var(--dashboard-green-soft);
 }
+
+
+/* ========================================================
+   CURRENT TREATMENT
+======================================================== */
 
 .dashboard-current-treatment {
   min-height: 410px;
@@ -200,12 +476,19 @@
 .dashboard-treatment-content {
   display: flex;
   flex-direction: column;
+
   gap: 18px;
 }
+
+
+/* --------------------------------------------------------
+   Current patient
+-------------------------------------------------------- */
 
 .dashboard-current-patient {
   display: flex;
   align-items: center;
+
   gap: 15px;
 }
 
@@ -215,8 +498,21 @@
   margin-bottom: 5px;
 }
 
+.dashboard-current-patient
+  .ant-typography:not(.ant-typography-secondary) {
+  color:
+    var(--dashboard-text-primary);
+}
+
+.dashboard-current-patient
+  .ant-typography-secondary {
+  color:
+    var(--dashboard-text-secondary);
+}
+
 .dashboard-current-patient__avatar {
   color: #ffffff;
+
   background:
     linear-gradient(
       135deg,
@@ -225,16 +521,32 @@
     );
 }
 
+
+/* --------------------------------------------------------
+   Treatment details
+-------------------------------------------------------- */
+
 .dashboard-treatment-details {
   margin-top: 2px;
 }
 
 .dashboard-detail-box {
   height: 100%;
+
   padding: 14px;
-  border: 1px solid #edf1f7;
+
+  background:
+    var(--dashboard-card-secondary);
+
+  border:
+    1px solid
+    var(--dashboard-border);
+
   border-radius: 13px;
-  background: #f8fafc;
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .dashboard-detail-box
@@ -243,23 +555,49 @@
   margin-bottom: 0;
 }
 
+.dashboard-detail-box
+  .ant-typography:not(.ant-typography-secondary) {
+  color:
+    var(--dashboard-text-primary);
+}
+
+.dashboard-detail-box
+  .ant-typography-secondary {
+  color:
+    var(--dashboard-text-secondary);
+}
+
+
+/* ========================================================
+   ALERT CARD
+======================================================== */
+
 .dashboard-alert-card {
   min-height: 410px;
 }
 
+
+/* ========================================================
+   ALL CLEAR
+======================================================== */
+
 .dashboard-all-clear {
+  min-height: 270px;
+
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 270px;
+
   text-align: center;
-  flex-direction: column;
 }
 
 .dashboard-all-clear
   > .anticon {
   margin-bottom: 14px;
+
   color: #16a34a;
+
   font-size: 52px;
 }
 
@@ -269,15 +607,37 @@
   margin-bottom: 5px;
 }
 
+.dashboard-all-clear
+  .ant-typography:not(.ant-typography-secondary) {
+  color:
+    var(--dashboard-text-primary);
+}
+
+.dashboard-all-clear
+  .ant-typography-secondary {
+  color:
+    var(--dashboard-text-secondary);
+}
+
+
+/* ========================================================
+   QUEUE NUMBER
+======================================================== */
+
 .dashboard-queue-number {
+  width: 42px;
+  height: 42px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
+
   color: #ffffff;
+
+  border-radius: 12px;
+
   font-weight: 700;
+
   background:
     linear-gradient(
       135deg,
@@ -286,37 +646,149 @@
     );
 }
 
+
+/* ========================================================
+   PATIENT AVATAR
+======================================================== */
+
 .dashboard-patient-avatar {
   color: #2563eb;
-  background: #eff6ff;
+
+  background:
+    var(--dashboard-blue-soft);
 }
 
+
+/* ========================================================
+   TABLE SPECIAL ROWS
+======================================================== */
+
+/* --------------------------------------------------------
+   Next patient
+-------------------------------------------------------- */
+
 .dashboard-next-patient-row td {
-  background: #eff6ff !important;
+  background:
+    var(--dashboard-next-row) !important;
 }
 
 .dashboard-next-patient-row td:first-child {
-  border-left: 4px solid #2563eb;
+  border-left:
+    4px solid
+    #2563eb;
 }
 
+
+/* --------------------------------------------------------
+   In treatment
+-------------------------------------------------------- */
+
 .dashboard-treatment-row td {
-  background: #f5f3ff !important;
+  background:
+    var(--dashboard-treatment-row) !important;
 }
 
 .dashboard-treatment-row td:first-child {
-  border-left: 4px solid #7c3aed;
+  border-left:
+    4px solid
+    #7c3aed;
 }
 
+
+/* --------------------------------------------------------
+   Allergy
+-------------------------------------------------------- */
+
 .dashboard-allergy-row td {
-  background: #fff7f7;
+  background:
+    var(--dashboard-allergy-row) !important;
 }
 
 .dashboard-allergy-row td:first-child {
-  border-left: 4px solid #dc2626;
+  border-left:
+    4px solid
+    #dc2626;
 }
+
+
+/* --------------------------------------------------------
+   Preserve special row highlighting on hover
+-------------------------------------------------------- */
+
+.dashboard-next-patient-row:hover td {
+  background:
+    var(--dashboard-next-row) !important;
+}
+
+.dashboard-treatment-row:hover td {
+  background:
+    var(--dashboard-treatment-row) !important;
+}
+
+.dashboard-allergy-row:hover td {
+  background:
+    var(--dashboard-allergy-row) !important;
+}
+
+
+/* ========================================================
+   TABLE TEXT
+======================================================== */
+
+.dashboard-card
+  .ant-table {
+  background:
+    var(--dashboard-card-bg);
+
+  color:
+    var(--dashboard-text-primary);
+}
+
+.dashboard-card
+  .ant-table-thead
+  > tr
+  > th {
+  color:
+    var(--dashboard-text-secondary);
+
+  background:
+    var(--dashboard-card-secondary);
+
+  border-bottom-color:
+    var(--dashboard-border);
+}
+
+.dashboard-card
+  .ant-table-tbody
+  > tr
+  > td {
+  color:
+    var(--dashboard-text-primary);
+
+  border-bottom-color:
+    var(--dashboard-border);
+}
+
+.dashboard-card
+  .ant-table-tbody
+  > tr:not(
+    .dashboard-next-patient-row,
+    .dashboard-treatment-row,
+    .dashboard-allergy-row
+  ):hover
+  > td {
+  background:
+    var(--dashboard-card-secondary) !important;
+}
+
+
+/* ========================================================
+   PROGRESS CARD
+======================================================== */
 
 .dashboard-progress-card {
   height: calc(100% - 16px);
+
   text-align: center;
 }
 
@@ -325,19 +797,48 @@
   margin: 14px 0 24px;
 }
 
+.dashboard-progress-card
+  .ant-typography:not(.ant-typography-secondary) {
+  color:
+    var(--dashboard-text-primary);
+}
+
+.dashboard-progress-card
+  .ant-typography-secondary {
+  color:
+    var(--dashboard-text-secondary);
+}
+
+
+/* ========================================================
+   PROGRESS STATISTICS
+======================================================== */
+
 .dashboard-progress-statistics {
   display: grid;
+
   grid-template-columns:
     repeat(3, 1fr);
+
   gap: 10px;
 }
 
 .dashboard-progress-statistics
   > div {
   padding: 12px 8px;
-  border: 1px solid #edf1f7;
+
+  background:
+    var(--dashboard-card-secondary);
+
+  border:
+    1px solid
+    var(--dashboard-border);
+
   border-radius: 12px;
-  background: #f8fafc;
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .dashboard-progress-statistics
@@ -345,6 +846,138 @@
   margin-top: 3px;
   margin-bottom: 0;
 }
+
+.dashboard-progress-statistics
+  .ant-typography:not(.ant-typography-secondary) {
+  color:
+    var(--dashboard-text-primary);
+}
+
+.dashboard-progress-statistics
+  .ant-typography-secondary {
+  color:
+    var(--dashboard-text-secondary);
+}
+
+
+/* ========================================================
+   EMPTY STATES
+======================================================== */
+
+.dashboard-card
+  .ant-empty-description {
+  color:
+    var(--dashboard-text-secondary);
+}
+
+
+/* ========================================================
+   DIVIDERS
+======================================================== */
+
+.dashboard-card
+  .ant-divider {
+  border-color:
+    var(--dashboard-border);
+}
+
+
+/* ========================================================
+   DARK MODE SMALL IMPROVEMENTS
+======================================================== */
+
+html[data-theme="dark"]
+  .dashboard-summary-card--blue
+  .dashboard-summary-card__icon {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"]
+  .dashboard-summary-card--cyan
+  .dashboard-summary-card__icon {
+  color: #22d3ee;
+}
+
+html[data-theme="dark"]
+  .dashboard-summary-card--purple
+  .dashboard-summary-card__icon {
+  color: #a78bfa;
+}
+
+html[data-theme="dark"]
+  .dashboard-summary-card--orange
+  .dashboard-summary-card__icon {
+  color: #fbbf24;
+}
+
+html[data-theme="dark"]
+  .dashboard-summary-card--green
+  .dashboard-summary-card__icon {
+  color: #4ade80;
+}
+
+html[data-theme="dark"]
+  .dashboard-summary-card--red
+  .dashboard-summary-card__icon {
+  color: #f87171;
+}
+
+
+html[data-theme="dark"]
+  .dashboard-section-icon--blue {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"]
+  .dashboard-section-icon--purple {
+  color: #a78bfa;
+}
+
+html[data-theme="dark"]
+  .dashboard-section-icon--orange {
+  color: #fbbf24;
+}
+
+html[data-theme="dark"]
+  .dashboard-section-icon--red {
+  color: #f87171;
+}
+
+html[data-theme="dark"]
+  .dashboard-section-icon--green {
+  color: #4ade80;
+}
+
+
+html[data-theme="dark"]
+  .dashboard-patient-avatar {
+  color: #60a5fa;
+}
+
+
+/* ========================================================
+   TRANSITIONS
+======================================================== */
+
+.dashboard-summary-card,
+.dashboard-card,
+.dashboard-detail-box,
+.dashboard-progress-statistics
+  > div,
+.dashboard-next-patient-row td,
+.dashboard-treatment-row td,
+.dashboard-allergy-row td {
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+/* ========================================================
+   RESPONSIVE
+======================================================== */
 
 @media (max-width: 1200px) {
   .dashboard-current-treatment,
@@ -357,13 +990,16 @@
   }
 }
 
+
 @media (max-width: 768px) {
-  .dashboard-card .ant-card-body {
+  .dashboard-card
+    .ant-card-body {
     padding: 17px;
   }
 
   .dashboard-section-heading {
     align-items: flex-start;
+
     flex-direction: column;
   }
 
@@ -372,6 +1008,7 @@
   }
 
   .dashboard-progress-statistics {
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      1fr;
   }
 }

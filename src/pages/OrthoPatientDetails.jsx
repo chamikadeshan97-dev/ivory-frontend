@@ -1900,7 +1900,7 @@ const OrthoPatientDetails = () => {
         ================================================== */}
 
       <Row gutter={[16, 16]} className="ortho-summary-grid">
-        <Col xs={24} sm={12} xl={6}>
+        <Col xs={24} sm={12} xl={4}>
           <Card className="ortho-summary-card">
             <div className="ortho-summary-icon visits">
               <MedicineBoxOutlined />
@@ -1912,7 +1912,7 @@ const OrthoPatientDetails = () => {
           </Card>
         </Col>
 
-        <Col xs={24} sm={12} xl={6}>
+        <Col xs={24} sm={12} xl={7}>
           <Card className="ortho-summary-card">
             <div className="ortho-summary-icon paid">
               <DollarOutlined />

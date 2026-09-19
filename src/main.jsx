@@ -9,6 +9,7 @@ import App from "./App";
 import {
   AuthProvider,
 } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
 
 import "./index.css";
 
@@ -17,9 +18,10 @@ ReactDOM.createRoot(
 ).render(
   <React.StrictMode>
     <BrowserRouter>
+    <ThemeProvider>
       <AuthProvider>
         <App />
-      </AuthProvider>
+      </AuthProvider></ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>,
 );

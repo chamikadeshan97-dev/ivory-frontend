@@ -1,9 +1,116 @@
 /* ========================================================
-   General
+   ORTHODONTIC PATIENTS
+   PATIENTS-PAGE MATCHING DESIGN
+   LIGHT + DARK THEME
+======================================================== */
+
+
+/* ========================================================
+   THEME VARIABLES
+======================================================== */
+
+:root,
+html[data-theme="light"] {
+  --ortho-bg: #ffffff;
+  --ortho-surface: #ffffff;
+  --ortho-surface-secondary: #f8fafc;
+  --ortho-surface-soft: #f4f7fb;
+  --ortho-surface-hover: #f8fbff;
+
+  --ortho-text: #172033;
+  --ortho-text-secondary: #64748b;
+  --ortho-text-muted: #94a3b8;
+
+  --ortho-border: #e6ebf2;
+  --ortho-border-soft: #edf1f7;
+  --ortho-border-strong: #d9e2ec;
+
+  --ortho-input-bg: #ffffff;
+
+  --ortho-table-header: #f7f9fc;
+  --ortho-table-row: #ffffff;
+  --ortho-table-hover: #f8fbff;
+
+  --ortho-primary: #1677ff;
+
+  --ortho-blue: #1677ff;
+  --ortho-green: #16a34a;
+  --ortho-purple: #7c3aed;
+  --ortho-cyan: #0891b2;
+  --ortho-orange: #f59e0b;
+  --ortho-red: #ef4444;
+
+  --ortho-blue-soft: rgba(22, 119, 255, 0.1);
+  --ortho-green-soft: rgba(22, 163, 74, 0.1);
+  --ortho-purple-soft: rgba(124, 58, 237, 0.1);
+  --ortho-cyan-soft: rgba(8, 145, 178, 0.1);
+  --ortho-orange-soft: rgba(245, 158, 11, 0.12);
+  --ortho-red-soft: rgba(239, 68, 68, 0.1);
+
+  --ortho-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.05);
+
+  --ortho-shadow-hover:
+    0 14px 30px rgba(15, 23, 42, 0.09);
+
+  --ortho-modal-section: #fbfcfe;
+}
+
+
+html[data-theme="dark"] {
+  --ortho-bg: #081321;
+  --ortho-surface: #101a29;
+  --ortho-surface-secondary: #172338;
+  --ortho-surface-soft: #142033;
+  --ortho-surface-hover: #18263a;
+
+  --ortho-text: #f8fafc;
+  --ortho-text-secondary: #c2ccda;
+  --ortho-text-muted: #8fa0b7;
+
+  --ortho-border: #27374b;
+  --ortho-border-soft: #223247;
+  --ortho-border-strong: #39495e;
+
+  --ortho-input-bg: #111d2b;
+
+  --ortho-table-header: #172338;
+  --ortho-table-row: #101a29;
+  --ortho-table-hover: #162337;
+
+  --ortho-primary: #1677ff;
+
+  --ortho-blue: #3b82f6;
+  --ortho-green: #22c55e;
+  --ortho-purple: #a855f7;
+  --ortho-cyan: #22d3ee;
+  --ortho-orange: #f59e0b;
+  --ortho-red: #f87171;
+
+  --ortho-blue-soft: rgba(59, 130, 246, 0.14);
+  --ortho-green-soft: rgba(34, 197, 94, 0.14);
+  --ortho-purple-soft: rgba(168, 85, 247, 0.14);
+  --ortho-cyan-soft: rgba(34, 211, 238, 0.14);
+  --ortho-orange-soft: rgba(245, 158, 11, 0.14);
+  --ortho-red-soft: rgba(239, 68, 68, 0.14);
+
+  --ortho-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.18);
+
+  --ortho-shadow-hover:
+    0 14px 34px rgba(0, 0, 0, 0.3);
+
+  --ortho-modal-section: #142033;
+}
+
+
+/* ========================================================
+   GENERAL
 ======================================================== */
 
 .ortho-error-alert {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
+  border-radius: 12px;
 }
 
 .ortho-full-width {
@@ -11,120 +118,103 @@
 }
 
 .ortho-secondary-text {
+  color: var(--ortho-text-secondary) !important;
   font-size: 12px;
 }
 
 
 /* ========================================================
-   Summary
+   SUMMARY GRID
 ======================================================== */
 
-.ortho-summary-row {
+.ortho-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+
   margin-bottom: 16px;
 }
+
+
+/* ========================================================
+   SUMMARY CARD
+======================================================== */
 
 .ortho-summary-card {
   position: relative;
 
-  height: 100%;
+  min-width: 0;
+  min-height: 128px;
 
   overflow: hidden;
 
-  cursor: default;
+  background: var(--ortho-surface);
 
-  border: 1px solid #edf1f7;
-  border-radius: 18px;
+  border: 1px solid var(--ortho-border);
 
-  box-shadow:
-    0 8px 24px rgba(15, 23, 42, 0.05);
+  border-radius: 15px;
+
+  box-shadow: var(--ortho-shadow);
 
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease,
-    border-color 0.2s ease;
+    border-color 0.2s ease,
+    background-color 0.25s ease;
 }
 
-.ortho-summary-card[onclick] {
+.ortho-summary-card--clickable {
   cursor: pointer;
 }
 
-.ortho-summary-card:hover {
-  transform: translateY(-3px);
-
-  border-color:
-    rgba(37, 99, 235, 0.22);
-
-  box-shadow:
-    0 14px 30px rgba(15, 23, 42, 0.09);
+.ortho-summary-card--clickable:focus-visible {
+  outline: 2px solid var(--ortho-primary);
+  outline-offset: 2px;
 }
 
-/* ========================================================
-   Colored left accent
-======================================================== */
+.ortho-summary-card:hover {
+  transform: translateY(-2px);
 
-.ortho-summary-card::before {
+  border-color: rgba(22, 119, 255, 0.2);
+
+  box-shadow: var(--ortho-shadow-hover);
+}
+
+
+/* --------------------------------------------------------
+   Left accent
+-------------------------------------------------------- */
+
+.ortho-summary-card__accent {
   position: absolute;
-
   top: 0;
+  bottom: 0;
   left: 0;
 
   width: 5px;
-  height: 100%;
 
-  content: "";
-
-  z-index: 1;
+  border-radius: 15px 0 0 15px;
 }
 
-.ortho-summary-card--blue::before {
-  background: #2563eb;
-}
 
-.ortho-summary-card--green::before {
-  background: #16a34a;
-}
-
-.ortho-summary-card--purple::before {
-  background: #7c3aed;
-}
-
-.ortho-summary-card--cyan::before {
-  background: #0891b2;
-}
-
-.ortho-summary-card--orange::before {
-  background: #f59e0b;
-}
-
-.ortho-summary-card--red::before {
-  background: #dc2626;
-}
-
-/* ========================================================
-   Card body
-======================================================== */
-
-.ortho-summary-card .ant-card-body {
-  padding: 20px;
-}
-
-/* ========================================================
-   Summary content
-======================================================== */
+/* --------------------------------------------------------
+   Card content
+-------------------------------------------------------- */
 
 .ortho-summary-card__content {
   display: flex;
-
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
 
-  gap: 14px;
+  min-height: 128px;
+
+  gap: 16px;
+
+  padding: 20px 20px 20px 20px;
 }
 
-.ortho-summary-card__content
-  > div:first-child {
+.ortho-summary-card__details {
   min-width: 0;
-
   flex: 1;
 }
 
@@ -133,493 +223,1064 @@
 
   margin-bottom: 7px;
 
-  color: #64748b;
+  color: var(--ortho-text) !important;
 
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
 .ortho-summary-card__value {
-  margin-bottom: 0;
+  margin-bottom: 5px;
 
-  color: #172033;
+  color: var(--ortho-text);
 
   font-size: 29px;
-  line-height: 1.2;
-  font-weight: 750;
+  font-weight: 700;
+  line-height: 1.1;
 
-  word-break: break-word;
+  letter-spacing: -0.4px;
+
+  white-space: nowrap;
 }
 
 .ortho-summary-card__helper {
   display: block;
 
-  margin-top: 5px;
-
-  color: #94a3b8;
+  color: var(--ortho-text-secondary) !important;
 
   font-size: 12px;
+  line-height: 1.4;
 }
 
-/* ========================================================
+
+/* --------------------------------------------------------
    Summary icon
-======================================================== */
+-------------------------------------------------------- */
 
 .ortho-summary-card__icon {
-  width: 47px;
-  height: 47px;
-
-  flex: 0 0 auto;
-
   display: flex;
+  flex: 0 0 48px;
   align-items: center;
   justify-content: center;
 
+  width: 48px;
+  height: 48px;
+
   border-radius: 14px;
 
-  font-size: 21px;
+  font-size: 22px;
 }
 
+
 /* ========================================================
-   Blue
+   SUMMARY TONES
 ======================================================== */
+
+/* Blue */
+
+.ortho-summary-card--blue
+  .ortho-summary-card__accent {
+  background: var(--ortho-blue);
+}
 
 .ortho-summary-card--blue
   .ortho-summary-card__icon {
-  color: #2563eb;
-
-  background: #eff6ff;
+  color: var(--ortho-blue);
+  background: var(--ortho-blue-soft);
 }
 
-/* ========================================================
-   Green
-======================================================== */
+
+/* Green */
+
+.ortho-summary-card--green
+  .ortho-summary-card__accent {
+  background: var(--ortho-green);
+}
 
 .ortho-summary-card--green
   .ortho-summary-card__icon {
-  color: #16a34a;
-
-  background: #f0fdf4;
+  color: var(--ortho-green);
+  background: var(--ortho-green-soft);
 }
 
-/* ========================================================
-   Purple
-======================================================== */
+
+/* Purple */
+
+.ortho-summary-card--purple
+  .ortho-summary-card__accent {
+  background: var(--ortho-purple);
+}
 
 .ortho-summary-card--purple
   .ortho-summary-card__icon {
-  color: #7c3aed;
-
-  background: #f5f3ff;
+  color: var(--ortho-purple);
+  background: var(--ortho-purple-soft);
 }
 
-/* ========================================================
-   Cyan
-======================================================== */
+
+/* Cyan */
+
+.ortho-summary-card--cyan
+  .ortho-summary-card__accent {
+  background: var(--ortho-cyan);
+}
 
 .ortho-summary-card--cyan
   .ortho-summary-card__icon {
-  color: #0891b2;
-
-  background: #ecfeff;
+  color: var(--ortho-cyan);
+  background: var(--ortho-cyan-soft);
 }
 
-/* ========================================================
-   Orange
-======================================================== */
+
+/* Orange */
+
+.ortho-summary-card--orange
+  .ortho-summary-card__accent {
+  background: var(--ortho-orange);
+}
 
 .ortho-summary-card--orange
   .ortho-summary-card__icon {
-  color: #d97706;
-
-  background: #fffbeb;
+  color: var(--ortho-orange);
+  background: var(--ortho-orange-soft);
 }
 
-/* ========================================================
-   Red
-======================================================== */
+
+/* Red */
+
+.ortho-summary-card--red
+  .ortho-summary-card__accent {
+  background: var(--ortho-red);
+}
 
 .ortho-summary-card--red
   .ortho-summary-card__icon {
-  color: #dc2626;
-
-  background: #fef2f2;
+  color: var(--ortho-red);
+  background: var(--ortho-red-soft);
 }
+
 
 /* ========================================================
-   Dark theme
-======================================================== */
-
-[data-theme="dark"] .ortho-summary-card,
-.dark .ortho-summary-card {
-  border-color: rgba(255, 255, 255, 0.1);
-
-  background: #18191d;
-
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.14);
-}
-
-[data-theme="dark"] .ortho-summary-card:hover,
-.dark .ortho-summary-card:hover {
-  border-color:
-    rgba(96, 165, 250, 0.25);
-
-  box-shadow:
-    0 12px 28px rgba(0, 0, 0, 0.28);
-}
-
-[data-theme="dark"]
-  .ortho-summary-card__title,
-.dark
-  .ortho-summary-card__title {
-  color: #94a3b8;
-}
-
-[data-theme="dark"]
-  .ortho-summary-card__value,
-.dark
-  .ortho-summary-card__value {
-  color: #f1f5f9;
-}
-
-[data-theme="dark"]
-  .ortho-summary-card__helper,
-.dark
-  .ortho-summary-card__helper {
-  color: #7f8b9d;
-}
-
-/* Blue icon */
-
-[data-theme="dark"]
-  .ortho-summary-card--blue
-  .ortho-summary-card__icon,
-.dark
-  .ortho-summary-card--blue
-  .ortho-summary-card__icon {
-  color: #60a5fa;
-
-  background:
-    rgba(37, 99, 235, 0.16);
-}
-
-/* Green icon */
-
-[data-theme="dark"]
-  .ortho-summary-card--green
-  .ortho-summary-card__icon,
-.dark
-  .ortho-summary-card--green
-  .ortho-summary-card__icon {
-  color: #4ade80;
-
-  background:
-    rgba(22, 163, 74, 0.16);
-}
-
-/* Purple icon */
-
-[data-theme="dark"]
-  .ortho-summary-card--purple
-  .ortho-summary-card__icon,
-.dark
-  .ortho-summary-card--purple
-  .ortho-summary-card__icon {
-  color: #a78bfa;
-
-  background:
-    rgba(124, 58, 237, 0.16);
-}
-
-/* Cyan icon */
-
-[data-theme="dark"]
-  .ortho-summary-card--cyan
-  .ortho-summary-card__icon,
-.dark
-  .ortho-summary-card--cyan
-  .ortho-summary-card__icon {
-  color: #22d3ee;
-
-  background:
-    rgba(8, 145, 178, 0.16);
-}
-
-/* Orange icon */
-
-[data-theme="dark"]
-  .ortho-summary-card--orange
-  .ortho-summary-card__icon,
-.dark
-  .ortho-summary-card--orange
-  .ortho-summary-card__icon {
-  color: #fbbf24;
-
-  background:
-    rgba(245, 158, 11, 0.16);
-}
-
-/* Red icon */
-
-[data-theme="dark"]
-  .ortho-summary-card--red
-  .ortho-summary-card__icon,
-.dark
-  .ortho-summary-card--red
-  .ortho-summary-card__icon {
-  color: #f87171;
-
-  background:
-    rgba(220, 38, 38, 0.16);
-}
-
-/* ========================================================
-   Responsive
-======================================================== */
-
-@media (max-width: 992px) {
-  .ortho-summary-card__value {
-    font-size: 27px;
-  }
-}
-
-@media (max-width: 768px) {
-  .ortho-summary-card .ant-card-body {
-    padding: 17px;
-  }
-
-  .ortho-summary-card__value {
-    font-size: 25px;
-  }
-
-  .ortho-summary-card__icon {
-    width: 44px;
-    height: 44px;
-
-    font-size: 19px;
-  }
-}
-
-@media (max-width: 576px) {
-  .ortho-summary-row {
-    margin-bottom: 14px;
-  }
-
-  .ortho-summary-card {
-    border-radius: 15px;
-  }
-
-  .ortho-summary-card .ant-card-body {
-    padding: 16px;
-  }
-
-  .ortho-summary-card__content {
-    gap: 12px;
-  }
-
-  .ortho-summary-card__value {
-    font-size: 24px;
-  }
-
-  .ortho-summary-card__icon {
-    width: 42px;
-    height: 42px;
-
-    border-radius: 12px;
-
-    font-size: 18px;
-  }
-}
-/* ========================================================
-   Directory
+   DIRECTORY CARD
 ======================================================== */
 
 .ortho-directory-card {
-  border-radius: 14px;
   overflow: hidden;
+
+  background: var(--ortho-surface);
+
+  border: 1px solid var(--ortho-border);
+
+  border-radius: 15px;
+
+  box-shadow: var(--ortho-shadow);
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
-.ortho-directory-card > .ant-card-body {
-  padding: 0;
-}
+
+/* ========================================================
+   DIRECTORY HEADER
+======================================================== */
 
 .ortho-directory-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
 
-  gap: 16px;
+  gap: 20px;
 
-  padding: 20px 20px 16px;
+  padding: 24px 22px 20px;
 }
 
-.ortho-directory-header h4.ant-typography {
-  margin: 0 0 3px;
+.ortho-directory-header__content {
+  min-width: 0;
 }
+
+.ortho-directory-title.ant-typography {
+  margin: 0 0 5px !important;
+
+  color: var(--ortho-text) !important;
+
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.ortho-directory-subtitle {
+  color: var(--ortho-text-secondary) !important;
+
+  font-size: 13px;
+}
+
+
+/* --------------------------------------------------------
+   Result count
+-------------------------------------------------------- */
 
 .ortho-result-count {
-  margin: 0;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
 
-  padding-inline: 10px;
+  min-height: 30px;
 
-  border-radius: 20px;
+  padding: 5px 12px;
+
+  color: var(--ortho-blue);
+
+  background: var(--ortho-blue-soft);
+
+  border-radius: 8px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  white-space: nowrap;
 }
 
+
 /* ========================================================
-   Toolbar
+   TOOLBAR
 ======================================================== */
 
 .ortho-table-toolbar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 
-  gap: 12px;
+  gap: 18px;
 
-  padding: 14px 20px;
+  margin: 0 22px 20px;
 
-  border-top: 1px solid rgba(5, 5, 5, 0.06);
-  border-bottom: 1px solid rgba(5, 5, 5, 0.06);
+  padding: 14px;
+
+  background: var(--ortho-surface-secondary);
+
+  border: 1px solid var(--ortho-border);
+
+  border-radius: 14px;
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
 }
 
-.ortho-search-input {
-  width: min(430px, 100%);
-}
-
-.ortho-status-filter {
-  width: 180px;
-}
 
 /* ========================================================
-   Table
+   SEARCH
 ======================================================== */
+
+.ortho-search-wrapper {
+  flex: 1 1 440px;
+  min-width: 240px;
+  max-width: 500px;
+}
+
+.ortho-search-input.ant-input-affix-wrapper {
+  width: 100%;
+  height: 34px;
+
+  padding: 4px 11px;
+
+  color: var(--ortho-text);
+
+  background: var(--ortho-input-bg);
+
+  border-color: var(--ortho-border-strong);
+
+  border-radius: 9px;
+
+  box-shadow: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.25s ease;
+}
+
+.ortho-search-input.ant-input-affix-wrapper:hover {
+  border-color: var(--ortho-primary);
+}
+
+.ortho-search-input.ant-input-affix-wrapper-focused,
+.ortho-search-input.ant-input-affix-wrapper:focus-within {
+  border-color: var(--ortho-primary);
+
+  box-shadow:
+    0 0 0 2px
+    rgba(22, 119, 255, 0.1);
+}
+
+.ortho-search-input.ant-input-affix-wrapper
+  .ant-input-prefix {
+  margin-right: 7px;
+
+  color: var(--ortho-text-secondary);
+}
+
+.ortho-search-input.ant-input-affix-wrapper
+  .ant-input {
+  color: var(--ortho-text);
+
+  background: transparent;
+
+  font-size: 13px;
+}
+
+.ortho-search-input.ant-input-affix-wrapper
+  .ant-input::placeholder {
+  color: var(--ortho-text-muted);
+}
+
+.ortho-search-input
+  .ant-input-clear-icon {
+  color: var(--ortho-text-muted);
+}
+
+.ortho-search-input
+  .ant-input-clear-icon:hover {
+  color: var(--ortho-text);
+}
+
+
+/* ========================================================
+   FILTER TABS
+======================================================== */
+
+.ortho-filter-tabs {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+
+  gap: 3px;
+
+  overflow-x: auto;
+
+  scrollbar-width: none;
+}
+
+.ortho-filter-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.ortho-filter-tab {
+  min-height: 32px;
+
+  padding: 5px 11px;
+
+  color: var(--ortho-text-secondary);
+
+  background: transparent;
+
+  border: none;
+  border-radius: 8px;
+
+  outline: none;
+
+  cursor: pointer;
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+
+  white-space: nowrap;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.ortho-filter-tab:hover {
+  color: var(--ortho-text);
+
+  background:
+    rgba(148, 163, 184, 0.1);
+}
+
+.ortho-filter-tab--active {
+  color: var(--ortho-text);
+
+  background: var(--ortho-surface);
+
+  font-weight: 600;
+
+  box-shadow:
+    0 1px 4px
+    rgba(15, 23, 42, 0.06);
+}
+
+html[data-theme="dark"]
+  .ortho-filter-tab--active {
+  background: #0e1928;
+
+  box-shadow:
+    0 1px 5px rgba(0, 0, 0, 0.22);
+}
+
+.ortho-filter-tab:focus-visible {
+  outline: 2px solid var(--ortho-primary);
+  outline-offset: 1px;
+}
+
+
+/* ========================================================
+   TABLE WRAPPER
+======================================================== */
+
+.ortho-table-wrapper {
+  width: 100%;
+
+  overflow: hidden;
+
+  border-top:
+    1px solid
+    var(--ortho-border-soft);
+}
+
+
+/* ========================================================
+   TABLE
+======================================================== */
+
+.ortho-directory-table {
+  width: 100%;
+}
+
+.ortho-directory-table
+  .ant-spin-nested-loading,
+.ortho-directory-table
+  .ant-spin-container {
+  width: 100%;
+}
+
+.ortho-directory-table
+  .ant-table {
+  color: var(--ortho-text);
+
+  background: var(--ortho-surface);
+
+  font-size: 13px;
+}
+
+.ortho-directory-table
+  .ant-table-container {
+  border-radius: 0;
+}
+
+
+/* --------------------------------------------------------
+   Header
+-------------------------------------------------------- */
 
 .ortho-directory-table
   .ant-table-thead
   > tr
   > th {
+  height: 55px;
+
+  padding: 14px 16px;
+
+  color: var(--ortho-text) !important;
+
+  background:
+    var(--ortho-table-header) !important;
+
+  border-bottom:
+    1px solid
+    var(--ortho-border) !important;
+
+  font-size: 13px;
   font-weight: 600;
+
   white-space: nowrap;
 }
+
+.ortho-directory-table
+  .ant-table-thead
+  > tr
+  > th::before {
+  background:
+    var(--ortho-border) !important;
+}
+
+
+/* --------------------------------------------------------
+   Rows
+-------------------------------------------------------- */
 
 .ortho-directory-table
   .ant-table-tbody
   > tr
   > td {
+  min-height: 72px;
+
+  padding: 16px;
+
+  color: var(--ortho-text);
+
+  background:
+    var(--ortho-table-row);
+
+  border-bottom:
+    1px solid
+    var(--ortho-border-soft);
+
   vertical-align: middle;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.25s ease,
+    color 0.2s ease;
 }
 
-.ortho-directory-card .ant-pagination {
-  padding-inline: 20px;
+.ortho-directory-table
+  .ant-table-tbody
+  > tr:hover
+  > td {
+  background:
+    var(--ortho-table-hover) !important;
 }
+
+.ortho-directory-table
+  .ant-table-tbody
+  > tr:last-child
+  > td {
+  border-bottom-color:
+    var(--ortho-border-soft);
+}
+
+
+/* --------------------------------------------------------
+   Fixed table cells
+-------------------------------------------------------- */
+
+.ortho-directory-table
+  .ant-table-cell-fix-left,
+.ortho-directory-table
+  .ant-table-cell-fix-right {
+  background:
+    var(--ortho-table-row);
+}
+
+.ortho-directory-table
+  .ant-table-tbody
+  > tr:hover
+  .ant-table-cell-fix-left,
+.ortho-directory-table
+  .ant-table-tbody
+  > tr:hover
+  .ant-table-cell-fix-right {
+  background:
+    var(--ortho-table-hover) !important;
+}
+
 
 /* ========================================================
-   Case
+   TABLE SCROLLBAR
+======================================================== */
+
+.ortho-directory-table
+  .ant-table-body,
+.ortho-directory-table
+  .ant-table-content {
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    var(--ortho-border-strong)
+    transparent;
+}
+
+.ortho-directory-table
+  .ant-table-body::-webkit-scrollbar,
+.ortho-directory-table
+  .ant-table-content::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+.ortho-directory-table
+  .ant-table-body::-webkit-scrollbar-track,
+.ortho-directory-table
+  .ant-table-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ortho-directory-table
+  .ant-table-body::-webkit-scrollbar-thumb,
+.ortho-directory-table
+  .ant-table-content::-webkit-scrollbar-thumb {
+  background:
+    var(--ortho-border-strong);
+
+  border-radius: 20px;
+}
+
+
+/* ========================================================
+   CASE ID
 ======================================================== */
 
 .ortho-case-id {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
 
-  padding: 4px 9px;
+  min-height: 34px;
 
-  border-radius: 7px;
+  padding: 5px 10px;
 
-  background: rgba(22, 119, 255, 0.09);
-  color: #1677ff;
+  color: var(--ortho-blue);
+
+  background: var(--ortho-blue-soft);
+
+  border-radius: 8px;
 
   font-size: 12px;
   font-weight: 700;
+
+  white-space: nowrap;
 }
 
+
 /* ========================================================
-   Patient cell
+   PATIENT CELL
 ======================================================== */
 
 .ortho-patient-cell {
   display: flex;
   align-items: center;
 
-  gap: 10px;
+  min-width: 0;
+
+  gap: 11px;
 }
 
 .ortho-patient-avatar {
-  flex-shrink: 0;
+  flex: 0 0 auto;
 
-  color: #1677ff;
-  background: rgba(22, 119, 255, 0.1);
+  color: var(--ortho-blue) !important;
+
+  background:
+    var(--ortho-blue-soft) !important;
+}
+
+.ortho-patient-cell__details {
+  min-width: 0;
 }
 
 .ortho-patient-name {
   display: block;
+
+  overflow: hidden;
+
+  color: var(--ortho-text) !important;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .ortho-patient-id {
   display: block;
 
-  margin-top: 1px;
+  margin-top: 2px;
+
+  overflow: hidden;
+
+  color:
+    var(--ortho-text-secondary) !important;
+
+  font-size: 11px;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* ========================================================
+   TAGS
+======================================================== */
+
+.ortho-date-tag,
+.ortho-status-tag {
+  margin-inline-end: 0;
+
+  border-radius: 6px;
+
+  font-size: 11px;
+
+  white-space: nowrap;
+}
+
+
+/* ========================================================
+   VIEW BUTTON
+======================================================== */
+
+.ortho-view-button.ant-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 30px;
+
+  padding-inline: 10px;
+
+  border-radius: 6px;
 
   font-size: 12px;
 }
 
+
 /* ========================================================
-   Modal title
+   TABLE TYPOGRAPHY
+======================================================== */
+
+.ortho-directory-table
+  .ant-typography:not(
+    .ant-typography-secondary
+  ) {
+  color: var(--ortho-text);
+}
+
+.ortho-directory-table
+  .ant-typography-secondary {
+  color:
+    var(--ortho-text-secondary);
+}
+
+.ortho-directory-table
+  .ant-typography-success {
+  color: #16a34a !important;
+}
+
+.ortho-directory-table
+  .ant-typography-danger {
+  color: #dc2626 !important;
+}
+
+html[data-theme="dark"]
+  .ortho-directory-table
+  .ant-typography-success {
+  color: #4ade80 !important;
+}
+
+html[data-theme="dark"]
+  .ortho-directory-table
+  .ant-typography-danger {
+  color: #f87171 !important;
+}
+
+
+/* ========================================================
+   EMPTY TABLE
+======================================================== */
+
+.ortho-directory-table
+  .ant-table-placeholder
+  > td {
+  padding: 45px 20px !important;
+
+  background:
+    var(--ortho-surface) !important;
+}
+
+.ortho-directory-card
+  .ant-empty-description {
+  color:
+    var(--ortho-text-secondary);
+}
+
+
+/* ========================================================
+   PAGINATION
+======================================================== */
+
+.ortho-directory-table
+  .ant-table-pagination.ant-pagination {
+  display: flex;
+  align-items: center;
+
+  margin:
+    18px 20px 18px;
+
+  color:
+    var(--ortho-text-secondary);
+}
+
+.ortho-directory-card
+  .ant-pagination-total-text {
+  margin-right: auto;
+
+  color:
+    var(--ortho-text-secondary);
+}
+
+.ortho-directory-card
+  .ant-pagination-item {
+  background: transparent;
+
+  border-color: transparent;
+
+  border-radius: 8px;
+}
+
+.ortho-directory-card
+  .ant-pagination-item
+  a {
+  color: var(--ortho-text-secondary);
+}
+
+.ortho-directory-card
+  .ant-pagination-item:hover {
+  background:
+    var(--ortho-surface-secondary);
+}
+
+.ortho-directory-card
+  .ant-pagination-item:hover
+  a {
+  color: var(--ortho-text);
+}
+
+.ortho-directory-card
+  .ant-pagination-item-active {
+  background:
+    var(--ortho-blue-soft);
+
+  border-color: var(--ortho-primary);
+}
+
+.ortho-directory-card
+  .ant-pagination-item-active
+  a {
+  color: var(--ortho-blue);
+  font-weight: 600;
+}
+
+.ortho-directory-card
+  .ant-pagination-prev
+  button,
+.ortho-directory-card
+  .ant-pagination-next
+  button {
+  color:
+    var(--ortho-text-secondary);
+}
+
+
+/* --------------------------------------------------------
+   Pagination size selector
+-------------------------------------------------------- */
+
+.ortho-directory-card
+  .ant-pagination-options
+  .ant-select-selector {
+  color: var(--ortho-text) !important;
+
+  background:
+    var(--ortho-input-bg) !important;
+
+  border-color:
+    var(--ortho-border-strong) !important;
+
+  border-radius: 8px !important;
+}
+
+.ortho-directory-card
+  .ant-pagination-options
+  .ant-select-arrow {
+  color:
+    var(--ortho-text-secondary);
+}
+
+
+/* ========================================================
+   MODAL TITLE
 ======================================================== */
 
 .ortho-modal-title {
   display: flex;
   align-items: center;
 
-  gap: 11px;
+  gap: 12px;
 }
 
 .ortho-modal-title__icon {
-  width: 38px;
-  height: 38px;
-
   display: flex;
+  flex: 0 0 40px;
   align-items: center;
   justify-content: center;
 
-  flex: 0 0 38px;
+  width: 40px;
+  height: 40px;
 
-  border-radius: 10px;
+  color: var(--ortho-purple);
 
-  color: #722ed1;
-  background: rgba(114, 46, 209, 0.1);
+  background:
+    var(--ortho-purple-soft);
 
-  font-size: 18px;
+  border-radius: 11px;
+
+  font-size: 19px;
 }
 
 .ortho-modal-title__icon--patient {
-  color: #1677ff;
-  background: rgba(22, 119, 255, 0.1);
+  color: var(--ortho-blue);
+
+  background:
+    var(--ortho-blue-soft);
 }
 
-.ortho-modal-title > div:last-child {
+.ortho-modal-title__content {
   display: flex;
   flex-direction: column;
+
+  min-width: 0;
 }
+
+.ortho-modal-title__content
+  .ant-typography:first-child {
+  color: var(--ortho-text);
+
+  font-size: 15px;
+}
+
+.ortho-modal-title__content
+  .ant-typography-secondary {
+  margin-top: 1px;
+
+  color:
+    var(--ortho-text-secondary);
+
+  font-size: 12px;
+}
+
 
 /* ========================================================
-   Case modal
+   MODAL
 ======================================================== */
 
-.ortho-case-modal .ant-modal-content,
-.ortho-patient-modal .ant-modal-content {
-  border-radius: 16px;
+.ortho-case-modal
+  .ant-modal-content,
+.ortho-patient-modal
+  .ant-modal-content {
+  overflow: hidden;
+
+  color: var(--ortho-text);
+
+  background:
+    var(--ortho-surface);
+
+  border:
+    1px solid
+    var(--ortho-border);
+
+  border-radius: 17px;
+
+  box-shadow:
+    0 24px 70px
+    rgba(0, 0, 0, 0.18);
 }
 
-.ortho-case-form {
-  margin-top: 20px;
+.ortho-case-modal
+  .ant-modal-header,
+.ortho-patient-modal
+  .ant-modal-header {
+  margin-bottom: 0;
+
+  padding-bottom: 16px;
+
+  background:
+    var(--ortho-surface);
 }
+
+.ortho-case-modal
+  .ant-modal-title,
+.ortho-patient-modal
+  .ant-modal-title {
+  color: var(--ortho-text);
+}
+
+.ortho-case-modal
+  .ant-modal-close,
+.ortho-patient-modal
+  .ant-modal-close {
+  color:
+    var(--ortho-text-secondary);
+}
+
+.ortho-case-modal
+  .ant-modal-close:hover,
+.ortho-patient-modal
+  .ant-modal-close:hover {
+  color: var(--ortho-text);
+
+  background:
+    var(--ortho-surface-secondary);
+}
+
+.ortho-case-modal
+  .ant-modal-footer,
+.ortho-patient-modal
+  .ant-modal-footer {
+  padding-top: 16px;
+
+  border-top:
+    1px solid
+    var(--ortho-border-soft);
+}
+
+
+/* ========================================================
+   FORM
+======================================================== */
+
+.ortho-case-form {
+  margin-top: 5px;
+}
+
+.ortho-case-form
+  .ant-form-item-label
+  > label,
+.ortho-patient-modal
+  .ant-form-item-label
+  > label {
+  color: var(--ortho-text);
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+
+/* ========================================================
+   MODAL SECTIONS
+======================================================== */
 
 .ortho-modal-section {
   margin-bottom: 16px;
-  padding: 17px;
 
-  border: 1px solid rgba(5, 5, 5, 0.08);
-  border-radius: 12px;
+  padding: 18px;
+
+  background:
+    var(--ortho-modal-section);
+
+  border:
+    1px solid
+    var(--ortho-border);
+
+  border-radius: 13px;
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .ortho-modal-section:last-child {
@@ -631,20 +1292,33 @@
   align-items: flex-start;
   justify-content: space-between;
 
-  gap: 12px;
+  gap: 14px;
 
-  margin-bottom: 15px;
+  margin-bottom: 16px;
 }
 
-.ortho-modal-section__header > div:first-child {
+.ortho-modal-section__header
+  > div:first-child {
   display: flex;
   flex-direction: column;
+}
+
+.ortho-modal-section__header
+  .ant-typography:not(
+    .ant-typography-secondary
+  ) {
+  color: var(--ortho-text);
+
+  font-size: 14px;
 }
 
 .ortho-section-description {
   display: block;
 
   margin-top: 2px;
+
+  color:
+    var(--ortho-text-secondary) !important;
 
   font-size: 12px;
 }
@@ -653,36 +1327,169 @@
   margin-bottom: 0;
 }
 
+
 /* ========================================================
-   Selected patient
+   MODAL INPUTS
+======================================================== */
+
+.ortho-case-modal
+  .ant-input,
+.ortho-case-modal
+  .ant-input-affix-wrapper,
+.ortho-case-modal
+  .ant-input-number,
+.ortho-case-modal
+  .ant-picker,
+.ortho-patient-modal
+  .ant-input,
+.ortho-patient-modal
+  .ant-input-affix-wrapper,
+.ortho-patient-modal
+  .ant-input-number,
+.ortho-patient-modal
+  .ant-picker {
+  color: var(--ortho-text);
+
+  background:
+    var(--ortho-input-bg);
+
+  border-color:
+    var(--ortho-border-strong);
+}
+
+.ortho-case-modal
+  textarea.ant-input,
+.ortho-patient-modal
+  textarea.ant-input {
+  color: var(--ortho-text);
+
+  background:
+    var(--ortho-input-bg);
+
+  border-color:
+    var(--ortho-border-strong);
+}
+
+.ortho-case-modal
+  .ant-select-selector,
+.ortho-patient-modal
+  .ant-select-selector {
+  color: var(--ortho-text) !important;
+
+  background:
+    var(--ortho-input-bg) !important;
+
+  border-color:
+    var(--ortho-border-strong) !important;
+}
+
+.ortho-case-modal
+  .ant-select-selection-item,
+.ortho-patient-modal
+  .ant-select-selection-item {
+  color: var(--ortho-text) !important;
+}
+
+.ortho-case-modal
+  .ant-select-arrow,
+.ortho-patient-modal
+  .ant-select-arrow,
+.ortho-case-modal
+  .ant-picker-suffix,
+.ortho-patient-modal
+  .ant-picker-suffix {
+  color:
+    var(--ortho-text-secondary);
+}
+
+.ortho-case-modal
+  .ant-input::placeholder,
+.ortho-case-modal
+  textarea.ant-input::placeholder,
+.ortho-patient-modal
+  .ant-input::placeholder,
+.ortho-patient-modal
+  textarea.ant-input::placeholder,
+.ortho-case-modal
+  .ant-select-selection-placeholder,
+.ortho-patient-modal
+  .ant-select-selection-placeholder {
+  color:
+    var(--ortho-text-muted) !important;
+}
+
+.ortho-case-modal
+  .ant-input-number-input,
+.ortho-patient-modal
+  .ant-input-number-input {
+  color: var(--ortho-text);
+}
+
+
+/* ========================================================
+   SELECTED PATIENT
 ======================================================== */
 
 .ortho-selected-patient {
   margin-top: 4px;
+
+  border-radius: 10px;
 }
 
-.ortho-patient-not-found {
-  padding: 12px;
+.ortho-selected-patient
+  .ant-typography:not(
+    .ant-typography-secondary
+  ) {
+  color: var(--ortho-text);
+}
 
+.ortho-selected-patient
+  .ant-typography-secondary {
+  color:
+    var(--ortho-text-secondary);
+}
+
+
+/* ========================================================
+   PATIENT NOT FOUND
+======================================================== */
+
+.ortho-patient-not-found {
   display: flex;
   flex-direction: column;
   align-items: center;
 
-  gap: 8px;
+  gap: 9px;
+
+  padding: 14px;
+
+  color:
+    var(--ortho-text-secondary);
 
   text-align: center;
 }
 
+
 /* ========================================================
-   New patient
+   NEW PATIENT ALERT
 ======================================================== */
 
 .ortho-new-patient-alert {
-  margin: 18px 0 20px;
+  margin:
+    5px 0 20px;
+
+  border-radius: 11px;
 }
+
+
+/* ========================================================
+   ALLERGY
+======================================================== */
 
 .ortho-allergy-alert {
   margin-bottom: 20px;
+
+  border-radius: 11px;
 }
 
 .ortho-allergy-form-item {
@@ -690,65 +1497,316 @@
   margin-bottom: 0;
 }
 
-/* ========================================================
-   Dark theme / Ant Design dark algorithm compatibility
-======================================================== */
-
-[data-theme="dark"] .ortho-table-toolbar,
-.dark .ortho-table-toolbar {
-  border-color: rgba(255, 255, 255, 0.09);
-}
-
-[data-theme="dark"] .ortho-modal-section,
-.dark .ortho-modal-section {
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .ortho-summary-card:hover,
-.dark .ortho-summary-card:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
-}
-
-[data-theme="dark"] .ortho-case-id,
-.dark .ortho-case-id {
-  background: rgba(22, 119, 255, 0.16);
-}
 
 /* ========================================================
-   Responsive
+   GENERAL TYPOGRAPHY
 ======================================================== */
 
-@media (max-width: 992px) {
-  .ortho-summary-card__value {
-    font-size: 22px;
+.ortho-directory-card
+  .ant-typography:not(
+    .ant-typography-secondary
+  ),
+.ortho-case-modal
+  .ant-typography:not(
+    .ant-typography-secondary
+  ),
+.ortho-patient-modal
+  .ant-typography:not(
+    .ant-typography-secondary
+  ) {
+  color: var(--ortho-text);
+}
+
+.ortho-directory-card
+  .ant-typography-secondary,
+.ortho-case-modal
+  .ant-typography-secondary,
+.ortho-patient-modal
+  .ant-typography-secondary {
+  color:
+    var(--ortho-text-secondary);
+}
+
+
+/* ========================================================
+   DARK SELECT DROPDOWN
+======================================================== */
+
+html[data-theme="dark"]
+  .ant-select-dropdown {
+  color: var(--ortho-text);
+
+  background:
+    var(--ortho-surface-secondary);
+
+  border:
+    1px solid
+    var(--ortho-border);
+
+  box-shadow:
+    0 14px 38px
+    rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme="dark"]
+  .ant-select-item {
+  color: var(--ortho-text);
+}
+
+html[data-theme="dark"]
+  .ant-select-item-option-content {
+  color: inherit;
+}
+
+html[data-theme="dark"]
+  .ant-select-item-option-active:not(
+    .ant-select-item-option-disabled
+  ) {
+  background:
+    rgba(255, 255, 255, 0.06);
+}
+
+html[data-theme="dark"]
+  .ant-select-item-option-selected:not(
+    .ant-select-item-option-disabled
+  ) {
+  color: #60a5fa;
+
+  background:
+    rgba(37, 99, 235, 0.18);
+
+  font-weight: 600;
+}
+
+
+/* ========================================================
+   DARK DATE PICKER
+======================================================== */
+
+html[data-theme="dark"]
+  .ant-picker-dropdown
+  .ant-picker-panel-container {
+  color: var(--ortho-text);
+
+  background:
+    var(--ortho-surface-secondary);
+
+  border:
+    1px solid
+    var(--ortho-border);
+}
+
+html[data-theme="dark"]
+  .ant-picker-dropdown
+  .ant-picker-panel {
+  border-color:
+    var(--ortho-border);
+}
+
+html[data-theme="dark"]
+  .ant-picker-dropdown
+  .ant-picker-header {
+  color: var(--ortho-text);
+
+  border-bottom-color:
+    var(--ortho-border);
+}
+
+html[data-theme="dark"]
+  .ant-picker-dropdown
+  .ant-picker-header
+  button {
+  color:
+    var(--ortho-text-secondary);
+}
+
+html[data-theme="dark"]
+  .ant-picker-dropdown
+  .ant-picker-content
+  th,
+html[data-theme="dark"]
+  .ant-picker-dropdown
+  .ant-picker-cell {
+  color:
+    var(--ortho-text-secondary);
+}
+
+html[data-theme="dark"]
+  .ant-picker-dropdown
+  .ant-picker-cell-in-view {
+  color: var(--ortho-text);
+}
+
+
+/* ========================================================
+   DARK INPUT AUTOFILL
+======================================================== */
+
+html[data-theme="dark"]
+  .ortho-case-modal
+  input:-webkit-autofill,
+html[data-theme="dark"]
+  .ortho-patient-modal
+  input:-webkit-autofill {
+  -webkit-text-fill-color:
+    var(--ortho-text);
+
+  box-shadow:
+    0 0 0 1000px
+    var(--ortho-input-bg)
+    inset;
+}
+
+
+/* ========================================================
+   TRANSITIONS
+======================================================== */
+
+.ortho-summary-card,
+.ortho-directory-card,
+.ortho-table-toolbar,
+.ortho-modal-section,
+.ortho-directory-table
+  .ant-table,
+.ortho-directory-table
+  .ant-table-thead
+  > tr
+  > th,
+.ortho-directory-table
+  .ant-table-tbody
+  > tr
+  > td {
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+/* ========================================================
+   RESPONSIVE
+======================================================== */
+
+
+/* --------------------------------------------------------
+   Medium desktop / laptop
+-------------------------------------------------------- */
+
+@media (max-width: 1400px) {
+  .ortho-summary-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
   }
-}
 
-@media (max-width: 768px) {
-  .ortho-directory-header {
-    flex-direction: column;
+  .ortho-summary-card__value {
+    font-size: 27px;
   }
 
   .ortho-table-toolbar {
-    flex-direction: column;
-    align-items: stretch;
+    gap: 12px;
   }
 
-  .ortho-search-input,
-  .ortho-status-filter {
+  .ortho-filter-tab {
+    padding-inline: 9px;
+  }
+}
+
+
+/* --------------------------------------------------------
+   Tablet landscape
+-------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+  .ortho-summary-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .ortho-table-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ortho-search-wrapper {
+    width: 100%;
+    max-width: none;
+    flex-basis: auto;
+  }
+
+  .ortho-filter-tabs {
     width: 100%;
   }
+}
 
-  .ortho-summary-card .ant-card-body {
-    padding: 16px;
+
+/* --------------------------------------------------------
+   Tablet
+-------------------------------------------------------- */
+
+@media (max-width: 768px) {
+  .ortho-summary-grid {
+    gap: 12px;
+  }
+
+  .ortho-summary-card {
+    min-height: 120px;
+  }
+
+  .ortho-summary-card__content {
+    min-height: 120px;
+
+    padding: 17px;
   }
 
   .ortho-summary-card__value {
-    font-size: 22px;
+    font-size: 24px;
+  }
+
+  .ortho-directory-header {
+    flex-direction: column;
+
+    padding:
+      19px 17px 16px;
+  }
+
+  .ortho-result-count {
+    align-self: flex-start;
+  }
+
+  .ortho-table-toolbar {
+    margin:
+      0 17px 17px;
+
+    padding: 11px;
+  }
+
+  .ortho-filter-tabs {
+    padding-bottom: 2px;
+  }
+
+  .ortho-directory-table
+    .ant-table-thead
+    > tr
+    > th {
+    padding: 13px;
+  }
+
+  .ortho-directory-table
+    .ant-table-tbody
+    > tr
+    > td {
+    padding: 14px 13px;
+  }
+
+  .ortho-directory-table
+    .ant-table-pagination.ant-pagination {
+    margin:
+      16px 14px;
   }
 
   .ortho-modal-section {
-    padding: 14px;
+    padding: 15px;
   }
 
   .ortho-modal-section__header {
@@ -756,14 +1814,43 @@
   }
 }
 
+
+/* --------------------------------------------------------
+   Mobile
+-------------------------------------------------------- */
+
 @media (max-width: 576px) {
+  .ortho-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ortho-summary-card {
+    min-height: 112px;
+  }
+
+  .ortho-summary-card__content {
+    min-height: 112px;
+
+    padding: 16px;
+  }
+
   .ortho-summary-card__icon {
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
 
-    flex-basis: 42px;
+    flex-basis: 44px;
 
-    font-size: 19px;
+    border-radius: 12px;
+
+    font-size: 20px;
+  }
+
+  .ortho-summary-card__value {
+    font-size: 24px;
+  }
+
+  .ortho-directory-title.ant-typography {
+    font-size: 18px;
   }
 
   .ortho-directory-header {
@@ -771,10 +1858,41 @@
   }
 
   .ortho-table-toolbar {
-    padding: 12px 16px;
+    margin:
+      0 12px 15px;
+
+    padding: 10px;
   }
 
-  .ortho-directory-card .ant-pagination {
-    padding-inline: 12px;
+  .ortho-search-wrapper {
+    min-width: 0;
+  }
+
+  .ortho-filter-tab {
+    min-height: 30px;
+
+    padding:
+      4px 9px;
+
+    font-size: 12px;
+  }
+
+  .ortho-directory-table
+    .ant-table-pagination.ant-pagination {
+    justify-content: center;
+
+    margin: 14px 10px;
+
+    gap: 2px;
+  }
+
+  .ortho-directory-card
+    .ant-pagination-total-text {
+    width: 100%;
+
+    margin:
+      0 0 8px;
+
+    text-align: center;
   }
 }

@@ -1,3 +1,7 @@
+/* ========================================================
+   APPOINTMENT DETAILS MODAL
+======================================================== */
+
 /* --------------------------------------------------------
    Main modal
 -------------------------------------------------------- */
@@ -5,8 +9,13 @@
 .appointment-details-modal
   .ant-modal-content {
   overflow: hidden;
+
   padding: 0;
+
   border-radius: 20px;
+
+  background: #ffffff;
+
   box-shadow:
     0 24px 60px rgba(15, 23, 42, 0.22);
 }
@@ -14,14 +23,18 @@
 .appointment-details-modal
   .ant-modal-body {
   padding: 0;
+
   background: #f4f7fb;
 }
 
 .appointment-details-modal
   .ant-modal-footer {
   margin-top: 0;
+
   padding: 15px 22px;
+
   border-top: 1px solid #e8edf5;
+
   background: #ffffff;
 }
 
@@ -29,24 +42,19 @@
   .ant-modal-close {
   top: 16px;
   right: 16px;
+
   color: #ffffff;
-  background: rgba(
-    255,
-    255,
-    255,
-    0.16
-  );
+
+  background:
+    rgba(255, 255, 255, 0.16);
 }
 
 .appointment-details-modal
   .ant-modal-close:hover {
   color: #ffffff;
-  background: rgba(
-    255,
-    255,
-    255,
-    0.26
-  );
+
+  background:
+    rgba(255, 255, 255, 0.26);
 }
 
 /* --------------------------------------------------------
@@ -58,10 +66,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 430px;
-  padding: 40px;
   flex-direction: column;
+
+  min-height: 430px;
+
   gap: 14px;
+
+  padding: 40px;
+
   background: #ffffff;
 }
 
@@ -73,10 +85,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   min-height: 160px;
+
   gap: 24px;
+
   padding: 30px 34px;
+
   color: #ffffff;
+
   background:
     radial-gradient(
       circle at top right,
@@ -108,20 +125,22 @@
 .appointment-details-header__patient {
   display: flex;
   align-items: center;
+
   min-width: 0;
+
   gap: 17px;
 }
 
 .appointment-details-header__avatar {
   flex: 0 0 auto;
+
   color: #2563eb;
-  border: 4px solid rgba(
-    255,
-    255,
-    255,
-    0.45
-  );
+
+  border: 4px solid
+    rgba(255, 255, 255, 0.45);
+
   background: #ffffff;
+
   box-shadow:
     0 10px 25px rgba(15, 23, 42, 0.2);
 }
@@ -137,74 +156,83 @@
 
 .appointment-details-header__eyebrow {
   display: block;
+
   margin-bottom: 3px;
-  color: rgba(
-    255,
-    255,
-    255,
-    0.74
-  );
+
+  color:
+    rgba(255, 255, 255, 0.74);
+
   font-size: 12px;
   font-weight: 700;
+
   text-transform: uppercase;
+
   letter-spacing: 0.7px;
 }
 
 .appointment-details-header__identity
   h3.ant-typography {
   margin: 0;
+
   color: #ffffff;
+
   font-weight: 750;
 }
 
 .appointment-details-header__status {
   margin-inline-end: 0;
+
   padding: 4px 11px;
+
   font-weight: 700;
 }
 
 .appointment-details-header__meta {
   display: flex;
   align-items: center;
-  gap: 8px 18px;
-  margin-top: 10px;
   flex-wrap: wrap;
+
+  gap: 8px 18px;
+
+  margin-top: 10px;
 }
 
 .appointment-details-header__meta
   span {
   display: inline-flex;
   align-items: center;
+
   gap: 7px;
-  color: rgba(
-    255,
-    255,
-    255,
-    0.88
-  );
+
+  color:
+    rgba(255, 255, 255, 0.88);
+
   font-size: 13px;
 }
+
+/* --------------------------------------------------------
+   Dentist block
+-------------------------------------------------------- */
 
 .appointment-details-header__dentist {
   display: flex;
   flex: 0 0 auto;
   align-items: center;
+
   max-width: 310px;
+
   gap: 12px;
+
   padding: 14px 16px;
-  border: 1px solid rgba(
-    255,
-    255,
-    255,
-    0.28
-  );
+
+  border: 1px solid
+    rgba(255, 255, 255, 0.28);
+
   border-radius: 14px;
-  background: rgba(
-    255,
-    255,
-    255,
-    0.14
-  );
+
+  background:
+    rgba(255, 255, 255, 0.14);
+
   backdrop-filter: blur(8px);
 }
 
@@ -213,28 +241,39 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+
   width: 43px;
   height: 43px;
+
   border-radius: 12px;
+
   color: #2563eb;
-  font-size: 19px;
+
   background: #ffffff;
+
+  font-size: 19px;
 }
 
 .appointment-details-header__dentist
   > div:last-child {
   display: flex;
-  min-width: 0;
   flex-direction: column;
+
+  min-width: 0;
+
   gap: 1px;
 }
 
 .appointment-details-header__dentist
   .ant-typography {
   overflow: hidden;
+
   margin: 0;
+
   color: #ffffff;
+
   white-space: nowrap;
+
   text-overflow: ellipsis;
 }
 
@@ -249,9 +288,11 @@
 
 .appointment-details-content {
   display: flex;
-  padding: 22px;
   flex-direction: column;
+
   gap: 16px;
+
+  padding: 22px;
 }
 
 .appointment-allergy-alert,
@@ -267,7 +308,9 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 14px;
+
   margin-bottom: 18px;
 }
 
@@ -287,19 +330,24 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+
   width: 43px;
   height: 43px;
+
   border-radius: 13px;
+
   font-size: 19px;
 }
 
 .appointment-section-icon--blue {
   color: #2563eb;
+
   background: #eff6ff;
 }
 
 .appointment-section-icon--purple {
   color: #7c3aed;
+
   background: #f5f3ff;
 }
 
@@ -310,6 +358,9 @@
 .appointment-progress-card {
   border: 1px solid #e8edf5;
   border-radius: 16px;
+
+  background: #ffffff;
+
   box-shadow:
     0 7px 22px rgba(15, 23, 42, 0.04);
 }
@@ -321,6 +372,7 @@
 
 .appointment-progress-scroll {
   overflow-x: auto;
+
   padding: 6px 2px 8px;
 }
 
@@ -335,8 +387,12 @@
 
 .appointment-information-card {
   height: 100%;
+
   border: 1px solid #e8edf5;
   border-radius: 16px;
+
+  background: #ffffff;
+
   box-shadow:
     0 7px 22px rgba(15, 23, 42, 0.04);
 }
@@ -349,9 +405,13 @@
 .appointment-descriptions
   .ant-descriptions-item-label {
   width: 145px;
+
   color: #64748b;
+
   font-weight: 600;
-  background: #f8fafc !important;
+
+  background:
+    #f8fafc !important;
 }
 
 .appointment-descriptions
@@ -365,10 +425,16 @@
 
 .appointment-finance-card {
   position: relative;
+
   height: 100%;
+
   overflow: hidden;
+
   border: 1px solid #e8edf5;
   border-radius: 15px;
+
+  background: #ffffff;
+
   box-shadow:
     0 7px 20px rgba(15, 23, 42, 0.04);
 }
@@ -377,8 +443,10 @@
   position: absolute;
   top: 0;
   left: 0;
+
   width: 4px;
   height: 100%;
+
   content: "";
 }
 
@@ -407,12 +475,14 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 12px;
 }
 
 .appointment-finance-card
   .ant-statistic-title {
   color: #64748b;
+
   font-size: 13px;
   font-weight: 600;
 }
@@ -420,6 +490,7 @@
 .appointment-finance-card
   .ant-statistic-content {
   color: #172033;
+
   font-size: 22px;
   font-weight: 750;
 }
@@ -429,38 +500,46 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+
   width: 43px;
   height: 43px;
+
   border-radius: 13px;
+
   font-size: 19px;
 }
 
 .appointment-finance-card--blue
   .appointment-finance-card__icon {
   color: #2563eb;
+
   background: #eff6ff;
 }
 
 .appointment-finance-card--green
   .appointment-finance-card__icon {
   color: #16a34a;
+
   background: #f0fdf4;
 }
 
 .appointment-finance-card--red
   .appointment-finance-card__icon {
   color: #dc2626;
+
   background: #fef2f2;
 }
 
 .appointment-finance-card--orange
   .appointment-finance-card__icon {
   color: #d97706;
+
   background: #fffbeb;
 }
 
 .appointment-finance-status {
   padding: 4px 11px;
+
   font-weight: 700;
 }
 
@@ -476,15 +555,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
   height: 54px;
+
   gap: 8px;
+
   border-radius: 13px;
+
   font-weight: 650;
 }
 
 .appointment-detail-action--treatment {
   color: #7c3aed;
+
   border-color: #ddd6fe;
+
   background:
     linear-gradient(
       135deg,
@@ -495,7 +580,9 @@
 
 .appointment-detail-action--payment {
   color: #15803d;
+
   border-color: #bbf7d0;
+
   background:
     linear-gradient(
       135deg,
@@ -511,8 +598,13 @@
 .appointment-sub-modal
   .ant-modal-content {
   overflow: hidden;
+
   padding: 0;
+
   border-radius: 20px;
+
+  background: #ffffff;
+
   box-shadow:
     0 24px 60px rgba(15, 23, 42, 0.22);
 }
@@ -520,14 +612,18 @@
 .appointment-sub-modal
   .ant-modal-body {
   padding: 0;
+
   background: #f4f7fb;
 }
 
 .appointment-sub-modal
   .ant-modal-footer {
   margin-top: 0;
+
   padding: 15px 22px;
+
   border-top: 1px solid #e8edf5;
+
   background: #ffffff;
 }
 
@@ -535,32 +631,31 @@
   .ant-modal-close {
   top: 16px;
   right: 16px;
+
   color: #ffffff;
-  background: rgba(
-    255,
-    255,
-    255,
-    0.16
-  );
+
+  background:
+    rgba(255, 255, 255, 0.16);
 }
 
 .appointment-sub-modal
   .ant-modal-close:hover {
   color: #ffffff;
-  background: rgba(
-    255,
-    255,
-    255,
-    0.25
-  );
+
+  background:
+    rgba(255, 255, 255, 0.25);
 }
 
 .appointment-sub-modal__header {
   display: flex;
   align-items: center;
+
   min-height: 125px;
+
   gap: 14px;
+
   padding: 25px 30px;
+
   color: #ffffff;
 }
 
@@ -597,27 +692,25 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+
   width: 55px;
   height: 55px;
-  border: 1px solid rgba(
-    255,
-    255,
-    255,
-    0.34
-  );
+
+  border: 1px solid
+    rgba(255, 255, 255, 0.34);
+
   border-radius: 16px;
+
+  background:
+    rgba(255, 255, 255, 0.16);
+
   font-size: 24px;
-  background: rgba(
-    255,
-    255,
-    255,
-    0.16
-  );
 }
 
 .appointment-sub-modal__header
   .ant-typography {
   margin: 0;
+
   color: #ffffff;
 }
 
@@ -631,13 +724,18 @@
 
 .appointment-sub-summary__item {
   display: flex;
+  flex-direction: column;
+
   min-height: 72px;
+
+  gap: 4px;
+
   padding: 13px 15px;
+
   border: 1px solid #e8edf5;
   border-radius: 12px;
+
   background: #ffffff;
-  flex-direction: column;
-  gap: 4px;
 }
 
 .appointment-payment-summary {
@@ -650,28 +748,36 @@
 
 .appointment-detail-table {
   overflow: hidden;
+
   border: 1px solid #e8edf5;
   border-radius: 14px;
+
   background: #ffffff;
 }
 
 .appointment-detail-id {
   display: inline-flex;
   align-items: center;
+
   min-height: 32px;
+
   padding: 4px 9px;
+
   border-radius: 8px;
+
   font-size: 12px;
   font-weight: 700;
 }
 
 .appointment-detail-id--purple {
   color: #7c3aed;
+
   background: #f5f3ff;
 }
 
 .appointment-detail-id--green {
   color: #15803d;
+
   background: #f0fdf4;
 }
 
@@ -679,13 +785,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
   width: 34px;
   height: 34px;
+
   margin: auto;
+
   border-radius: 10px;
+
   color: #2563eb;
-  font-weight: 700;
+
   background: #eff6ff;
+
+  font-weight: 700;
 }
 
 .payment-value {
@@ -702,13 +814,824 @@
 
 .appointment-payment-status {
   min-width: 75px;
+
   text-align: center;
+
   font-weight: 600;
 }
 
+/* ========================================================
+   DARK MODE
+======================================================== */
+
 /* --------------------------------------------------------
-   Responsive
+   Main modal
 -------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .appointment-details-modal
+  .ant-modal-content {
+  border: 1px solid #2a394d;
+
+  background: #111b2c;
+
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme="dark"]
+  .appointment-details-modal
+  .ant-modal-body {
+  background: #0d1625;
+}
+
+html[data-theme="dark"]
+  .appointment-details-modal
+  .ant-modal-footer {
+  border-top-color: #27364a;
+
+  background: #111b2c;
+}
+
+/* --------------------------------------------------------
+   Loading / empty
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .appointment-details-loading,
+html[data-theme="dark"]
+  .appointment-details-empty {
+  color: #cbd5e1;
+
+  background: #111b2c;
+}
+
+html[data-theme="dark"]
+  .appointment-details-empty
+  .ant-empty-description {
+  color: #94a3b8;
+}
+
+/* --------------------------------------------------------
+   Header
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .appointment-details-header {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.12),
+      transparent 290px
+    ),
+    linear-gradient(
+      135deg,
+      #1d4ed8,
+      #0369a1
+    );
+}
+
+html[data-theme="dark"]
+  .appointment-details-modal--cancelled
+  .appointment-details-header {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.12),
+      transparent 290px
+    ),
+    linear-gradient(
+      135deg,
+      #7f1d1d,
+      #b91c1c
+    );
+}
+
+html[data-theme="dark"]
+  .appointment-details-header__avatar {
+  color: #60a5fa;
+
+  border-color:
+    rgba(255, 255, 255, 0.28);
+
+  background: #f8fafc;
+
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.28);
+}
+
+html[data-theme="dark"]
+  .appointment-details-modal--cancelled
+  .appointment-details-header__avatar {
+  color: #dc2626;
+}
+
+html[data-theme="dark"]
+  .appointment-details-header__dentist {
+  border-color:
+    rgba(255, 255, 255, 0.2);
+
+  background:
+    rgba(15, 23, 42, 0.18);
+}
+
+html[data-theme="dark"]
+  .appointment-details-header__dentist-icon {
+  color: #60a5fa;
+
+  background: #f8fafc;
+}
+
+/* --------------------------------------------------------
+   Content
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .appointment-details-content {
+  background: #0d1625;
+}
+
+/* --------------------------------------------------------
+   Alerts
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .appointment-allergy-alert.ant-alert-error,
+html[data-theme="dark"]
+  .appointment-cancelled-alert.ant-alert-error {
+  border-color:
+    rgba(248, 113, 113, 0.3);
+
+  background:
+    rgba(127, 29, 29, 0.2);
+}
+
+html[data-theme="dark"]
+  .appointment-allergy-alert.ant-alert-error
+  .ant-alert-message,
+html[data-theme="dark"]
+  .appointment-cancelled-alert.ant-alert-error
+  .ant-alert-message {
+  color: #fecaca;
+}
+
+html[data-theme="dark"]
+  .appointment-allergy-alert.ant-alert-error
+  .ant-alert-description,
+html[data-theme="dark"]
+  .appointment-cancelled-alert.ant-alert-error
+  .ant-alert-description {
+  color: #fca5a5;
+}
+
+/* --------------------------------------------------------
+   Section headings
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .appointment-section-heading
+  .ant-typography {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"]
+  .appointment-section-heading
+  .ant-typography-secondary {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .appointment-section-icon--blue {
+  color: #60a5fa;
+
+  background:
+    rgba(37, 99, 235, 0.16);
+}
+
+html[data-theme="dark"]
+  .appointment-section-icon--purple {
+  color: #c4b5fd;
+
+  background:
+    rgba(124, 58, 237, 0.17);
+}
+
+/* --------------------------------------------------------
+   Progress card
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .appointment-progress-card {
+  border-color: #27364a;
+
+  background: #162033;
+
+  box-shadow:
+    0 7px 22px rgba(0, 0, 0, 0.17);
+}
+
+/* --------------------------------------------------------
+   Steps
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .appointment-progress-card
+  .ant-steps-item-title {
+  color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"]
+  .appointment-progress-card
+  .ant-steps-item-description {
+  color: #64748b !important;
+}
+
+html[data-theme="dark"]
+  .appointment-progress-card
+  .ant-steps-item-wait
+  .ant-steps-item-icon {
+  border-color: #475569;
+
+  background: #111827;
+}
+
+html[data-theme="dark"]
+  .appointment-progress-card
+  .ant-steps-item-wait
+  .ant-steps-icon {
+  color: #64748b;
+}
+
+html[data-theme="dark"]
+  .appointment-progress-card
+  .ant-steps-item-finish
+  .ant-steps-item-icon {
+  border-color: #3b82f6;
+
+  background:
+    rgba(37, 99, 235, 0.14);
+}
+
+html[data-theme="dark"]
+  .appointment-progress-card
+  .ant-steps-item-finish
+  .ant-steps-icon {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"]
+  .appointment-progress-card
+  .ant-steps-item-process
+  .ant-steps-item-icon {
+  border-color: #3b82f6;
+
+  background: #2563eb;
+}
+
+html[data-theme="dark"]
+  .appointment-progress-card
+  .ant-steps-item-tail::after {
+  background-color: #334155 !important;
+}
+
+/* --------------------------------------------------------
+   Information cards
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .appointment-information-card {
+  border-color: #27364a;
+
+  background: #162033;
+
+  box-shadow:
+    0 7px 22px rgba(0, 0, 0, 0.17);
+}
+
+/* --------------------------------------------------------
+   Descriptions
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .appointment-descriptions
+  .ant-descriptions-view {
+  border-color: #334155;
+}
+
+html[data-theme="dark"]
+  .appointment-descriptions
+  .ant-descriptions-row {
+  border-color: #334155;
+}
+
+html[data-theme="dark"]
+  .appointment-descriptions
+  .ant-descriptions-item-label {
+  color: #94a3b8;
+
+  border-color: #334155 !important;
+
+  background:
+    #111b2c !important;
+}
+
+html[data-theme="dark"]
+  .appointment-descriptions
+  .ant-descriptions-item-content {
+  color: #e2e8f0;
+
+  border-color: #334155 !important;
+
+  background: #162033;
+}
+
+html[data-theme="dark"]
+  .appointment-descriptions
+  .ant-typography {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"]
+  .appointment-descriptions
+  .ant-typography-secondary {
+  color: #94a3b8;
+}
+
+/* --------------------------------------------------------
+   Finance cards
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .appointment-finance-card {
+  border-color: #27364a;
+
+  background: #162033;
+
+  box-shadow:
+    0 7px 20px rgba(0, 0, 0, 0.17);
+}
+
+html[data-theme="dark"]
+  .appointment-finance-card
+  .ant-statistic-title {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .appointment-finance-card
+  .ant-statistic-content {
+  color: #f1f5f9;
+}
+
+html[data-theme="dark"]
+  .appointment-finance-card--blue
+  .appointment-finance-card__icon {
+  color: #60a5fa;
+
+  background:
+    rgba(37, 99, 235, 0.16);
+}
+
+html[data-theme="dark"]
+  .appointment-finance-card--green
+  .appointment-finance-card__icon {
+  color: #4ade80;
+
+  background:
+    rgba(22, 163, 74, 0.15);
+}
+
+html[data-theme="dark"]
+  .appointment-finance-card--red
+  .appointment-finance-card__icon {
+  color: #fb7185;
+
+  background:
+    rgba(239, 68, 68, 0.15);
+}
+
+html[data-theme="dark"]
+  .appointment-finance-card--orange
+  .appointment-finance-card__icon {
+  color: #fbbf24;
+
+  background:
+    rgba(245, 158, 11, 0.15);
+}
+
+/* --------------------------------------------------------
+   Action buttons
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .appointment-detail-action--treatment {
+  color: #c4b5fd;
+
+  border-color:
+    rgba(167, 139, 250, 0.3);
+
+  background:
+    linear-gradient(
+      135deg,
+      #162033,
+      rgba(124, 58, 237, 0.12)
+    );
+}
+
+html[data-theme="dark"]
+  .appointment-detail-action--treatment:hover {
+  color: #ddd6fe !important;
+
+  border-color: #8b5cf6 !important;
+
+  background:
+    rgba(124, 58, 237, 0.18) !important;
+}
+
+html[data-theme="dark"]
+  .appointment-detail-action--payment {
+  color: #4ade80;
+
+  border-color:
+    rgba(74, 222, 128, 0.28);
+
+  background:
+    linear-gradient(
+      135deg,
+      #162033,
+      rgba(22, 163, 74, 0.11)
+    );
+}
+
+html[data-theme="dark"]
+  .appointment-detail-action--payment:hover {
+  color: #86efac !important;
+
+  border-color: #22c55e !important;
+
+  background:
+    rgba(22, 163, 74, 0.17) !important;
+}
+
+/* ========================================================
+   SUB MODALS - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .appointment-sub-modal
+  .ant-modal-content {
+  border: 1px solid #2a394d;
+
+  background: #111b2c;
+
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme="dark"]
+  .appointment-sub-modal
+  .ant-modal-body {
+  background: #0d1625;
+}
+
+html[data-theme="dark"]
+  .appointment-sub-modal
+  .ant-modal-footer {
+  border-top-color: #27364a;
+
+  background: #111b2c;
+}
+
+html[data-theme="dark"]
+  .appointment-sub-modal__header--treatment {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.13),
+      transparent 260px
+    ),
+    linear-gradient(
+      135deg,
+      #6d28d9,
+      #4338ca
+    );
+}
+
+html[data-theme="dark"]
+  .appointment-sub-modal__header--payment {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.13),
+      transparent 260px
+    ),
+    linear-gradient(
+      135deg,
+      #166534,
+      #0f766e
+    );
+}
+
+html[data-theme="dark"]
+  .appointment-sub-modal__content {
+  background: #0d1625;
+}
+
+/* --------------------------------------------------------
+   Sub summary
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .appointment-sub-summary__item {
+  border-color: #27364a;
+
+  background: #162033;
+}
+
+html[data-theme="dark"]
+  .appointment-sub-summary__item
+  .ant-typography {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"]
+  .appointment-sub-summary__item
+  .ant-typography-secondary {
+  color: #94a3b8;
+}
+
+/* ========================================================
+   DETAIL TABLES - DARK
+======================================================== */
+
+html[data-theme="dark"]
+  .appointment-detail-table {
+  border-color: #27364a;
+
+  background: #162033;
+}
+
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-table {
+  color: #cbd5e1;
+
+  background: #162033;
+}
+
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-table-container,
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-table-content {
+  background: #162033;
+}
+
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-table-thead
+  > tr
+  > th {
+  color: #94a3b8;
+
+  border-bottom-color:
+    #2a394d !important;
+
+  background:
+    #111b2c !important;
+}
+
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-table-thead
+  > tr
+  > th::before {
+  background-color:
+    #334155 !important;
+}
+
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-table-tbody
+  > tr
+  > td {
+  color: #cbd5e1;
+
+  border-bottom-color: #27364a;
+
+  background: #162033;
+}
+
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-table-tbody
+  > tr:hover
+  > td {
+  background:
+    #1b2940 !important;
+}
+
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-table-cell-row-hover {
+  background:
+    #1b2940 !important;
+}
+
+/* --------------------------------------------------------
+   IDs
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .appointment-detail-id--purple {
+  color: #c4b5fd;
+
+  background:
+    rgba(124, 58, 237, 0.16);
+}
+
+html[data-theme="dark"]
+  .appointment-detail-id--green {
+  color: #4ade80;
+
+  background:
+    rgba(22, 163, 74, 0.15);
+}
+
+/* --------------------------------------------------------
+   Payment values
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .payment-installment-number {
+  color: #60a5fa;
+
+  background:
+    rgba(37, 99, 235, 0.15);
+}
+
+html[data-theme="dark"]
+  .payment-value--paid {
+  color: #4ade80;
+}
+
+html[data-theme="dark"]
+  .payment-value--remaining {
+  color: #fbbf24;
+}
+
+/* --------------------------------------------------------
+   Generic modal typography
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .appointment-sub-modal
+  .ant-typography,
+html[data-theme="dark"]
+  .appointment-details-modal
+  .ant-typography {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"]
+  .appointment-sub-modal
+  .ant-typography-secondary,
+html[data-theme="dark"]
+  .appointment-details-modal
+  .ant-typography-secondary {
+  color: #94a3b8;
+}
+
+/* --------------------------------------------------------
+   Empty state
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-empty-description {
+  color: #94a3b8;
+}
+
+/* --------------------------------------------------------
+   Pagination
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-pagination-total-text {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-pagination-item {
+  border-color: #334155;
+
+  background: #111b2c;
+}
+
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-pagination-item
+  a {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-pagination-item:hover {
+  border-color: #3b82f6;
+}
+
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-pagination-item:hover
+  a {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-pagination-item-active {
+  border-color: #3b82f6;
+
+  background:
+    rgba(37, 99, 235, 0.16);
+}
+
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-pagination-item-active
+  a {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-pagination-prev
+  button,
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-pagination-next
+  button {
+  color: #cbd5e1;
+}
+
+/* --------------------------------------------------------
+   Scrollbars
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .appointment-progress-scroll::-webkit-scrollbar,
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-table-content::-webkit-scrollbar,
+html[data-theme="dark"]
+  .appointment-sub-modal
+  .ant-modal-body::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html[data-theme="dark"]
+  .appointment-progress-scroll::-webkit-scrollbar-track,
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-table-content::-webkit-scrollbar-track,
+html[data-theme="dark"]
+  .appointment-sub-modal
+  .ant-modal-body::-webkit-scrollbar-track {
+  background: #0d1625;
+}
+
+html[data-theme="dark"]
+  .appointment-progress-scroll::-webkit-scrollbar-thumb,
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-table-content::-webkit-scrollbar-thumb,
+html[data-theme="dark"]
+  .appointment-sub-modal
+  .ant-modal-body::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+
+  background: #334155;
+}
+
+html[data-theme="dark"]
+  .appointment-progress-scroll::-webkit-scrollbar-thumb:hover,
+html[data-theme="dark"]
+  .appointment-detail-table
+  .ant-table-content::-webkit-scrollbar-thumb:hover,
+html[data-theme="dark"]
+  .appointment-sub-modal
+  .ant-modal-body::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* ========================================================
+   RESPONSIVE
+======================================================== */
 
 @media (max-width: 900px) {
   .appointment-details-header {
@@ -734,12 +1657,14 @@
   .appointment-details-header__avatar {
     width: 59px !important;
     height: 59px !important;
+
     font-size: 23px !important;
   }
 
   .appointment-details-header__meta {
     align-items: flex-start;
     flex-direction: column;
+
     gap: 6px;
   }
 
@@ -800,33 +1725,51 @@
   }
 }
 
-
 /* ========================================================
-   A6 Ivory Dental prescription preview and print
-   Add this entire section to AppointmentDetailsModal.css
+   A6 IVORY DENTAL PRESCRIPTION PREVIEW / PRINT
 ======================================================== */
 
-.ivory-prescription-preview-modal .ant-modal-content {
+.ivory-prescription-preview-modal
+  .ant-modal-content {
   overflow: hidden;
+
   border-radius: 18px;
+
+  background: #ffffff;
 }
 
-.ivory-prescription-preview-modal .ant-modal-body {
+.ivory-prescription-preview-modal
+  .ant-modal-body {
   max-height: 72vh;
+
   padding: 20px;
+
   overflow-y: auto;
+
   background: #e9efeb;
 }
 
+/* --------------------------------------------------------
+   Prescription sheet
+-------------------------------------------------------- */
+
 .ivory-prescription-sheet {
   position: relative;
+
   width: 105mm;
   min-height: 148mm;
   max-width: 100%;
+
   margin: 0 auto;
+
   padding: 5mm 6mm 4mm;
+
   overflow: hidden;
+
   color: #26332c;
+
+  border: 1px solid #cbd6cd;
+
   background:
     linear-gradient(
       rgba(249, 250, 245, 0.96),
@@ -838,11 +1781,21 @@
       transparent 2px,
       rgba(64, 103, 79, 0.025) 3px
     );
-  border: 1px solid #cbd6cd;
-  box-shadow: 0 15px 36px rgba(32, 62, 45, 0.15);
+
+  box-shadow:
+    0 15px 36px rgba(32, 62, 45, 0.15);
+
   box-sizing: border-box;
-  font-family: Georgia, "Times New Roman", serif;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
 }
+
+/* --------------------------------------------------------
+   Header
+-------------------------------------------------------- */
 
 .ivory-prescription-header {
   width: 100%;
@@ -852,6 +1805,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
   gap: 8px;
 }
 
@@ -863,20 +1817,29 @@
 
 .ivory-prescription-logo-circle {
   display: flex;
-  width: 42px;
-  height: 42px;
   align-items: center;
   justify-content: center;
+
+  width: 42px;
+  height: 42px;
+
   border: 1.5px solid #2f7254;
   border-radius: 50%;
+
   color: #2f7254;
 }
 
 .ivory-prescription-tooth {
   display: block;
-  font-family: Georgia, "Times New Roman", serif;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
   font-size: 25px;
   line-height: 1;
+
   transform: rotate(180deg);
 }
 
@@ -886,27 +1849,48 @@
 
 .ivory-prescription-brand-text h1 {
   margin: 0;
+
   color: #2c6c4e;
-  font-family: Georgia, "Times New Roman", serif;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
   font-size: 21px;
   font-weight: 700;
-  letter-spacing: 0.5px;
   line-height: 1.05;
+
+  letter-spacing: 0.5px;
 }
 
 .ivory-prescription-subtitle {
   margin-top: 2px;
+
   color: #27362e;
-  font-family: "Brush Script MT", "Segoe Script", cursive;
+
+  font-family:
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
+
   font-size: 12px;
   font-style: italic;
   line-height: 1.1;
 }
 
+/* --------------------------------------------------------
+   Contact details
+-------------------------------------------------------- */
+
 .ivory-prescription-contact-grid {
   display: grid;
-  grid-template-columns: 1.35fr 1fr;
+
+  grid-template-columns:
+    1.35fr 1fr;
+
   gap: 9px;
+
   margin-top: 8px;
 }
 
@@ -914,7 +1898,9 @@
 .ivory-prescription-clinic-address {
   display: flex;
   flex-direction: column;
+
   color: #2c332f;
+
   font-size: 7.5px;
   line-height: 1.25;
 }
@@ -930,15 +1916,23 @@
 
 .ivory-prescription-header-line {
   height: 1px;
+
   margin-top: 5px;
+
   background: #47584e;
 }
+
+/* --------------------------------------------------------
+   Patient meta
+-------------------------------------------------------- */
 
 .ivory-prescription-meta {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 7px;
+
   margin-top: 5px;
 }
 
@@ -946,10 +1940,15 @@
   display: flex;
   flex: 1;
   align-items: center;
-  gap: 3px;
+
   min-width: 0;
+
+  gap: 3px;
+
   padding-bottom: 2px;
+
   border-bottom: 1px dotted #7b867f;
+
   font-size: 7.5px;
 }
 
@@ -957,16 +1956,22 @@
   font-weight: 700;
 }
 
-.ivory-prescription-patient-line strong {
+.ivory-prescription-patient-line
+  strong {
   max-width: 128px;
+
   overflow: hidden;
-  text-overflow: ellipsis;
+
   white-space: nowrap;
+
+  text-overflow: ellipsis;
 }
 
 .ivory-prescription-patient-id {
   margin-left: auto;
+
   color: #58635c;
+
   font-size: 6.5px;
 }
 
@@ -974,64 +1979,113 @@
   display: flex;
   flex: 0 0 auto;
   align-items: center;
-  gap: 3px;
+
   min-width: 88px;
-  font-family: "Brush Script MT", "Segoe Script", cursive;
+
+  gap: 3px;
+
+  font-family:
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
+
   font-size: 10px;
   font-style: italic;
 }
 
-.ivory-prescription-date strong {
-  font-family: Georgia, "Times New Roman", serif;
+.ivory-prescription-date
+  strong {
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
   font-size: 7.5px;
   font-style: normal;
 }
 
+/* --------------------------------------------------------
+   Allergy
+-------------------------------------------------------- */
+
 .ivory-prescription-allergy {
   display: flex;
   align-items: flex-start;
+
   gap: 4px;
+
   margin-top: 5px;
+
   padding: 4px 5px;
+
   border: 1px solid #b45454;
   border-radius: 4px;
+
   color: #8d2626;
-  background: rgba(255, 237, 237, 0.75);
-  font-family: Arial, Helvetica, sans-serif;
+
+  background:
+    rgba(255, 237, 237, 0.75);
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
 }
 
-.ivory-prescription-allergy .anticon {
+.ivory-prescription-allergy
+  .anticon {
   margin-top: 1px;
+
   font-size: 8px;
 }
 
-.ivory-prescription-allergy strong,
-.ivory-prescription-allergy span {
+.ivory-prescription-allergy
+  strong,
+.ivory-prescription-allergy
+  span {
   display: block;
 }
 
-.ivory-prescription-allergy strong {
+.ivory-prescription-allergy
+  strong {
   font-size: 6.5px;
+
   letter-spacing: 0.04em;
 }
 
-.ivory-prescription-allergy span {
+.ivory-prescription-allergy
+  span {
   margin-top: 1px;
+
   font-size: 6.5px;
 }
 
+/* --------------------------------------------------------
+   Prescription body
+-------------------------------------------------------- */
+
 .ivory-prescription-body {
   position: relative;
+
   display: flex;
-  gap: 7px;
+
   min-height: 72mm;
+
+  gap: 7px;
+
   padding: 6mm 2px 2mm;
 }
 
 .ivory-prescription-rx {
   flex: 0 0 auto;
+
   color: #2d6048;
-  font-family: Georgia, "Times New Roman", serif;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
   font-size: 25px;
   font-weight: 700;
   line-height: 1;
@@ -1039,20 +2093,32 @@
 
 .ivory-prescription-medicines {
   flex: 1;
+
   padding-top: 2px;
 }
 
 .ivory-prescription-medicine-row {
   margin-bottom: 7px;
+
   padding-bottom: 4px;
-  border-bottom: 1px dotted rgba(63, 81, 69, 0.4);
+
+  border-bottom: 1px dotted
+    rgba(63, 81, 69, 0.4);
+
   color: #1f2d25;
-  font-family: "Courier New", monospace;
+
+  font-family:
+    "Courier New",
+    monospace;
+
   font-size: 8px;
   font-weight: 600;
   line-height: 1.35;
+
   white-space: pre-wrap;
+
   break-inside: avoid;
+
   page-break-inside: avoid;
 }
 
@@ -1060,81 +2126,250 @@
   margin-bottom: 0;
 }
 
+/* --------------------------------------------------------
+   Instructions
+-------------------------------------------------------- */
+
 .ivory-prescription-instructions {
   display: flex;
+
   gap: 3px;
+
   margin-top: 2px;
+
   padding: 4px 5px;
+
   border-top: 1px dotted #89958d;
   border-bottom: 1px dotted #89958d;
+
   color: #35433a;
-  font-family: Arial, Helvetica, sans-serif;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
   font-size: 6.5px;
 }
 
-.ivory-prescription-instructions span {
+.ivory-prescription-instructions
+  span {
   white-space: pre-wrap;
 }
 
 .ivory-prescription-follow-up {
   display: flex;
   align-items: center;
+
   gap: 3px;
+
   margin-top: 4px;
+
   color: #315d46;
-  font-family: Arial, Helvetica, sans-serif;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
   font-size: 6.5px;
 }
+
+/* --------------------------------------------------------
+   Footer
+-------------------------------------------------------- */
 
 .ivory-prescription-footer {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
+
   gap: 12px;
+
   margin-top: 5mm;
+
   padding: 0 3px;
 }
 
 .ivory-prescription-stamp {
   display: flex;
-  max-width: 135px;
   flex-direction: column;
-  color: rgba(74, 116, 91, 0.3);
+
+  max-width: 135px;
+
+  color:
+    rgba(74, 116, 91, 0.3);
+
   font-size: 6.5px;
   line-height: 1.15;
+
   text-align: center;
+
   transform: rotate(-1deg);
 }
 
-.ivory-prescription-stamp strong {
+.ivory-prescription-stamp
+  strong {
   font-size: 7.5px;
 }
 
 .ivory-prescription-signature {
   width: 90px;
+
   text-align: center;
 }
 
 .ivory-prescription-signature-line {
   margin-bottom: 3px;
-  border-top: 1px dotted #3e4a42;
+
+  border-top:
+    1px dotted #3e4a42;
 }
 
-.ivory-prescription-signature span {
+.ivory-prescription-signature
+  span {
   color: #2f3732;
-  font-family: "Brush Script MT", "Segoe Script", cursive;
+
+  font-family:
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
+
   font-size: 10px;
   font-style: italic;
 }
 
 .ivory-prescription-footer-text {
   margin-top: 4px;
+
   color: #283b30;
-  font-family: "Brush Script MT", "Segoe Script", cursive;
+
+  font-family:
+    "Brush Script MT",
+    "Segoe Script",
+    cursive;
+
   font-size: 12px;
   font-weight: 600;
+
   text-align: center;
 }
+
+/* ========================================================
+   PRESCRIPTION PREVIEW DARK MODE
+   The prescription paper itself intentionally remains ivory.
+======================================================== */
+
+html[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-content {
+  border: 1px solid #2a394d;
+
+  background: #111b2c;
+
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-header {
+  border-bottom-color: #27364a;
+
+  background: #111b2c;
+}
+
+html[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-title {
+  color: #f1f5f9;
+}
+
+html[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-close {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-close:hover {
+  color: #f1f5f9;
+
+  background: #1e293b;
+}
+
+html[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-body {
+  background: #0d1625;
+}
+
+html[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-footer {
+  border-top-color: #27364a;
+
+  background: #111b2c;
+}
+
+/* Keep printable prescription light */
+
+html[data-theme="dark"]
+  .ivory-prescription-sheet {
+  color: #26332c;
+
+  border-color: #cbd6cd;
+
+  background:
+    linear-gradient(
+      rgba(249, 250, 245, 0.96),
+      rgba(249, 250, 245, 0.96)
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(64, 103, 79, 0.025) 3px
+    );
+
+  box-shadow:
+    0 18px 46px rgba(0, 0, 0, 0.34);
+}
+
+/* --------------------------------------------------------
+   Prescription modal scrollbar - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+html[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-body::-webkit-scrollbar-track {
+  background: #0d1625;
+}
+
+html[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-body::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+
+  background: #334155;
+}
+
+html[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-modal-body::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* ========================================================
+   PRINT
+======================================================== */
 
 @media print {
   @page {
@@ -1146,33 +2381,63 @@
   body {
     width: 105mm;
     height: 148mm;
+
     margin: 0 !important;
     padding: 0 !important;
+
     background: #ffffff !important;
   }
 
   .ivory-prescription-sheet {
     width: 105mm;
     max-width: none;
+
     min-height: 148mm;
     height: 148mm;
+
     margin: 0;
+
     padding: 5mm 6mm 4mm;
+
     overflow: hidden;
+
     border: 0;
+
+    background:
+      linear-gradient(
+        rgba(249, 250, 245, 0.96),
+        rgba(249, 250, 245, 0.96)
+      ),
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(64, 103, 79, 0.025) 3px
+      ) !important;
+
     box-shadow: none;
+
     box-sizing: border-box;
+
+    color: #26332c !important;
+
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }
 }
 
+/* ========================================================
+   PRESCRIPTION RESPONSIVE
+======================================================== */
+
 @media (max-width: 560px) {
   .ivory-prescription-preview-modal {
-    max-width: calc(100vw - 16px);
+    max-width:
+      calc(100vw - 16px);
   }
 
-  .ivory-prescription-preview-modal .ant-modal-body {
+  .ivory-prescription-preview-modal
+    .ant-modal-body {
     padding: 10px;
   }
 

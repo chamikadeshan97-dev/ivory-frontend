@@ -2985,7 +2985,7 @@ const Appointments = () => {
                 >
                   {showPatientMoreOptions
                     ? "Hide additional information"
-                    : "+ Add more information"}
+                    : "+ Add more"}
                 </Button>
               </div>
             </Col>
@@ -3130,16 +3130,17 @@ const Appointments = () => {
                         }}
                         onConfirm={handleSaveSkippedAppointment}
                       >
-                        <Button
-                          htmlType="button"
-                          block
-                          danger
-                          ghost
-                          loading={skippingNumber}
-                          disabled={saving}
-                        >
-                          Reserve #{nextAppointmentNo}
-                        </Button>
+                       <Button
+  htmlType="button"
+  block
+  danger
+  ghost
+  loading={skippingNumber}
+  disabled={saving}
+  className="reserve-number-btn"
+>
+  Reserve #{nextAppointmentNo}
+</Button>
                       </Popconfirm>
                     ) : (
                       <Alert

@@ -1,6 +1,129 @@
+/* ========================================================
+   PATIENTS - THEME VARIABLES
+======================================================== */
+
 /* --------------------------------------------------------
-   Summary cards
+   Light Theme
 -------------------------------------------------------- */
+
+:root,
+html[data-theme="light"] {
+  --patient-bg: #ffffff;
+  --patient-bg-secondary: #f8fafc;
+  --patient-bg-soft: #fafafa;
+
+  --patient-text: #172033;
+  --patient-text-secondary: #64748b;
+  --patient-text-muted: #94a3b8;
+
+  --patient-border: #e8edf5;
+  --patient-border-soft: #edf1f7;
+  --patient-border-strong: #cbd5e1;
+
+  --patient-input-bg: #ffffff;
+
+  --patient-shadow:
+    0 8px 24px rgba(15, 23, 42, 0.05);
+
+  --patient-shadow-hover:
+    0 14px 30px rgba(15, 23, 42, 0.09);
+
+  /* Accent surfaces */
+
+  --patient-blue-soft: #eff6ff;
+  --patient-blue-medium: #dbeafe;
+
+  --patient-red-soft: #fef2f2;
+  --patient-red-medium: #fee2e2;
+
+  --patient-green-soft: #f0fdf4;
+  --patient-orange-soft: #fffbeb;
+  --patient-purple-soft: #f5f3ff;
+
+  /* Allergy row */
+
+  --patient-allergy-row: #fffafa;
+  --patient-allergy-row-hover: #fff4f4;
+
+  /* Form gradients */
+
+  --patient-form-gradient-start: #ffffff;
+  --patient-form-gradient-end: #f8fbff;
+
+  --patient-allergy-gradient-start: #ffffff;
+  --patient-allergy-gradient-end: #fffafa;
+}
+
+
+/* --------------------------------------------------------
+   Dark Theme
+-------------------------------------------------------- */
+
+html[data-theme="dark"] {
+  --patient-bg: #111827;
+  --patient-bg-secondary: #172033;
+  --patient-bg-soft: #151e2c;
+
+  --patient-text: #f8fafc;
+  --patient-text-secondary: #cbd5e1;
+  --patient-text-muted: #94a3b8;
+
+  --patient-border: #263244;
+  --patient-border-soft: #223044;
+  --patient-border-strong: #334155;
+
+  --patient-input-bg: #172033;
+
+  --patient-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.26);
+
+  --patient-shadow-hover:
+    0 16px 36px rgba(0, 0, 0, 0.36);
+
+  /* Accent surfaces */
+
+  --patient-blue-soft:
+    rgba(37, 99, 235, 0.14);
+
+  --patient-blue-medium:
+    rgba(37, 99, 235, 0.22);
+
+  --patient-red-soft:
+    rgba(220, 38, 38, 0.14);
+
+  --patient-red-medium:
+    rgba(220, 38, 38, 0.2);
+
+  --patient-green-soft:
+    rgba(22, 163, 74, 0.14);
+
+  --patient-orange-soft:
+    rgba(245, 158, 11, 0.14);
+
+  --patient-purple-soft:
+    rgba(124, 58, 237, 0.14);
+
+  /* Allergy row */
+
+  --patient-allergy-row:
+    rgba(220, 38, 38, 0.07);
+
+  --patient-allergy-row-hover:
+    rgba(220, 38, 38, 0.11);
+
+  /* Form gradients */
+
+  --patient-form-gradient-start: #111827;
+  --patient-form-gradient-end: #141e2d;
+
+  --patient-allergy-gradient-start: #111827;
+  --patient-allergy-gradient-end: #1a1820;
+}
+
+
+/* ========================================================
+   SUMMARY CARDS
+======================================================== */
 
 .patient-summary-row {
   margin-bottom: 16px;
@@ -8,32 +131,56 @@
 
 .patient-summary-card {
   position: relative;
+
   height: 100%;
+
   overflow: hidden;
+
   cursor: pointer;
-  border: 1px solid #edf1f7;
+
+  background:
+    var(--patient-bg);
+
+  border:
+    1px solid
+    var(--patient-border-soft);
+
   border-radius: 18px;
+
   box-shadow:
-    0 8px 24px rgba(15, 23, 42, 0.05);
+    var(--patient-shadow);
+
   transition:
     transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+    background-color 0.25s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .patient-summary-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(37, 99, 235, 0.22);
+
+  border-color:
+    rgba(37, 99, 235, 0.32);
+
   box-shadow:
-    0 14px 30px rgba(15, 23, 42, 0.09);
+    var(--patient-shadow-hover);
 }
+
+
+/* --------------------------------------------------------
+   Accent Line
+-------------------------------------------------------- */
 
 .patient-summary-card::before {
   position: absolute;
+
   top: 0;
   left: 0;
+
   width: 5px;
   height: 100%;
+
   content: "";
 }
 
@@ -53,7 +200,13 @@
   background: #f59e0b;
 }
 
-.patient-summary-card .ant-card-body {
+
+/* --------------------------------------------------------
+   Card Body
+-------------------------------------------------------- */
+
+.patient-summary-card
+  .ant-card-body {
   padding: 20px;
 }
 
@@ -61,75 +214,117 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 14px;
 }
 
 .patient-summary-card__title {
   display: block;
+
   margin-bottom: 7px;
-  color: #64748b;
+
+  color:
+    var(--patient-text-secondary);
+
   font-size: 13px;
   font-weight: 600;
 }
 
 .patient-summary-card__value {
-  color: #172033;
+  color:
+    var(--patient-text);
+
   font-size: 29px;
   font-weight: 750;
+
   line-height: 1.2;
 }
 
 .patient-summary-card__helper {
   display: block;
+
   margin-top: 5px;
-  color: #94a3b8;
+
+  color:
+    var(--patient-text-muted);
+
   font-size: 12px;
 }
 
+
+/* --------------------------------------------------------
+   Summary Icons
+-------------------------------------------------------- */
+
 .patient-summary-card__icon {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
   width: 47px;
   height: 47px;
+
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   border-radius: 14px;
+
   font-size: 21px;
 }
 
 .patient-summary-card--blue
   .patient-summary-card__icon {
   color: #2563eb;
-  background: #eff6ff;
+
+  background:
+    var(--patient-blue-soft);
 }
 
 .patient-summary-card--red
   .patient-summary-card__icon {
   color: #dc2626;
-  background: #fef2f2;
+
+  background:
+    var(--patient-red-soft);
 }
 
 .patient-summary-card--green
   .patient-summary-card__icon {
   color: #16a34a;
-  background: #f0fdf4;
+
+  background:
+    var(--patient-green-soft);
 }
 
 .patient-summary-card--orange
   .patient-summary-card__icon {
   color: #d97706;
-  background: #fffbeb;
+
+  background:
+    var(--patient-orange-soft);
 }
 
-/* --------------------------------------------------------
-   Directory card
--------------------------------------------------------- */
+
+/* ========================================================
+   DIRECTORY CARD
+======================================================== */
 
 .patient-directory-card {
-  border: 1px solid #e8edf5;
+  background:
+    var(--patient-bg);
+
+  border:
+    1px solid
+    var(--patient-border);
+
   border-radius: 18px;
+
   box-shadow:
-    0 8px 24px rgba(15, 23, 42, 0.045);
+    var(--patient-shadow);
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .patient-directory-card
@@ -137,11 +332,18 @@
   padding: 22px;
 }
 
+
+/* ========================================================
+   DIRECTORY HEADER
+======================================================== */
+
 .patient-directory-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 16px;
+
   margin-bottom: 20px;
 }
 
@@ -153,265 +355,550 @@
 
 .patient-result-count {
   padding: 4px 11px;
+
   font-weight: 600;
 }
+
+
+/* ========================================================
+   TABLE TOOLBAR
+======================================================== */
 
 .patient-table-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 14px;
+
   margin-bottom: 20px;
+
   padding: 14px;
-  border: 1px solid #edf1f7;
+
+  background:
+    var(--patient-bg-secondary);
+
+  border:
+    1px solid
+    var(--patient-border-soft);
+
   border-radius: 14px;
-  background: #f8fafc;
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .patient-search-input {
   width: 100%;
+
   max-width: 430px;
 }
 
 .patient-search-input
   .ant-input-affix-wrapper {
-  background: #ffffff;
+  background:
+    var(--patient-input-bg);
+
+  border-color:
+    var(--patient-border-strong);
+}
+
+.patient-search-input
+  .ant-input {
+  color:
+    var(--patient-text);
+
+  background: transparent;
+}
+
+.patient-search-input
+  .ant-input::placeholder {
+  color:
+    var(--patient-text-muted);
 }
 
 .patient-allergy-filter {
   flex: 0 0 auto;
 }
 
-/* --------------------------------------------------------
-   Patient table
--------------------------------------------------------- */
+
+/* ========================================================
+   PATIENT TABLE
+======================================================== */
+
+.patient-directory-card
+  .ant-table {
+  color:
+    var(--patient-text);
+
+  background:
+    var(--patient-bg);
+}
+
+.patient-directory-card
+  .ant-table-container {
+  border-color:
+    var(--patient-border);
+}
+
+.patient-directory-card
+  .ant-table-thead
+  > tr
+  > th {
+  color:
+    var(--patient-text-secondary);
+
+  background:
+    var(--patient-bg-secondary);
+
+  border-bottom-color:
+    var(--patient-border);
+}
+
+.patient-directory-card
+  .ant-table-thead
+  > tr
+  > th::before {
+  background:
+    var(--patient-border) !important;
+}
+
+.patient-directory-card
+  .ant-table-tbody
+  > tr
+  > td {
+  color:
+    var(--patient-text);
+
+  background:
+    var(--patient-bg);
+
+  border-bottom-color:
+    var(--patient-border);
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.patient-directory-card
+  .ant-table-tbody
+  > tr:not(.allergy-patient-row):hover
+  > td {
+  background:
+    var(--patient-bg-secondary) !important;
+}
+
+
+/* ========================================================
+   PATIENT ID
+======================================================== */
 
 .patient-id-badge {
+  min-height: 34px;
+
+  padding: 5px 10px;
+
   display: inline-flex;
   align-items: center;
-  min-height: 34px;
-  padding: 5px 10px;
-  border-radius: 9px;
+
   color: #2563eb;
+
+  background:
+    var(--patient-blue-soft);
+
+  border-radius: 9px;
+
   font-size: 12px;
   font-weight: 700;
-  background: #eff6ff;
 }
+
+
+/* ========================================================
+   PATIENT AVATAR
+======================================================== */
 
 .patient-avatar {
   color: #2563eb;
+
   background:
     linear-gradient(
       135deg,
-      #eff6ff,
-      #dbeafe
+      var(--patient-blue-soft),
+      var(--patient-blue-medium)
     );
 }
 
 .patient-avatar--allergy {
   color: #dc2626;
+
   background:
     linear-gradient(
       135deg,
-      #fef2f2,
-      #fee2e2
+      var(--patient-red-soft),
+      var(--patient-red-medium)
     );
 }
 
+
+/* ========================================================
+   PATIENT NAME CELL
+======================================================== */
+
 .patient-name-cell {
-  display: flex;
   min-width: 0;
+
+  display: flex;
   flex-direction: column;
+
   gap: 4px;
+}
+
+.patient-name-cell
+  .ant-typography {
+  color:
+    var(--patient-text);
+}
+
+.patient-name-cell
+  .ant-typography-secondary {
+  color:
+    var(--patient-text-secondary);
 }
 
 .patient-allergy-preview {
   display: block;
-  overflow: hidden;
+
   max-width: 220px;
+
+  overflow: hidden;
+
+  color:
+    var(--patient-text-secondary);
+
   font-size: 12px;
+
   white-space: nowrap;
+
   text-overflow: ellipsis;
 }
 
 .patient-phone-icon {
-  color: #64748b;
+  color:
+    var(--patient-text-secondary);
 }
+
+
+/* ========================================================
+   ALLERGY TAG
+======================================================== */
 
 .allergy-alert-tag {
   margin-inline-end: 0;
+
   font-size: 10px;
   font-weight: 700;
+
   letter-spacing: 0.2px;
 }
 
+
+/* ========================================================
+   ALLERGY TABLE ROW
+======================================================== */
+
 .allergy-patient-row td {
-  background: #fffafa !important;
+  background:
+    var(--patient-allergy-row) !important;
 }
 
 .allergy-patient-row:hover td {
-  background: #fff4f4 !important;
+  background:
+    var(--patient-allergy-row-hover) !important;
 }
 
 .allergy-patient-row
   td:first-child {
-  border-left: 4px solid #dc2626;
+  border-left:
+    4px solid
+    #dc2626;
 }
 
-/* --------------------------------------------------------
-   Modal title
--------------------------------------------------------- */
+
+/* ========================================================
+   MODAL TITLE
+======================================================== */
 
 .patient-modal-title {
   display: flex;
   align-items: center;
+
   gap: 11px;
 }
 
 .patient-modal-title__icon {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
   width: 39px;
   height: 39px;
-  border-radius: 11px;
+
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   color: #ffffff;
-  font-size: 17px;
+
   background:
     linear-gradient(
       135deg,
       #2563eb,
       #0284c7
     );
+
+  border-radius: 11px;
+
+  font-size: 17px;
 }
 
 .patient-modal-title
   > div:last-child {
   display: flex;
   flex-direction: column;
+
   gap: 1px;
 }
 
 .patient-modal-title
   .ant-typography-secondary {
+  color:
+    var(--patient-text-secondary);
+
   font-size: 12px;
   font-weight: 400;
 }
 
-/* --------------------------------------------------------
-   Modal form
--------------------------------------------------------- */
+
+/* ========================================================
+   PATIENT FORM MODAL
+======================================================== */
 
 .patient-form-modal
   .ant-modal-content {
   overflow: hidden;
+
+  background:
+    var(--patient-bg);
+}
+
+.patient-form-modal
+  .ant-modal-header {
+  background:
+    var(--patient-bg);
+}
+
+.patient-form-modal
+  .ant-modal-title {
+  color:
+    var(--patient-text);
+}
+
+.patient-form-modal
+  .ant-modal-close {
+  color:
+    var(--patient-text-secondary);
 }
 
 .patient-form-modal
   .ant-modal-body {
   max-height: 70vh;
+
   overflow-y: auto;
+
   padding-top: 20px;
+
+  color:
+    var(--patient-text);
+
+  background:
+    var(--patient-bg);
 }
+
+
+/* ========================================================
+   FORM SECTIONS
+======================================================== */
 
 .patient-form-section {
   margin-bottom: 16px;
+
   padding: 17px;
-  border: 1px solid #e8edf5;
+
+  background:
+    var(--patient-bg);
+
+  border:
+    1px solid
+    var(--patient-border);
+
   border-radius: 14px;
-  background: #ffffff;
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .patient-form-section--additional {
-  height: calc(100% - 16px);
+  height:
+    calc(100% - 16px);
+
   background:
     linear-gradient(
       145deg,
-      #ffffff,
-      #f8fbff
+      var(--patient-form-gradient-start),
+      var(--patient-form-gradient-end)
     );
 }
+
+
+/* ========================================================
+   FORM SECTION HEADER
+======================================================== */
 
 .patient-form-section__header {
   display: flex;
   align-items: center;
+
   gap: 10px;
+
   margin-bottom: 17px;
+
   padding-bottom: 12px;
-  border-bottom: 1px solid #edf1f7;
+
+  border-bottom:
+    1px solid
+    var(--patient-border-soft);
 }
 
 .patient-form-section__header
   > div:last-child {
   display: flex;
   flex-direction: column;
+
   gap: 1px;
 }
 
 .patient-form-section__header
   .ant-typography-secondary {
+  color:
+    var(--patient-text-secondary);
+
   font-size: 12px;
 }
 
+
+/* ========================================================
+   FORM SECTION ICONS
+======================================================== */
+
 .patient-form-section__icon {
-  display: flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
   width: 37px;
   height: 37px;
-  border-radius: 10px;
+
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   color: #2563eb;
-  background: #eff6ff;
+
+  background:
+    var(--patient-blue-soft);
+
+  border-radius: 10px;
 }
 
 .patient-form-section__icon--allergy {
   color: #dc2626;
-  background: #fef2f2;
+
+  background:
+    var(--patient-red-soft);
 }
 
 .patient-form-section__icon--additional {
   color: #7c3aed;
-  background: #f5f3ff;
+
+  background:
+    var(--patient-purple-soft);
 }
+
+
+/* ========================================================
+   ALLERGY SECTION
+======================================================== */
 
 .patient-allergy-section {
   background:
     linear-gradient(
       145deg,
-      #ffffff,
-      #fffafa
+      var(--patient-allergy-gradient-start),
+      var(--patient-allergy-gradient-end)
     );
 }
 
+
+/* ========================================================
+   ALLERGY CHOICE
+======================================================== */
+
 .allergy-choice-group {
   display: grid;
+
   grid-template-columns:
     repeat(2, 1fr);
+
   gap: 9px;
 }
 
 .allergy-choice {
   height: 42px;
+
   font-weight: 600;
 }
 
 .allergy-choice--selected-no {
   color: #ffffff !important;
-  border-color: #16a34a !important;
-  background: #16a34a !important;
+
+  background:
+    #16a34a !important;
+
+  border-color:
+    #16a34a !important;
+
   box-shadow:
-    0 5px 13px rgba(22, 163, 74, 0.18);
+    0 5px 13px
+    rgba(22, 163, 74, 0.18);
 }
 
 .allergy-choice--selected-yes {
   color: #ffffff !important;
-  border-color: #dc2626 !important;
-  background: #dc2626 !important;
+
+  background:
+    #dc2626 !important;
+
+  border-color:
+    #dc2626 !important;
+
   box-shadow:
-    0 5px 13px rgba(220, 38, 38, 0.18);
+    0 5px 13px
+    rgba(220, 38, 38, 0.18);
 }
+
+
+/* ========================================================
+   ALLERGY ALERT
+======================================================== */
 
 .allergy-form-alert {
   margin-top: 5px;
@@ -426,25 +913,336 @@
   margin-bottom: 0;
 }
 
+
+/* ========================================================
+   MORE OPTIONS
+======================================================== */
+
 .patient-more-options {
   display: flex;
+
   justify-content: flex-end;
+
   margin-top: -3px;
 }
 
 .patient-more-options
   .ant-btn {
   padding-inline: 0;
+
   font-weight: 600;
 }
 
-/* --------------------------------------------------------
-   Responsive
--------------------------------------------------------- */
+
+/* ========================================================
+   ANT DESIGN FORM ELEMENTS
+======================================================== */
+
+.patient-form-modal
+  .ant-form-item-label
+  > label {
+  color:
+    var(--patient-text);
+
+  font-weight: 600;
+}
+
+.patient-form-modal
+  .ant-input,
+.patient-form-modal
+  .ant-input-affix-wrapper,
+.patient-form-modal
+  .ant-input-number,
+.patient-form-modal
+  .ant-input-number-input,
+.patient-form-modal
+  .ant-select-selector,
+.patient-form-modal
+  .ant-picker,
+.patient-form-modal
+  textarea.ant-input {
+  color:
+    var(--patient-text);
+
+  background:
+    var(--patient-input-bg);
+
+  border-color:
+    var(--patient-border-strong);
+}
+
+.patient-form-modal
+  .ant-input::placeholder,
+.patient-form-modal
+  textarea.ant-input::placeholder,
+.patient-form-modal
+  .ant-select-selection-placeholder {
+  color:
+    var(--patient-text-muted);
+}
+
+
+/* ========================================================
+   TYPOGRAPHY
+======================================================== */
+
+.patient-directory-card
+  .ant-typography:not(
+    .ant-typography-secondary
+  ),
+.patient-form-modal
+  .ant-typography:not(
+    .ant-typography-secondary
+  ) {
+  color:
+    var(--patient-text);
+}
+
+.patient-directory-card
+  .ant-typography-secondary,
+.patient-form-modal
+  .ant-typography-secondary {
+  color:
+    var(--patient-text-secondary);
+}
+
+
+/* ========================================================
+   PAGINATION
+======================================================== */
+
+.patient-directory-card
+  .ant-pagination {
+  color:
+    var(--patient-text-secondary);
+}
+
+html[data-theme="dark"]
+  .patient-directory-card
+  .ant-pagination-item {
+  background:
+    var(--patient-bg-secondary);
+
+  border-color:
+    var(--patient-border);
+}
+
+html[data-theme="dark"]
+  .patient-directory-card
+  .ant-pagination-item
+  a {
+  color:
+    var(--patient-text);
+}
+
+html[data-theme="dark"]
+  .patient-directory-card
+  .ant-pagination-item-active {
+  border-color: #2563eb;
+
+  background:
+    var(--patient-blue-soft);
+}
+
+html[data-theme="dark"]
+  .patient-directory-card
+  .ant-pagination-prev
+  button,
+html[data-theme="dark"]
+  .patient-directory-card
+  .ant-pagination-next
+  button {
+  color:
+    var(--patient-text-secondary);
+}
+
+
+/* ========================================================
+   DARK MODE ACCENT IMPROVEMENTS
+======================================================== */
+
+html[data-theme="dark"]
+  .patient-summary-card--blue
+  .patient-summary-card__icon,
+html[data-theme="dark"]
+  .patient-id-badge {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"]
+  .patient-summary-card--red
+  .patient-summary-card__icon {
+  color: #f87171;
+}
+
+html[data-theme="dark"]
+  .patient-summary-card--green
+  .patient-summary-card__icon {
+  color: #4ade80;
+}
+
+html[data-theme="dark"]
+  .patient-summary-card--orange
+  .patient-summary-card__icon {
+  color: #fbbf24;
+}
+
+html[data-theme="dark"]
+  .patient-form-section__icon {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"]
+  .patient-form-section__icon--allergy {
+  color: #f87171;
+}
+
+html[data-theme="dark"]
+  .patient-form-section__icon--additional {
+  color: #a78bfa;
+}
+
+html[data-theme="dark"]
+  .patient-avatar {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"]
+  .patient-avatar--allergy {
+  color: #f87171;
+}
+
+
+/* ========================================================
+   DARK MODE SELECT / DROPDOWN
+======================================================== */
+
+html[data-theme="dark"]
+  .ant-select-dropdown {
+  color:
+    var(--patient-text);
+
+  background:
+    var(--patient-bg-secondary);
+}
+
+html[data-theme="dark"]
+  .ant-select-item {
+  color:
+    var(--patient-text);
+}
+
+html[data-theme="dark"]
+  .ant-select-item-option-active:not(
+    .ant-select-item-option-disabled
+  ) {
+  background:
+    rgba(255, 255, 255, 0.06);
+}
+
+html[data-theme="dark"]
+  .ant-select-item-option-selected:not(
+    .ant-select-item-option-disabled
+  ) {
+  color: #ffffff;
+
+  background:
+    rgba(37, 99, 235, 0.2);
+}
+
+
+/* ========================================================
+   DARK MODE SEGMENTED CONTROL
+======================================================== */
+
+html[data-theme="dark"]
+  .patient-allergy-filter.ant-segmented {
+  color:
+    var(--patient-text-secondary);
+
+  background:
+    var(--patient-bg-secondary);
+}
+
+html[data-theme="dark"]
+  .patient-allergy-filter
+  .ant-segmented-item-selected {
+  color:
+    var(--patient-text);
+
+  background:
+    var(--patient-bg);
+}
+
+
+/* ========================================================
+   DARK MODE MODAL MASK / SCROLLBAR
+======================================================== */
+
+.patient-form-modal
+  .ant-modal-body {
+  scrollbar-width: thin;
+
+  scrollbar-color:
+    var(--patient-border-strong)
+    transparent;
+}
+
+.patient-form-modal
+  .ant-modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.patient-form-modal
+  .ant-modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.patient-form-modal
+  .ant-modal-body::-webkit-scrollbar-thumb {
+  background:
+    var(--patient-border-strong);
+
+  border-radius: 999px;
+}
+
+
+/* ========================================================
+   TRANSITIONS
+======================================================== */
+
+.patient-summary-card,
+.patient-directory-card,
+.patient-table-toolbar,
+.patient-form-section,
+.patient-search-input
+  .ant-input-affix-wrapper,
+.patient-directory-card
+  .ant-table,
+.patient-directory-card
+  .ant-table-thead
+  > tr
+  > th,
+.patient-directory-card
+  .ant-table-tbody
+  > tr
+  > td {
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+/* ========================================================
+   RESPONSIVE
+======================================================== */
 
 @media (max-width: 900px) {
   .patient-table-toolbar {
     align-items: stretch;
+
     flex-direction: column;
   }
 
@@ -454,9 +1252,11 @@
 
   .patient-allergy-filter {
     width: 100%;
+
     overflow-x: auto;
   }
 }
+
 
 @media (max-width: 768px) {
   .patient-directory-card
@@ -466,6 +1266,7 @@
 
   .patient-directory-header {
     align-items: flex-start;
+
     flex-direction: column;
   }
 
@@ -477,6 +1278,7 @@
     grid-template-columns: 1fr;
   }
 }
+
 
 @media (max-width: 480px) {
   .patient-table-toolbar {
@@ -490,6 +1292,7 @@
   .patient-allergy-filter
     .ant-segmented-item-label {
     padding-inline: 8px;
+
     font-size: 12px;
   }
 }

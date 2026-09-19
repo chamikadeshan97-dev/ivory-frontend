@@ -1,19 +1,123 @@
 /* ========================================================
-   User Management
+   USER MANAGEMENT
    File: UserRegistration.css
+   LIGHT + DARK THEME
+======================================================== */
+
+
+/* ========================================================
+   THEME VARIABLES
 ======================================================== */
 
 /* --------------------------------------------------------
-   Page
+   Light Theme
 -------------------------------------------------------- */
+
+:root,
+html[data-theme="light"] {
+  --user-surface: #ffffff;
+  --user-surface-secondary: #f8fafc;
+  --user-surface-soft: #fbfdff;
+
+  --user-text-primary: #16324f;
+  --user-text-secondary: #66788a;
+  --user-text-muted: #94a3b8;
+
+  --user-border: #e6edf5;
+  --user-border-soft: #edf2f7;
+  --user-border-secondary: #e8eef5;
+
+  --user-input-bg: #ffffff;
+  --user-input-border: #d9e2ec;
+
+  --user-table-header: #f7faff;
+  --user-table-hover: #f5faff;
+
+  --user-role-guide-bg: #fbfdff;
+
+  --user-shadow:
+    0 8px 24px rgba(15, 45, 75, 0.06);
+
+  --user-shadow-hover:
+    0 12px 30px rgba(15, 45, 75, 0.1);
+
+  --user-blue-soft:
+    rgba(22, 119, 255, 0.1);
+
+  --user-green-soft:
+    rgba(22, 163, 74, 0.1);
+
+  --user-purple-soft:
+    rgba(124, 58, 237, 0.1);
+
+  --user-orange-soft:
+    rgba(245, 158, 11, 0.1);
+}
+
+
+/* --------------------------------------------------------
+   Dark Theme
+-------------------------------------------------------- */
+
+html[data-theme="dark"] {
+  --user-surface: #111827;
+  --user-surface-secondary: #172033;
+  --user-surface-soft: #141e2d;
+
+  --user-text-primary: #f8fafc;
+  --user-text-secondary: #cbd5e1;
+  --user-text-muted: #94a3b8;
+
+  --user-border: #263244;
+  --user-border-soft: #223044;
+  --user-border-secondary: #2b3748;
+
+  --user-input-bg: #172033;
+  --user-input-border: #334155;
+
+  --user-table-header: #172033;
+  --user-table-hover: #1b2638;
+
+  --user-role-guide-bg: #141e2d;
+
+  --user-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.26);
+
+  --user-shadow-hover:
+    0 15px 36px rgba(0, 0, 0, 0.36);
+
+  --user-blue-soft:
+    rgba(59, 130, 246, 0.14);
+
+  --user-green-soft:
+    rgba(34, 197, 94, 0.14);
+
+  --user-purple-soft:
+    rgba(168, 85, 247, 0.14);
+
+  --user-orange-soft:
+    rgba(245, 158, 11, 0.14);
+}
+
+
+/* ========================================================
+   PAGE
+======================================================== */
 
 .user-management-page {
   width: 100%;
+
+  color:
+    var(--user-text-primary);
+
+  transition:
+    color 0.25s ease;
 }
 
-/* --------------------------------------------------------
-   Summary cards
--------------------------------------------------------- */
+
+/* ========================================================
+   SUMMARY CARDS
+======================================================== */
 
 .user-summary-row {
   margin-bottom: 24px;
@@ -21,59 +125,134 @@
 
 .user-summary-card {
   height: 100%;
+
+  background:
+    var(--user-surface);
+
+  border:
+    1px solid
+    var(--user-border);
+
   border-radius: 16px;
-  border: 1px solid #e6edf5;
-  box-shadow: 0 8px 24px rgba(15, 45, 75, 0.06);
+
+  box-shadow:
+    var(--user-shadow);
+
   transition:
     transform 0.2s ease,
+    background-color 0.25s ease,
+    border-color 0.25s ease,
     box-shadow 0.2s ease;
 }
 
 .user-summary-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(15, 45, 75, 0.1);
+  transform:
+    translateY(-2px);
+
+  border-color:
+    rgba(37, 99, 235, 0.28);
+
+  box-shadow:
+    var(--user-shadow-hover);
 }
 
-.user-summary-card .ant-card-body {
+.user-summary-card
+  .ant-card-body {
   padding: 20px;
 }
 
-.user-summary-card .ant-statistic-title {
+
+/* --------------------------------------------------------
+   Statistic title
+-------------------------------------------------------- */
+
+.user-summary-card
+  .ant-statistic-title {
   margin-bottom: 8px;
-  color: #66788a;
+
+  color:
+    var(--user-text-secondary);
+
   font-size: 14px;
   font-weight: 600;
 }
 
-.user-summary-card .ant-statistic-content {
-  color: #16324f;
+
+/* --------------------------------------------------------
+   Statistic value
+-------------------------------------------------------- */
+
+.user-summary-card
+  .ant-statistic-content,
+.user-summary-card
+  .ant-statistic-content-value {
+  color:
+    var(--user-text-primary);
+
   font-size: 28px;
   font-weight: 700;
 }
 
-/* --------------------------------------------------------
-   Table card
--------------------------------------------------------- */
+
+/* ========================================================
+   TABLE CARD
+======================================================== */
 
 .user-table-card {
+  background:
+    var(--user-surface);
+
+  border:
+    1px solid
+    var(--user-border);
+
   border-radius: 16px;
-  border: 1px solid #e6edf5;
-  box-shadow: 0 8px 24px rgba(15, 45, 75, 0.06);
+
+  box-shadow:
+    var(--user-shadow);
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
-.user-table-card .ant-card-head {
+
+/* --------------------------------------------------------
+   Card Header
+-------------------------------------------------------- */
+
+.user-table-card
+  .ant-card-head {
   min-height: 72px;
-  border-bottom: 1px solid #edf2f7;
+
+  background:
+    var(--user-surface);
+
+  border-bottom:
+    1px solid
+    var(--user-border-soft);
 }
 
-.user-table-card .ant-card-head-title {
+.user-table-card
+  .ant-card-head-title {
+  color:
+    var(--user-text-primary);
+
   font-size: 17px;
   font-weight: 700;
 }
 
-.user-table-card .ant-card-extra {
-  padding: 14px 0;
+.user-table-card
+  .ant-card-extra {
+  padding:
+    14px 0;
 }
+
+
+/* ========================================================
+   SEARCH / ROLE FILTER
+======================================================== */
 
 .user-search-input {
   width: 240px;
@@ -83,99 +262,649 @@
   width: 170px;
 }
 
-.user-page-alert {
-  margin-bottom: 20px;
-}
 
 /* --------------------------------------------------------
-   Table
+   Search Input
 -------------------------------------------------------- */
 
-.user-table-card .ant-table-thead > tr > th {
-  background: #f7faff;
-  color: #314a62;
+.user-search-input
+  .ant-input-affix-wrapper {
+  color:
+    var(--user-text-primary);
+
+  background:
+    var(--user-input-bg);
+
+  border-color:
+    var(--user-input-border);
+}
+
+.user-search-input
+  .ant-input {
+  color:
+    var(--user-text-primary);
+
+  background: transparent;
+}
+
+.user-search-input
+  .ant-input::placeholder {
+  color:
+    var(--user-text-muted);
+}
+
+
+/* --------------------------------------------------------
+   Role Select
+-------------------------------------------------------- */
+
+.user-role-filter
+  .ant-select-selector {
+  color:
+    var(--user-text-primary) !important;
+
+  background:
+    var(--user-input-bg) !important;
+
+  border-color:
+    var(--user-input-border) !important;
+}
+
+.user-role-filter
+  .ant-select-selection-item {
+  color:
+    var(--user-text-primary);
+}
+
+.user-role-filter
+  .ant-select-selection-placeholder,
+.user-role-filter
+  .ant-select-arrow {
+  color:
+    var(--user-text-secondary);
+}
+
+
+/* ========================================================
+   PAGE ALERT
+======================================================== */
+
+.user-page-alert {
+  margin-bottom: 20px;
+
+  border-radius: 11px;
+}
+
+
+/* ========================================================
+   TABLE
+======================================================== */
+
+.user-table-card
+  .ant-table {
+  color:
+    var(--user-text-primary);
+
+  background:
+    var(--user-surface);
+}
+
+
+/* --------------------------------------------------------
+   Table Header
+-------------------------------------------------------- */
+
+.user-table-card
+  .ant-table-thead
+  > tr
+  > th {
+  color:
+    var(--user-text-secondary);
+
+  background:
+    var(--user-table-header);
+
+  border-bottom-color:
+    var(--user-border);
+
   font-weight: 700;
 }
 
-.user-table-card .ant-table-tbody > tr > td {
-  vertical-align: middle;
+.user-table-card
+  .ant-table-thead
+  > tr
+  > th::before {
+  background:
+    var(--user-border) !important;
 }
 
-.user-table-card .ant-table-tbody > tr:hover > td {
-  background: #f5faff;
-}
 
 /* --------------------------------------------------------
-   Role access guide
+   Table Body
 -------------------------------------------------------- */
+
+.user-table-card
+  .ant-table-tbody
+  > tr
+  > td {
+  color:
+    var(--user-text-primary);
+
+  background:
+    var(--user-surface);
+
+  border-bottom-color:
+    var(--user-border-soft);
+
+  vertical-align: middle;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.user-table-card
+  .ant-table-tbody
+  > tr:hover
+  > td {
+  background:
+    var(--user-table-hover) !important;
+}
+
+
+/* ========================================================
+   TABLE TYPOGRAPHY
+======================================================== */
+
+.user-table-card
+  .ant-typography:not(
+    .ant-typography-secondary
+  ) {
+  color:
+    var(--user-text-primary);
+}
+
+.user-table-card
+  .ant-typography-secondary {
+  color:
+    var(--user-text-secondary);
+}
+
+
+/* ========================================================
+   ROLE ACCESS GUIDE
+======================================================== */
 
 .role-guide-card {
   margin-top: 24px;
+
+  background:
+    var(--user-surface);
+
+  border:
+    1px solid
+    var(--user-border);
+
   border-radius: 16px;
-  border: 1px solid #e6edf5;
-  box-shadow: 0 8px 24px rgba(15, 45, 75, 0.06);
+
+  box-shadow:
+    var(--user-shadow);
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
+
+
+/* --------------------------------------------------------
+   Role Guide Card Header
+-------------------------------------------------------- */
+
+.role-guide-card
+  .ant-card-head {
+  background:
+    var(--user-surface);
+
+  border-bottom-color:
+    var(--user-border-soft);
+}
+
+.role-guide-card
+  .ant-card-head-title {
+  color:
+    var(--user-text-primary);
+}
+
+
+/* --------------------------------------------------------
+   Role Guide Item
+-------------------------------------------------------- */
 
 .role-guide-item {
+  min-height: 110px;
+
   display: flex;
   align-items: flex-start;
+
   gap: 12px;
-  min-height: 110px;
+
   padding: 16px;
-  border: 1px solid #e8eef5;
+
+  background:
+    var(--user-role-guide-bg);
+
+  border:
+    1px solid
+    var(--user-border-secondary);
+
   border-radius: 14px;
-  background: #fbfdff;
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.2s ease;
 }
 
-.role-guide-item .ant-tag {
+.role-guide-item:hover {
+  transform:
+    translateY(-1px);
+
+  border-color:
+    rgba(37, 99, 235, 0.25);
+}
+
+.role-guide-item
+  .ant-tag {
   margin-bottom: 8px;
+
   font-weight: 600;
 }
 
-/* --------------------------------------------------------
-   User modal
--------------------------------------------------------- */
+.role-guide-item
+  .ant-typography:not(
+    .ant-typography-secondary
+  ) {
+  color:
+    var(--user-text-primary);
+}
+
+.role-guide-item
+  .ant-typography-secondary {
+  color:
+    var(--user-text-secondary);
+}
+
+
+/* ========================================================
+   USER MODAL
+======================================================== */
 
 .user-modal-alert {
   margin-bottom: 20px;
 }
 
-.user-management-page .ant-modal-content {
+
+/*
+   IMPORTANT:
+   Ant Design Modal is normally rendered through a portal,
+   so it may not actually be inside .user-management-page.
+
+   If your Modal uses:
+       className="user-management-modal"
+
+   these selectors will fully control it.
+*/
+
+.user-management-modal
+  .ant-modal-content {
+  color:
+    var(--user-text-primary);
+
+  background:
+    var(--user-surface);
+
+  border:
+    1px solid
+    var(--user-border);
+
   border-radius: 18px;
+
+  box-shadow:
+    var(--user-shadow-hover);
 }
 
-.user-management-page .ant-form-item-label > label {
-  color: #29435c;
+.user-management-modal
+  .ant-modal-header {
+  background:
+    var(--user-surface);
+
+  border-bottom-color:
+    var(--user-border-soft);
+}
+
+.user-management-modal
+  .ant-modal-title {
+  color:
+    var(--user-text-primary);
+}
+
+.user-management-modal
+  .ant-modal-close {
+  color:
+    var(--user-text-secondary);
+}
+
+
+/* ========================================================
+   USER MODAL FORM
+======================================================== */
+
+.user-management-modal
+  .ant-form-item-label
+  > label,
+.user-management-page
+  .ant-form-item-label
+  > label {
+  color:
+    var(--user-text-primary);
+
   font-weight: 600;
 }
 
+
 /* --------------------------------------------------------
-   Responsive
+   Inputs
 -------------------------------------------------------- */
 
+.user-management-modal
+  .ant-input,
+.user-management-modal
+  .ant-input-affix-wrapper,
+.user-management-modal
+  .ant-input-password,
+.user-management-modal
+  .ant-select-selector,
+.user-management-modal
+  .ant-input-number,
+.user-management-modal
+  .ant-picker {
+  color:
+    var(--user-text-primary);
+
+  background:
+    var(--user-input-bg);
+
+  border-color:
+    var(--user-input-border);
+}
+
+.user-management-modal
+  .ant-input {
+  background: transparent;
+}
+
+.user-management-modal
+  .ant-input::placeholder,
+.user-management-modal
+  .ant-select-selection-placeholder {
+  color:
+    var(--user-text-muted);
+}
+
+.user-management-modal
+  .ant-select-selection-item {
+  color:
+    var(--user-text-primary);
+}
+
+.user-management-modal
+  .ant-select-arrow {
+  color:
+    var(--user-text-secondary);
+}
+
+
+/* ========================================================
+   PAGINATION
+======================================================== */
+
+.user-table-card
+  .ant-pagination {
+  color:
+    var(--user-text-secondary);
+}
+
+html[data-theme="dark"]
+  .user-table-card
+  .ant-pagination-item {
+  background:
+    var(--user-surface-secondary);
+
+  border-color:
+    var(--user-border);
+}
+
+html[data-theme="dark"]
+  .user-table-card
+  .ant-pagination-item
+  a {
+  color:
+    var(--user-text-primary);
+}
+
+html[data-theme="dark"]
+  .user-table-card
+  .ant-pagination-item-active {
+  background:
+    var(--user-blue-soft);
+
+  border-color: #2563eb;
+}
+
+html[data-theme="dark"]
+  .user-table-card
+  .ant-pagination-item-active
+  a {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"]
+  .user-table-card
+  .ant-pagination-prev
+  button,
+html[data-theme="dark"]
+  .user-table-card
+  .ant-pagination-next
+  button {
+  color:
+    var(--user-text-secondary);
+}
+
+
+/* ========================================================
+   DARK MODE - SELECT DROPDOWN
+======================================================== */
+
+html[data-theme="dark"]
+  .ant-select-dropdown {
+  color:
+    var(--user-text-primary);
+
+  background:
+    var(--user-surface-secondary);
+
+  border:
+    1px solid
+    var(--user-border);
+}
+
+html[data-theme="dark"]
+  .ant-select-item {
+  color:
+    var(--user-text-primary);
+}
+
+html[data-theme="dark"]
+  .ant-select-item-option-active:not(
+    .ant-select-item-option-disabled
+  ) {
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.06
+    );
+}
+
+html[data-theme="dark"]
+  .ant-select-item-option-selected:not(
+    .ant-select-item-option-disabled
+  ) {
+  color: #60a5fa;
+
+  background:
+    rgba(
+      37,
+      99,
+      235,
+      0.18
+    );
+
+  font-weight: 600;
+}
+
+
+/* ========================================================
+   DARK MODE - TAG IMPROVEMENTS
+======================================================== */
+
+html[data-theme="dark"]
+  .role-guide-item
+  .ant-tag {
+  border-color:
+    var(--user-border);
+}
+
+
+/* ========================================================
+   DARK MODE - ALERT
+======================================================== */
+
+html[data-theme="dark"]
+  .user-management-page
+  .ant-alert,
+html[data-theme="dark"]
+  .user-management-modal
+  .ant-alert {
+  border-radius: 11px;
+}
+
+
+/* ========================================================
+   DARK MODE - EMPTY
+======================================================== */
+
+html[data-theme="dark"]
+  .user-management-page
+  .ant-empty-description {
+  color:
+    var(--user-text-secondary);
+}
+
+
+/* ========================================================
+   DARK MODE - SPINNER
+======================================================== */
+
+html[data-theme="dark"]
+  .user-management-page
+  .ant-spin-text {
+  color:
+    var(--user-text-secondary);
+}
+
+
+/* ========================================================
+   DARK MODE - TOOLTIP / POPOVER
+======================================================== */
+
+html[data-theme="dark"]
+  .ant-tooltip-inner {
+  color: #f8fafc;
+
+  background: #1e293b;
+}
+
+
+/* ========================================================
+   TRANSITIONS
+======================================================== */
+
+.user-summary-card,
+.user-table-card,
+.role-guide-card,
+.role-guide-item,
+.user-table-card
+  .ant-card-head,
+.user-table-card
+  .ant-table,
+.user-table-card
+  .ant-table-thead
+  > tr
+  > th,
+.user-table-card
+  .ant-table-tbody
+  > tr
+  > td,
+.user-search-input
+  .ant-input-affix-wrapper,
+.user-role-filter
+  .ant-select-selector {
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+/* ========================================================
+   RESPONSIVE
+======================================================== */
+
 @media (max-width: 991px) {
-  .user-table-card .ant-card-head {
+  .user-table-card
+    .ant-card-head {
     display: block;
+
     padding-top: 16px;
     padding-bottom: 16px;
   }
 
-  .user-table-card .ant-card-head-wrapper {
+  .user-table-card
+    .ant-card-head-wrapper {
     display: block;
   }
 
-  .user-table-card .ant-card-extra {
+  .user-table-card
+    .ant-card-extra {
     width: 100%;
+
     margin-top: 14px;
     margin-left: 0;
   }
 
-  .user-table-card .ant-card-extra .ant-space {
+  .user-table-card
+    .ant-card-extra
+    .ant-space {
     width: 100%;
   }
 
   .user-search-input {
     width: 100%;
+
     min-width: 220px;
   }
 
@@ -184,12 +913,15 @@
   }
 }
 
+
 @media (max-width: 575px) {
-  .user-summary-card .ant-card-body {
+  .user-summary-card
+    .ant-card-body {
     padding: 18px;
   }
 
-  .user-summary-card .ant-statistic-content {
+  .user-summary-card
+    .ant-statistic-content {
     font-size: 25px;
   }
 
@@ -198,11 +930,15 @@
     width: 100%;
   }
 
-  .user-table-card .ant-card-extra .ant-space-item {
+  .user-table-card
+    .ant-card-extra
+    .ant-space-item {
     width: 100%;
   }
 
-  .user-table-card .ant-card-extra button {
+  .user-table-card
+    .ant-card-extra
+    button {
     width: 100%;
   }
 

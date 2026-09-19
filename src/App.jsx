@@ -5,6 +5,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import AppLayout from "./components/AppLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RoleRoute from "./components/RoleRoute";
+import { ThemeProvider } from "./context/ThemeContext";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -20,7 +21,6 @@ import CurrentTreatment from "./pages/CurrentTreatment";
 import CashierPayment from "./pages/CashierPayment";
 import FollowUpPatients from "./pages/FollowUpPatients";
 import UserRegistration from "./pages/UserRegistration";
-import QueueDisplay from "./pages/QueueDisplay";
 import PaymentDashboard from "./pages/PaymentDashboard";
 import CommonTreatments from "./pages/CommonTreatments";
 import Drugs from "./pages/Drugs";
@@ -52,7 +52,8 @@ const App = () => {
       {/* Public route */}
 
       <Route path="/login" element={<Login />} />
-      <Route path="/queue-display" element={<QueueDisplay />} />
+     
+     
       {/* Protected routes */}
 
       <Route element={<ProtectedRoute />}>

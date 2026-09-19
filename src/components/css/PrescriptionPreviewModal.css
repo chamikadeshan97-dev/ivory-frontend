@@ -1,41 +1,219 @@
 @import url("https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&display=swap");
 
 /* ========================================================
+   PRESCRIPTION PREVIEW
+   Light / Dark Theme
+======================================================== */
+
+/* --------------------------------------------------------
+   Theme variables
+
+   IMPORTANT:
+   These variables affect the modal UI only.
+
+   The actual A6 prescription sheet intentionally stays
+   white in both light and dark mode so the preview matches
+   the printed prescription.
+-------------------------------------------------------- */
+
+.ivory-prescription-preview-modal {
+  --prescription-bg: #eef2f7;
+  --prescription-surface: #ffffff;
+  --prescription-surface-secondary: #f8fafc;
+
+  --prescription-border: #e5e7eb;
+  --prescription-border-strong: #cbd5e1;
+
+  --prescription-text-primary: #17324d;
+  --prescription-text-secondary: #64748b;
+  --prescription-text-muted: #94a3b8;
+
+  --prescription-scrollbar: #cbd5e1;
+  --prescription-scrollbar-hover: #94a3b8;
+
+  --prescription-shadow:
+    0 24px 60px rgba(15, 23, 42, 0.22);
+}
+
+/* --------------------------------------------------------
+   Dark theme
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .ivory-prescription-preview-modal {
+  --prescription-bg: #0f172a;
+  --prescription-surface: #111c2f;
+  --prescription-surface-secondary: #162235;
+
+  --prescription-border: #26364d;
+  --prescription-border-strong: #33445d;
+
+  --prescription-text-primary: #e8eef8;
+  --prescription-text-secondary: #a9b7ca;
+  --prescription-text-muted: #7f91aa;
+
+  --prescription-scrollbar: #33445d;
+  --prescription-scrollbar-hover: #64748b;
+
+  --prescription-shadow:
+    0 26px 70px rgba(0, 0, 0, 0.52);
+}
+
+/* ========================================================
    Prescription Preview Modal
 ======================================================== */
 
-.ivory-prescription-preview-modal .ant-modal-content {
-  padding: 0;
+.ivory-prescription-preview-modal
+  .ant-modal-content {
   overflow: hidden;
+
+  padding: 0;
+
+  border: 1px solid
+    var(--prescription-border);
+
   border-radius: 16px;
-  background: #ffffff;
+
+  background:
+    var(--prescription-surface);
+
+  box-shadow:
+    var(--prescription-shadow);
 }
 
-.ivory-prescription-preview-modal .ant-modal-header {
+/* --------------------------------------------------------
+   Modal header
+-------------------------------------------------------- */
+
+.ivory-prescription-preview-modal
+  .ant-modal-header {
   margin: 0;
+
   padding: 17px 20px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #ffffff;
+
+  border-bottom: 1px solid
+    var(--prescription-border);
+
+  background:
+    var(--prescription-surface);
 }
 
-.ivory-prescription-preview-modal .ant-modal-title {
-  color: #17324d;
+.ivory-prescription-preview-modal
+  .ant-modal-title {
+  color:
+    var(--prescription-text-primary);
+
   font-size: 17px;
   font-weight: 700;
 }
 
-.ivory-prescription-preview-modal .ant-modal-body {
-  max-height: 72vh;
-  padding: 20px;
-  overflow: auto;
-  background: #eef2f7;
+/* --------------------------------------------------------
+   Close button
+-------------------------------------------------------- */
+
+.ivory-prescription-preview-modal
+  .ant-modal-close {
+  color:
+    var(--prescription-text-secondary);
+
+  background: transparent;
+
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
 }
 
-.ivory-prescription-preview-modal .ant-modal-footer {
+.ivory-prescription-preview-modal
+  .ant-modal-close:hover {
+  color:
+    var(--prescription-text-primary);
+
+  background:
+    var(--prescription-surface-secondary);
+}
+
+.ivory-prescription-preview-modal
+  .ant-modal-close-x {
+  color: inherit;
+}
+
+/* --------------------------------------------------------
+   Modal body
+-------------------------------------------------------- */
+
+.ivory-prescription-preview-modal
+  .ant-modal-body {
+  max-height: 72vh;
+
+  padding: 20px;
+
+  overflow: auto;
+
+  color:
+    var(--prescription-text-primary);
+
+  background:
+    var(--prescription-bg);
+}
+
+/* --------------------------------------------------------
+   Modal footer
+-------------------------------------------------------- */
+
+.ivory-prescription-preview-modal
+  .ant-modal-footer {
   margin: 0;
+
   padding: 14px 20px;
-  border-top: 1px solid #e5e7eb;
-  background: #ffffff;
+
+  border-top: 1px solid
+    var(--prescription-border);
+
+  background:
+    var(--prescription-surface);
+}
+
+/* ========================================================
+   Modal Typography
+======================================================== */
+
+.ivory-prescription-preview-modal
+  .ant-typography {
+  color:
+    var(--prescription-text-primary);
+}
+
+.ivory-prescription-preview-modal
+  .ant-typography-secondary {
+  color:
+    var(--prescription-text-secondary);
+}
+
+/* ========================================================
+   Modal Buttons
+======================================================== */
+
+html[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-btn-default {
+  color:
+    var(--prescription-text-primary);
+
+  border-color:
+    var(--prescription-border-strong);
+
+  background:
+    var(--prescription-surface-secondary);
+}
+
+html[data-theme="dark"]
+  .ivory-prescription-preview-modal
+  .ant-btn-default:hover {
+  color: #60a5fa;
+
+  border-color: #60a5fa;
+
+  background: #1a2940;
 }
 
 /* ========================================================
@@ -44,39 +222,85 @@
 
 .ivory-prescription-empty {
   padding: 42px 20px;
-  color: #64748b;
+
+  color:
+    var(--prescription-text-secondary);
+
   font-size: 14px;
   line-height: 1.6;
+
   text-align: center;
+}
+
+.ivory-prescription-preview-modal
+  .ant-empty-description {
+  color:
+    var(--prescription-text-secondary);
 }
 
 /* ========================================================
    A6 Prescription Sheet
 
-   A6 size:
-   Width: 105mm
-   Height: 148mm
+   IMPORTANT:
+   This represents physical prescription paper.
 
-   Top 37mm is reserved for the printed paper header.
+   It must remain WHITE even when the application uses
+   dark mode.
+
+   A6:
+   Width  = 105mm
+   Height = 148mm
+
+   Top 37mm reserved for printed paper header.
 ======================================================== */
 
 .ivory-prescription-sheet {
   position: relative;
+
   width: 105mm;
   height: 148mm;
+
   margin: 0 auto;
+
   overflow: hidden;
+
   box-sizing: border-box;
+
+  /*
+    Do NOT convert these to theme variables.
+    The prescription is physical white paper.
+  */
+
   color: #111827;
+
   background: #ffffff;
+
   border: 1px solid #cbd5e1;
+
   box-shadow:
     0 16px 40px rgba(15, 23, 42, 0.14),
     0 4px 12px rgba(15, 23, 42, 0.08);
 }
 
+/* Give the paper slightly stronger separation
+   from the dark preview background */
+
+html[data-theme="dark"]
+  .ivory-prescription-sheet {
+  border-color: #475569;
+
+  box-shadow:
+    0 20px 55px rgba(0, 0, 0, 0.42),
+    0 5px 16px rgba(0, 0, 0, 0.24);
+}
+
+/* ========================================================
+   Prescription Content
+======================================================== */
+
 .ivory-prescription-content {
   position: absolute;
+
   top: 37mm;
   right: 7mm;
   bottom: 8mm;
@@ -86,7 +310,15 @@
   flex-direction: column;
 
   box-sizing: border-box;
+
   overflow: hidden;
+
+  /*
+    Force normal paper colors even if global
+    dark-theme rules affect Typography elsewhere.
+  */
+
+  color: #111827;
 }
 
 /* ========================================================
@@ -95,51 +327,79 @@
 
 .ivory-prescription-meta {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+
+  grid-template-columns:
+    minmax(0, 1fr) auto;
+
   align-items: center;
+
   width: 100%;
+
   gap: 5mm;
 
   box-sizing: border-box;
+
   padding-bottom: 2.5mm;
 
-  border-bottom: 0.25mm solid #9ca3af;
+  border-bottom:
+    0.25mm solid #9ca3af;
 }
 
 .ivory-prescription-patient-line {
   min-width: 0;
+
   overflow: hidden;
 }
 
-.ivory-prescription-patient-line strong {
+.ivory-prescription-patient-line
+  strong {
   display: block;
+
   width: 100%;
   max-width: 100%;
 
   color: #111827;
-  font-family: "Caveat", cursive;
+
+  font-family:
+    "Caveat",
+    cursive;
+
   font-size: 5mm;
   font-weight: 700;
   line-height: 1.1;
 
   white-space: nowrap;
+
   overflow: hidden;
+
   text-overflow: ellipsis;
 }
 
+/* --------------------------------------------------------
+   Date
+-------------------------------------------------------- */
+
 .ivory-prescription-date {
   display: flex;
+
   align-items: center;
   justify-content: flex-end;
 
   min-width: 32mm;
+
   text-align: right;
+
   white-space: nowrap;
 }
 
-.ivory-prescription-date strong {
+.ivory-prescription-date
+  strong {
   color: #111827;
-  font-family: "Caveat", cursive;
+
+  font-family:
+    "Caveat",
+    cursive;
+
   font-size: 4.4mm;
   font-weight: 700;
   line-height: 1;
@@ -151,47 +411,79 @@
 
 .ivory-prescription-allergy {
   display: flex;
+
   align-items: flex-start;
+
   width: 100%;
+
   gap: 2mm;
 
   box-sizing: border-box;
+
   margin-top: 2.5mm;
+
   padding: 1.8mm 2.3mm;
 
   color: #991b1b;
-  border: 0.3mm solid #dc2626;
+
+  border:
+    0.3mm solid #dc2626;
+
   border-radius: 1.5mm;
 }
 
-.ivory-prescription-allergy > .anticon {
+.ivory-prescription-allergy
+  > .anticon {
   flex-shrink: 0;
+
   margin-top: 0.4mm;
+
   font-size: 3.5mm;
+
+  color: #dc2626;
 }
 
-.ivory-prescription-allergy div {
+.ivory-prescription-allergy
+  div {
   display: flex;
+
   flex: 1;
   flex-direction: column;
+
   min-width: 0;
+
   gap: 0.5mm;
 }
 
-.ivory-prescription-allergy strong {
-  font-family: Arial, Helvetica, sans-serif;
+.ivory-prescription-allergy
+  strong {
+  color: #991b1b;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
   font-size: 2.4mm;
   font-weight: 800;
 }
 
-.ivory-prescription-allergy span {
-  font-family: "Caveat", cursive;
+.ivory-prescription-allergy
+  span {
+  color: #991b1b;
+
+  font-family:
+    "Caveat",
+    cursive;
+
   font-size: 3.8mm;
   font-weight: 600;
   line-height: 1.2;
 
   white-space: pre-wrap;
+
   overflow-wrap: break-word;
+
   word-break: normal;
 }
 
@@ -201,13 +493,17 @@
 
 .ivory-prescription-body {
   display: block;
+
   flex: 1;
 
   width: 100%;
   min-height: 0;
-  padding: 5mm 0 3mm;
+
+  padding:
+    5mm 0 3mm;
 
   box-sizing: border-box;
+
   overflow: hidden;
 }
 
@@ -221,39 +517,149 @@
 
 .ivory-prescription-medicines {
   display: flex;
+
   flex-direction: column;
+
   width: 100%;
+
   gap: 2.5mm;
 
   box-sizing: border-box;
+
   overflow: hidden;
 }
 
 .ivory-prescription-medicine-row {
   display: block;
+
   width: 100%;
+
   min-height: 7mm;
 
   box-sizing: border-box;
-  padding: 0 2mm 1.5mm;
+
+  padding:
+    0 2mm 1.5mm;
 
   color: #111827;
-  font-family: "Caveat", cursive;
+
+  font-family:
+    "Caveat",
+    cursive;
+
   font-size: 5.2mm;
   font-weight: 600;
   line-height: 1.25;
+
   letter-spacing: 0.12mm;
 
   /*
-    Keeps the spaces inside each medicine line
-    and wraps long lines correctly.
+    Preserve medicine spacing and allow
+    long lines to wrap naturally.
   */
+
   white-space: pre-wrap;
+
   overflow-wrap: break-word;
+
   word-break: normal;
 
-  border-bottom: 0.25mm solid
+  border-bottom:
+    0.25mm solid
     rgba(107, 114, 128, 0.4);
+}
+
+/* ========================================================
+   Dark Theme Protection for Prescription Paper
+
+   Prevent global Ant Design / dark-theme Typography rules
+   from changing anything inside the physical paper.
+======================================================== */
+
+html[data-theme="dark"]
+  .ivory-prescription-sheet {
+  color: #111827;
+
+  background: #ffffff;
+}
+
+html[data-theme="dark"]
+  .ivory-prescription-sheet
+  .ant-typography {
+  color: #111827;
+}
+
+html[data-theme="dark"]
+  .ivory-prescription-patient-line
+  strong,
+html[data-theme="dark"]
+  .ivory-prescription-date
+  strong,
+html[data-theme="dark"]
+  .ivory-prescription-medicine-row {
+  color: #111827;
+}
+
+html[data-theme="dark"]
+  .ivory-prescription-allergy {
+  color: #991b1b;
+
+  border-color: #dc2626;
+
+  background: transparent;
+}
+
+html[data-theme="dark"]
+  .ivory-prescription-allergy
+  strong,
+html[data-theme="dark"]
+  .ivory-prescription-allergy
+  span {
+  color: #991b1b;
+}
+
+html[data-theme="dark"]
+  .ivory-prescription-allergy
+  > .anticon {
+  color: #dc2626;
+}
+
+/* ========================================================
+   Scrollbar
+======================================================== */
+
+.ivory-prescription-preview-modal
+  .ant-modal-body::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+.ivory-prescription-preview-modal
+  .ant-modal-body::-webkit-scrollbar-track {
+  background:
+    var(--prescription-bg);
+}
+
+.ivory-prescription-preview-modal
+  .ant-modal-body::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+
+  border-radius: 999px;
+
+  background:
+    var(--prescription-scrollbar);
+
+  background-clip:
+    padding-box;
+}
+
+.ivory-prescription-preview-modal
+  .ant-modal-body::-webkit-scrollbar-thumb:hover {
+  background:
+    var(--prescription-scrollbar-hover);
+
+  background-clip:
+    padding-box;
 }
 
 /* ========================================================
@@ -262,16 +668,20 @@
 
 @media screen and (max-width: 650px) {
   .ivory-prescription-preview-modal {
-    max-width: calc(100vw - 20px);
+    max-width:
+      calc(100vw - 20px);
   }
 
-  .ivory-prescription-preview-modal .ant-modal-body {
+  .ivory-prescription-preview-modal
+    .ant-modal-body {
     padding: 10px;
   }
 
   .ivory-prescription-sheet {
     width: 100%;
+
     height: auto;
+
     min-height: 148mm;
   }
 
@@ -283,11 +693,14 @@
   }
 
   .ivory-prescription-meta {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns:
+      minmax(0, 1fr) auto;
+
     gap: 12px;
   }
 
-  .ivory-prescription-patient-line strong {
+  .ivory-prescription-patient-line
+    strong {
     font-size: 20px;
   }
 
@@ -295,7 +708,8 @@
     min-width: auto;
   }
 
-  .ivory-prescription-date strong {
+  .ivory-prescription-date
+    strong {
     font-size: 17px;
   }
 
@@ -306,11 +720,15 @@
 
 /* ========================================================
    A6 Printing
+
+   Print styling is intentionally independent of the
+   application's light/dark theme.
 ======================================================== */
 
 @media print {
   @page {
     size: A6 portrait;
+
     margin: 0;
   }
 
@@ -318,29 +736,43 @@
   body {
     width: 105mm;
     height: 148mm;
+
     margin: 0;
     padding: 0;
+
     overflow: hidden;
+
     background: transparent;
   }
 
-  .ivory-prescription-sheet {
+  .ivory-prescription-sheet,
+  html[data-theme="dark"]
+    .ivory-prescription-sheet {
     position: absolute;
+
     top: 0;
     left: 0;
 
     width: 105mm;
     height: 148mm;
+
     margin: 0;
     padding: 0;
+
     overflow: hidden;
 
+    color: #111827;
+
     background: transparent;
+
     border: none;
+
     box-shadow: none;
 
     print-color-adjust: exact;
-    -webkit-print-color-adjust: exact;
+
+    -webkit-print-color-adjust:
+      exact;
   }
 
   .ivory-prescription-content {
@@ -354,6 +786,28 @@
   .ivory-prescription-allergy,
   .ivory-prescription-medicine-row {
     break-inside: avoid;
+
     page-break-inside: avoid;
+  }
+
+  .ivory-prescription-patient-line
+    strong,
+  .ivory-prescription-date
+    strong,
+  .ivory-prescription-medicine-row {
+    color: #111827 !important;
+  }
+
+  .ivory-prescription-allergy,
+  .ivory-prescription-allergy
+    strong,
+  .ivory-prescription-allergy
+    span {
+    color: #991b1b !important;
+  }
+
+  .ivory-prescription-allergy {
+    border-color:
+      #dc2626 !important;
   }
 }

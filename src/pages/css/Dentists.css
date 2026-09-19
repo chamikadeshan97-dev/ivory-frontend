@@ -1,3 +1,8 @@
+/* ========================================================
+   DENTISTS PAGE
+   LIGHT / DARK THEME
+======================================================== */
+
 /* --------------------------------------------------------
    Summary cards
 -------------------------------------------------------- */
@@ -10,19 +15,27 @@
   position: relative;
   height: 100%;
   overflow: hidden;
+
   border: 1px solid #edf1f7;
   border-radius: 18px;
+
+  background: #ffffff;
+
   box-shadow:
     0 8px 24px rgba(15, 23, 42, 0.05);
+
   transition:
     transform 0.2s ease,
     border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .dentist-summary-card:hover {
   transform: translateY(-3px);
+
   border-color: rgba(37, 99, 235, 0.22);
+
   box-shadow:
     0 14px 30px rgba(15, 23, 42, 0.09);
 }
@@ -31,8 +44,10 @@
   position: absolute;
   top: 0;
   left: 0;
+
   width: 5px;
   height: 100%;
+
   content: "";
 }
 
@@ -65,14 +80,18 @@
 
 .dentist-summary-card__title {
   display: block;
+
   margin-bottom: 7px;
+
   color: #64748b;
+
   font-size: 13px;
   font-weight: 600;
 }
 
 .dentist-summary-card__value {
   color: #172033;
+
   font-size: 29px;
   font-weight: 750;
   line-height: 1.2;
@@ -80,8 +99,11 @@
 
 .dentist-summary-card__helper {
   display: block;
+
   margin-top: 5px;
+
   color: #94a3b8;
+
   font-size: 12px;
 }
 
@@ -90,9 +112,12 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+
   width: 47px;
   height: 47px;
+
   border-radius: 14px;
+
   font-size: 21px;
 }
 
@@ -127,8 +152,16 @@
 .dentist-directory-card {
   border: 1px solid #e8edf5;
   border-radius: 18px;
+
+  background: #ffffff;
+
   box-shadow:
     0 8px 24px rgba(15, 23, 42, 0.045);
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .dentist-directory-card
@@ -140,7 +173,9 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
   gap: 16px;
+
   margin-bottom: 20px;
 }
 
@@ -158,11 +193,18 @@
 .dentist-table-toolbar {
   display: flex;
   align-items: center;
+
   padding: 14px;
   margin-bottom: 20px;
+
   border: 1px solid #edf1f7;
   border-radius: 14px;
+
   background: #f8fafc;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .dentist-search-input {
@@ -177,17 +219,24 @@
 .dentist-id-badge {
   display: inline-flex;
   align-items: center;
+
   min-height: 34px;
+
   padding: 5px 10px;
+
   border-radius: 9px;
+
   color: #2563eb;
+
   font-size: 12px;
   font-weight: 700;
+
   background: #eff6ff;
 }
 
 .dentist-avatar {
   color: #2563eb;
+
   background:
     linear-gradient(
       135deg,
@@ -198,6 +247,7 @@
 
 .dentist-avatar--inactive {
   color: #64748b;
+
   background:
     linear-gradient(
       135deg,
@@ -208,8 +258,11 @@
 
 .dentist-name-cell {
   display: flex;
+
   min-width: 0;
+
   flex-direction: column;
+
   gap: 3px;
 }
 
@@ -219,14 +272,18 @@
 
 .dentist-specialization-tag {
   max-width: 195px;
+
   overflow: hidden;
+
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 .dentist-status-tag {
   min-width: 85px;
+
   text-align: center;
+
   font-weight: 600;
 }
 
@@ -250,8 +307,13 @@
 .dentist-details-modal
   .ant-modal-content {
   overflow: hidden;
+
   padding: 0;
+
   border-radius: 20px;
+
+  background: #ffffff;
+
   box-shadow:
     0 24px 60px rgba(15, 23, 42, 0.22);
 }
@@ -260,7 +322,9 @@
   .ant-modal-close {
   top: 16px;
   right: 16px;
+
   color: #ffffff;
+
   background: rgba(
     255,
     255,
@@ -272,6 +336,7 @@
 .dentist-details-modal
   .ant-modal-close:hover {
   color: #ffffff;
+
   background: rgba(
     255,
     255,
@@ -283,24 +348,33 @@
 .dentist-details-modal
   .ant-modal-body {
   padding: 0;
+
   background: #f4f7fb;
 }
 
 .dentist-details-modal
   .ant-modal-footer {
   margin-top: 0;
+
   padding: 15px 22px;
+
   border-top: 1px solid #e8edf5;
+
   background: #ffffff;
 }
 
 .dentist-details-header {
   display: flex;
   align-items: center;
+
   min-height: 145px;
+
   gap: 17px;
+
   padding: 28px 32px;
+
   color: #ffffff;
+
   background:
     radial-gradient(
       circle at top right,
@@ -331,14 +405,18 @@
 
 .dentist-details-header__avatar {
   flex: 0 0 auto;
+
   color: #2563eb;
+
   border: 4px solid rgba(
     255,
     255,
     255,
     0.45
   );
+
   background: #ffffff;
+
   box-shadow:
     0 10px 25px rgba(15, 23, 42, 0.2);
 }
@@ -352,18 +430,22 @@
   h3.ant-typography {
   margin-top: 0;
   margin-bottom: 9px;
+
   color: #ffffff;
+
   font-weight: 750;
 }
 
 .dentist-details-header__id {
   color: #ffffff;
+
   border-color: rgba(
     255,
     255,
     255,
     0.35
   );
+
   background: rgba(
     255,
     255,
@@ -374,14 +456,20 @@
 
 .dentist-details-content {
   display: flex;
+
   padding: 22px;
+
   flex-direction: column;
+
   gap: 16px;
 }
 
 .dentist-information-card {
   border: 1px solid #e8edf5;
   border-radius: 16px;
+
+  background: #ffffff;
+
   box-shadow:
     0 7px 22px rgba(15, 23, 42, 0.04);
 }
@@ -404,8 +492,11 @@
 .dentist-descriptions
   .ant-descriptions-item-label {
   width: 145px;
+
   color: #64748b;
+
   font-weight: 600;
+
   background: #f8fafc !important;
 }
 
@@ -417,12 +508,14 @@
 .dentist-professional-card {
   border: 1px solid #dbeafe;
   border-radius: 16px;
+
   background:
     linear-gradient(
       135deg,
       #ffffff,
       #f4f8ff
     );
+
   box-shadow:
     0 7px 22px rgba(37, 99, 235, 0.05);
 }
@@ -431,7 +524,9 @@
   .ant-card-body {
   display: flex;
   align-items: flex-start;
+
   gap: 15px;
+
   padding: 20px;
 }
 
@@ -440,24 +535,32 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+
   width: 49px;
   height: 49px;
+
   border-radius: 14px;
+
   color: #ffffff;
+
   font-size: 21px;
+
   background:
     linear-gradient(
       135deg,
       #2563eb,
       #0284c7
     );
+
   box-shadow:
     0 8px 18px rgba(37, 99, 235, 0.2);
 }
 
 .dentist-professional-card__content {
   display: flex;
+
   flex-direction: column;
+
   gap: 3px;
 }
 
@@ -465,6 +568,7 @@
   h4.ant-typography {
   margin-top: 0;
   margin-bottom: 1px;
+
   color: #1d4ed8;
 }
 
@@ -472,7 +576,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
   min-height: 420px;
+
   padding: 40px;
 }
 
@@ -483,6 +589,7 @@
 .dentist-form-modal-title {
   display: flex;
   align-items: center;
+
   gap: 11px;
 }
 
@@ -491,11 +598,16 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+
   width: 39px;
   height: 39px;
+
   border-radius: 11px;
+
   color: #ffffff;
+
   font-size: 17px;
+
   background:
     linear-gradient(
       135deg,
@@ -507,7 +619,9 @@
 .dentist-form-modal-title
   > div:last-child {
   display: flex;
+
   flex-direction: column;
+
   gap: 1px;
 }
 
@@ -520,21 +634,32 @@
 .dentist-form-modal
   .ant-modal-content {
   overflow: hidden;
+
+  background: #ffffff;
 }
 
 .dentist-form-modal
   .ant-modal-body {
   max-height: 70vh;
+
   overflow-y: auto;
+
   padding-top: 20px;
 }
 
 .dentist-form-section {
   margin-bottom: 16px;
+
   padding: 17px;
+
   border: 1px solid #e8edf5;
   border-radius: 14px;
+
   background: #ffffff;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .dentist-form-section--professional {
@@ -549,16 +674,21 @@
 .dentist-form-section__header {
   display: flex;
   align-items: center;
+
   gap: 10px;
+
   margin-bottom: 17px;
   padding-bottom: 12px;
+
   border-bottom: 1px solid #edf1f7;
 }
 
 .dentist-form-section__header
   > div:last-child {
   display: flex;
+
   flex-direction: column;
+
   gap: 1px;
 }
 
@@ -572,10 +702,14 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+
   width: 37px;
   height: 37px;
+
   border-radius: 10px;
+
   color: #2563eb;
+
   background: #eff6ff;
 }
 
@@ -583,6 +717,1023 @@
   color: #7c3aed;
   background: #f5f3ff;
 }
+
+
+/* ========================================================
+   DARK THEME
+======================================================== */
+
+/* --------------------------------------------------------
+   Summary cards - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .dentist-summary-card {
+  border-color: #27364a;
+
+  background: #162033;
+
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+html[data-theme="dark"]
+  .dentist-summary-card:hover {
+  border-color: rgba(96, 165, 250, 0.42);
+
+  box-shadow:
+    0 14px 32px rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme="dark"]
+  .dentist-summary-card__title {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .dentist-summary-card__value {
+  color: #f1f5f9;
+}
+
+html[data-theme="dark"]
+  .dentist-summary-card__helper {
+  color: #64748b;
+}
+
+html[data-theme="dark"]
+  .dentist-summary-card--blue
+  .dentist-summary-card__icon {
+  color: #60a5fa;
+
+  background: rgba(37, 99, 235, 0.16);
+}
+
+html[data-theme="dark"]
+  .dentist-summary-card--green
+  .dentist-summary-card__icon {
+  color: #4ade80;
+
+  background: rgba(22, 163, 74, 0.15);
+}
+
+html[data-theme="dark"]
+  .dentist-summary-card--orange
+  .dentist-summary-card__icon {
+  color: #fbbf24;
+
+  background: rgba(245, 158, 11, 0.15);
+}
+
+html[data-theme="dark"]
+  .dentist-summary-card--purple
+  .dentist-summary-card__icon {
+  color: #c4b5fd;
+
+  background: rgba(124, 58, 237, 0.17);
+}
+
+
+/* --------------------------------------------------------
+   Dentist directory - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .dentist-directory-card {
+  border-color: #27364a;
+
+  background: #162033;
+
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+html[data-theme="dark"]
+  .dentist-directory-header
+  .ant-typography {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"]
+  .dentist-directory-header
+  .ant-typography-secondary {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .dentist-table-toolbar {
+  border-color: #2a394d;
+
+  background: #111b2c;
+}
+
+html[data-theme="dark"]
+  .dentist-search-input.ant-input-affix-wrapper {
+  border-color: #334155;
+
+  background: #111827;
+}
+
+html[data-theme="dark"]
+  .dentist-search-input.ant-input-affix-wrapper:hover {
+  border-color: #3b82f6;
+}
+
+html[data-theme="dark"]
+  .dentist-search-input.ant-input-affix-wrapper-focused,
+html[data-theme="dark"]
+  .dentist-search-input.ant-input-affix-wrapper:focus-within {
+  border-color: #3b82f6;
+
+  box-shadow:
+    0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+html[data-theme="dark"]
+  .dentist-search-input
+  input {
+  color: #e2e8f0;
+
+  background: transparent;
+}
+
+html[data-theme="dark"]
+  .dentist-search-input
+  input::placeholder {
+  color: #64748b;
+}
+
+html[data-theme="dark"]
+  .dentist-search-input
+  .ant-input-prefix {
+  color: #64748b;
+}
+
+
+/* --------------------------------------------------------
+   Dentist table - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .dentist-directory-card
+  .ant-table {
+  color: #cbd5e1;
+
+  background: transparent;
+}
+
+html[data-theme="dark"]
+  .dentist-directory-card
+  .ant-table-container {
+  border-color: #27364a;
+}
+
+html[data-theme="dark"]
+  .dentist-directory-card
+  .ant-table-thead
+  > tr
+  > th {
+  color: #94a3b8;
+
+  border-bottom-color: #2a394d;
+
+  background: #111b2c;
+}
+
+html[data-theme="dark"]
+  .dentist-directory-card
+  .ant-table-thead
+  > tr
+  > th::before {
+  background-color: #334155 !important;
+}
+
+html[data-theme="dark"]
+  .dentist-directory-card
+  .ant-table-tbody
+  > tr
+  > td {
+  color: #cbd5e1;
+
+  border-bottom-color: #27364a;
+
+  background: #162033;
+}
+
+html[data-theme="dark"]
+  .dentist-directory-card
+  .ant-table-tbody
+  > tr:hover
+  > td {
+  background: #1b2940 !important;
+}
+
+html[data-theme="dark"]
+  .dentist-directory-card
+  .ant-table-cell-row-hover {
+  background: #1b2940 !important;
+}
+
+html[data-theme="dark"]
+  .dentist-id-badge {
+  color: #60a5fa;
+
+  background: rgba(37, 99, 235, 0.16);
+}
+
+html[data-theme="dark"]
+  .dentist-avatar {
+  color: #60a5fa;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(37, 99, 235, 0.18),
+      rgba(2, 132, 199, 0.22)
+    );
+}
+
+html[data-theme="dark"]
+  .dentist-avatar--inactive {
+  color: #94a3b8;
+
+  background:
+    linear-gradient(
+      135deg,
+      #253246,
+      #334155
+    );
+}
+
+html[data-theme="dark"]
+  .dentist-name-cell
+  .ant-typography {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"]
+  .dentist-name-cell
+  .ant-typography-secondary {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .dentist-phone-icon {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .inactive-dentist-row
+  td {
+  background: #131d2e !important;
+}
+
+html[data-theme="dark"]
+  .inactive-dentist-row:hover
+  td {
+  background: #182337 !important;
+}
+
+html[data-theme="dark"]
+  .inactive-dentist-row
+  td:first-child {
+  border-left-color: #64748b;
+}
+
+
+/* --------------------------------------------------------
+   Table empty state - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .dentist-directory-card
+  .ant-empty-description {
+  color: #94a3b8;
+}
+
+
+/* --------------------------------------------------------
+   Table pagination - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .dentist-directory-card
+  .ant-pagination
+  .ant-pagination-item {
+  border-color: #334155;
+
+  background: #111b2c;
+}
+
+html[data-theme="dark"]
+  .dentist-directory-card
+  .ant-pagination
+  .ant-pagination-item
+  a {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"]
+  .dentist-directory-card
+  .ant-pagination
+  .ant-pagination-item:hover {
+  border-color: #3b82f6;
+}
+
+html[data-theme="dark"]
+  .dentist-directory-card
+  .ant-pagination
+  .ant-pagination-item:hover
+  a {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"]
+  .dentist-directory-card
+  .ant-pagination
+  .ant-pagination-item-active {
+  border-color: #3b82f6;
+
+  background: rgba(37, 99, 235, 0.16);
+}
+
+html[data-theme="dark"]
+  .dentist-directory-card
+  .ant-pagination
+  .ant-pagination-item-active
+  a {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"]
+  .dentist-directory-card
+  .ant-pagination
+  .ant-pagination-prev
+  button,
+html[data-theme="dark"]
+  .dentist-directory-card
+  .ant-pagination
+  .ant-pagination-next
+  button {
+  color: #cbd5e1;
+}
+
+
+/* --------------------------------------------------------
+   Dentist details modal - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .dentist-details-modal
+  .ant-modal-content {
+  border: 1px solid #2a394d;
+
+  background: #111b2c;
+
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme="dark"]
+  .dentist-details-modal
+  .ant-modal-body {
+  background: #0d1625;
+}
+
+html[data-theme="dark"]
+  .dentist-details-modal
+  .ant-modal-footer {
+  border-top-color: #27364a;
+
+  background: #111b2c;
+}
+
+html[data-theme="dark"]
+  .dentist-details-header {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.13),
+      transparent 260px
+    ),
+    linear-gradient(
+      135deg,
+      #1d4ed8,
+      #0369a1
+    );
+}
+
+html[data-theme="dark"]
+  .dentist-details-modal--inactive
+  .dentist-details-header {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.1),
+      transparent 260px
+    ),
+    linear-gradient(
+      135deg,
+      #334155,
+      #475569
+    );
+}
+
+html[data-theme="dark"]
+  .dentist-details-header__avatar {
+  color: #60a5fa;
+
+  border-color: rgba(
+    255,
+    255,
+    255,
+    0.3
+  );
+
+  background: #f8fafc;
+
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.28);
+}
+
+html[data-theme="dark"]
+  .dentist-details-modal--inactive
+  .dentist-details-header__avatar {
+  color: #64748b;
+}
+
+
+/* --------------------------------------------------------
+   Information card - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .dentist-information-card {
+  border-color: #27364a;
+
+  background: #162033;
+
+  box-shadow:
+    0 7px 22px rgba(0, 0, 0, 0.17);
+}
+
+html[data-theme="dark"]
+  .dentist-section-heading
+  .ant-typography {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"]
+  .dentist-section-heading
+  .ant-typography-secondary {
+  color: #94a3b8;
+}
+
+
+/* --------------------------------------------------------
+   Descriptions - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .dentist-descriptions
+  .ant-descriptions-view {
+  border-color: #334155;
+}
+
+html[data-theme="dark"]
+  .dentist-descriptions
+  .ant-descriptions-row {
+  border-color: #334155;
+}
+
+html[data-theme="dark"]
+  .dentist-descriptions
+  .ant-descriptions-item-label {
+  color: #94a3b8;
+
+  border-color: #334155 !important;
+
+  background: #111b2c !important;
+}
+
+html[data-theme="dark"]
+  .dentist-descriptions
+  .ant-descriptions-item-content {
+  color: #e2e8f0;
+
+  border-color: #334155 !important;
+
+  background: #162033;
+}
+
+html[data-theme="dark"]
+  .dentist-descriptions
+  .ant-typography {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"]
+  .dentist-descriptions
+  .ant-typography-secondary {
+  color: #94a3b8;
+}
+
+
+/* --------------------------------------------------------
+   Professional card - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .dentist-professional-card {
+  border-color: rgba(59, 130, 246, 0.28);
+
+  background:
+    linear-gradient(
+      135deg,
+      #162033,
+      #14233a
+    );
+
+  box-shadow:
+    0 7px 24px rgba(0, 0, 0, 0.17);
+}
+
+html[data-theme="dark"]
+  .dentist-professional-card__icon {
+  background:
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #0369a1
+    );
+
+  box-shadow:
+    0 8px 20px rgba(37, 99, 235, 0.25);
+}
+
+html[data-theme="dark"]
+  .dentist-professional-card__content
+  h4.ant-typography {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"]
+  .dentist-professional-card__content
+  .ant-typography {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"]
+  .dentist-professional-card__content
+  .ant-typography-secondary {
+  color: #94a3b8;
+}
+
+
+/* --------------------------------------------------------
+   Details empty state - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .dentist-details-empty
+  .ant-empty-description {
+  color: #94a3b8;
+}
+
+
+/* --------------------------------------------------------
+   Add/Edit modal - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-modal-content {
+  border: 1px solid #2a394d;
+
+  background: #111b2c;
+
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-modal-header {
+  background: #111b2c;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-modal-title {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-modal-body {
+  background: #0d1625;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-modal-footer {
+  border-top-color: #27364a;
+
+  background: #111b2c;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-modal-close {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-modal-close:hover {
+  color: #f1f5f9;
+
+  background: #1e293b;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal-title
+  .ant-typography {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal-title
+  .ant-typography-secondary {
+  color: #94a3b8;
+}
+
+
+/* --------------------------------------------------------
+   Form sections - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .dentist-form-section {
+  border-color: #2a394d;
+
+  background: #162033;
+}
+
+html[data-theme="dark"]
+  .dentist-form-section--professional {
+  background:
+    linear-gradient(
+      145deg,
+      #162033,
+      #142239
+    );
+}
+
+html[data-theme="dark"]
+  .dentist-form-section__header {
+  border-bottom-color: #2a394d;
+}
+
+html[data-theme="dark"]
+  .dentist-form-section__header
+  .ant-typography {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"]
+  .dentist-form-section__header
+  .ant-typography-secondary {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"]
+  .dentist-form-section__icon {
+  color: #60a5fa;
+
+  background: rgba(37, 99, 235, 0.16);
+}
+
+html[data-theme="dark"]
+  .dentist-form-section__icon--professional {
+  color: #c4b5fd;
+
+  background: rgba(124, 58, 237, 0.17);
+}
+
+
+/* --------------------------------------------------------
+   Form labels - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-form-item-label
+  > label {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-form-item-extra {
+  color: #64748b;
+}
+
+
+/* --------------------------------------------------------
+   Inputs - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-input,
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-input-affix-wrapper,
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-input-number,
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-picker,
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-select-selector {
+  color: #e2e8f0 !important;
+
+  border-color: #334155 !important;
+
+  background: #111827 !important;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  textarea.ant-input {
+  color: #e2e8f0;
+
+  background: #111827;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-input:hover,
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-input-affix-wrapper:hover,
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-input-number:hover,
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-picker:hover,
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-select-selector:hover {
+  border-color: #3b82f6 !important;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-input:focus,
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-input-focused,
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-input-affix-wrapper-focused,
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-input-number-focused,
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-picker-focused,
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-select-focused
+  .ant-select-selector {
+  border-color: #3b82f6 !important;
+
+  box-shadow:
+    0 0 0 2px rgba(59, 130, 246, 0.14) !important;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-input::placeholder,
+html[data-theme="dark"]
+  .dentist-form-modal
+  textarea.ant-input::placeholder {
+  color: #64748b;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-input-affix-wrapper
+  input {
+  color: #e2e8f0;
+
+  background: transparent;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-input-prefix,
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-input-suffix {
+  color: #64748b;
+}
+
+
+/* --------------------------------------------------------
+   Select - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-select-selection-item {
+  color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-select-selection-placeholder {
+  color: #64748b !important;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-select-arrow {
+  color: #94a3b8;
+}
+
+
+/* --------------------------------------------------------
+   Input number - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-input-number-input {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-input-number-handler-wrap {
+  border-left-color: #334155;
+
+  background: #162033;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-input-number-handler {
+  border-color: #334155;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-input-number-handler
+  .anticon {
+  color: #94a3b8;
+}
+
+
+/* --------------------------------------------------------
+   Date picker - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-picker-input
+  > input {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-picker-input
+  > input::placeholder {
+  color: #64748b;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-picker-suffix {
+  color: #94a3b8;
+}
+
+
+/* --------------------------------------------------------
+   Switch - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-switch:not(.ant-switch-checked) {
+  background: #475569;
+}
+
+
+/* --------------------------------------------------------
+   Dropdown portal - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .ant-select-dropdown {
+  border: 1px solid #334155;
+
+  background: #162033;
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.38);
+}
+
+html[data-theme="dark"]
+  .ant-select-dropdown
+  .ant-select-item {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"]
+  .ant-select-dropdown
+  .ant-select-item-option-active:not(
+    .ant-select-item-option-disabled
+  ) {
+  background: #1e2d43;
+}
+
+html[data-theme="dark"]
+  .ant-select-dropdown
+  .ant-select-item-option-selected:not(
+    .ant-select-item-option-disabled
+  ) {
+  color: #60a5fa;
+
+  background: rgba(37, 99, 235, 0.17);
+}
+
+
+/* --------------------------------------------------------
+   Tooltip / Popconfirm portal - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .ant-popover
+  .ant-popover-inner {
+  color: #e2e8f0;
+
+  border: 1px solid #334155;
+
+  background: #162033;
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="dark"]
+  .ant-popover
+  .ant-popover-title {
+  color: #f1f5f9;
+}
+
+html[data-theme="dark"]
+  .ant-popover
+  .ant-popover-inner-content {
+  color: #cbd5e1;
+}
+
+
+/* --------------------------------------------------------
+   Scrollbar - Dark
+-------------------------------------------------------- */
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-modal-body::-webkit-scrollbar-track {
+  background: #0d1625;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-modal-body::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+
+  background: #334155;
+}
+
+html[data-theme="dark"]
+  .dentist-form-modal
+  .ant-modal-body::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
 
 /* --------------------------------------------------------
    Responsive
@@ -605,12 +1756,14 @@
 
   .dentist-details-header {
     align-items: flex-start;
+
     padding: 25px 21px;
   }
 
   .dentist-details-header__avatar {
     width: 59px !important;
     height: 59px !important;
+
     font-size: 23px !important;
   }
 

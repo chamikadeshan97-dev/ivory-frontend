@@ -3,41 +3,161 @@
    File: CommonTreatments.css
 ======================================================== */
 
+
+/* ========================================================
+   THEME VARIABLES
+======================================================== */
+
 /* --------------------------------------------------------
-   Page
+   Light Theme
 -------------------------------------------------------- */
 
+:root,
+html[data-theme="light"] {
+  --common-bg: #ffffff;
+  --common-bg-secondary: #f8fafc;
+  --common-bg-soft: #fbfdff;
+
+  --common-text: #102a43;
+  --common-text-secondary: #486581;
+  --common-text-muted: #627d98;
+
+  --common-border: #e2e8f0;
+  --common-border-soft: #edf2f7;
+  --common-border-card: #e7edf5;
+
+  --common-input-bg: #ffffff;
+
+  --common-shadow:
+    0 8px 28px rgba(15, 42, 67, 0.07);
+
+  --common-shadow-soft:
+    0 5px 18px rgba(15, 42, 67, 0.06);
+
+  --common-shadow-hover:
+    0 10px 26px rgba(15, 42, 67, 0.1);
+
+  /* Blue */
+  --common-blue-soft: #e6f4ff;
+  --common-blue-soft-2: #f0f5ff;
+  --common-blue-border: #bae0ff;
+
+  /* Green */
+  --common-green-soft: #f0fdf4;
+
+  /* Red */
+  --common-red-soft: #fff1f0;
+
+  /* Statistic card gradient */
+  --common-stat-start: #ffffff;
+  --common-stat-end: #f8fbff;
+
+  /* Toolbar gradient */
+  --common-toolbar-start: #ffffff;
+  --common-toolbar-end: #fbfdff;
+
+  /* Table hover */
+  --common-table-hover: #f7fbff;
+}
 
 
 /* --------------------------------------------------------
-   Header
+   Dark Theme
 -------------------------------------------------------- */
+
+html[data-theme="dark"] {
+  --common-bg: #111827;
+  --common-bg-secondary: #172033;
+  --common-bg-soft: #141e2d;
+
+  --common-text: #f8fafc;
+  --common-text-secondary: #cbd5e1;
+  --common-text-muted: #94a3b8;
+
+  --common-border: #263244;
+  --common-border-soft: #223044;
+  --common-border-card: #2a3749;
+
+  --common-input-bg: #172033;
+
+  --common-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.28);
+
+  --common-shadow-soft:
+    0 8px 24px rgba(0, 0, 0, 0.22);
+
+  --common-shadow-hover:
+    0 14px 34px rgba(0, 0, 0, 0.34);
+
+  /* Blue */
+  --common-blue-soft:
+    rgba(22, 119, 255, 0.15);
+
+  --common-blue-soft-2:
+    rgba(37, 99, 235, 0.12);
+
+  --common-blue-border:
+    rgba(96, 165, 250, 0.34);
+
+  /* Green */
+  --common-green-soft:
+    rgba(22, 163, 74, 0.14);
+
+  /* Red */
+  --common-red-soft:
+    rgba(220, 38, 38, 0.14);
+
+  /* Statistic card gradient */
+  --common-stat-start: #111827;
+  --common-stat-end: #141e2d;
+
+  /* Toolbar gradient */
+  --common-toolbar-start: #111827;
+  --common-toolbar-end: #141e2d;
+
+  /* Table hover */
+  --common-table-hover: #172233;
+}
+
+
+/* ========================================================
+   HEADER
+======================================================== */
 
 .common-treatments-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 20px;
+
   margin-bottom: 22px;
 }
 
 .common-treatments-title-row {
   display: flex;
   align-items: center;
+
   gap: 14px;
 }
 
-.common-treatments-title-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
 
+/* --------------------------------------------------------
+   Header icon
+-------------------------------------------------------- */
+
+.common-treatments-title-icon {
   width: 52px;
   height: 52px;
 
   flex-shrink: 0;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   color: #ffffff;
+
   font-size: 24px;
 
   border-radius: 16px;
@@ -50,31 +170,55 @@
     );
 
   box-shadow:
-    0 10px 24px rgba(22, 119, 255, 0.24);
+    0 10px 24px
+    rgba(22, 119, 255, 0.24);
 }
+
+
+/* --------------------------------------------------------
+   Header text
+-------------------------------------------------------- */
 
 .common-treatments-title {
   margin: 0 !important;
-  color: #102a43 !important;
+
+  color:
+    var(--common-text) !important;
+
   font-size: 28px !important;
+
   line-height: 1.25 !important;
+
+  transition:
+    color 0.25s ease;
 }
 
 .common-treatments-subtitle {
   display: block;
+
   margin-top: 4px;
+
+  color:
+    var(--common-text-muted);
+
   font-size: 14px;
+
+  transition:
+    color 0.25s ease;
 }
 
 .common-treatment-add-button {
   min-height: 38px;
-  font-weight: 600;
+
   border-radius: 9px;
+
+  font-weight: 600;
 }
 
-/* --------------------------------------------------------
-   Statistics
--------------------------------------------------------- */
+
+/* ========================================================
+   STATISTICS
+======================================================== */
 
 .common-treatment-statistics-row {
   margin-bottom: 18px;
@@ -83,65 +227,105 @@
 .common-treatment-stat-card {
   height: 100%;
 
-  border: 1px solid #e7edf5;
-  border-radius: 14px;
-
   background:
     linear-gradient(
       145deg,
-      #ffffff 0%,
-      #f8fbff 100%
+      var(--common-stat-start) 0%,
+      var(--common-stat-end) 100%
     );
 
+  border:
+    1px solid
+    var(--common-border-card);
+
+  border-radius: 14px;
+
   box-shadow:
-    0 5px 18px rgba(15, 42, 67, 0.06);
+    var(--common-shadow-soft);
 
   transition:
     transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+    background-color 0.25s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .common-treatment-stat-card:hover {
   transform: translateY(-2px);
-  border-color: #c9def7;
+
+  border-color:
+    rgba(22, 119, 255, 0.35);
 
   box-shadow:
-    0 10px 26px rgba(15, 42, 67, 0.1);
+    var(--common-shadow-hover);
 }
+
+
+/* --------------------------------------------------------
+   Statistic title
+-------------------------------------------------------- */
 
 .common-treatment-stat-card
   .ant-statistic-title {
   margin-bottom: 8px;
-  color: #627d98;
+
+  color:
+    var(--common-text-muted);
+
   font-size: 14px;
   font-weight: 600;
 }
 
+
+/* --------------------------------------------------------
+   Statistic value
+-------------------------------------------------------- */
+
 .common-treatment-stat-card
   .ant-statistic-content {
-  color: #102a43;
+  color:
+    var(--common-text);
+
   font-size: 25px;
   font-weight: 700;
 }
 
+.common-treatment-stat-card
+  .ant-statistic-content-value {
+  color:
+    var(--common-text);
+}
+
 .statistic-prefix-icon {
   margin-right: 5px;
+
   color: #1677ff;
 }
 
-/* --------------------------------------------------------
-   Table card
--------------------------------------------------------- */
+
+/* ========================================================
+   TABLE CARD
+======================================================== */
 
 .common-treatments-table-card {
   overflow: hidden;
 
-  border: 1px solid #e2e8f0;
+  background:
+    var(--common-bg);
+
+  border:
+    1px solid
+    var(--common-border);
+
   border-radius: 16px;
 
   box-shadow:
-    0 8px 28px rgba(15, 42, 67, 0.07);
+    var(--common-shadow);
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .common-treatments-table-card
@@ -149,69 +333,159 @@
   padding: 0;
 }
 
+
+/* ========================================================
+   TOOLBAR
+======================================================== */
+
 .common-treatments-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 20px;
 
   padding: 20px 20px 18px;
 
-  border-bottom: 1px solid #edf2f7;
-
   background:
     linear-gradient(
       180deg,
-      #ffffff 0%,
-      #fbfdff 100%
+      var(--common-toolbar-start) 0%,
+      var(--common-toolbar-end) 100%
     );
+
+  border-bottom:
+    1px solid
+    var(--common-border-soft);
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .common-treatments-table-title {
   display: block;
-  color: #102a43;
+
+  color:
+    var(--common-text);
+
   font-size: 17px;
+
+  transition:
+    color 0.25s ease;
 }
 
 .common-treatments-table-description {
   display: block;
+
   margin-top: 3px;
+
+  color:
+    var(--common-text-muted);
+
   font-size: 13px;
 }
+
+
+/* ========================================================
+   SEARCH
+======================================================== */
 
 .common-treatment-search {
   width: 100%;
   max-width: 440px;
 }
 
-.common-treatment-search .ant-input-affix-wrapper {
+.common-treatment-search
+  .ant-input-affix-wrapper {
   min-height: 40px;
+
+  color:
+    var(--common-text);
+
+  background:
+    var(--common-input-bg);
+
+  border-color:
+    var(--common-border);
+
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease;
 }
 
-.common-treatment-search .ant-btn {
+.common-treatment-search
+  .ant-input {
+  color:
+    var(--common-text);
+
+  background: transparent;
+}
+
+.common-treatment-search
+  .ant-input::placeholder {
+  color:
+    var(--common-text-muted);
+}
+
+.common-treatment-search
+  .ant-btn {
   min-height: 40px;
+
   font-weight: 600;
 }
 
-/* --------------------------------------------------------
-   Table
--------------------------------------------------------- */
 
-.common-treatments-table-card .ant-table {
+/* ========================================================
+   TABLE
+======================================================== */
+
+.common-treatments-table-card
+  .ant-table {
+  color:
+    var(--common-text);
+
+  background:
+    var(--common-bg);
+
   font-size: 14px;
 }
+
+
+/* --------------------------------------------------------
+   Table header
+-------------------------------------------------------- */
 
 .common-treatments-table-card
   .ant-table-thead
   > tr
   > th {
-  color: #486581;
+  color:
+    var(--common-text-secondary);
+
+  background:
+    var(--common-bg-secondary);
+
+  border-bottom-color:
+    var(--common-border);
+
   font-size: 13px;
   font-weight: 700;
-
-  background: #f7fafc;
-  border-bottom-color: #e2e8f0;
 }
+
+.common-treatments-table-card
+  .ant-table-thead
+  > tr
+  > th::before {
+  background:
+    var(--common-border) !important;
+}
+
+
+/* --------------------------------------------------------
+   Table body
+-------------------------------------------------------- */
 
 .common-treatments-table-card
   .ant-table-tbody
@@ -219,130 +493,289 @@
   > td {
   padding-top: 15px;
   padding-bottom: 15px;
-  border-bottom-color: #edf2f7;
+
+  color:
+    var(--common-text);
+
+  background:
+    var(--common-bg);
+
+  border-bottom-color:
+    var(--common-border-soft);
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .common-treatments-table-card
   .ant-table-tbody
   > tr:hover
   > td {
-  background: #f7fbff !important;
+  background:
+    var(--common-table-hover) !important;
 }
+
+
+/* ========================================================
+   TREATMENT ID
+======================================================== */
 
 .common-treatment-id-tag {
   min-width: 92px;
+
   margin: 0;
+
   padding: 4px 10px;
 
-  color: #0958d9;
+  color: #1677ff;
+
+  background:
+    var(--common-blue-soft);
+
+  border:
+    1px solid
+    var(--common-blue-border);
+
+  border-radius: 7px;
+
   font-family:
     "SFMono-Regular",
     Consolas,
     "Liberation Mono",
     monospace;
+
   font-size: 12px;
   font-weight: 700;
+
   text-align: center;
-
-  border: 1px solid #bae0ff;
-  border-radius: 7px;
-
-  background: #e6f4ff;
 }
+
+
+/* ========================================================
+   TREATMENT NAME
+======================================================== */
 
 .common-treatment-name-cell {
   display: flex;
   align-items: center;
+
   gap: 10px;
 }
 
-.common-treatment-table-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.common-treatment-name-cell
+  .ant-typography {
+  color:
+    var(--common-text);
+}
 
+
+/* --------------------------------------------------------
+   Treatment icon
+-------------------------------------------------------- */
+
+.common-treatment-table-icon {
   width: 34px;
   height: 34px;
 
   flex-shrink: 0;
 
-  color: #1677ff;
-  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  border: 1px solid #d6e4ff;
+  color: #1677ff;
+
+  background:
+    var(--common-blue-soft-2);
+
+  border:
+    1px solid
+    var(--common-blue-border);
+
   border-radius: 9px;
 
-  background: #f0f5ff;
+  font-size: 16px;
 }
 
+
+/* ========================================================
+   TREATMENT FEE
+======================================================== */
+
 .common-treatment-fee {
-  color: #087443;
+  color: #16a34a;
+
   font-size: 15px;
   font-weight: 700;
 }
 
+
+/* ========================================================
+   ACTION BUTTONS
+======================================================== */
+
 .common-treatment-edit-button,
 .common-treatment-delete-button {
+  width: 34px;
+  height: 34px;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  width: 34px;
-  height: 34px;
-
   border-radius: 8px;
 }
+
+
+/* --------------------------------------------------------
+   Edit
+-------------------------------------------------------- */
 
 .common-treatment-edit-button {
   color: #1677ff;
 }
 
 .common-treatment-edit-button:hover {
-  color: #0958d9 !important;
-  background: #e6f4ff !important;
+  color: #4096ff !important;
+
+  background:
+    var(--common-blue-soft) !important;
 }
 
+
+/* --------------------------------------------------------
+   Delete
+-------------------------------------------------------- */
+
 .common-treatment-delete-button:hover {
-  background: #fff1f0 !important;
+  background:
+    var(--common-red-soft) !important;
 }
+
+
+/* ========================================================
+   PAGINATION
+======================================================== */
 
 .common-treatments-table-card
   .ant-pagination {
   margin: 18px 20px;
+
+  color:
+    var(--common-text-secondary);
 }
 
+
 /* --------------------------------------------------------
-   Modal
+   Dark pagination
 -------------------------------------------------------- */
 
-.common-treatment-modal .ant-modal-content {
+html[data-theme="dark"]
+  .common-treatments-table-card
+  .ant-pagination-item {
+  background:
+    var(--common-bg-secondary);
+
+  border-color:
+    var(--common-border);
+}
+
+html[data-theme="dark"]
+  .common-treatments-table-card
+  .ant-pagination-item
+  a {
+  color:
+    var(--common-text);
+}
+
+html[data-theme="dark"]
+  .common-treatments-table-card
+  .ant-pagination-item-active {
+  background:
+    var(--common-blue-soft);
+
+  border-color: #1677ff;
+}
+
+html[data-theme="dark"]
+  .common-treatments-table-card
+  .ant-pagination-item-active
+  a {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"]
+  .common-treatments-table-card
+  .ant-pagination-prev
+  button,
+html[data-theme="dark"]
+  .common-treatments-table-card
+  .ant-pagination-next
+  button {
+  color:
+    var(--common-text-secondary);
+}
+
+
+/* ========================================================
+   MODAL
+======================================================== */
+
+.common-treatment-modal
+  .ant-modal-content {
+  color:
+    var(--common-text);
+
+  background:
+    var(--common-bg);
+
   border-radius: 16px;
 }
 
-.common-treatment-modal .ant-modal-header {
+.common-treatment-modal
+  .ant-modal-header {
   margin-bottom: 22px;
+
+  background:
+    var(--common-bg);
 }
+
+.common-treatment-modal
+  .ant-modal-title {
+  color:
+    var(--common-text);
+}
+
+.common-treatment-modal
+  .ant-modal-close {
+  color:
+    var(--common-text-secondary);
+}
+
+
+/* ========================================================
+   MODAL TITLE
+======================================================== */
 
 .common-treatment-modal-title {
   display: flex;
   align-items: center;
+
   gap: 12px;
 }
 
 .common-treatment-modal-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
   width: 42px;
   height: 42px;
 
   flex-shrink: 0;
 
-  color: #ffffff;
-  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  border-radius: 12px;
+  color: #ffffff;
 
   background:
     linear-gradient(
@@ -351,28 +784,194 @@
       #0958d9 100%
     );
 
+  border-radius: 12px;
+
   box-shadow:
-    0 7px 16px rgba(22, 119, 255, 0.22);
+    0 7px 16px
+    rgba(22, 119, 255, 0.22);
+
+  font-size: 18px;
 }
 
 .common-treatment-modal-subtitle {
   display: block;
+
   margin-top: 2px;
+
+  color:
+    var(--common-text-muted);
+
   font-size: 12px;
   font-weight: 400;
+}
+
+
+/* ========================================================
+   MODAL FORM
+======================================================== */
+
+.common-treatment-modal
+  .ant-form-item-label
+  > label {
+  color:
+    var(--common-text);
+
+  font-weight: 600;
+}
+
+.common-treatment-modal
+  .ant-input,
+.common-treatment-modal
+  .ant-input-affix-wrapper,
+.common-treatment-modal
+  .ant-input-number,
+.common-treatment-modal
+  .ant-input-number-input,
+.common-treatment-modal
+  .ant-select-selector {
+  color:
+    var(--common-text);
+
+  background:
+    var(--common-input-bg);
+
+  border-color:
+    var(--common-border);
+}
+
+.common-treatment-modal
+  .ant-input::placeholder,
+.common-treatment-modal
+  .ant-select-selection-placeholder {
+  color:
+    var(--common-text-muted);
 }
 
 .common-treatment-fee-input {
   width: 100%;
 }
 
-/* --------------------------------------------------------
-   Responsive
--------------------------------------------------------- */
+
+/* ========================================================
+   TYPOGRAPHY
+======================================================== */
+
+.common-treatments-table-card
+  .ant-typography:not(
+    .ant-typography-secondary
+  ),
+.common-treatment-modal
+  .ant-typography:not(
+    .ant-typography-secondary
+  ) {
+  color:
+    var(--common-text);
+}
+
+.common-treatments-table-card
+  .ant-typography-secondary,
+.common-treatment-modal
+  .ant-typography-secondary {
+  color:
+    var(--common-text-muted);
+}
+
+
+/* ========================================================
+   DARK MODE ACCENT IMPROVEMENTS
+======================================================== */
+
+html[data-theme="dark"]
+  .common-treatment-id-tag,
+html[data-theme="dark"]
+  .common-treatment-table-icon {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"]
+  .statistic-prefix-icon {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"]
+  .common-treatment-fee {
+  color: #4ade80;
+}
+
+
+/* ========================================================
+   DARK MODE DROPDOWN
+======================================================== */
+
+html[data-theme="dark"]
+  .ant-select-dropdown {
+  color:
+    var(--common-text);
+
+  background:
+    var(--common-bg-secondary);
+}
+
+html[data-theme="dark"]
+  .ant-select-item {
+  color:
+    var(--common-text);
+}
+
+html[data-theme="dark"]
+  .ant-select-item-option-active:not(
+    .ant-select-item-option-disabled
+  ) {
+  background:
+    rgba(255, 255, 255, 0.06);
+}
+
+html[data-theme="dark"]
+  .ant-select-item-option-selected:not(
+    .ant-select-item-option-disabled
+  ) {
+  background:
+    rgba(22, 119, 255, 0.18);
+
+  color: #ffffff;
+}
+
+
+/* ========================================================
+   TRANSITIONS
+======================================================== */
+
+.common-treatment-stat-card,
+.common-treatments-table-card,
+.common-treatments-toolbar,
+.common-treatment-search
+  .ant-input-affix-wrapper,
+.common-treatments-table-card
+  .ant-table,
+.common-treatments-table-card
+  .ant-table-thead
+  > tr
+  > th,
+.common-treatments-table-card
+  .ant-table-tbody
+  > tr
+  > td {
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+/* ========================================================
+   RESPONSIVE
+======================================================== */
 
 @media (max-width: 991px) {
   .common-treatments-toolbar {
     align-items: stretch;
+
     flex-direction: column;
   }
 
@@ -381,13 +980,16 @@
   }
 }
 
+
 @media (max-width: 767px) {
   .common-treatments-header {
     align-items: stretch;
+
     flex-direction: column;
   }
 
-  .common-treatments-header > .ant-space {
+  .common-treatments-header
+    > .ant-space {
     width: 100%;
   }
 
@@ -406,12 +1008,15 @@
   .common-treatments-title-icon {
     width: 46px;
     height: 46px;
-    font-size: 21px;
+
     border-radius: 13px;
+
+    font-size: 21px;
   }
 
   .common-treatments-title {
-    font-size: 23px !important;
+    font-size:
+      23px !important;
   }
 
   .common-treatments-subtitle {
@@ -438,6 +1043,7 @@
   }
 }
 
+
 @media (max-width: 480px) {
   .common-treatments-title-row {
     align-items: flex-start;
@@ -450,12 +1056,18 @@
   .common-treatment-search
     .ant-input-affix-wrapper {
     width: 100%;
-    border-radius: 8px !important;
+
+    border-radius:
+      8px !important;
   }
 
-  .common-treatment-search .ant-btn {
+  .common-treatment-search
+    .ant-btn {
     width: 100%;
+
     margin-top: 8px;
-    border-radius: 8px !important;
+
+    border-radius:
+      8px !important;
   }
 }
