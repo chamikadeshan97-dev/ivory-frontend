@@ -1,3 +1,5 @@
+// src/pages/DailyIncome.jsx
+
 import React, {
   useCallback,
   useEffect,
@@ -13,13 +15,12 @@ import {
   DatePicker,
   Empty,
   Input,
+  Progress,
   Row,
   Segmented,
   Space,
-  Statistic,
   Table,
   Tag,
-  Tooltip,
   Typography,
   message,
 } from "antd";
@@ -50,23 +51,17 @@ import TreatmentPaymentDetailsModal from "../components/TreatmentPaymentDetailsM
 
 import "./css/DailyIncome.css";
 
-const {
-  Title,
-  Text,
-} = Typography;
+const { Title, Text } = Typography;
+const { RangePicker } = DatePicker;
 
-const {
-  RangePicker,
-} = DatePicker;
-
-/* --------------------------------------------------------
-   General helpers
--------------------------------------------------------- */
+/* ========================================================
+   GENERAL HELPERS
+======================================================== */
 
 const getDefaultDateRange = () => {
   return [
-    dayjs().startOf("month"),
-    dayjs(),
+    dayjs().subtract(6, "day").startOf("day"),
+    dayjs().endOf("day"),
   ];
 };
 
@@ -79,9 +74,7 @@ const hasValue = (value) => {
 };
 
 const toNumber = (value) => {
-  const number = Number(
-    value || 0,
-  );
+  const number = Number(value || 0);
 
   return Number.isNaN(number)
     ? 0
@@ -94,9 +87,7 @@ const normalizeValue = (value) => {
     .toLowerCase();
 };
 
-const getPaymentAmount = (
-  payment,
-) => {
+const getPaymentAmount = (payment) => {
   return toNumber(
     payment?.payment_amount ??
       payment?.amount ??
@@ -104,9 +95,7 @@ const getPaymentAmount = (
   );
 };
 
-const getTreatmentCharge = (
-  payment,
-) => {
+const getTreatmentCharge = (payment) => {
   return toNumber(
     payment?.treatment_charge ??
       payment?.treatment_fee ??
@@ -116,12 +105,13 @@ const getTreatmentCharge = (
 };
 
 const formatCurrency = (value) => {
-  return `Rs. ${toNumber(
-    value,
-  ).toLocaleString("en-LK", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
+  return `Rs. ${toNumber(value).toLocaleString(
+    "en-LK",
+    {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    },
+  )}`;
 };
 
 const formatDate = (value) => {
@@ -136,9 +126,7 @@ const formatDate = (value) => {
     : value;
 };
 
-const getPaymentDateValue = (
-  record,
-) => {
+const getPaymentDateValue = (record) => {
   const date = dayjs(
     record?.created_at ||
       record?.payment_date,
@@ -149,34 +137,26 @@ const getPaymentDateValue = (
     : 0;
 };
 
-const getPaymentStatus = (
-  balance,
-) => {
+const getPaymentStatus = (balance) => {
   return toNumber(balance) <= 0
     ? "Full"
     : "Partial";
 };
 
-const getStatusColor = (
-  status,
-) => {
+const getStatusColor = (status) => {
   return status === "Full"
     ? "success"
     : "warning";
 };
 
-/* --------------------------------------------------------
-   Reusable status
--------------------------------------------------------- */
+/* ========================================================
+   STATUS TAG
+======================================================== */
 
-const StatusTag = ({
-  status,
-}) => {
+const StatusTag = ({ status }) => {
   return (
     <Tag
-      color={getStatusColor(
-        status,
-      )}
+      color={getStatusColor(status)}
       icon={
         status === "Full" ? (
           <CheckCircleOutlined />
@@ -191,19 +171,16 @@ const StatusTag = ({
   );
 };
 
-/* --------------------------------------------------------
-   Patient display
--------------------------------------------------------- */
+/* ========================================================
+   PATIENT DISPLAY
+======================================================== */
 
 const PatientDisplay = ({
   name,
   patientId,
 }) => {
   return (
-    <Space
-      size={10}
-      align="center"
-    >
+    <Space size={10} align="center">
       <Avatar
         size={39}
         icon={<UserOutlined />}
@@ -215,12 +192,10 @@ const PatientDisplay = ({
           strong
           ellipsis={{
             tooltip:
-              name ||
-              "Unknown Patient",
+              name || "Unknown Patient",
           }}
         >
-          {name ||
-            "Unknown Patient"}
+          {name || "Unknown Patient"}
         </Text>
 
         <Text type="secondary">
@@ -231,58 +206,47 @@ const PatientDisplay = ({
   );
 };
 
-/* --------------------------------------------------------
-   Summary card
--------------------------------------------------------- */
+/* ========================================================
+   DASHBOARD SUMMARY CARD
+======================================================== */
 
-const IncomeSummaryCard = ({
+const DashboardSummaryCard = ({
   title,
   value,
   helper,
   icon,
   tone,
-  currency = false,
 }) => {
   return (
     <Card
       bordered={false}
-      className={`income-summary-card income-summary-card--${tone}`}
+      className={`income-dashboard-stat income-dashboard-stat--${tone}`}
     >
-      <div className="income-summary-card__content">
-        <Statistic
-          title={title}
-          value={
-            currency
-              ? toNumber(value)
-              : value
-          }
-          prefix={
-            currency
-              ? "Rs."
-              : undefined
-          }
-          precision={
-            currency
-              ? 2
-              : undefined
-          }
-        />
+      <Text className="income-dashboard-stat__label">
+        {title}
+      </Text>
 
-        <div className="income-summary-card__icon">
+      <div className="income-dashboard-stat__value">
+        <span className="income-dashboard-stat__value-icon">
           {icon}
-        </div>
+        </span>
+
+        <span>{value}</span>
       </div>
 
-      <Text className="income-summary-card__helper">
+      <Text
+        type="secondary"
+        className="income-dashboard-stat__helper"
+      >
         {helper}
       </Text>
     </Card>
   );
 };
 
-/* --------------------------------------------------------
-   Component
--------------------------------------------------------- */
+/* ========================================================
+   COMPONENT
+======================================================== */
 
 const DailyIncome = () => {
   const [loading, setLoading] =
@@ -302,7 +266,7 @@ const DailyIncome = () => {
   );
 
   const [viewMode, setViewMode] =
-    useState("treatment");
+    useState("treatments");
 
   const [search, setSearch] =
     useState("");
@@ -317,9 +281,9 @@ const DailyIncome = () => {
     setSelectedPayment,
   ] = useState(null);
 
-  /* ------------------------------------------------------
-     Load patients
-  ------------------------------------------------------ */
+  /* ======================================================
+     LOAD PATIENTS
+  ====================================================== */
 
   const loadPatients =
     useCallback(async () => {
@@ -347,73 +311,72 @@ const DailyIncome = () => {
       }
     }, []);
 
-  /* ------------------------------------------------------
-     Load income
-  ------------------------------------------------------ */
+  /* ======================================================
+     LOAD INCOME
+  ====================================================== */
 
-  const loadIncome =
-    useCallback(
-      async (
-        dateRange =
-          selectedDateRange,
-      ) => {
-        if (
-          !dateRange ||
-          dateRange.length !== 2 ||
-          !dateRange[0] ||
-          !dateRange[1]
-        ) {
-          message.warning(
-            "Please select a valid date range",
+  const loadIncome = useCallback(
+    async (
+      dateRange =
+        selectedDateRange,
+    ) => {
+      if (
+        !dateRange ||
+        dateRange.length !== 2 ||
+        !dateRange[0] ||
+        !dateRange[1]
+      ) {
+        message.warning(
+          "Please select a valid date range",
+        );
+
+        return;
+      }
+
+      const startDate =
+        dateRange[0].format(
+          "YYYY-MM-DD",
+        );
+
+      const endDate =
+        dateRange[1].format(
+          "YYYY-MM-DD",
+        );
+
+      setLoading(true);
+
+      try {
+        const response =
+          await getIncomeByDateRange(
+            startDate,
+            endDate,
           );
 
-          return;
-        }
+        setReport(
+          response?.data?.data ??
+            response?.data ??
+            null,
+        );
+      } catch (error) {
+        console.error(
+          "Failed to load income:",
+          error,
+        );
 
-        const startDate =
-          dateRange[0].format(
-            "YYYY-MM-DD",
-          );
+        setReport(null);
 
-        const endDate =
-          dateRange[1].format(
-            "YYYY-MM-DD",
-          );
-
-        setLoading(true);
-
-        try {
-          const response =
-            await getIncomeByDateRange(
-              startDate,
-              endDate,
-            );
-
-          setReport(
-            response?.data?.data ??
-              response?.data ??
-              null,
-          );
-        } catch (error) {
-          console.error(
-            "Failed to load income:",
-            error,
-          );
-
-          setReport(null);
-
-          message.error(
-            error?.response?.data
-              ?.message ||
-              error?.message ||
-              "Failed to load payment history",
-          );
-        } finally {
-          setLoading(false);
-        }
-      },
-      [selectedDateRange],
-    );
+        message.error(
+          error?.response?.data
+            ?.message ||
+            error?.message ||
+            "Failed to load payment history",
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [selectedDateRange],
+  );
 
   useEffect(() => {
     const initialRange =
@@ -425,6 +388,10 @@ const DailyIncome = () => {
     loadIncome,
     loadPatients,
   ]);
+
+  /* ======================================================
+     DATE RANGE
+  ====================================================== */
 
   const handleDateRangeChange = (
     dates,
@@ -439,12 +406,47 @@ const DailyIncome = () => {
     }
 
     setSelectedDateRange(dates);
-    loadIncome(dates);
   };
 
-  /* ------------------------------------------------------
-     Payment rows
-  ------------------------------------------------------ */
+  const setQuickDateRange = (
+    type,
+  ) => {
+    let range = null;
+
+    if (type === "today") {
+      range = [
+        dayjs().startOf("day"),
+        dayjs().endOf("day"),
+      ];
+    }
+
+    if (type === "week") {
+      range = [
+        dayjs()
+          .subtract(6, "day")
+          .startOf("day"),
+        dayjs().endOf("day"),
+      ];
+    }
+
+    if (type === "month") {
+      range = [
+        dayjs().startOf("month"),
+        dayjs().endOf("day"),
+      ];
+    }
+
+    if (!range) {
+      return;
+    }
+
+    setSelectedDateRange(range);
+    loadIncome(range);
+  };
+
+  /* ======================================================
+     PAYMENT ROWS
+  ====================================================== */
 
   const paymentRows = useMemo(() => {
     if (Array.isArray(report)) {
@@ -476,9 +478,9 @@ const DailyIncome = () => {
     return [];
   }, [report]);
 
-  /* ------------------------------------------------------
-     Patient lookup
-  ------------------------------------------------------ */
+  /* ======================================================
+     PATIENT LOOKUP
+  ====================================================== */
 
   const patientNameMap =
     useMemo(() => {
@@ -532,9 +534,9 @@ const DailyIncome = () => {
       [patientNameMap],
     );
 
-  /* ------------------------------------------------------
-     Treatment groups
-  ------------------------------------------------------ */
+  /* ======================================================
+     TREATMENT GROUPS
+  ====================================================== */
 
   const treatmentGroups =
     useMemo(() => {
@@ -724,9 +726,9 @@ const DailyIncome = () => {
       getPatientName,
     ]);
 
-  /* ------------------------------------------------------
-     Installment rows
-  ------------------------------------------------------ */
+  /* ======================================================
+     INSTALLMENT ROWS
+  ====================================================== */
 
   const installmentRows =
     useMemo(() => {
@@ -831,9 +833,9 @@ const DailyIncome = () => {
         );
     }, [treatmentGroups]);
 
-  /* ------------------------------------------------------
-     Patient groups
-  ------------------------------------------------------ */
+  /* ======================================================
+     PATIENT GROUPS
+  ====================================================== */
 
   const patientGroups =
     useMemo(() => {
@@ -920,9 +922,9 @@ const DailyIncome = () => {
         );
     }, [treatmentGroups]);
 
-  /* ------------------------------------------------------
-     Financial summary
-  ------------------------------------------------------ */
+  /* ======================================================
+     FINANCIAL SUMMARY
+  ====================================================== */
 
   const totalIncome = useMemo(() => {
     return paymentRows.reduce(
@@ -965,6 +967,27 @@ const DailyIncome = () => {
     treatmentGroups.length -
     fullPaymentCount;
 
+  const collectionPercentage =
+    useMemo(() => {
+      if (
+        totalTreatmentCharge <= 0
+      ) {
+        return 0;
+      }
+
+      return Math.min(
+        Math.round(
+          (totalIncome /
+            totalTreatmentCharge) *
+            100,
+        ),
+        100,
+      );
+    }, [
+      totalIncome,
+      totalTreatmentCharge,
+    ]);
+
   const formattedDateRange =
     useMemo(() => {
       if (
@@ -998,9 +1021,9 @@ const DailyIncome = () => {
       )}`;
     }, [selectedDateRange]);
 
-  /* ------------------------------------------------------
-     Details modal
-  ------------------------------------------------------ */
+  /* ======================================================
+     DETAILS MODAL
+  ====================================================== */
 
   const openPaymentDetails = (
     payment,
@@ -1038,9 +1061,9 @@ const DailyIncome = () => {
     setSelectedPayment(null);
   };
 
-  /* ------------------------------------------------------
-     Installment columns
-  ------------------------------------------------------ */
+  /* ======================================================
+     INSTALLMENT COLUMNS
+  ====================================================== */
 
   const installmentColumns = [
     {
@@ -1078,6 +1101,7 @@ const DailyIncome = () => {
         </Space>
       ),
     },
+
     {
       title: "Patient",
       key: "patient",
@@ -1095,6 +1119,7 @@ const DailyIncome = () => {
         />
       ),
     },
+
     {
       title: "Treatment",
       key: "treatment",
@@ -1129,6 +1154,7 @@ const DailyIncome = () => {
         </div>
       ),
     },
+
     {
       title: "Treatment Charge",
       key: "charge",
@@ -1144,6 +1170,7 @@ const DailyIncome = () => {
         </Text>
       ),
     },
+
     {
       title: "This Payment",
       key: "current_payment",
@@ -1170,6 +1197,7 @@ const DailyIncome = () => {
         </div>
       ),
     },
+
     {
       title: "Balance",
       key: "balance",
@@ -1202,6 +1230,7 @@ const DailyIncome = () => {
         </div>
       ),
     },
+
     {
       title: "Method",
       dataIndex:
@@ -1218,9 +1247,9 @@ const DailyIncome = () => {
     },
   ];
 
-  /* ------------------------------------------------------
-     Treatment columns
-  ------------------------------------------------------ */
+  /* ======================================================
+     TREATMENT COLUMNS
+  ====================================================== */
 
   const treatmentColumns = [
     {
@@ -1237,6 +1266,7 @@ const DailyIncome = () => {
         />
       ),
     },
+
     {
       title: "Treatment",
       key: "treatment",
@@ -1266,6 +1296,7 @@ const DailyIncome = () => {
         </div>
       ),
     },
+
     {
       title: "Payment Activity",
       key: "activity",
@@ -1294,6 +1325,7 @@ const DailyIncome = () => {
         </div>
       ),
     },
+
     {
       title: "Charge",
       dataIndex:
@@ -1308,6 +1340,7 @@ const DailyIncome = () => {
         </Text>
       ),
     },
+
     {
       title: "Period Received",
       dataIndex:
@@ -1322,6 +1355,7 @@ const DailyIncome = () => {
         </Text>
       ),
     },
+
     {
       title: "Total Paid",
       dataIndex: "totalPaid",
@@ -1335,6 +1369,7 @@ const DailyIncome = () => {
         </Text>
       ),
     },
+
     {
       title: "Balance",
       key: "balance",
@@ -1363,9 +1398,9 @@ const DailyIncome = () => {
     },
   ];
 
-  /* ------------------------------------------------------
-     Patient columns
-  ------------------------------------------------------ */
+  /* ======================================================
+     PATIENT COLUMNS
+  ====================================================== */
 
   const patientColumns = [
     {
@@ -1382,6 +1417,7 @@ const DailyIncome = () => {
         />
       ),
     },
+
     {
       title: "Activity",
       key: "activity",
@@ -1414,6 +1450,7 @@ const DailyIncome = () => {
         </div>
       ),
     },
+
     {
       title: "Total Charges",
       dataIndex: "totalCharge",
@@ -1427,6 +1464,7 @@ const DailyIncome = () => {
         </Text>
       ),
     },
+
     {
       title: "Period Received",
       dataIndex:
@@ -1441,6 +1479,7 @@ const DailyIncome = () => {
         </Text>
       ),
     },
+
     {
       title: "Total Paid",
       dataIndex: "totalPaid",
@@ -1454,6 +1493,7 @@ const DailyIncome = () => {
         </Text>
       ),
     },
+
     {
       title: "Balance",
       key: "balance",
@@ -1483,9 +1523,9 @@ const DailyIncome = () => {
     },
   ];
 
-  /* ------------------------------------------------------
-     Expanded treatments
-  ------------------------------------------------------ */
+  /* ======================================================
+     EXPANDED PATIENT TREATMENTS
+  ====================================================== */
 
   const renderPatientTreatments = (
     patientGroup,
@@ -1555,9 +1595,9 @@ const DailyIncome = () => {
     );
   };
 
-  /* ------------------------------------------------------
-     Selected table configuration
-  ------------------------------------------------------ */
+  /* ======================================================
+     TABLE CONFIGURATION
+  ====================================================== */
 
   const tableConfiguration =
     useMemo(() => {
@@ -1620,9 +1660,9 @@ const DailyIncome = () => {
       installmentRows,
     ]);
 
-  /* ------------------------------------------------------
-     Search selected view
-  ------------------------------------------------------ */
+  /* ======================================================
+     SEARCH
+  ====================================================== */
 
   const filteredTableRows =
     useMemo(() => {
@@ -1705,42 +1745,19 @@ const DailyIncome = () => {
       return "Search patient, treatment, payment, receipt or method";
     }, [viewMode]);
 
-  /* ------------------------------------------------------
-     Render
-  ------------------------------------------------------ */
+  /* ======================================================
+     RENDER
+  ====================================================== */
 
   return (
     <ClinicPage
       title="Payment History"
-      subtitle={`Review clinic income, installments and outstanding balances from ${formattedDateRange}.`}
+      subtitle={`Clinic income and outstanding balances • ${formattedDateRange}`}
       icon={<DollarOutlined />}
       actions={[
-        <div
-          key="date-range"
-          className="income-date-control"
-        >
-          <div className="income-date-control__icon">
-            <CalendarOutlined />
-          </div>
-
-          <RangePicker
-            value={
-              selectedDateRange
-            }
-            format="YYYY-MM-DD"
-            allowClear={false}
-            onChange={
-              handleDateRangeChange
-            }
-            className="income-range-picker"
-          />
-        </div>,
-
         <Button
           key="refresh"
-          icon={
-            <ReloadOutlined />
-          }
+          icon={<ReloadOutlined />}
           loading={loading}
           onClick={() =>
             loadIncome(
@@ -1752,42 +1769,104 @@ const DailyIncome = () => {
         </Button>,
       ]}
     >
-      {/* Summary */}
+      {/* ==================================================
+          DATE FILTER
+      =================================================== */}
+
+      <Card
+        bordered={false}
+        className="income-filter-card"
+      >
+        <div className="income-filter-layout">
+          <div className="income-filter-left">
+            <RangePicker
+              value={
+                selectedDateRange
+              }
+              format="DD MMM YYYY"
+              allowClear={false}
+              onChange={
+                handleDateRangeChange
+              }
+              className="income-main-range-picker"
+            />
+
+            <Button
+              type="primary"
+              icon={<SearchOutlined />}
+              loading={loading}
+              onClick={() =>
+                loadIncome(
+                  selectedDateRange,
+                )
+              }
+              className="income-load-button"
+            >
+              Load Report
+            </Button>
+          </div>
+
+          <div className="income-quick-ranges">
+            <Button
+              onClick={() =>
+                setQuickDateRange(
+                  "today",
+                )
+              }
+            >
+              Today
+            </Button>
+
+            <Button
+              onClick={() =>
+                setQuickDateRange(
+                  "week",
+                )
+              }
+            >
+              This Week
+            </Button>
+
+            <Button
+              onClick={() =>
+                setQuickDateRange(
+                  "month",
+                )
+              }
+            >
+              This Month
+            </Button>
+          </div>
+        </div>
+      </Card>
+
+      {/* ==================================================
+          SUMMARY
+      =================================================== */}
 
       <Row
         gutter={[16, 16]}
-        className="income-summary-row"
+        className="income-dashboard-summary"
       >
         <Col
           xs={24}
           sm={12}
-          xl={8}
-          xxl={4}
+          xl={6}
         >
-          <IncomeSummaryCard
-            title="Total Received"
-            value={totalIncome}
-            helper="Payments in selected period"
-            tone="blue"
-            currency
-            icon={<DollarOutlined />}
-          />
-        </Col>
-
-        <Col
-          xs={24}
-          sm={12}
-          xl={8}
-          xxl={4}
-        >
-          <IncomeSummaryCard
+          <DashboardSummaryCard
             title="Treatment Charges"
-            value={
-              totalTreatmentCharge
-            }
-            helper="Unique treatment charges"
-            tone="purple"
-            currency
+            value={formatCurrency(
+              totalTreatmentCharge,
+            )}
+            helper={`${
+              treatmentGroups.length
+            } treatment${
+              treatmentGroups.length ===
+              1
+                ? ""
+                : "s"
+            }`}
+            tone="blue"
             icon={
               <MedicineBoxOutlined />
             }
@@ -1797,56 +1876,21 @@ const DailyIncome = () => {
         <Col
           xs={24}
           sm={12}
-          xl={8}
-          xxl={4}
+          xl={6}
         >
-          <IncomeSummaryCard
-            title="Outstanding"
-            value={
-              totalOutstanding
-            }
-            helper="Remaining treatment balances"
-            tone={
-              totalOutstanding > 0
-                ? "red"
-                : "green"
-            }
-            currency
-            icon={<WalletOutlined />}
-          />
-        </Col>
-
-        <Col
-          xs={24}
-          sm={12}
-          xl={8}
-          xxl={4}
-        >
-          <IncomeSummaryCard
-            title="Installments"
-            value={
+          <DashboardSummaryCard
+            title="Total Collected"
+            value={formatCurrency(
+              totalIncome,
+            )}
+            helper={`${
               installmentRows.length
-            }
-            helper="Payment transactions"
-            tone="cyan"
-            icon={
-              <UnorderedListOutlined />
-            }
-          />
-        </Col>
-
-        <Col
-          xs={24}
-          sm={12}
-          xl={8}
-          xxl={4}
-        >
-          <IncomeSummaryCard
-            title="Fully Paid"
-            value={
-              fullPaymentCount
-            }
-            helper="Completed treatments"
+            } payment record${
+              installmentRows.length ===
+              1
+                ? ""
+                : "s"
+            }`}
             tone="green"
             icon={
               <CheckCircleOutlined />
@@ -1857,24 +1901,107 @@ const DailyIncome = () => {
         <Col
           xs={24}
           sm={12}
-          xl={8}
-          xxl={4}
+          xl={6}
         >
-          <IncomeSummaryCard
-            title="Partial Payments"
-            value={
-              partialPaymentCount
+          <DashboardSummaryCard
+            title="Outstanding Balance"
+            value={formatCurrency(
+              totalOutstanding,
+            )}
+            helper={
+              totalOutstanding > 0
+                ? "Amount still to be collected"
+                : "All payments completed"
             }
-            helper="Treatments with balances"
-            tone="orange"
+            tone={
+              totalOutstanding > 0
+                ? "red"
+                : "green"
+            }
             icon={
               <WarningOutlined />
             }
           />
         </Col>
+
+        <Col
+          xs={24}
+          sm={12}
+          xl={6}
+        >
+          <DashboardSummaryCard
+            title="Treatments"
+            value={
+              treatmentGroups.length
+            }
+            helper="Within selected date range"
+            tone="purple"
+            icon={
+              <CalendarOutlined />
+            }
+          />
+        </Col>
       </Row>
 
-      {/* Main report */}
+      {/* ==================================================
+          COLLECTION PROGRESS
+      =================================================== */}
+
+      <Card
+        bordered={false}
+        className="income-collection-card"
+      >
+        <div className="income-collection-layout">
+          <div className="income-collection-info">
+            <div className="income-collection-icon">
+              <DollarOutlined />
+            </div>
+
+            <div>
+              <Title level={4}>
+                Collection Progress
+              </Title>
+
+              <Text type="secondary">
+                Percentage of treatment
+                charges collected
+              </Text>
+            </div>
+          </div>
+
+          <div className="income-collection-progress">
+            <Progress
+              percent={
+                collectionPercentage
+              }
+              strokeWidth={13}
+              status="normal"
+            />
+
+            <div className="income-collection-numbers">
+              <Text>
+                Collected{" "}
+                <strong>
+                  {formatCurrency(
+                    totalIncome,
+                  )}
+                </strong>
+              </Text>
+
+              <Text type="secondary">
+                of{" "}
+                {formatCurrency(
+                  totalTreatmentCharge,
+                )}
+              </Text>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* ==================================================
+          REPORT
+      =================================================== */}
 
       <Card
         bordered={false}
@@ -1910,6 +2037,8 @@ const DailyIncome = () => {
             </Tag>
           </div>
         </div>
+
+        {/* Toolbar */}
 
         <div className="income-report-toolbar">
           <Input
@@ -1962,6 +2091,8 @@ const DailyIncome = () => {
             ]}
           />
         </div>
+
+        {/* Table */}
 
         <Table
           rowKey={(
@@ -2099,6 +2230,10 @@ const DailyIncome = () => {
           }}
         />
       </Card>
+
+      {/* ==================================================
+          PAYMENT DETAILS
+      =================================================== */}
 
       <TreatmentPaymentDetailsModal
         open={paymentModalOpen}

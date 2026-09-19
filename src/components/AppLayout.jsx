@@ -187,18 +187,14 @@ const MENU_CONFIG = [
         icon: <MedicineBoxOutlined />,
         roles: DOCTOR_ROLES,
       },
-      {
-        key: "/cashier-payment",
-        title: "Cashier Payment",
-        icon: <WalletOutlined />,
-        roles: PAYMENT_ROLES,
-      },
-      {
-        key: "/payments",
-        title: "Payments",
-        icon: <DollarOutlined />,
-        roles: PAYMENT_ROLES,
-      },
+    
+      
+      // {
+      //   key: "/payments",
+      //   title: "Payments",
+      //   icon: <DollarOutlined />,
+      //   roles: PAYMENT_ROLES,
+      // },
       {
         key: "/daily-income",
         title: "Payment History",
