@@ -1,15 +1,20 @@
 import axios from "axios";
+
 const axiosInstance = axios.create({
-//baseURL: import.meta.env.VITE_API_BASE_URL || "https://ivory-backend-3km8.onrender.com/api",
-  
+  // baseURL:
+  //   import.meta.env.VITE_API_BASE_URL ||
+  //   "https://ivory-backend-3km8.onrender.com/api",
+
   baseURL: "http://localhost:5000/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
+
+/* ========================================================
+   RESPONSE INTERCEPTOR
+======================================================== */
 
 axiosInstance.interceptors.response.use(
   (response) => response,
+
   (error) => {
     const message =
       error?.response?.data?.message ||
@@ -17,7 +22,10 @@ axiosInstance.interceptors.response.use(
       error?.message ||
       "Something went wrong";
 
-    return Promise.reject({ ...error, message });
+    return Promise.reject({
+      ...error,
+      message,
+    });
   }
 );
 

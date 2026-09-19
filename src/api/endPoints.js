@@ -689,3 +689,242 @@ export const deletePatientMedia = (mediaId) => {
     `/patient-media/${encodeURIComponent(mediaId)}`,
   );
 };
+
+
+// ========================================================
+// ORTHO CASES
+// ========================================================
+
+export const createOrthoCase = async (payload) => {
+  return axiosInstance.post("/ortho/cases", payload);
+};
+
+export const getAllOrthoCases = async (params = {}) => {
+  return axiosInstance.get("/ortho/cases", {
+    params,
+  });
+};
+
+export const getOrthoCaseById = async (caseId) => {
+  return axiosInstance.get(
+    `/ortho/cases/${caseId}`
+  );
+};
+
+export const getOrthoCasesByPatient = async (
+  patientId
+) => {
+  return axiosInstance.get(
+    `/ortho/patient/${patientId}`
+  );
+};
+
+export const updateOrthoCase = async (
+  caseId,
+  payload
+) => {
+  return axiosInstance.patch(
+    `/ortho/cases/${caseId}`,
+    payload
+  );
+};
+
+export const updateOrthoCaseStatus = async (
+  caseId,
+  status
+) => {
+  return axiosInstance.patch(
+    `/ortho/cases/${caseId}/status`,
+    {
+      status,
+    }
+  );
+};
+
+export const getOrthoCaseSummary = async (
+  caseId
+) => {
+  return axiosInstance.get(
+    `/ortho/cases/${caseId}/summary`
+  );
+};
+
+// ========================================================
+// ORTHO VISITS
+// ========================================================
+
+export const createOrthoVisit = async (
+  caseId,
+  payload
+) => {
+  return axiosInstance.post(
+    `/ortho/cases/${caseId}/visits`,
+    payload
+  );
+};
+
+export const getOrthoVisitsByCase = async (
+  caseId
+) => {
+  return axiosInstance.get(
+    `/ortho/cases/${caseId}/visits`
+  );
+};
+
+export const getOrthoVisitById = async (
+  visitId
+) => {
+  return axiosInstance.get(
+    `/ortho/visits/${visitId}`
+  );
+};
+
+export const updateOrthoVisit = async (
+  visitId,
+  payload
+) => {
+  return axiosInstance.patch(
+    `/ortho/visits/${visitId}`,
+    payload
+  );
+};
+
+export const deleteOrthoVisit = async (
+  visitId
+) => {
+  return axiosInstance.delete(
+    `/ortho/visits/${visitId}`
+  );
+};
+
+// ========================================================
+// ORTHO PAYMENTS
+// ========================================================
+
+export const createOrthoPayment = async (
+  caseId,
+  payload
+) => {
+  return axiosInstance.post(
+    `/ortho/cases/${caseId}/payments`,
+    payload
+  );
+};
+
+export const getOrthoPaymentsByCase = async (
+  caseId
+) => {
+  return axiosInstance.get(
+    `/ortho/cases/${caseId}/payments`
+  );
+};
+
+export const getOrthoPaymentById = async (
+  paymentId
+) => {
+  return axiosInstance.get(
+    `/ortho/payments/${paymentId}`
+  );
+};
+
+export const updateOrthoPayment = async (
+  paymentId,
+  payload
+) => {
+  return axiosInstance.patch(
+    `/ortho/payments/${paymentId}`,
+    payload
+  );
+};
+
+export const deleteOrthoPayment = async (
+  paymentId
+) => {
+  return axiosInstance.delete(
+    `/ortho/payments/${paymentId}`
+  );
+};
+
+// ========================================================
+// ORTHO MEDIA
+// ========================================================
+
+export const createOrthoMedia = async (
+  caseId,
+  payload
+) => {
+  return axiosInstance.post(
+    `/ortho/cases/${caseId}/media`,
+    payload
+  );
+};
+
+export const getOrthoMediaByCase = async (
+  caseId,
+  params = {}
+) => {
+  return axiosInstance.get(
+    `/ortho/cases/${caseId}/media`,
+    {
+      params,
+    }
+  );
+};
+
+export const getOrthoMediaById = async (
+  mediaId
+) => {
+  return axiosInstance.get(
+    `/ortho/media/${mediaId}`
+  );
+};
+
+
+export const uploadOrthoMedia = async (
+  caseId,
+  formData
+) => {
+  return axiosInstance.post(
+    `/ortho/cases/${caseId}/media`,
+    formData
+  );
+};
+export const getOrthoMedia = (caseId) => {
+  return axiosInstance.get(
+    `/ortho/cases/${encodeURIComponent(
+      caseId,
+    )}/media`,
+  );
+};
+
+export const getOrthoMediaViewUrl = (
+  mediaId,
+) => {
+  return `${axiosInstance.defaults.baseURL}/ortho/media/${encodeURIComponent(
+    mediaId,
+  )}/view`;
+};
+
+export const downloadOrthoMedia = (
+  mediaId,
+) => {
+  return axiosInstance.get(
+    `/ortho/media/${encodeURIComponent(
+      mediaId,
+    )}/download`,
+    {
+      responseType: "blob",
+    },
+  );
+};
+
+export const deleteOrthoMedia = (
+  mediaId,
+) => {
+  return axiosInstance.delete(
+    `/ortho/media/${encodeURIComponent(
+      mediaId,
+    )}`,
+  );
+};
+

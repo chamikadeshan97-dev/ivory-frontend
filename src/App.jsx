@@ -31,6 +31,8 @@ import PatientQueueDisplay from "./pages/PatientQueueDisplay";
 import PatientMediaUpload from "./pages/PatientMediaUpload";
 import PatientMediaLibrary from "./pages/PatientMediaLibrary";
 import SMSManagement from "./pages/SMSManagement";
+import OrthoPatients from "./pages/OrthoPatients";
+import OrthoPatientDetails from "./pages/OrthoPatientDetails.jsx";
 /* --------------------------------------------------------
    Layout wrapper
 -------------------------------------------------------- */
@@ -296,6 +298,28 @@ const App = () => {
           </RoleRoute>
         }
       />
+      <Route
+        path="/ortho"
+        element={
+          <RoleRoute allowedRoles={["Admin", "Dentist"]}>
+            <LayoutPage>
+              <OrthoPatients />
+            </LayoutPage>
+          </RoleRoute>
+        }
+      />
+
+      <Route
+        path="/ortho/:caseId"
+        element={
+          <RoleRoute allowedRoles={["Admin", "Dentist"]}>
+            <LayoutPage>
+              <OrthoPatientDetails />
+            </LayoutPage>
+          </RoleRoute>
+        }
+      />
+
       {/* Unknown routes */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

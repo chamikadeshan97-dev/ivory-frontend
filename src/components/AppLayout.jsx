@@ -206,7 +206,18 @@ const allMenuItems = [
     ],
   },
 
-
+ {
+    type: "group",
+    label: "Orthodontic Patients",
+    children: [
+      {
+        key: "/ortho",
+        icon: <MedicineBoxOutlined />,
+        roles: ALL_ROLES,
+        label: <Link to="/ortho">Orthodontic Patients</Link>,
+      },
+    ],
+  },
   {
     type: "group",
     label: "System Administration",

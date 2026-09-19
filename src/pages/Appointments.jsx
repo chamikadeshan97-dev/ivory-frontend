@@ -2489,7 +2489,7 @@ const Appointments = () => {
                 todaysSmsAppointments.length === 0 || sendingDoctorArrivalSMS
               }
             >
-              Appointment SMS {todaysSmsAppointments.length }
+              Appointment SMS
             </Button>
           </Tooltip>
         </Popconfirm>,
