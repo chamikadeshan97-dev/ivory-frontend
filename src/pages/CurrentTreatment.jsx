@@ -38,6 +38,7 @@ import {
   CalendarOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
+  CreditCardOutlined,
   DeleteOutlined,
   DollarOutlined,
   EditOutlined,
@@ -50,6 +51,7 @@ import {
   ReloadOutlined,
   SaveOutlined,
   UserOutlined,
+  WalletOutlined,
   WarningOutlined,
 } from "@ant-design/icons";
 
@@ -59,6 +61,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useReactToPrint } from "react-to-print";
 
 import {
+  createPayment,
   createTreatment,
   getAppointmentsByDate,
   getCommonTreatments,
@@ -74,12 +77,11 @@ import "./css/CurrentTreatment.css";
 dayjs.extend(customParseFormat);
 
 const { Title, Text } = Typography;
-
 const { TextArea } = Input;
 
-/* --------------------------------------------------------
-   Constants
--------------------------------------------------------- */
+/* ========================================================
+   CONSTANTS
+======================================================== */
 
 const CLINIC_INFORMATION = {
   name: "IVORY DENTAL",
@@ -109,35 +111,37 @@ const STEP_ITEMS = [
   },
   {
     title: "Finish",
-    description: "Fee and follow-up",
+    description: "Fee, payment and follow-up",
     icon: <CheckCircleOutlined />,
   },
 ];
 
 const DOSE_OPTIONS = [
-  {
-    value: "bd",
-    label: "bd",
-  },
-  {
-    value: "qds",
-    label: "qds",
-  },
-  {
-    value: "tds",
-    label: "tds",
-  },
-  {
-    value: "sos",
-    label: "sos",
-  },
-  {
-    value: "eod",
-    label: "eod",
-  },
+  { value: "bd", label: "bd" },
+  { value: "qds", label: "qds" },
+  { value: "tds", label: "tds" },
+  { value: "sos", label: "sos" },
+  { value: "eod", label: "eod" },
 ];
 
 const COMMON_TREATMENT_AMOUNTS = [500, 1000, 2000, 5000, 10000];
+
+const QUICK_PAYMENT_AMOUNTS = [500, 1000, 2000, 5000, 10000];
+
+const PAYMENT_METHOD_OPTIONS = [
+  {
+    value: "Cash",
+    label: "Cash",
+  },
+  {
+    value: "Card",
+    label: "Card",
+  },
+  {
+    value: "Bank Transfer",
+    label: "Bank Transfer",
+  },
+];
 
 const FOLLOW_UP_OPTIONS = [
   {
@@ -157,9 +161,9 @@ const FOLLOW_UP_OPTIONS = [
   },
 ];
 
-/* --------------------------------------------------------
-   Helpers
--------------------------------------------------------- */
+/* ========================================================
+   HELPERS
+======================================================== */
 
 const extractArray = (response) => {
   const data = response?.data?.data || response?.data || [];
@@ -284,9 +288,9 @@ const createPrescriptionRow = () => {
   };
 };
 
-/* --------------------------------------------------------
-   Component
--------------------------------------------------------- */
+/* ========================================================
+   COMPONENT
+======================================================== */
 
 const CurrentTreatment = () => {
   const [form] = Form.useForm();
@@ -296,14 +300,12 @@ const CurrentTreatment = () => {
   const [currentStep, setCurrentStep] = useState(0);
 
   const [loading, setLoading] = useState(false);
-
   const [saving, setSaving] = useState(false);
 
   const [appointments, setAppointments] = useState([]);
-
   const [patients, setPatients] = useState([]);
-
   const [commonTreatments, setCommonTreatments] = useState([]);
+  const [drugs, setDrugs] = useState([]);
 
   const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
 
@@ -313,8 +315,6 @@ const CurrentTreatment = () => {
 
   const [treatmentEditable, setTreatmentEditable] = useState(false);
 
-  const [drugs, setDrugs] = useState([]);
-
   const [prescriptionRows, setPrescriptionRows] = useState([
     createPrescriptionRow(),
   ]);
@@ -323,7 +323,13 @@ const CurrentTreatment = () => {
 
   const [printPrescriptionData, setPrintPrescriptionData] = useState(null);
 
+  /* ========================================================
+     FORM WATCHERS
+  ======================================================== */
+
   const treatmentCharge = Number(Form.useWatch("treatment_charge", form) || 0);
+
+  const paymentAmount = Number(Form.useWatch("payment_amount", form) || 0);
 
   const selectedTreatment = Form.useWatch("treatment_name", form);
 
@@ -331,9 +337,15 @@ const CurrentTreatment = () => {
 
   const today = dayjs().format("YYYY-MM-DD");
 
-  /* ------------------------------------------------------
-     Selected common treatment and fee
-  ------------------------------------------------------ */
+  const remainingAmount = Math.max(treatmentCharge - paymentAmount, 0);
+
+  const hasPayment = paymentAmount > 0;
+
+  const isFullyPaid = treatmentCharge > 0 && paymentAmount >= treatmentCharge;
+
+  /* ========================================================
+     SELECTED COMMON TREATMENT
+  ======================================================== */
 
   const selectedCommonTreatment = useMemo(() => {
     return findCommonTreatmentByName(commonTreatments, selectedTreatment);
@@ -369,9 +381,9 @@ const CurrentTreatment = () => {
     form.setFieldValue("treatment_charge", selectedCommonTreatmentFee);
   }, [selectedTreatment, selectedCommonTreatmentFee, form]);
 
-  /* ------------------------------------------------------
-     Load current treatments
-  ------------------------------------------------------ */
+  /* ========================================================
+     LOAD CURRENT TREATMENTS
+  ======================================================== */
 
   const loadCurrentTreatments = useCallback(async () => {
     setLoading(true);
@@ -390,9 +402,7 @@ const CurrentTreatment = () => {
       ]);
 
       const appointmentList = extractArray(appointmentsResponse);
-
       const patientList = extractArray(patientsResponse);
-
       const commonTreatmentList = extractArray(commonTreatmentsResponse);
 
       const drugList = extractArray(drugsResponse)
@@ -405,18 +415,14 @@ const CurrentTreatment = () => {
         .filter((appointment) => appointment?.status === "In Treatment")
         .sort((first, second) => {
           const firstTime = first?.appointment_time || first?.time || "";
-
           const secondTime = second?.appointment_time || second?.time || "";
 
           return firstTime.localeCompare(secondTime);
         });
 
       setAppointments(currentTreatments);
-
       setPatients(patientList);
-
       setCommonTreatments(commonTreatmentList);
-
       setDrugs(drugList);
 
       setSelectedAppointmentId((previousId) => {
@@ -450,9 +456,9 @@ const CurrentTreatment = () => {
     loadCurrentTreatments();
   }, [loadCurrentTreatments]);
 
-  /* ------------------------------------------------------
-     Selected appointment and patient
-  ------------------------------------------------------ */
+  /* ========================================================
+     SELECTED APPOINTMENT / PATIENT
+  ======================================================== */
 
   const selectedAppointment = useMemo(() => {
     return appointments.find(
@@ -473,9 +479,9 @@ const CurrentTreatment = () => {
     );
   }, [patients, selectedAppointment]);
 
-  /* ------------------------------------------------------
-     Patient information
-  ------------------------------------------------------ */
+  /* ========================================================
+     PATIENT INFORMATION
+  ======================================================== */
 
   const patientInformation = useMemo(() => {
     if (!selectedAppointment) {
@@ -540,9 +546,9 @@ const CurrentTreatment = () => {
     };
   }, [selectedAppointment, selectedPatient]);
 
-  /* ------------------------------------------------------
-     Current patient options
-  ------------------------------------------------------ */
+  /* ========================================================
+     PATIENT SELECTOR
+  ======================================================== */
 
   const currentPatientOptions = useMemo(() => {
     return appointments.map((appointment) => {
@@ -563,16 +569,15 @@ const CurrentTreatment = () => {
     });
   }, [appointments, patients]);
 
-  /* ------------------------------------------------------
-     Reset form when patient changes
-  ------------------------------------------------------ */
+  /* ========================================================
+     RESET FORM
+  ======================================================== */
 
   useEffect(() => {
     if (!selectedAppointment) {
       form.resetFields();
 
       setPrescriptionRows([createPrescriptionRow()]);
-
       setCurrentStep(0);
       setSelectedFollowUp("none");
       setTreatmentEditable(false);
@@ -610,6 +615,10 @@ const CurrentTreatment = () => {
         Number.isFinite(standardFee) && standardFee > 0 ? standardFee : null,
 
       next_appointment_date: null,
+
+      payment_amount: 0,
+
+      payment_method: "Cash",
     });
 
     setPrescriptionRows([createPrescriptionRow()]);
@@ -620,9 +629,9 @@ const CurrentTreatment = () => {
     setPatientDetailsOpen(false);
   }, [selectedAppointment, commonTreatments, form]);
 
-  /* ------------------------------------------------------
-     Step navigation
-  ------------------------------------------------------ */
+  /* ========================================================
+     STEP NAVIGATION
+  ======================================================== */
 
   const handleContinue = async () => {
     try {
@@ -636,21 +645,58 @@ const CurrentTreatment = () => {
     }
   };
 
-  /* ------------------------------------------------------
-     Treatment fee
-  ------------------------------------------------------ */
+  /* ========================================================
+     TREATMENT FEE
+  ======================================================== */
 
   const setTreatmentFee = (amount) => {
     form.setFieldValue("treatment_charge", amount);
 
-    form.validateFields(["treatment_charge"]).catch(() => {
-      // Ant Design displays the validation error.
+    const currentPayment = Number(form.getFieldValue("payment_amount") || 0);
+
+    if (currentPayment > amount) {
+      form.setFieldValue("payment_amount", amount);
+    }
+
+    form.validateFields(["treatment_charge"]).catch(() => {});
+  };
+
+  /* ========================================================
+     PAYMENT
+  ======================================================== */
+
+  const setPaymentAmount = (amount) => {
+    const charge = Number(form.getFieldValue("treatment_charge") || 0);
+
+    const safeAmount = Math.min(Number(amount || 0), charge);
+
+    form.setFieldValue("payment_amount", safeAmount);
+
+    form.validateFields(["payment_amount"]).catch(() => {});
+  };
+
+  const setFullPayment = () => {
+    const charge = Number(form.getFieldValue("treatment_charge") || 0);
+
+    if (charge <= 0) {
+      message.warning("Please enter the treatment fee first");
+
+      return;
+    }
+
+    form.setFieldValue("payment_amount", charge);
+  };
+
+  const clearPayment = () => {
+    form.setFieldsValue({
+      payment_amount: 0,
+      payment_method: "Cash",
     });
   };
 
-  /* ------------------------------------------------------
-     Follow-up options
-  ------------------------------------------------------ */
+  /* ========================================================
+     FOLLOW-UP
+  ======================================================== */
 
   const setFollowUpOption = (option) => {
     setSelectedFollowUp(option.key);
@@ -673,9 +719,9 @@ const CurrentTreatment = () => {
     form.setFieldValue("next_appointment_date", null);
   };
 
-  /* ------------------------------------------------------
-     Prescription
-  ------------------------------------------------------ */
+  /* ========================================================
+     PRESCRIPTION
+  ======================================================== */
 
   const selectedPrescriptionDrugNames = useMemo(() => {
     return prescriptionRows
@@ -792,9 +838,7 @@ const CurrentTreatment = () => {
       .filter((row) => normalizeText(row.drug_name))
       .map((row, index) => {
         const drugName = normalizeText(row.drug_name);
-
         const dose = normalizeText(row.dose);
-
         const days = Number(row.days);
 
         const parts = [`${index + 1}. ${drugName}`];
@@ -811,6 +855,10 @@ const CurrentTreatment = () => {
       })
       .join("\n");
   };
+
+  /* ========================================================
+     PRESCRIPTION PRINT DATA
+  ======================================================== */
 
   const buildPrintPrescriptionData = ({
     treatment,
@@ -833,11 +881,13 @@ const CurrentTreatment = () => {
 
       dentist: {
         id: selectedAppointment?.dentist_id || "",
+
         name:
           selectedAppointment?.dentist_name ||
           selectedAppointment?.doctor_name ||
           selectedAppointment?.dentist?.name ||
           "Dental Surgeon",
+
         specialization:
           selectedAppointment?.dentist_specialization ||
           selectedAppointment?.specialization ||
@@ -847,10 +897,12 @@ const CurrentTreatment = () => {
 
       appointment: {
         id: getAppointmentId(selectedAppointment),
+
         date:
           selectedAppointment?.appointment_date ||
           selectedAppointment?.date ||
           today,
+
         time:
           selectedAppointment?.appointment_time ||
           selectedAppointment?.time ||
@@ -907,6 +959,10 @@ const CurrentTreatment = () => {
     },
   });
 
+  /* ========================================================
+     PRESCRIPTION TABLE
+  ======================================================== */
+
   const prescriptionColumns = [
     {
       title: "Drug Name",
@@ -940,9 +996,7 @@ const CurrentTreatment = () => {
 
             updatePrescriptionRow(record.key, "drug_name", normalizedValue);
           }}
-          style={{
-            width: "100%",
-          }}
+          style={{ width: "100%" }}
         />
       ),
     },
@@ -962,9 +1016,7 @@ const CurrentTreatment = () => {
           onChange={(value) =>
             updatePrescriptionRow(record.key, "dose", value || "")
           }
-          style={{
-            width: "100%",
-          }}
+          style={{ width: "100%" }}
         />
       ),
     },
@@ -983,9 +1035,7 @@ const CurrentTreatment = () => {
           value={record.days}
           placeholder="Days"
           onChange={(value) => updatePrescriptionRow(record.key, "days", value)}
-          style={{
-            width: "100%",
-          }}
+          style={{ width: "100%" }}
         />
       ),
     },
@@ -1009,9 +1059,9 @@ const CurrentTreatment = () => {
     },
   ];
 
-  /* ------------------------------------------------------
-     Save treatment
-  ------------------------------------------------------ */
+  /* ========================================================
+     SAVE TREATMENT + PAYMENT
+  ======================================================== */
 
   const handleSaveTreatment = async () => {
     if (!selectedAppointment) {
@@ -1025,13 +1075,26 @@ const CurrentTreatment = () => {
         "treatment_name",
         "treatment_details",
         "treatment_charge",
+        "payment_amount",
       ];
+
+      const currentPaymentAmount = Number(
+        form.getFieldValue("payment_amount") || 0,
+      );
+
+      if (currentPaymentAmount > 0) {
+        fieldsToValidate.push("payment_method");
+      }
 
       if (selectedFollowUp === "custom") {
         fieldsToValidate.push("next_appointment_date");
       }
 
       await form.validateFields(fieldsToValidate);
+
+      /* ----------------------------------------------------
+         Prescription validation
+      ---------------------------------------------------- */
 
       const invalidPrescriptionRow = prescriptionRows.find(
         (row) =>
@@ -1051,13 +1114,41 @@ const CurrentTreatment = () => {
 
       const values = form.getFieldsValue(true);
 
-      setSaving(true);
-
       const appointmentId = getAppointmentId(selectedAppointment);
 
       const charge = Number(values?.treatment_charge || 0);
 
+      const amountPaid = Number(values?.payment_amount || 0);
+
+      /* ----------------------------------------------------
+         Payment validation
+      ---------------------------------------------------- */
+
+      if (amountPaid < 0) {
+        message.warning("Payment amount cannot be negative");
+
+        return;
+      }
+
+      if (amountPaid > charge) {
+        message.warning("Payment amount cannot exceed the treatment fee");
+
+        return;
+      }
+
+      if (amountPaid > 0 && !values?.payment_method) {
+        message.warning("Please select a payment method");
+
+        return;
+      }
+
+      setSaving(true);
+
       const prescriptionText = buildPrescriptionText();
+
+      /* ----------------------------------------------------
+         Create treatment
+      ---------------------------------------------------- */
 
       const treatmentData = {
         appointment_id: appointmentId,
@@ -1097,26 +1188,97 @@ const CurrentTreatment = () => {
         treatmentResponse?.data ||
         treatmentData;
 
+      const treatmentId =
+        savedTreatment?.treatment_id || savedTreatment?.id || "";
+
+      /* ----------------------------------------------------
+         Prescription print data
+      ---------------------------------------------------- */
+
       const prescriptionData = buildPrintPrescriptionData({
         treatment: savedTreatment,
         prescriptionText,
         treatmentValues: values,
       });
 
-      await updateAppointmentStatus(appointmentId, "Treatment Done");
+      /* ----------------------------------------------------
+         Create payment
+      ---------------------------------------------------- */
+
+      if (amountPaid > 0) {
+        if (!treatmentId) {
+          throw new Error(
+            "Treatment was saved but the treatment ID was not returned. Payment could not be recorded.",
+          );
+        }
+
+        const paymentData = {
+          patient_id: selectedAppointment?.patient_id || "",
+
+          treatment_id: treatmentId,
+
+          treatment_charge: charge,
+
+          payment_amount: amountPaid,
+
+          total_paid: amountPaid,
+
+          remaining_amount: Math.max(charge - amountPaid, 0),
+
+          payment_method: values?.payment_method || "Cash",
+
+          payment_date: today,
+        };
+
+        console.log("Creating treatment payment:", paymentData);
+
+        await createPayment(paymentData);
+      }
+
+      /* ----------------------------------------------------
+         Update appointment status
+      ---------------------------------------------------- */
+
+      let nextStatus = "Payment Pending";
+
+      if (amountPaid > 0 && amountPaid >= charge) {
+        nextStatus = "Paid";
+      }
+
+      await updateAppointmentStatus(appointmentId, nextStatus);
 
       setPrintPrescriptionData(prescriptionData);
 
-      //setPrescriptionPreviewOpen(true);
+      // setPrescriptionPreviewOpen(true);
 
-      message.success("Treatment saved successfully");
+      /* ----------------------------------------------------
+         Success message
+      ---------------------------------------------------- */
+
+      if (isFullyPaid || (amountPaid > 0 && amountPaid >= charge)) {
+        message.success("Treatment and full payment saved successfully");
+      } else if (amountPaid > 0) {
+        message.success(
+          `Treatment saved. ${formatCurrency(
+            charge - amountPaid,
+          )} remains to be paid.`,
+        );
+      } else {
+        message.success("Treatment saved. Payment is pending.");
+      }
+
+      /* ----------------------------------------------------
+         Reset
+      ---------------------------------------------------- */
 
       form.resetFields();
 
       setPrescriptionRows([createPrescriptionRow()]);
 
       setCurrentStep(0);
+
       setSelectedFollowUp("none");
+
       setTreatmentEditable(false);
 
       await loadCurrentTreatments();
@@ -1125,7 +1287,7 @@ const CurrentTreatment = () => {
         return;
       }
 
-      console.error("Could not save treatment:", error);
+      console.error("Could not save treatment/payment:", error);
 
       message.error(
         error?.response?.data?.message ||
@@ -1137,9 +1299,9 @@ const CurrentTreatment = () => {
     }
   };
 
-  /* ------------------------------------------------------
-     Patient summary
-  ------------------------------------------------------ */
+  /* ========================================================
+     PATIENT SUMMARY
+  ======================================================== */
 
   const renderPatientSummary = () => {
     return (
@@ -1191,13 +1353,11 @@ const CurrentTreatment = () => {
               <div className="current-treatment-patient__meta">
                 <span>
                   <IdcardOutlined />
-
                   {patientInformation.id}
                 </span>
 
                 <span>
                   <ClockCircleOutlined />
-
                   {formatAppointmentTime(
                     selectedAppointment?.appointment_time ||
                       selectedAppointment?.time,
@@ -1206,7 +1366,6 @@ const CurrentTreatment = () => {
 
                 <span>
                   <MedicineBoxOutlined />
-
                   {selectedAppointment?.reason_for_visit || "Dental Treatment"}
                 </span>
               </div>
@@ -1236,9 +1395,9 @@ const CurrentTreatment = () => {
     );
   };
 
-  /* ------------------------------------------------------
-     Treatment step
-  ------------------------------------------------------ */
+  /* ========================================================
+     TREATMENT STEP
+  ======================================================== */
 
   const renderTreatmentStep = () => {
     const extraClinicalItems = [
@@ -1248,7 +1407,6 @@ const CurrentTreatment = () => {
         label: (
           <Space size={8}>
             <MedicineBoxOutlined />
-
             <Text strong>Add diagnosis or extra notes</Text>
           </Space>
         ),
@@ -1270,9 +1428,7 @@ const CurrentTreatment = () => {
               <Form.Item
                 label="Additional Notes"
                 name="doctor_notes"
-                style={{
-                  marginBottom: 0,
-                }}
+                style={{ marginBottom: 0 }}
               >
                 <TextArea
                   rows={4}
@@ -1288,366 +1444,281 @@ const CurrentTreatment = () => {
     ];
 
     return (
-  <div className="current-treatment-step">
-    <Card
-      bordered={false}
-      className="current-treatment-information-card"
-    >
-      {/* =====================================================
-          CARD HEADER
-      ====================================================== */}
-      <div className="current-treatment-section-heading">
-        <div>
-          <Title level={4}>Treatment Information</Title>
+      <div className="current-treatment-step">
+        <Card bordered={false} className="current-treatment-information-card">
+          <div className="current-treatment-section-heading">
+            <div>
+              <Title level={4}>Treatment Information</Title>
 
-          <Text type="secondary">
-            Record the treatment details and prescription for the patient.
-          </Text>
-        </div>
+              <Text type="secondary">
+                Record the treatment details and prescription for the patient.
+              </Text>
+            </div>
 
-        <div className="current-treatment-section-icon">
-          <MedicineBoxOutlined />
-        </div>
-      </div>
+            <div className="current-treatment-section-icon">
+              <MedicineBoxOutlined />
+            </div>
+          </div>
 
-      {/* =====================================================
-          TABS
-      ====================================================== */}
-      <Tabs
-        defaultActiveKey="treatment-details"
-        className="current-treatment-information-tabs"
-        items={[
-          /* =================================================
-             TAB 1 — TREATMENT DETAILS
-          ================================================== */
-          {
-            key: "treatment-details",
+          <Tabs
+            defaultActiveKey="treatment-details"
+            className="current-treatment-information-tabs"
+            items={[
+              {
+                key: "treatment-details",
 
-            label: (
-              <Space size={8}>
-                <MedicineBoxOutlined />
-                <span>Treatment Details</span>
-              </Space>
-            ),
+                label: (
+                  <Space size={8}>
+                    <MedicineBoxOutlined />
+                    <span>Treatment Details</span>
+                  </Space>
+                ),
 
-            children: (
-              <div className="current-treatment-tab-content">
-                {/* =================================================
-                    TREATMENT + TOOTH NUMBER
-                ================================================== */}
-                <Row gutter={[18, 0]}>
-                  <Col xs={24} md={16}>
-                    <Form.Item
-                      label={
-                        <Space wrap>
-                          <Text strong>Treatment</Text>
+                children: (
+                  <div className="current-treatment-tab-content">
+                    <Row gutter={[18, 0]}>
+                      <Col xs={24} md={16}>
+                        <Form.Item
+                          label={
+                            <Space wrap>
+                              <Text strong>Treatment</Text>
 
-                          {!treatmentEditable && (
-                            <Tag color="blue">
-                              Filled automatically
-                            </Tag>
-                          )}
-
-                          {selectedCommonTreatmentFee > 0 && (
-                            <Tag
-                              color="green"
-                              icon={<DollarOutlined />}
-                            >
-                              Standard Fee:{" "}
-                              {formatCurrency(
-                                selectedCommonTreatmentFee,
+                              {!treatmentEditable && (
+                                <Tag color="blue">Filled automatically</Tag>
                               )}
-                            </Tag>
-                          )}
-                        </Space>
-                      }
-                      name="treatment_name"
-                      rules={[
-                        {
-                          required: true,
-                          whitespace: true,
-                          message: "Please enter the treatment",
-                        },
-                      ]}
-                    >
-                      <Input
-                        size="large"
-                        readOnly={!treatmentEditable}
-                        prefix={<MedicineBoxOutlined />}
-                        placeholder="Enter treatment"
-                        className={
-                          treatmentEditable
-                            ? "current-treatment-name-input"
-                            : "current-treatment-name-input current-treatment-name-input--locked"
-                        }
-                        addonAfter={
-                          <Button
-                            type="text"
-                            size="small"
-                            icon={<EditOutlined />}
-                            onClick={() =>
-                              setTreatmentEditable(
-                                (previous) => !previous,
-                              )
+
+                              {selectedCommonTreatmentFee > 0 && (
+                                <Tag color="green" icon={<DollarOutlined />}>
+                                  Standard Fee:{" "}
+                                  {formatCurrency(selectedCommonTreatmentFee)}
+                                </Tag>
+                              )}
+                            </Space>
+                          }
+                          name="treatment_name"
+                          rules={[
+                            {
+                              required: true,
+                              whitespace: true,
+                              message: "Please enter the treatment",
+                            },
+                          ]}
+                        >
+                          <Input
+                            size="large"
+                            readOnly={!treatmentEditable}
+                            prefix={<MedicineBoxOutlined />}
+                            placeholder="Enter treatment"
+                            className={
+                              treatmentEditable
+                                ? "current-treatment-name-input"
+                                : "current-treatment-name-input current-treatment-name-input--locked"
                             }
-                          >
-                            {treatmentEditable
-                              ? "Lock"
-                              : "Change"}
-                          </Button>
-                        }
-                      />
-                    </Form.Item>
-                  </Col>
+                            addonAfter={
+                              <Button
+                                type="text"
+                                size="small"
+                                icon={<EditOutlined />}
+                                onClick={() =>
+                                  setTreatmentEditable((previous) => !previous)
+                                }
+                              >
+                                {treatmentEditable ? "Lock" : "Change"}
+                              </Button>
+                            }
+                          />
+                        </Form.Item>
+                      </Col>
 
-                  <Col xs={24} md={8}>
+                      <Col xs={24} md={8}>
+                        <Form.Item
+                          label={<Text strong>Tooth Number</Text>}
+                          name="tooth_number"
+                          extra="Leave empty when not required."
+                        >
+                          <Input size="large" placeholder="Example: 16" />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+
                     <Form.Item
-                      label={<Text strong>Tooth Number</Text>}
-                      name="tooth_number"
-                      extra="Leave empty when not required."
+                      label={<Text strong>What treatment was performed?</Text>}
+                      name="treatment_details"
+                      extra="Enter a clear clinical note describing what was completed."
                     >
-                      <Input
-                        size="large"
-                        placeholder="Example: 16"
+                      <TextArea
+                        rows={3}
+                        maxLength={1500}
+                        showCount
+                        placeholder="Example: Removed decay and completed composite filling"
+                        className="current-treatment-details-input"
                       />
                     </Form.Item>
-                  </Col>
-                </Row>
 
-                {/* =================================================
-                    TREATMENT DETAILS
-                ================================================== */}
-                <Form.Item
-                  label={
-                    <Text strong>
-                      What treatment was performed?
-                    </Text>
-                  }
-                  name="treatment_details"
-                  rules={[
-                    {
-                      required: true,
-                      whitespace: true,
-                      message:
-                        "Please enter the treatment details",
-                    },
-                  ]}
-                  extra="Enter a clear clinical note describing what was completed."
-                >
-                  <TextArea
-                    rows={3}
-                    maxLength={1500}
-                    showCount
-                    placeholder="Example: Removed decay and completed composite filling"
-                    className="current-treatment-details-input"
-                  />
-                </Form.Item>
-
-                {/* =================================================
-                    EXTRA CLINICAL DETAILS
-                ================================================== */}
-                <Collapse
-                  items={extraClinicalItems}
-                  className="current-treatment-extra-details"
-                />
-              </div>
-            ),
-          },
-
-          /* =================================================
-             TAB 2 — PRESCRIPTION
-          ================================================== */
-          {
-            key: "prescription",
-
-            label: (
-              <Space size={8}>
-                <MedicineBoxOutlined />
-
-                <span>Prescription</span>
-
-                {selectedPrescriptionDrugNames.length > 0 && (
-                  <Tag
-                    color="blue"
-                    style={{
-                      marginInlineStart: 2,
-                      marginInlineEnd: 0,
-                    }}
-                  >
-                    {selectedPrescriptionDrugNames.length}
-                  </Tag>
-                )}
-              </Space>
-            ),
-
-            children: (
-              <div className="current-treatment-tab-content">
-                {/* =================================================
-                    PRESCRIPTION HEADER
-                ================================================== */}
-                <div className="current-treatment-prescription-heading">
-                  <div>
-                    <Space size={10}>
-                      <div className="current-treatment-prescription-icon">
-                        <MedicineBoxOutlined />
-                      </div>
-
-                      <div>
-                        <Title level={5}>
-                          Prescription Medicines
-                        </Title>
-
-                        <Text type="secondary">
-                          Select medicines, dose and number of
-                          days.
-                        </Text>
-                      </div>
-                    </Space>
+                    <Collapse
+                      items={extraClinicalItems}
+                      className="current-treatment-extra-details"
+                    />
                   </div>
+                ),
+              },
 
-                  {selectedPrescriptionDrugNames.length > 0 && (
+              {
+                key: "prescription",
+
+                label: (
+                  <Space size={8}>
+                    <MedicineBoxOutlined />
+
+                    <span>Prescription</span>
+
+                    {selectedPrescriptionDrugNames.length > 0 && (
+                      <Tag
+                        color="blue"
+                        style={{
+                          marginInlineStart: 2,
+                          marginInlineEnd: 0,
+                        }}
+                      >
+                        {selectedPrescriptionDrugNames.length}
+                      </Tag>
+                    )}
+                  </Space>
+                ),
+
+                children: (
+                  <div className="current-treatment-tab-content">
+                    <div className="current-treatment-prescription-heading">
+                      <div>
+                        <Space size={10}>
+                          <div className="current-treatment-prescription-icon">
+                            <MedicineBoxOutlined />
+                          </div>
+
+                          <div>
+                            <Title level={5}>Prescription Medicines</Title>
+
+                            <Text type="secondary">
+                              Select medicines, dose and number of days.
+                            </Text>
+                          </div>
+                        </Space>
+                      </div>
+
+                      {selectedPrescriptionDrugNames.length > 0 && (
+                        <Button
+                          htmlType="button"
+                          size="small"
+                          danger
+                          onClick={clearPrescription}
+                        >
+                          Clear Prescription
+                        </Button>
+                      )}
+                    </div>
+
+                    {drugs.length > 0 ? (
+                      <div className="current-treatment-drug-list">
+                        {drugs.map((drug) => {
+                          const drugId = getDrugId(drug);
+                          const drugName = getDrugName(drug);
+
+                          const isSelected = selectedPrescriptionDrugNames.some(
+                            (selectedDrugName) =>
+                              normalizeForComparison(selectedDrugName) ===
+                              normalizeForComparison(drugName),
+                          );
+
+                          return (
+                            <Button
+                              key={drugId}
+                              htmlType="button"
+                              type={isSelected ? "primary" : "default"}
+                              icon={
+                                isSelected ? (
+                                  <CheckCircleOutlined />
+                                ) : (
+                                  <PlusOutlined />
+                                )
+                              }
+                              className={
+                                isSelected
+                                  ? "current-treatment-drug-button current-treatment-drug-button--selected"
+                                  : "current-treatment-drug-button"
+                              }
+                              onClick={() => toggleDrugInPrescription(drug)}
+                            >
+                              {drugName}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <Alert
+                        type="info"
+                        showIcon
+                        message="No medicines available"
+                        description="Add medicines from the Drugs management page to show them here."
+                        style={{ marginBottom: 18 }}
+                      />
+                    )}
+
+                    <div className="current-treatment-prescription-table-header">
+                      <div>
+                        <Text strong>Selected Medicines</Text>
+
+                        <div>
+                          <Text
+                            type="secondary"
+                            className="current-treatment-prescription-table-description"
+                          >
+                            Configure the dose and treatment duration for each
+                            medicine.
+                          </Text>
+                        </div>
+                      </div>
+
+                      {selectedPrescriptionDrugNames.length > 0 && (
+                        <Tag color="blue">
+                          {selectedPrescriptionDrugNames.length} selected
+                        </Tag>
+                      )}
+                    </div>
+
+                    <Table
+                      rowKey="key"
+                      columns={prescriptionColumns}
+                      dataSource={prescriptionRows}
+                      pagination={false}
+                      bordered
+                      size="small"
+                      scroll={{ x: 700 }}
+                      className="current-treatment-prescription-table"
+                    />
+
                     <Button
                       htmlType="button"
-                      size="small"
-                      danger
-                      onClick={clearPrescription}
+                      type="dashed"
+                      block
+                      icon={<PlusOutlined />}
+                      onClick={addPrescriptionRow}
+                      className="current-treatment-add-drug-row-button"
                     >
-                      Clear Prescription
+                      Add Another Drug
                     </Button>
-                  )}
-                </div>
-
-                {/* =================================================
-                    DRUG QUICK SELECT
-                ================================================== */}
-                {drugs.length > 0 ? (
-                  <div className="current-treatment-drug-list">
-                    {drugs.map((drug) => {
-                      const drugId = getDrugId(drug);
-
-                      const drugName = getDrugName(drug);
-
-                      const isSelected =
-                        selectedPrescriptionDrugNames.some(
-                          (selectedDrugName) =>
-                            normalizeForComparison(
-                              selectedDrugName,
-                            ) ===
-                            normalizeForComparison(drugName),
-                        );
-
-                      return (
-                        <Button
-                          key={drugId}
-                          htmlType="button"
-                          type={
-                            isSelected
-                              ? "primary"
-                              : "default"
-                          }
-                          icon={
-                            isSelected ? (
-                              <CheckCircleOutlined />
-                            ) : (
-                              <PlusOutlined />
-                            )
-                          }
-                          className={
-                            isSelected
-                              ? "current-treatment-drug-button current-treatment-drug-button--selected"
-                              : "current-treatment-drug-button"
-                          }
-                          onClick={() =>
-                            toggleDrugInPrescription(drug)
-                          }
-                        >
-                          {drugName}
-                        </Button>
-                      );
-                    })}
                   </div>
-                ) : (
-                  <Alert
-                    type="info"
-                    showIcon
-                    message="No medicines available"
-                    description="Add medicines from the Drugs management page to show them here."
-                    style={{
-                      marginBottom: 18,
-                    }}
-                  />
-                )}
-
-                {/* =================================================
-                    PRESCRIPTION TABLE HEADER
-                ================================================== */}
-                <div className="current-treatment-prescription-table-header">
-                  <div>
-                    <Text strong>
-                      Selected Medicines
-                    </Text>
-
-                    <div>
-                      <Text
-                        type="secondary"
-                        className="current-treatment-prescription-table-description"
-                      >
-                        Configure the dose and treatment duration
-                        for each medicine.
-                      </Text>
-                    </div>
-                  </div>
-
-                  {selectedPrescriptionDrugNames.length > 0 && (
-                    <Tag color="blue">
-                      {selectedPrescriptionDrugNames.length}{" "}
-                      selected
-                    </Tag>
-                  )}
-                </div>
-
-                {/* =================================================
-                    PRESCRIPTION TABLE
-                ================================================== */}
-                <Table
-                  rowKey="key"
-                  columns={prescriptionColumns}
-                  dataSource={prescriptionRows}
-                  pagination={false}
-                  bordered
-                  size="small"
-                  scroll={{
-                    x: 700,
-                  }}
-                  className="current-treatment-prescription-table"
-                />
-
-                {/* =================================================
-                    ADD CUSTOM ROW
-                ================================================== */}
-                <Button
-                  htmlType="button"
-                  type="dashed"
-                  block
-                  icon={<PlusOutlined />}
-                  onClick={addPrescriptionRow}
-                  className="current-treatment-add-drug-row-button"
-                >
-                  Add Another Drug
-                </Button>
-              </div>
-            ),
-          },
-        ]}
-      />
-    </Card>
-  </div>
-);
+                ),
+              },
+            ]}
+          />
+        </Card>
+      </div>
+    );
   };
 
-  /* ------------------------------------------------------
-     Finish step
-  ------------------------------------------------------ */
+  /* ========================================================
+     FINISH STEP
+  ======================================================== */
 
   const renderFinishStep = () => {
     return (
@@ -1657,7 +1728,8 @@ const CurrentTreatment = () => {
             <Title level={4}>Finish Treatment</Title>
 
             <Text type="secondary">
-              Enter the treatment fee and schedule a follow-up when required.
+              Enter the fee, collect payment and schedule a follow-up when
+              required.
             </Text>
           </div>
 
@@ -1666,283 +1738,590 @@ const CurrentTreatment = () => {
           </div>
         </div>
 
-        <Row gutter={[18, 18]}>
-          <Col xs={24} lg={12}>
-            <Card
-              bordered={false}
-              className="current-treatment-finish-card current-treatment-finish-card--fee"
-            >
-              <div className="current-treatment-finish-heading">
-                <div className="current-treatment-finish-icon current-treatment-finish-icon--fee">
-                  <DollarOutlined />
-                </div>
+        <Tabs
+  defaultActiveKey="payment"
+  className="current-treatment-finish-tabs"
+  items={[
+    {
+      key: "payment",
+      label: (
+        <Space size={8}>
+          <WalletOutlined />
+          <span>Payment</span>
 
-                <div>
-                  <Title level={4}>Treatment Fee</Title>
+          {isFullyPaid && (
+            <Tag color="green" style={{ marginInlineEnd: 0 }}>
+              Paid
+            </Tag>
+          )}
 
-                  <Text type="secondary">
-                    Enter or select the final charge.
-                  </Text>
-                </div>
+          {hasPayment && !isFullyPaid && (
+            <Tag color="orange" style={{ marginInlineEnd: 0 }}>
+              Partial
+            </Tag>
+          )}
+        </Space>
+      ),
+
+      children: (
+       <div className="current-treatment-finish-tab-content">
+  <Card
+    bordered={false}
+    className="current-treatment-finish-card current-treatment-payment-card"
+  >
+    <div className="current-treatment-finish-heading">
+      <div className="current-treatment-finish-icon current-treatment-finish-icon--payment">
+        <WalletOutlined />
+      </div>
+
+      <div>
+        <Title level={4}>Payment</Title>
+
+        <Text type="secondary">
+          Confirm the treatment fee and collect payment.
+        </Text>
+      </div>
+    </div>
+
+    <Row gutter={[24, 24]} align="stretch">
+      {/* =====================================================
+          LEFT SIDE — PAYMENT DETAILS
+      ====================================================== */}
+
+      <Col xs={24} lg={12}>
+        <div className="current-treatment-payment-panel">
+          <div className="current-treatment-payment-panel-title">
+            <Text strong>Payment Details</Text>
+
+            {isFullyPaid ? (
+              <Tag color="green" icon={<CheckCircleOutlined />}>
+                Paid
+              </Tag>
+            ) : hasPayment ? (
+              <Tag color="orange">Partial</Tag>
+            ) : (
+              <Tag>Not Paid</Tag>
+            )}
+          </div>
+
+          {/* Treatment */}
+
+          <div className="current-treatment-payment-treatment">
+            <Text type="secondary">Treatment</Text>
+
+            <Text strong>
+              {selectedTreatment || "Dental Treatment"}
+            </Text>
+          </div>
+
+          {/* Standard Fee */}
+
+          {selectedCommonTreatmentFee > 0 && (
+            <div className="current-treatment-payment-standard">
+              <div>
+                <Text type="secondary">Standard Fee</Text>
+
+                <Text strong>
+                  {formatCurrency(selectedCommonTreatmentFee)}
+                </Text>
               </div>
 
-              {selectedCommonTreatmentFee > 0 && (
-                <Alert
-                  type="success"
-                  showIcon
-                  icon={<MedicineBoxOutlined />}
-                  message="Selected treatment standard fee"
-                  description={
-                    <div>
-                      <Text strong>{selectedTreatment}</Text>
-
-                      <div
-                        style={{
-                          marginTop: 5,
-                        }}
-                      >
-                        <Text>
-                          Standard fee:{" "}
-                          <strong>
-                            {formatCurrency(selectedCommonTreatmentFee)}
-                          </strong>
-                        </Text>
-                      </div>
-
-                      <div
-                        style={{
-                          marginTop: 3,
-                        }}
-                      >
-                        <Text type="secondary">
-                          You can change this amount when the final treatment
-                          charge is different.
-                        </Text>
-                      </div>
-                    </div>
-                  }
-                  style={{
-                    marginBottom: 18,
-                  }}
-                />
-              )}
-
-              <Form.Item
-                name="treatment_charge"
-                rules={[
-                  {
-                   
-                    message: "Please enter the treatment fee",
-                  },
-                  {
-                    type: "number",
-                    min: 1,
-                    message: "The fee must be greater than 0",
-                  },
-                ]}
-              >
-                <InputNumber
-                  min={1}
-                  precision={2}
-                  prefix="Rs."
-                  size="large"
-                  placeholder="Enter treatment fee"
-                  formatter={(value) =>
-                    value
-                      ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                      : ""
-                  }
-                  parser={(value) => (value ? value.replace(/,/g, "") : "")}
-                  className="current-treatment-fee-input"
-                />
-              </Form.Item>
-
-              <Text strong className="current-treatment-quick-label">
-                Quick amounts
-              </Text>
-
-              <Row gutter={[9, 9]} className="current-treatment-amount-grid">
-                {quickTreatmentAmounts.map((amount) => {
-                  const isStandardFee =
-                    selectedCommonTreatmentFee > 0 &&
-                    amount === selectedCommonTreatmentFee;
-
-                  return (
-                    <Col xs={12} sm={8} key={amount}>
-                      <Button
-                        block
-                        htmlType="button"
-                        size="large"
-                        type={
-                          treatmentCharge === amount ? "primary" : "default"
-                        }
-                        className="current-treatment-amount-button"
-                        onClick={() => setTreatmentFee(amount)}
-                      >
-                        {isStandardFee
-                          ? `Standard ${formatCurrency(amount)}`
-                          : `Rs. ${amount.toLocaleString()}`}
-                      </Button>
-                    </Col>
-                  );
-                })}
-              </Row>
-
-              {treatmentCharge > 0 && (
-                <Alert
-                  type="info"
-                  showIcon
-                  message="Final treatment fee"
-                  description={
-                    <Space direction="vertical" size={2}>
-                      <Text strong>{formatCurrency(treatmentCharge)}</Text>
-
-                      {selectedCommonTreatmentFee > 0 &&
-                        treatmentCharge !== selectedCommonTreatmentFee && (
-                          <Text type="secondary">
-                            Standard fee:{" "}
-                            {formatCurrency(selectedCommonTreatmentFee)}
-                          </Text>
-                        )}
-                    </Space>
-                  }
-                  className="current-treatment-selected-fee"
-                />
-              )}
-            </Card>
-          </Col>
-
-          <Col xs={24} lg={12}>
-            <Card
-              bordered={false}
-              className="current-treatment-finish-card current-treatment-finish-card--follow-up"
-            >
-              <div className="current-treatment-finish-heading">
-                <div className="current-treatment-finish-icon current-treatment-finish-icon--follow-up">
-                  <CalendarOutlined />
-                </div>
-
-                <div>
-                  <Title level={4}>Follow-up Visit</Title>
-
-                  <Text type="secondary">
-                    Select whether the patient needs to return.
-                  </Text>
-                </div>
-              </div>
-
-              <div className="current-treatment-follow-up-grid">
+              {treatmentCharge !== selectedCommonTreatmentFee && (
                 <Button
-                  block
                   htmlType="button"
-                  size="large"
-                  type={selectedFollowUp === "none" ? "primary" : "default"}
-                  className={
-                    selectedFollowUp === "none"
-                      ? "current-treatment-follow-up-button current-treatment-follow-up-button--none-selected"
-                      : "current-treatment-follow-up-button"
+                  type="link"
+                  size="small"
+                  onClick={() =>
+                    setTreatmentFee(selectedCommonTreatmentFee)
                   }
-                  onClick={removeFollowUp}
                 >
-                  No Follow-up Needed
+                  Use Standard
                 </Button>
+              )}
+            </div>
+          )}
 
-                <Row gutter={[9, 9]}>
-                  {FOLLOW_UP_OPTIONS.map((option) => (
-                    <Col xs={12} key={option.key}>
-                      <Button
-                        block
-                        htmlType="button"
-                        size="large"
-                        type={
-                          selectedFollowUp === option.key
-                            ? "primary"
-                            : "default"
-                        }
-                        className="current-treatment-follow-up-button"
-                        onClick={() => setFollowUpOption(option)}
-                      >
-                        {option.label}
-                      </Button>
-                    </Col>
-                  ))}
+          {/* Treatment Fee */}
 
-                  <Col xs={12}>
+          <Form.Item
+            label={<Text strong>Treatment Fee</Text>}
+            name="treatment_charge"
+            rules={[
+              {
+                required: true,
+                message: "Please enter the treatment fee",
+              },
+              {
+                type: "number",
+                min: 1,
+                message: "The fee must be greater than 0",
+              },
+            ]}
+            className="current-treatment-simple-form-item"
+          >
+            <InputNumber
+              min={1}
+              precision={2}
+              prefix="Rs."
+              size="large"
+              placeholder="Treatment fee"
+              formatter={(value) =>
+                value
+                  ? `${value}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ",",
+                    )
+                  : ""
+              }
+              parser={(value) =>
+                value ? value.replace(/,/g, "") : ""
+              }
+              className="current-treatment-fee-input"
+            />
+          </Form.Item>
+
+          {/* Summary */}
+
+          <div className="current-treatment-simple-summary">
+            <div>
+              <Text type="secondary">Fee</Text>
+
+              <Text strong>
+                {formatCurrency(treatmentCharge)}
+              </Text>
+            </div>
+
+            <div>
+              <Text type="secondary">Paid</Text>
+
+              <Text
+                strong
+                className={
+                  hasPayment
+                    ? "current-treatment-payment-paid"
+                    : undefined
+                }
+              >
+                {formatCurrency(paymentAmount)}
+              </Text>
+            </div>
+
+            <div>
+              <Text type="secondary">Balance</Text>
+
+              <Text
+                strong
+                type={
+                  remainingAmount > 0
+                    ? "danger"
+                    : undefined
+                }
+              >
+                {formatCurrency(remainingAmount)}
+              </Text>
+            </div>
+          </div>
+
+          {/* Status */}
+
+          {isFullyPaid ? (
+            <Alert
+              type="success"
+              showIcon
+              message="Full payment received"
+              className="current-treatment-simple-status"
+            />
+          ) : hasPayment ? (
+            <Alert
+              type="warning"
+              showIcon
+              message={`Balance: ${formatCurrency(
+                remainingAmount,
+              )}`}
+              className="current-treatment-simple-status"
+            />
+          ) : (
+            <Alert
+              type="info"
+              showIcon
+              message="Payment not collected"
+              className="current-treatment-simple-status"
+            />
+          )}
+        </div>
+      </Col>
+
+      {/* =====================================================
+          RIGHT SIDE — PAYMENT ACTIONS
+      ====================================================== */}
+
+      <Col xs={24} lg={12}>
+        <div className="current-treatment-payment-panel current-treatment-payment-actions-panel">
+          <div className="current-treatment-payment-panel-title">
+            <Text strong>Collect Payment</Text>
+
+            <DollarOutlined />
+          </div>
+
+          {/* Payment Amount */}
+
+          <Form.Item
+            label={<Text strong>Amount Paying Now</Text>}
+            name="payment_amount"
+            rules={[
+              {
+                validator: (_, value) => {
+                  const amount = Number(value || 0);
+
+                  const charge = Number(
+                    form.getFieldValue(
+                      "treatment_charge",
+                    ) || 0,
+                  );
+
+                  if (amount < 0) {
+                    return Promise.reject(
+                      new Error(
+                        "Payment cannot be negative",
+                      ),
+                    );
+                  }
+
+                  if (amount > charge) {
+                    return Promise.reject(
+                      new Error(
+                        "Payment cannot exceed the treatment fee",
+                      ),
+                    );
+                  }
+
+                  return Promise.resolve();
+                },
+              },
+            ]}
+            className="current-treatment-simple-form-item"
+          >
+            <InputNumber
+              min={0}
+              max={
+                treatmentCharge > 0
+                  ? treatmentCharge
+                  : undefined
+              }
+              precision={2}
+              prefix="Rs."
+              size="large"
+              placeholder="Enter amount"
+              formatter={(value) =>
+                value
+                  ? `${value}`.replace(
+                      /\B(?=(\d{3})+(?!\d))/g,
+                      ",",
+                    )
+                  : ""
+              }
+              parser={(value) =>
+                value
+                  ? value.replace(/,/g, "")
+                  : ""
+              }
+              className="current-treatment-fee-input"
+            />
+          </Form.Item>
+
+          {/* Full Payment */}
+
+          {treatmentCharge > 0 && (
+            <Button
+              htmlType="button"
+              block
+              size="large"
+              type="primary"
+              icon={<CheckCircleOutlined />}
+              onClick={setFullPayment}
+              className="current-treatment-simple-full-payment"
+            >
+              Pay Full Amount —{" "}
+              {formatCurrency(treatmentCharge)}
+            </Button>
+          )}
+
+          {/* Quick Amounts */}
+
+          <div className="current-treatment-simple-quick">
+            <Text type="secondary">
+              Quick amount
+            </Text>
+
+            <div className="current-treatment-simple-quick-buttons">
+              {QUICK_PAYMENT_AMOUNTS.filter(
+                (amount) =>
+                  treatmentCharge <= 0 ||
+                  amount < treatmentCharge,
+              ).map((amount) => (
+                <Button
+                  key={amount}
+                  htmlType="button"
+                  type={
+                    paymentAmount === amount
+                      ? "primary"
+                      : "default"
+                  }
+                  onClick={() =>
+                    setPaymentAmount(amount)
+                  }
+                >
+                  Rs. {amount.toLocaleString()}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Payment Method */}
+
+          {hasPayment && (
+            <Form.Item
+              label={<Text strong>Payment Method</Text>}
+              name="payment_method"
+              rules={[
+                {
+                  required: true,
+                  message:
+                    "Please select the payment method",
+                },
+              ]}
+              className="current-treatment-simple-payment-method"
+            >
+              <Select
+                size="large"
+                options={PAYMENT_METHOD_OPTIONS}
+                placeholder="Select payment method"
+                suffixIcon={
+                  <CreditCardOutlined />
+                }
+              />
+            </Form.Item>
+          )}
+
+          {/* Clear */}
+
+          {hasPayment && (
+            <Button
+              htmlType="button"
+              danger
+              block
+              onClick={clearPayment}
+              className="current-treatment-simple-clear"
+            >
+              Clear Payment
+            </Button>
+          )}
+        </div>
+      </Col>
+    </Row>
+  </Card>
+</div>
+      ),
+    },
+
+    /* =======================================================
+       FOLLOW-UP TAB
+    ======================================================== */
+
+    {
+      key: "follow-up",
+
+      label: (
+        <Space size={8}>
+          <CalendarOutlined />
+
+          <span>Follow-up Visit</span>
+
+          {nextAppointmentDate && (
+            <Tag color="green" style={{ marginInlineEnd: 0 }}>
+              Scheduled
+            </Tag>
+          )}
+        </Space>
+      ),
+
+      children: (
+        <div className="current-treatment-finish-tab-content">
+          <Card
+            bordered={false}
+            className="current-treatment-finish-card current-treatment-finish-card--follow-up"
+          >
+            {/* =====================================================
+                FOLLOW-UP HEADER
+            ====================================================== */}
+
+            <div className="current-treatment-finish-heading">
+              <div className="current-treatment-finish-icon current-treatment-finish-icon--follow-up">
+                <CalendarOutlined />
+              </div>
+
+              <div>
+                <Title level={4}>Follow-up Visit</Title>
+
+                <Text type="secondary">
+                  Schedule another visit only when the patient needs to return.
+                </Text>
+              </div>
+            </div>
+
+            {/* =====================================================
+                NO FOLLOW-UP
+            ====================================================== */}
+
+            <div className="current-treatment-follow-up-grid">
+              <Button
+                block
+                htmlType="button"
+                size="large"
+                type={selectedFollowUp === "none" ? "primary" : "default"}
+                className={
+                  selectedFollowUp === "none"
+                    ? "current-treatment-follow-up-button current-treatment-follow-up-button--none-selected"
+                    : "current-treatment-follow-up-button"
+                }
+                onClick={removeFollowUp}
+              >
+                No Follow-up Needed
+              </Button>
+
+              {/* =================================================
+                  FOLLOW-UP OPTIONS
+              ================================================== */}
+
+              <Row gutter={[9, 9]}>
+                {FOLLOW_UP_OPTIONS.map((option) => (
+                  <Col xs={12} key={option.key}>
                     <Button
                       block
                       htmlType="button"
                       size="large"
                       type={
-                        selectedFollowUp === "custom" ? "primary" : "default"
+                        selectedFollowUp === option.key ? "primary" : "default"
                       }
                       className="current-treatment-follow-up-button"
-                      onClick={selectCustomFollowUp}
+                      onClick={() => setFollowUpOption(option)}
                     >
-                      Choose Date
+                      {option.label}
                     </Button>
                   </Col>
-                </Row>
-              </div>
+                ))}
 
-              {selectedFollowUp === "custom" && (
-                <Form.Item
-                  name="next_appointment_date"
-                  className="current-treatment-custom-date"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please choose a follow-up date",
-                    },
-                  ]}
-                >
-                  <DatePicker
+                <Col xs={12}>
+                  <Button
+                    block
+                    htmlType="button"
                     size="large"
-                    format="YYYY-MM-DD"
-                    placeholder="Choose follow-up date"
-                    style={{
-                      width: "100%",
-                    }}
-                    disabledDate={(date) =>
-                      date &&
-                      date.startOf("day").valueOf() <=
-                        dayjs().startOf("day").valueOf()
+                    type={
+                      selectedFollowUp === "custom" ? "primary" : "default"
                     }
-                  />
-                </Form.Item>
-              )}
+                    className="current-treatment-follow-up-button"
+                    onClick={selectCustomFollowUp}
+                  >
+                    Choose Date
+                  </Button>
+                </Col>
+              </Row>
+            </div>
 
-              {selectedFollowUp !== "custom" && (
-                <Form.Item name="next_appointment_date" hidden>
-                  <DatePicker />
-                </Form.Item>
-              )}
+            {/* =====================================================
+                CUSTOM DATE
+            ====================================================== */}
 
-              {nextAppointmentDate && (
-                <Alert
-                  type="success"
-                  showIcon
-                  message="Follow-up scheduled"
-                  description={dayjs(nextAppointmentDate).format(
-                    "dddd, DD MMMM YYYY",
-                  )}
-                  className="current-treatment-follow-up-alert"
+            {selectedFollowUp === "custom" && (
+              <Form.Item
+                label={<Text strong>Follow-up Date</Text>}
+                name="next_appointment_date"
+                className="current-treatment-custom-date"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please choose a follow-up date",
+                  },
+                ]}
+              >
+                <DatePicker
+                  size="large"
+                  format="YYYY-MM-DD"
+                  placeholder="Choose follow-up date"
+                  style={{ width: "100%" }}
+                  disabledDate={(date) =>
+                    date &&
+                    date.startOf("day").valueOf() <=
+                      dayjs().startOf("day").valueOf()
+                  }
                 />
-              )}
-            </Card>
-          </Col>
-        </Row>
+              </Form.Item>
+            )}
+
+            {selectedFollowUp !== "custom" && (
+              <Form.Item name="next_appointment_date" hidden>
+                <DatePicker />
+              </Form.Item>
+            )}
+
+            {/* =====================================================
+                SELECTED FOLLOW-UP
+            ====================================================== */}
+
+            {nextAppointmentDate && (
+              <Alert
+                type="success"
+                showIcon
+                icon={<CalendarOutlined />}
+                message="Follow-up Scheduled"
+                description={
+                  <Space direction="vertical" size={2}>
+                    <Text strong>
+                      {dayjs(nextAppointmentDate).format(
+                        "dddd, DD MMMM YYYY",
+                      )}
+                    </Text>
+
+                    <Text type="secondary">
+                      This date will be saved with the treatment.
+                    </Text>
+                  </Space>
+                }
+                className="current-treatment-follow-up-alert"
+              />
+            )}
+
+            {/* =====================================================
+                NO FOLLOW-UP INFO
+            ====================================================== */}
+
+            {!nextAppointmentDate && selectedFollowUp === "none" && (
+              <Alert
+                type="info"
+                showIcon
+                message="No Follow-up Required"
+                description="The treatment can be completed without scheduling another visit."
+                className="current-treatment-follow-up-alert"
+              />
+            )}
+          </Card>
+        </div>
+      ),
+    },
+  ]}
+/>
       </div>
     );
   };
 
-  /* ------------------------------------------------------
-     Render
-  ------------------------------------------------------ */
+  /* ========================================================
+     RENDER
+  ======================================================== */
 
   return (
     <ClinicPage
       title="Doctor Treatment"
-      subtitle="Record the current patient's treatment, fee and follow-up instructions."
+      subtitle="Record the current patient's treatment, fee, payment and follow-up instructions."
       icon={<MedicineBoxOutlined />}
       actions={[
         ...(appointments.length > 1
@@ -2054,7 +2433,9 @@ const CurrentTreatment = () => {
         )}
       </Spin>
 
-      {/* Patient details modal */}
+      {/* =====================================================
+          PATIENT DETAILS MODAL
+      ====================================================== */}
 
       <Modal
         title={null}
@@ -2142,7 +2523,6 @@ const CurrentTreatment = () => {
             <Descriptions.Item label="Phone">
               <Space size={7}>
                 <PhoneOutlined />
-
                 {patientInformation.phone}
               </Space>
             </Descriptions.Item>
@@ -2186,220 +2566,181 @@ const CurrentTreatment = () => {
         </div>
       </Modal>
 
-      {/* Prescription preview modal */}
+      {/* =====================================================
+          PRESCRIPTION PREVIEW
+      ====================================================== */}
 
-     <Modal
-  title={
-    <Space size={10}>
-      <PrinterOutlined />
+      <Modal
+        title={
+          <Space size={10}>
+            <PrinterOutlined />
+            <span>Prescription Preview</span>
+          </Space>
+        }
+        open={prescriptionPreviewOpen}
+        onCancel={() => setPrescriptionPreviewOpen(false)}
+        width={560}
+        centered
+        destroyOnHidden={false}
+        className="ivory-prescription-preview-modal"
+        footer={[
+          <Button key="close" onClick={() => setPrescriptionPreviewOpen(false)}>
+            Close
+          </Button>,
 
-      <span>Prescription Preview</span>
-    </Space>
-  }
-  open={prescriptionPreviewOpen}
-  onCancel={() => setPrescriptionPreviewOpen(false)}
-  width={560}
-  centered
-  destroyOnHidden={false}
-  className="ivory-prescription-preview-modal"
-  footer={[
-    <Button
-      key="close"
-      onClick={() => setPrescriptionPreviewOpen(false)}
-    >
-      Close
-    </Button>,
-
-    <Button
-      key="print"
-      type="primary"
-      icon={<PrinterOutlined />}
-      disabled={!printPrescriptionData}
-      onClick={handlePrintPrescription}
-    >
-      Print Prescription
-    </Button>,
-  ]}
->
-  {printPrescriptionData && (
-    <div
-      ref={prescriptionPrintRef}
-      className="ivory-prescription-sheet"
-    >
-      {/* Top clinic heading */}
-
-      <header className="ivory-prescription-header">
-        <div className="ivory-prescription-brand">
-          <div className="ivory-prescription-logo">
-            <div className="ivory-prescription-logo-circle">
-              <MedicineBoxOutlined />
-            </div>
-          </div>
-
-          <div className="ivory-prescription-brand-text">
-            <h1>{CLINIC_INFORMATION.name}</h1>
-
-            <div className="ivory-prescription-subtitle">
-              {CLINIC_INFORMATION.subtitle}
-            </div>
-          </div>
-        </div>
-
-        <div className="ivory-prescription-contact-grid">
-          <div className="ivory-prescription-doctor-details">
-           
-           
-          </div>
-
-          <div className="ivory-prescription-clinic-address">
-            <span>{CLINIC_INFORMATION.addressLineOne}</span>
-
-            <span>{CLINIC_INFORMATION.addressLineTwo}</span>
-
-            <span>{CLINIC_INFORMATION.addressLineThree}</span>
-
-            <strong>
-              Hot Line : {CLINIC_INFORMATION.hotline}
-            </strong>
-          </div>
-        </div>
-      </header>
-
-      <div className="ivory-prescription-header-line" />
-
-      {/* Date and patient information */}
-
-      <section className="ivory-prescription-meta">
-        <div className="ivory-prescription-patient-line">
-          <span className="ivory-prescription-label">
-            Patient:
-          </span>
-
-          <strong>
-            {printPrescriptionData.patient.name}
-          </strong>
-
-          <span className="ivory-prescription-patient-id">
-            ID: {printPrescriptionData.patient.id}
-          </span>
-        </div>
-
-        <div className="ivory-prescription-date">
-          <span>Date :</span>
-
-          <strong>
-            {dayjs(
-              printPrescriptionData.treatment.treatment_date,
-            ).format("DD / MM / YYYY")}
-          </strong>
-        </div>
-      </section>
-
-      {/* Allergy warning */}
-
-      {printPrescriptionData.patient.has_allergies && (
-        <div className="ivory-prescription-allergy">
-          <WarningOutlined />
-
-          <div>
-            <strong>ALLERGY WARNING</strong>
-
-            <span>
-              {printPrescriptionData.patient.allergy_details}
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* Main prescription area */}
-
-      <main className="ivory-prescription-body">
-
-        <div className="ivory-prescription-medicines">
-          {printPrescriptionData.treatment.prescription ? (
-            printPrescriptionData.treatment.prescription
-              .split("\n")
-              .filter(Boolean)
-              .map((line, index) => (
-                <div
-                  key={`${line}-${index}`}
-                  className="ivory-prescription-medicine-row"
-                >
-                  {line}
+          <Button
+            key="print"
+            type="primary"
+            icon={<PrinterOutlined />}
+            disabled={!printPrescriptionData}
+            onClick={handlePrintPrescription}
+          >
+            Print Prescription
+          </Button>,
+        ]}
+      >
+        {printPrescriptionData && (
+          <div ref={prescriptionPrintRef} className="ivory-prescription-sheet">
+            <header className="ivory-prescription-header">
+              <div className="ivory-prescription-brand">
+                <div className="ivory-prescription-logo">
+                  <div className="ivory-prescription-logo-circle">
+                    <MedicineBoxOutlined />
+                  </div>
                 </div>
-              ))
-          ) : (
-            <div className="ivory-prescription-empty">
-              No medicines prescribed.
+
+                <div className="ivory-prescription-brand-text">
+                  <h1>{CLINIC_INFORMATION.name}</h1>
+
+                  <div className="ivory-prescription-subtitle">
+                    {CLINIC_INFORMATION.subtitle}
+                  </div>
+                </div>
+              </div>
+
+              <div className="ivory-prescription-contact-grid">
+                <div className="ivory-prescription-doctor-details" />
+
+                <div className="ivory-prescription-clinic-address">
+                  <span>{CLINIC_INFORMATION.addressLineOne}</span>
+                  <span>{CLINIC_INFORMATION.addressLineTwo}</span>
+                  <span>{CLINIC_INFORMATION.addressLineThree}</span>
+
+                  <strong>Hot Line : {CLINIC_INFORMATION.hotline}</strong>
+                </div>
+              </div>
+            </header>
+
+            <div className="ivory-prescription-header-line" />
+
+            <section className="ivory-prescription-meta">
+              <div className="ivory-prescription-patient-line">
+                <span className="ivory-prescription-label">Patient:</span>
+
+                <strong>{printPrescriptionData.patient.name}</strong>
+
+                <span className="ivory-prescription-patient-id">
+                  ID: {printPrescriptionData.patient.id}
+                </span>
+              </div>
+
+              <div className="ivory-prescription-date">
+                <span>Date :</span>
+
+                <strong>
+                  {dayjs(printPrescriptionData.treatment.treatment_date).format(
+                    "DD / MM / YYYY",
+                  )}
+                </strong>
+              </div>
+            </section>
+
+            {printPrescriptionData.patient.has_allergies && (
+              <div className="ivory-prescription-allergy">
+                <WarningOutlined />
+
+                <div>
+                  <strong>ALLERGY WARNING</strong>
+
+                  <span>{printPrescriptionData.patient.allergy_details}</span>
+                </div>
+              </div>
+            )}
+
+            <main className="ivory-prescription-body">
+              <div className="ivory-prescription-medicines">
+                {printPrescriptionData.treatment.prescription ? (
+                  printPrescriptionData.treatment.prescription
+                    .split("\n")
+                    .filter(Boolean)
+                    .map((line, index) => (
+                      <div
+                        key={`${line}-${index}`}
+                        className="ivory-prescription-medicine-row"
+                      >
+                        {line}
+                      </div>
+                    ))
+                ) : (
+                  <div className="ivory-prescription-empty">
+                    No medicines prescribed.
+                  </div>
+                )}
+              </div>
+            </main>
+
+            {printPrescriptionData.treatment.doctor_notes && (
+              <section className="ivory-prescription-instructions">
+                <strong>Instructions:</strong>
+
+                <span>{printPrescriptionData.treatment.doctor_notes}</span>
+              </section>
+            )}
+
+            {printPrescriptionData.treatment.next_appointment_date && (
+              <section className="ivory-prescription-follow-up">
+                <CalendarOutlined />
+
+                <span>
+                  Follow-up:{" "}
+                  <strong>
+                    {dayjs(
+                      printPrescriptionData.treatment.next_appointment_date,
+                    ).format("DD / MM / YYYY")}
+                  </strong>
+                </span>
+              </section>
+            )}
+
+            <footer className="ivory-prescription-footer">
+              <div className="ivory-prescription-stamp">
+                <strong>{CLINIC_INFORMATION.dentistName}</strong>
+
+                <span>
+                  {CLINIC_INFORMATION.designation},{" "}
+                  {CLINIC_INFORMATION.qualificationTwo}
+                </span>
+
+                <span>{CLINIC_INFORMATION.qualificationOne}</span>
+
+                <span>{CLINIC_INFORMATION.registrationNumber}</span>
+
+                <span>Tel: {CLINIC_INFORMATION.stampPhone}</span>
+              </div>
+
+              <div className="ivory-prescription-signature">
+                <div className="ivory-prescription-signature-line" />
+
+                <span>Signature</span>
+              </div>
+            </footer>
+
+            <div className="ivory-prescription-footer-text">
+              {CLINIC_INFORMATION.footerText}
             </div>
-          )}
-        </div>
-      </main>
-
-      {/* Optional notes */}
-
-      {printPrescriptionData.treatment.doctor_notes && (
-        <section className="ivory-prescription-instructions">
-          <strong>Instructions:</strong>
-
-          <span>
-            {printPrescriptionData.treatment.doctor_notes}
-          </span>
-        </section>
-      )}
-
-      {/* Follow-up */}
-
-      {printPrescriptionData.treatment
-        .next_appointment_date && (
-        <section className="ivory-prescription-follow-up">
-          <CalendarOutlined />
-
-          <span>
-            Follow-up:{" "}
-            <strong>
-              {dayjs(
-                printPrescriptionData.treatment
-                  .next_appointment_date,
-              ).format("DD / MM / YYYY")}
-            </strong>
-          </span>
-        </section>
-      )}
-
-      {/* Bottom stamp and signature */}
-
-      <footer className="ivory-prescription-footer">
-        <div className="ivory-prescription-stamp">
-          <strong>{CLINIC_INFORMATION.dentistName}</strong>
-
-          <span>
-            {CLINIC_INFORMATION.designation},{" "}
-            {CLINIC_INFORMATION.qualificationTwo}
-          </span>
-
-          <span>{CLINIC_INFORMATION.qualificationOne}</span>
-
-          <span>{CLINIC_INFORMATION.registrationNumber}</span>
-
-          <span>
-            Tel: {CLINIC_INFORMATION.stampPhone}
-          </span>
-        </div>
-
-        <div className="ivory-prescription-signature">
-          <div className="ivory-prescription-signature-line" />
-
-          <span>Signature</span>
-        </div>
-      </footer>
-
-      <div className="ivory-prescription-footer-text">
-        {CLINIC_INFORMATION.footerText}
-      </div>
-    </div>
-  )}
-</Modal>
+          </div>
+        )}
+      </Modal>
     </ClinicPage>
   );
 };

@@ -1,0 +1,666 @@
+/* ========================================================
+   PAGE
+======================================================== */
+
+.unauthorized-page {
+  position: relative;
+
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 40px;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 15% 20%,
+      rgba(22, 119, 255, 0.08),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 85% 80%,
+      rgba(19, 194, 194, 0.08),
+      transparent 30%
+    ),
+    #f8fbff;
+}
+
+/* ========================================================
+   BACKGROUND DECORATIONS
+======================================================== */
+
+.unauthorized-background-shape {
+  position: absolute;
+
+  border-radius: 50%;
+
+  pointer-events: none;
+
+  filter: blur(2px);
+}
+
+.unauthorized-background-shape.shape-one {
+  width: 420px;
+  height: 420px;
+
+  top: -180px;
+  left: -150px;
+
+  background: rgba(22, 119, 255, 0.06);
+}
+
+.unauthorized-background-shape.shape-two {
+  width: 350px;
+  height: 350px;
+
+  right: -120px;
+  bottom: -140px;
+
+  background: rgba(19, 194, 194, 0.07);
+}
+
+/* ========================================================
+   MAIN CONTAINER
+======================================================== */
+
+.unauthorized-container {
+  position: relative;
+  z-index: 2;
+
+  width: min(1180px, 100%);
+
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  align-items: center;
+
+  gap: 70px;
+}
+
+/* ========================================================
+   IMAGE SIDE
+======================================================== */
+
+.unauthorized-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 0;
+}
+
+.unauthorized-image-wrapper {
+  position: relative;
+
+  width: 100%;
+  max-width: 590px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.unauthorized-image-glow {
+  position: absolute;
+
+  width: 70%;
+  height: 70%;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(22, 119, 255, 0.15),
+      rgba(22, 119, 255, 0.03) 55%,
+      transparent 75%
+    );
+
+  filter: blur(20px);
+}
+
+.unauthorized-image {
+  position: relative;
+  z-index: 2;
+
+  display: block;
+
+  width: 100%;
+  height: auto;
+
+  object-fit: contain;
+
+  filter:
+    drop-shadow(
+      0 20px 30px rgba(22, 119, 255, 0.12)
+    );
+}
+
+/* ========================================================
+   CONTENT
+======================================================== */
+
+.unauthorized-content {
+  width: 100%;
+  max-width: 520px;
+}
+
+/* ========================================================
+   LOCK ICON
+======================================================== */
+
+.unauthorized-icon {
+  width: 64px;
+  height: 64px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 20px;
+
+  border-radius: 18px;
+
+  color: #1677ff;
+
+  font-size: 28px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(22, 119, 255, 0.14),
+      rgba(19, 194, 194, 0.12)
+    );
+
+  border: 1px solid rgba(22, 119, 255, 0.12);
+}
+
+/* ========================================================
+   ACCESS TAG
+======================================================== */
+
+.unauthorized-tag {
+  margin: 0 0 16px 0 !important;
+
+  padding: 5px 12px !important;
+
+  border-radius: 999px !important;
+
+  border: 1px solid rgba(255, 77, 79, 0.2) !important;
+
+  background: rgba(255, 77, 79, 0.07) !important;
+
+  color: #cf1322 !important;
+
+  font-size: 12px !important;
+  font-weight: 700 !important;
+
+  letter-spacing: 0.8px;
+}
+
+/* ========================================================
+   TITLE
+======================================================== */
+
+.unauthorized-title {
+  margin: 0 0 14px !important;
+
+  color: #101828 !important;
+
+  font-size: clamp(36px, 4vw, 52px) !important;
+
+  font-weight: 750 !important;
+
+  line-height: 1.08 !important;
+
+  letter-spacing: -1.5px;
+}
+
+/* ========================================================
+   DESCRIPTION
+======================================================== */
+
+.unauthorized-description {
+  max-width: 480px;
+
+  margin: 0 0 28px !important;
+
+  color: #667085 !important;
+
+  font-size: 16px !important;
+
+  line-height: 1.7 !important;
+}
+
+/* ========================================================
+   ROLE BOX
+======================================================== */
+
+.unauthorized-role-box {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 16px;
+
+  padding: 15px 17px;
+
+  border: 1px solid #e4eaf2;
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.75);
+
+  box-shadow:
+    0 5px 20px rgba(16, 24, 40, 0.035);
+
+  backdrop-filter: blur(10px);
+}
+
+.unauthorized-role-info {
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+
+  min-width: 0;
+}
+
+.unauthorized-role-label {
+  color: #98a2b3 !important;
+
+  font-size: 12px;
+}
+
+.unauthorized-role-value {
+  overflow: hidden;
+
+  color: #344054;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unauthorized-role-tag {
+  flex-shrink: 0;
+
+  margin: 0 !important;
+
+  padding: 4px 12px !important;
+
+  border: none !important;
+
+  border-radius: 999px !important;
+
+  color: #0958d9 !important;
+
+  font-weight: 600;
+
+  background: #e6f4ff !important;
+}
+
+/* ========================================================
+   RESTRICTED PATH
+======================================================== */
+
+.unauthorized-path {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  margin-bottom: 28px;
+
+  padding: 11px 14px;
+
+  overflow: hidden;
+
+  border-radius: 10px;
+
+  color: #667085;
+
+  font-size: 12px;
+
+  background: #f2f4f7;
+}
+
+.unauthorized-path .anticon {
+  flex-shrink: 0;
+
+  color: #98a2b3;
+}
+
+.unauthorized-path code {
+  overflow: hidden;
+
+  color: #475467;
+
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ========================================================
+   ACTION BUTTONS
+======================================================== */
+
+.unauthorized-actions {
+  width: 100%;
+}
+
+.unauthorized-actions .ant-btn {
+  height: 48px;
+
+  padding: 0 22px;
+
+  border-radius: 12px;
+
+  font-weight: 600;
+}
+
+/* ========================================================
+   BACK BUTTON
+======================================================== */
+
+.unauthorized-back-button {
+  border-color: #d0d5dd !important;
+
+  color: #344054 !important;
+
+  background: #ffffff !important;
+}
+
+.unauthorized-back-button:hover {
+  border-color: #1677ff !important;
+
+  color: #1677ff !important;
+}
+
+/* ========================================================
+   DASHBOARD BUTTON
+======================================================== */
+
+.unauthorized-dashboard-button {
+  min-width: 155px;
+
+  border: none !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #1677ff,
+      #13a8a8
+    ) !important;
+
+  box-shadow:
+    0 8px 22px rgba(22, 119, 255, 0.2) !important;
+}
+
+.unauthorized-dashboard-button:hover {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 10px 26px rgba(22, 119, 255, 0.28) !important;
+}
+
+/* ========================================================
+   FOOTER
+======================================================== */
+
+.unauthorized-footer {
+  display: flex;
+  align-items: center;
+
+  gap: 3px;
+
+  margin-top: 26px;
+  padding-top: 20px;
+
+  border-top: 1px solid #eaecf0;
+}
+
+.unauthorized-footer .ant-typography {
+  color: #98a2b3;
+
+  font-size: 13px;
+}
+
+.unauthorized-footer .ant-btn {
+  height: auto;
+
+  padding: 2px 6px;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ========================================================
+   TABLET
+======================================================== */
+
+@media (max-width: 992px) {
+  .unauthorized-page {
+    padding: 32px 24px;
+  }
+
+  .unauthorized-container {
+    grid-template-columns: 1fr;
+
+    gap: 25px;
+
+    text-align: center;
+  }
+
+  .unauthorized-image-wrapper {
+    max-width: 430px;
+  }
+
+  .unauthorized-content {
+    max-width: 560px;
+
+    margin: 0 auto;
+  }
+
+  .unauthorized-icon {
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .unauthorized-description {
+    margin-right: auto !important;
+    margin-left: auto !important;
+  }
+
+  .unauthorized-actions {
+    justify-content: center;
+  }
+
+  .unauthorized-footer {
+    justify-content: center;
+  }
+
+  .unauthorized-path {
+    justify-content: center;
+  }
+
+  .unauthorized-role-box {
+    text-align: left;
+  }
+}
+
+/* ========================================================
+   MOBILE
+======================================================== */
+
+@media (max-width: 576px) {
+  .unauthorized-page {
+    align-items: flex-start;
+
+    padding: 25px 18px 35px;
+  }
+
+  .unauthorized-container {
+    gap: 10px;
+  }
+
+  .unauthorized-image-wrapper {
+    max-width: 300px;
+  }
+
+  .unauthorized-icon {
+    width: 54px;
+    height: 54px;
+
+    margin-bottom: 14px;
+
+    border-radius: 15px;
+
+    font-size: 24px;
+  }
+
+  .unauthorized-title {
+    font-size: 34px !important;
+
+    letter-spacing: -0.8px;
+  }
+
+  .unauthorized-description {
+    margin-bottom: 20px !important;
+
+    font-size: 14px !important;
+
+    line-height: 1.6 !important;
+  }
+
+  .unauthorized-role-box {
+    padding: 13px 14px;
+  }
+
+  .unauthorized-actions {
+    display: flex !important;
+    flex-direction: column;
+
+    width: 100%;
+  }
+
+  .unauthorized-actions .ant-space-item {
+    width: 100%;
+  }
+
+  .unauthorized-actions .ant-btn {
+    width: 100%;
+  }
+
+  .unauthorized-footer {
+    flex-wrap: wrap;
+
+    margin-top: 20px;
+  }
+}
+
+/* ========================================================
+   DARK MODE
+======================================================== */
+
+[data-theme="dark"] .unauthorized-page,
+.dark .unauthorized-page {
+  background:
+    radial-gradient(
+      circle at 15% 20%,
+      rgba(22, 119, 255, 0.12),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 85% 80%,
+      rgba(19, 194, 194, 0.08),
+      transparent 30%
+    ),
+    #0d1117;
+}
+
+[data-theme="dark"] .unauthorized-title,
+.dark .unauthorized-title {
+  color: #f5f7fa !important;
+}
+
+[data-theme="dark"] .unauthorized-description,
+.dark .unauthorized-description {
+  color: #98a2b3 !important;
+}
+
+[data-theme="dark"] .unauthorized-role-box,
+.dark .unauthorized-role-box {
+  border-color: #283341;
+
+  background: rgba(22, 29, 39, 0.82);
+
+  box-shadow: none;
+}
+
+[data-theme="dark"] .unauthorized-role-value,
+.dark .unauthorized-role-value {
+  color: #eaecf0;
+}
+
+[data-theme="dark"] .unauthorized-path,
+.dark .unauthorized-path {
+  color: #98a2b3;
+
+  background: #161d27;
+}
+
+[data-theme="dark"] .unauthorized-path code,
+.dark .unauthorized-path code {
+  color: #d0d5dd;
+}
+
+[data-theme="dark"] .unauthorized-back-button,
+.dark .unauthorized-back-button {
+  border-color: #344054 !important;
+
+  color: #d0d5dd !important;
+
+  background: #161d27 !important;
+}
+
+[data-theme="dark"] .unauthorized-footer,
+.dark .unauthorized-footer {
+  border-color: #283341;
+}
+
+/* ========================================================
+   REDUCED MOTION
+======================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  .unauthorized-image {
+    animation: unauthorizedFloat 5s ease-in-out infinite;
+  }
+
+  @keyframes unauthorizedFloat {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+}

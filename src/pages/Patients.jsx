@@ -1,4 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import {
   Alert,
@@ -52,70 +57,174 @@ import "./css/Patients.css";
 
 const { Title, Text } = Typography;
 
-/* --------------------------------------------------------
-   Patient helpers
--------------------------------------------------------- */
+/* ========================================================
+   PATIENT HELPERS
+======================================================== */
 
 const getPatientId = (patient) => {
-  return patient?.id ?? patient?.patient_id ?? "";
+  return (
+    patient?.id ??
+    patient?.patient_id ??
+    ""
+  );
 };
 
 const getPatientName = (patient) => {
-  return patient?.name ?? patient?.patient_name ?? "";
+  return (
+    patient?.name ??
+    patient?.patient_name ??
+    ""
+  );
 };
 
 const getPatientPhone = (patient) => {
-  return patient?.phone ?? patient?.phone_number ?? "";
+  return (
+    patient?.phone ??
+    patient?.phone_number ??
+    ""
+  );
 };
+
 const getPatientLocation = (patient) => {
-  return patient?.location ?? patient?.city ?? patient?.patient_location ?? "";
+  return (
+    patient?.location ??
+    patient?.city ??
+    patient?.patient_location ??
+    ""
+  );
 };
 
 const getPatientDistance = (patient) => {
   const distance =
-    patient?.distance ?? patient?.distance_km ?? patient?.location_distance;
+    patient?.distance ??
+    patient?.distance_km ??
+    patient?.location_distance;
 
-  if (distance === undefined || distance === null || distance === "") {
+  if (
+    distance === undefined ||
+    distance === null ||
+    distance === ""
+  ) {
     return "";
   }
 
   return Number(distance);
 };
-/* --------------------------------------------------------
-   Allergy helpers
--------------------------------------------------------- */
+
+/* ========================================================
+   ALLERGY HELPERS
+======================================================== */
 
 const convertToBoolean = (value) => {
-  if (value === true || value === 1) {
+  if (
+    value === true ||
+    value === 1
+  ) {
     return true;
   }
 
-  return ["true", "yes", "1"].includes(
+  return [
+    "true",
+    "yes",
+    "1",
+  ].includes(
     String(value ?? "")
       .trim()
       .toLowerCase(),
   );
 };
 
-const patientHasAllergies = (patient) => {
-  return convertToBoolean(patient?.has_allergies ?? patient?.is_allergies);
+const patientHasAllergies = (
+  patient,
+) => {
+  return convertToBoolean(
+    patient?.has_allergies ??
+      patient?.is_allergies,
+  );
 };
 
-const getPatientAllergyDetails = (patient) => {
-  return patient?.allergy_details ?? patient?.allergies ?? "";
+const getPatientAllergyDetails = (
+  patient,
+) => {
+  return (
+    patient?.allergy_details ??
+    patient?.allergies ??
+    ""
+  );
 };
 
 const normalizeStatus = (value) => {
-  return String(value || "Active")
+  return String(
+    value || "Active",
+  )
     .trim()
     .toLowerCase();
 };
 
-/* --------------------------------------------------------
-   Summary card
--------------------------------------------------------- */
+/* ========================================================
+   PHONE HELPERS
+======================================================== */
 
-const PatientSummaryCard = ({ title, value, helper, icon, tone, onClick }) => {
+const normalizePhoneNumber = (
+  phone,
+) => {
+  let number = String(
+    phone || "",
+  ).replace(/\D/g, "");
+
+  /*
+   * 0094 70 427 9279
+   * ->
+   * 0704279279
+   */
+  if (
+    number.startsWith("0094")
+  ) {
+    number = `0${number.slice(
+      4,
+    )}`;
+  }
+
+  /*
+   * 94 70 427 9279
+   * ->
+   * 0704279279
+   */
+  else if (
+    number.startsWith("94") &&
+    number.length === 11
+  ) {
+    number = `0${number.slice(
+      2,
+    )}`;
+  }
+
+  /*
+   * 704279279
+   * ->
+   * 0704279279
+   */
+  else if (
+    number.length === 9
+  ) {
+    number = `0${number}`;
+  }
+
+  return number;
+};
+
+/* ========================================================
+   SUMMARY CARD
+======================================================== */
+
+const PatientSummaryCard = ({
+  title,
+  value,
+  helper,
+  icon,
+  tone,
+  onClick,
+}) => {
   return (
     <Card
       bordered={false}
@@ -124,579 +233,1009 @@ const PatientSummaryCard = ({ title, value, helper, icon, tone, onClick }) => {
     >
       <div className="patient-summary-card__content">
         <div>
-          <Text className="patient-summary-card__title">{title}</Text>
+          <Text className="patient-summary-card__title">
+            {title}
+          </Text>
 
-          <div className="patient-summary-card__value">{value}</div>
+          <div className="patient-summary-card__value">
+            {value}
+          </div>
 
-          <Text className="patient-summary-card__helper">{helper}</Text>
+          <Text className="patient-summary-card__helper">
+            {helper}
+          </Text>
         </div>
 
-        <div className="patient-summary-card__icon">{icon}</div>
+        <div className="patient-summary-card__icon">
+          {icon}
+        </div>
       </div>
     </Card>
   );
 };
 
-/* --------------------------------------------------------
-   Patients page
--------------------------------------------------------- */
+/* ========================================================
+   PATIENTS PAGE
+======================================================== */
 
 const Patients = () => {
   const [form] = Form.useForm();
-  const [patientLocations, setPatientLocations] = useState([]);
-  const [locationsLoading, setLocationsLoading] = useState(false);
-  const loadPatientLocations = useCallback(async () => {
-    try {
-      setLocationsLoading(true);
 
-      const response = await getLocations();
+  /* ======================================================
+     PATIENT DATA
+  ====================================================== */
 
-      const locationData =
-        response?.data?.data ??
-        response?.data?.locations ??
-        response?.data ??
-        [];
+  const [patients, setPatients] =
+    useState([]);
 
-      const normalizedLocations = Array.isArray(locationData)
-        ? locationData
-            .map((location) => {
-              const city =
-                location?.location ?? location?.city ?? location?.name ?? "";
+  const [loading, setLoading] =
+    useState(false);
 
-              const rawDistance =
-                location?.distance_km ??
-                location?.distance ??
-                location?.location_distance;
+  const [saving, setSaving] =
+    useState(false);
 
-              return {
-                id: location?.id ?? location?.location_id ?? city,
-                city: String(city).trim(),
-                distance:
-                  rawDistance === undefined ||
-                  rawDistance === null ||
-                  rawDistance === ""
-                    ? ""
-                    : Number(rawDistance),
-              };
-            })
-            .filter((location) => location.city)
-            .sort((firstLocation, secondLocation) => {
-              const firstDistance =
-                firstLocation.distance === ""
-                  ? Number.MAX_SAFE_INTEGER
-                  : firstLocation.distance;
+  /* ======================================================
+     LOCATIONS
+  ====================================================== */
 
-              const secondDistance =
-                secondLocation.distance === ""
-                  ? Number.MAX_SAFE_INTEGER
-                  : secondLocation.distance;
+  const [
+    patientLocations,
+    setPatientLocations,
+  ] = useState([]);
 
-              return firstDistance - secondDistance;
-            })
-        : [];
+  const [
+    locationsLoading,
+    setLocationsLoading,
+  ] = useState(false);
 
-      setPatientLocations(normalizedLocations);
-    } catch (error) {
-      console.error("Failed to load patient locations:", error);
+  /* ======================================================
+     FILTERS
+  ====================================================== */
 
-      message.error(
-        error?.response?.data?.message ||
-          error?.message ||
-          "Failed to load locations",
-      );
+  const [search, setSearch] =
+    useState("");
 
-      setPatientLocations([]);
-    } finally {
-      setLocationsLoading(false);
-    }
-  }, []);
+  const [
+    allergyFilter,
+    setAllergyFilter,
+  ] = useState("all");
 
-  const [loading, setLoading] = useState(false);
+  /* ======================================================
+     ADD / EDIT MODAL
+  ====================================================== */
 
-  const [saving, setSaving] = useState(false);
+  const [modalOpen, setModalOpen] =
+    useState(false);
 
-  const [patients, setPatients] = useState([]);
-  const normalizePhoneNumber = (phone) => {
-    let number = String(phone || "").replace(/\D/g, "");
+  const [
+    editingPatient,
+    setEditingPatient,
+  ] = useState(null);
 
-    // 0094 70 427 9279 → 0704279279
-    if (number.startsWith("0094")) {
-      number = `0${number.slice(4)}`;
-    }
+  const [
+    showMoreOptions,
+    setShowMoreOptions,
+  ] = useState(false);
 
-    // 94 70 427 9279 → 0704279279
-    else if (number.startsWith("94") && number.length === 11) {
-      number = `0${number.slice(2)}`;
-    }
+  /* ======================================================
+     PATIENT DETAILS MODAL
+  ====================================================== */
 
-    // 704279279 → 0704279279
-    else if (number.length === 9) {
-      number = `0${number}`;
-    }
+  const [
+    viewModalOpen,
+    setViewModalOpen,
+  ] = useState(false);
 
-    return number;
+  const [
+    selectedPatient,
+    setSelectedPatient,
+  ] = useState(null);
+
+  /* ======================================================
+     FORM WATCHERS
+  ====================================================== */
+
+  const hasAllergies =
+    Form.useWatch(
+      "has_allergies",
+      form,
+    );
+
+  /* ======================================================
+     RESPONSE HELPER
+  ====================================================== */
+
+  const extractArray = (
+    response,
+  ) => {
+    const data =
+      response?.data?.data ||
+      response?.data ||
+      [];
+
+    return Array.isArray(data)
+      ? data
+      : [];
   };
-  const [search, setSearch] = useState("");
 
-  const [allergyFilter, setAllergyFilter] = useState("all");
+  /* ======================================================
+     LOAD PATIENTS
+  ====================================================== */
 
-  const [modalOpen, setModalOpen] = useState(false);
+  const loadPatients =
+    useCallback(async () => {
+      setLoading(true);
 
-  const [editingPatient, setEditingPatient] = useState(null);
+      try {
+        const response =
+          await getPatients();
 
-  const locationOptions = useMemo(() => {
-    return patientLocations.map((location) => ({
-      label: `${location.city} • ${location.distance} km`,
-      value: location.city,
-    }));
-  }, [patientLocations]);
+        setPatients(
+          extractArray(response),
+        );
+      } catch (error) {
+        console.error(
+          "Failed to load patients:",
+          error,
+        );
+
+        message.error(
+          error?.response?.data
+            ?.message ||
+            error?.message ||
+            "Failed to load patients",
+        );
+      } finally {
+        setLoading(false);
+      }
+    }, []);
 
   useEffect(() => {
-    if (!modalOpen || editingPatient) {
+    loadPatients();
+  }, [loadPatients]);
+
+  /* ======================================================
+     LOAD LOCATIONS
+  ====================================================== */
+
+  const loadPatientLocations =
+    useCallback(async () => {
+      try {
+        setLocationsLoading(true);
+
+        const response =
+          await getLocations();
+
+        const locationData =
+          response?.data?.data ??
+          response?.data
+            ?.locations ??
+          response?.data ??
+          [];
+
+        const normalizedLocations =
+          Array.isArray(
+            locationData,
+          )
+            ? locationData
+                .map(
+                  (location) => {
+                    const city =
+                      location?.location ??
+                      location?.city ??
+                      location?.name ??
+                      "";
+
+                    const rawDistance =
+                      location?.distance_km ??
+                      location?.distance ??
+                      location?.location_distance;
+
+                    return {
+                      id:
+                        location?.id ??
+                        location?.location_id ??
+                        city,
+
+                      city: String(
+                        city,
+                      ).trim(),
+
+                      distance:
+                        rawDistance ===
+                          undefined ||
+                        rawDistance ===
+                          null ||
+                        rawDistance ===
+                          ""
+                          ? ""
+                          : Number(
+                              rawDistance,
+                            ),
+                    };
+                  },
+                )
+                .filter(
+                  (location) =>
+                    location.city,
+                )
+                .sort(
+                  (
+                    firstLocation,
+                    secondLocation,
+                  ) => {
+                    const firstDistance =
+                      firstLocation.distance ===
+                      ""
+                        ? Number.MAX_SAFE_INTEGER
+                        : firstLocation.distance;
+
+                    const secondDistance =
+                      secondLocation.distance ===
+                      ""
+                        ? Number.MAX_SAFE_INTEGER
+                        : secondLocation.distance;
+
+                    return (
+                      firstDistance -
+                      secondDistance
+                    );
+                  },
+                )
+            : [];
+
+        setPatientLocations(
+          normalizedLocations,
+        );
+      } catch (error) {
+        console.error(
+          "Failed to load patient locations:",
+          error,
+        );
+
+        message.error(
+          error?.response?.data
+            ?.message ||
+            error?.message ||
+            "Failed to load locations",
+        );
+
+        setPatientLocations([]);
+      } finally {
+        setLocationsLoading(
+          false,
+        );
+      }
+    }, []);
+
+  useEffect(() => {
+    loadPatientLocations();
+  }, [loadPatientLocations]);
+
+  /* ======================================================
+     LOCATION OPTIONS
+  ====================================================== */
+
+  const locationOptions =
+    useMemo(() => {
+      return patientLocations.map(
+        (location) => ({
+          label:
+            location.distance ===
+            ""
+              ? location.city
+              : `${location.city} • ${location.distance} km`,
+
+          value: location.city,
+        }),
+      );
+    }, [patientLocations]);
+
+  /* ======================================================
+     DEFAULT LOCATION
+  ====================================================== */
+
+  useEffect(() => {
+    if (
+      !modalOpen ||
+      editingPatient
+    ) {
       return;
     }
 
-    if (locationOptions.length === 0) {
+    if (
+      locationOptions.length === 0
+    ) {
       return;
     }
 
-    const currentLocation = form.getFieldValue("location");
+    const currentLocation =
+      form.getFieldValue(
+        "location",
+      );
 
     if (currentLocation) {
       return;
     }
 
-    const firstLocation = patientLocations[0];
+    const firstLocation =
+      patientLocations[0];
 
     if (!firstLocation) {
       return;
     }
 
     form.setFieldsValue({
-      location: locationOptions[0].value,
-      distance: firstLocation.distance,
+      location:
+        firstLocation.city,
+
+      distance:
+        firstLocation.distance,
     });
-  }, [modalOpen, editingPatient, locationOptions, patientLocations, form]);
-  useEffect(() => {
-    loadPatientLocations();
-  }, [loadPatientLocations]);
+  }, [
+    modalOpen,
+    editingPatient,
+    locationOptions,
+    patientLocations,
+    form,
+  ]);
 
-  const [showMoreOptions, setShowMoreOptions] = useState(false);
+  /* ======================================================
+     PATIENT COUNTS
+  ====================================================== */
 
-  /* ------------------------------------------------------
-     Patient details modal
-  ------------------------------------------------------ */
+  const patientCounts =
+    useMemo(() => {
+      const allergyPatients =
+        patients.filter(
+          (patient) =>
+            patientHasAllergies(
+              patient,
+            ),
+        ).length;
 
-  const [viewModalOpen, setViewModalOpen] = useState(false);
+      const activePatients =
+        patients.filter(
+          (patient) =>
+            normalizeStatus(
+              patient?.status,
+            ) !== "inactive",
+        ).length;
 
-  const [selectedPatient, setSelectedPatient] = useState(null);
+      const inactivePatients =
+        patients.length -
+        activePatients;
 
-  const hasAllergies = Form.useWatch("has_allergies", form);
+      return {
+        total: patients.length,
 
-  /* ------------------------------------------------------
-     Extract response data
-  ------------------------------------------------------ */
+        allergy:
+          allergyPatients,
 
-  const extractArray = (response) => {
-    const data = response?.data?.data || response?.data || [];
+        noAllergy:
+          patients.length -
+          allergyPatients,
 
-    return Array.isArray(data) ? data : [];
-  };
+        active:
+          activePatients,
 
-  /* ------------------------------------------------------
-     Load patients
-  ------------------------------------------------------ */
+        inactive:
+          inactivePatients,
+      };
+    }, [patients]);
 
-  const loadPatients = async () => {
-    setLoading(true);
+  /* ======================================================
+     SEARCH + FILTER
+  ====================================================== */
 
-    try {
-      const response = await getPatients();
+  const filteredPatients =
+    useMemo(() => {
+      const keyword = search
+        .toLowerCase()
+        .trim();
 
-      setPatients(extractArray(response));
-    } catch (error) {
-      console.error("Failed to load patients:", error);
+      const filtered =
+        patients.filter(
+          (patient) => {
+            const hasAllergy =
+              patientHasAllergies(
+                patient,
+              );
 
-      message.error(
-        error?.response?.data?.message ||
-          error?.message ||
-          "Failed to load patients",
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+            const allergyDetails =
+              getPatientAllergyDetails(
+                patient,
+              );
 
-  useEffect(() => {
-    loadPatients();
-  }, []);
+            const searchableValues =
+              [
+                getPatientId(
+                  patient,
+                ),
 
-  /* ------------------------------------------------------
-     Patient counts
-  ------------------------------------------------------ */
+                getPatientName(
+                  patient,
+                ),
 
-  const patientCounts = useMemo(() => {
-    const allergyPatients = patients.filter((patient) =>
-      patientHasAllergies(patient),
-    ).length;
+                getPatientPhone(
+                  patient,
+                ),
 
-    const activePatients = patients.filter(
-      (patient) => normalizeStatus(patient?.status) !== "inactive",
-    ).length;
+                patient?.gender,
 
-    const inactivePatients = patients.length - activePatients;
+                patient?.address,
 
-    return {
-      total: patients.length,
-      allergy: allergyPatients,
-      noAllergy: patients.length - allergyPatients,
-      active: activePatients,
-      inactive: inactivePatients,
-    };
-  }, [patients]);
+                patient?.status,
 
-  /* ------------------------------------------------------
-     Search and filtering
-  ------------------------------------------------------ */
+                getPatientLocation(
+                  patient,
+                ),
 
-  const filteredPatients = useMemo(() => {
-    const keyword = search.toLowerCase().trim();
+                getPatientDistance(
+                  patient,
+                ),
 
-    const filtered = patients.filter((patient) => {
-      const hasAllergy = patientHasAllergies(patient);
+                allergyDetails,
+              ];
 
-      const allergyDetails = getPatientAllergyDetails(patient);
+            const matchesSearch =
+              !keyword ||
+              searchableValues.some(
+                (value) =>
+                  String(
+                    value ?? "",
+                  )
+                    .toLowerCase()
+                    .includes(
+                      keyword,
+                    ),
+              );
 
-      const searchableValues = [
-        getPatientId(patient),
-        getPatientName(patient),
-        getPatientPhone(patient),
-        patient?.gender,
-        patient?.address,
-        patient?.status,
-        getPatientLocation(patient),
-        getPatientDistance(patient),
-        allergyDetails,
-      ];
+            const matchesFilter =
+              allergyFilter ===
+                "all" ||
+              (allergyFilter ===
+                "allergy" &&
+                hasAllergy) ||
+              (allergyFilter ===
+                "no-allergy" &&
+                !hasAllergy);
 
-      const matchesSearch =
-        !keyword ||
-        searchableValues.some((value) =>
-          String(value ?? "")
-            .toLowerCase()
-            .includes(keyword),
+            return (
+              matchesSearch &&
+              matchesFilter
+            );
+          },
         );
 
-      const matchesFilter =
-        allergyFilter === "all" ||
-        (allergyFilter === "allergy" && hasAllergy) ||
-        (allergyFilter === "no-allergy" && !hasAllergy);
+      return [...filtered].sort(
+        (first, second) => {
+          const firstHasAllergy =
+            patientHasAllergies(
+              first,
+            );
 
-      return matchesSearch && matchesFilter;
-    });
+          const secondHasAllergy =
+            patientHasAllergies(
+              second,
+            );
 
-    return [...filtered].sort((first, second) => {
-      const firstHasAllergy = patientHasAllergies(first);
+          if (
+            firstHasAllergy !==
+            secondHasAllergy
+          ) {
+            return firstHasAllergy
+              ? -1
+              : 1;
+          }
 
-      const secondHasAllergy = patientHasAllergies(second);
+          return getPatientName(
+            first,
+          ).localeCompare(
+            getPatientName(
+              second,
+            ),
+          );
+        },
+      );
+    }, [
+      patients,
+      search,
+      allergyFilter,
+    ]);
 
-      if (firstHasAllergy !== secondHasAllergy) {
-        return firstHasAllergy ? -1 : 1;
-      }
-
-      return getPatientName(first).localeCompare(getPatientName(second));
-    });
-  }, [patients, search, allergyFilter]);
-
-  /* ------------------------------------------------------
-     Add patient
-  ------------------------------------------------------ */
+  /* ======================================================
+     OPEN ADD PATIENT
+  ====================================================== */
 
   const openAddModal = () => {
     setEditingPatient(null);
-    setShowMoreOptions(false);
+
+    setShowMoreOptions(
+      false,
+    );
 
     form.resetFields();
 
-    const firstLocation = patientLocations[0];
+    const firstLocation =
+      patientLocations[0];
 
     form.setFieldsValue({
       name: "",
+
       phone: "",
+
       gender: "Male",
+
       address: "",
 
-      location: "New",
-      distance: 0,
+      location:
+        firstLocation?.city ||
+        undefined,
+
+      distance:
+        firstLocation
+          ?.distance ?? "",
 
       status: "Active",
+
       has_allergies: false,
+
       allergy_details: "",
     });
 
     setModalOpen(true);
   };
 
-  /* ------------------------------------------------------
-     Edit patient
-  ------------------------------------------------------ */
+  /* ======================================================
+     OPEN EDIT PATIENT
+  ====================================================== */
 
-  const openEditModal = (patient) => {
+  const openEditModal = (
+    patient,
+  ) => {
     if (!patient) {
       return;
     }
 
-    const hasAllergy = patientHasAllergies(patient);
+    const hasAllergy =
+      patientHasAllergies(
+        patient,
+      );
 
-    setEditingPatient(patient);
-    setShowMoreOptions(false);
+    setEditingPatient(
+      patient,
+    );
+
+    setShowMoreOptions(
+      false,
+    );
 
     form.resetFields();
 
     form.setFieldsValue({
-      name: getPatientName(patient),
-      phone: getPatientPhone(patient),
+      name:
+        getPatientName(
+          patient,
+        ),
 
-      gender: patient?.gender || undefined,
+      phone:
+        getPatientPhone(
+          patient,
+        ),
 
-      address: patient?.address || "",
+      gender:
+        patient?.gender ||
+        undefined,
 
-      location: getPatientLocation(patient) || undefined,
+      address:
+        patient?.address || "",
 
-      distance: getPatientDistance(patient) || undefined,
+      location:
+        getPatientLocation(
+          patient,
+        ) || undefined,
 
-      status: patient?.status || "Active",
+      distance:
+        getPatientDistance(
+          patient,
+        ),
 
-      has_allergies: hasAllergy,
+      status:
+        patient?.status ||
+        "Active",
 
-      allergy_details: hasAllergy ? getPatientAllergyDetails(patient) : "",
+      has_allergies:
+        hasAllergy,
+
+      allergy_details:
+        hasAllergy
+          ? getPatientAllergyDetails(
+              patient,
+            )
+          : "",
     });
 
     setModalOpen(true);
   };
 
+  /* ======================================================
+     CLOSE ADD / EDIT MODAL
+  ====================================================== */
+
   const closeModal = () => {
     setModalOpen(false);
+
     setEditingPatient(null);
-    setShowMoreOptions(false);
+
+    setShowMoreOptions(
+      false,
+    );
 
     form.resetFields();
   };
 
-  /* ------------------------------------------------------
-     View patient details
-  ------------------------------------------------------ */
+  /* ======================================================
+     VIEW PATIENT
+  ====================================================== */
 
-  const openViewModal = (patient) => {
-    setSelectedPatient(patient);
+  const openViewModal = (
+    patient,
+  ) => {
+    if (!patient) {
+      return;
+    }
+
+    setSelectedPatient(
+      patient,
+    );
+
     setViewModalOpen(true);
   };
 
   const closeViewModal = () => {
     setViewModalOpen(false);
+
     setSelectedPatient(null);
   };
 
-  const handleEditFromDetails = (fullPatient) => {
+  /* ======================================================
+     EDIT FROM PATIENT DETAILS
+  ====================================================== */
+
+  const handleEditFromDetails = (
+    fullPatient,
+  ) => {
     closeViewModal();
 
     if (fullPatient) {
-      openEditModal(fullPatient);
+      openEditModal(
+        fullPatient,
+      );
     }
   };
 
-  /* ------------------------------------------------------
-     Add or update patient
-  ------------------------------------------------------ */
+  /* ======================================================
+     ADD / UPDATE PATIENT
+  ====================================================== */
 
-  const handleSubmit = async () => {
-    try {
-      const values = await form.validateFields();
+  const handleSubmit =
+    async () => {
+      try {
+        const values =
+          await form.validateFields();
 
-      setSaving(true);
+        setSaving(true);
 
-      /* ========================================================
-       Normalize entered phone number
-    ======================================================== */
+        /* ================================================
+           NORMALIZE PHONE
+        ================================================ */
 
-      const normalizedPhone = normalizePhoneNumber(values.phone);
+        const normalizedPhone =
+          normalizePhoneNumber(
+            values.phone,
+          );
 
-      /* ========================================================
-       Check duplicate phone number
-    ======================================================== */
+        /* ================================================
+           DUPLICATE PHONE CHECK
+        ================================================ */
 
-      const duplicatePatient = patients.find((patient) => {
-        const existingPhone = normalizePhoneNumber(patient.phone);
+        const duplicatePatient =
+          patients.find(
+            (patient) => {
+              const existingPhone =
+                normalizePhoneNumber(
+                  getPatientPhone(
+                    patient,
+                  ),
+                );
 
-        if (!existingPhone || existingPhone !== normalizedPhone) {
-          return false;
+              if (
+                !existingPhone ||
+                existingPhone !==
+                  normalizedPhone
+              ) {
+                return false;
+              }
+
+              /*
+               * When editing,
+               * ignore the patient's
+               * own record.
+               */
+              if (
+                editingPatient
+              ) {
+                const currentPatientId =
+                  String(
+                    getPatientId(
+                      editingPatient,
+                    ) || "",
+                  ).trim();
+
+                const existingPatientId =
+                  String(
+                    getPatientId(
+                      patient,
+                    ) || "",
+                  ).trim();
+
+                if (
+                  currentPatientId ===
+                  existingPatientId
+                ) {
+                  return false;
+                }
+              }
+
+              return true;
+            },
+          );
+
+        if (duplicatePatient) {
+          message.error(
+            `Phone number ${normalizedPhone} is already registered to ${
+              getPatientName(
+                duplicatePatient,
+              ) ||
+              "another patient"
+            }`,
+          );
+
+          return;
         }
 
-        // Editing patient
-        if (editingPatient) {
-          const currentPatientId = String(
-            getPatientId(editingPatient) || "",
-          ).trim();
+        /* ================================================
+           LOCATION
+        ================================================ */
 
-          const existingPatientId = String(getPatientId(patient) || "").trim();
+        const selectedLocation =
+          patientLocations.find(
+            (location) =>
+              location.city ===
+              values.location,
+          );
 
-          // Ignore the patient's own record
-          if (currentPatientId === existingPatientId) {
-            return false;
-          }
-        }
+        /* ================================================
+           ALLERGY
+        ================================================ */
 
-        return true;
-      });
+        const hasPatientAllergy =
+          values.has_allergies ===
+          true;
 
-      if (duplicatePatient) {
-        message.error(
-          `Phone number ${normalizedPhone} is already registered to ${
-            duplicatePatient.name || "another patient"
-          }`,
+        /* ================================================
+           PAYLOAD
+        ================================================ */
+
+        const payload = {
+          name:
+            values.name?.trim() ||
+            "",
+
+          phone:
+            normalizedPhone,
+
+          gender:
+            values.gender || "",
+
+          address:
+            values.address?.trim() ||
+            "",
+
+          status:
+            values.status ||
+            "Active",
+
+          location:
+            selectedLocation?.city ||
+            values.location ||
+            "",
+
+          distance:
+            selectedLocation
+              ?.distance ??
+            values.distance ??
+            "",
+
+          has_allergies:
+            hasPatientAllergy,
+
+          allergy_details:
+            hasPatientAllergy
+              ? values.allergy_details?.trim() ||
+                ""
+              : "",
+        };
+
+        console.log(
+          "Patient payload:",
+          payload,
         );
 
-        form.resetFields();
-        return;
-      }
+        /* ================================================
+           UPDATE
+        ================================================ */
 
-      /* ========================================================
-       Location
-    ======================================================== */
+        if (editingPatient) {
+          const patientId =
+            getPatientId(
+              editingPatient,
+            );
 
-      const selectedLocation = patientLocations.find(
-        (location) => location.city === values.location,
-      );
+          if (!patientId) {
+            throw new Error(
+              "Patient ID is missing",
+            );
+          }
 
-      /* ========================================================
-       Allergy
-    ======================================================== */
+          await updatePatient(
+            patientId,
+            payload,
+          );
 
-      const hasPatientAllergy = values.has_allergies === true;
-
-      /* ========================================================
-       Payload
-    ======================================================== */
-
-      const payload = {
-        name: values.name?.trim() || "",
-
-        // Save standardized number
-        phone: normalizedPhone,
-
-        gender: values.gender || "",
-
-        address: values.address?.trim() || "",
-
-        status: values.status || "Active",
-
-        location: selectedLocation?.city || values.location || "",
-
-        distance: selectedLocation?.distance ?? values.distance ?? "",
-
-        has_allergies: hasPatientAllergy,
-
-        allergy_details: hasPatientAllergy
-          ? values.allergy_details?.trim() || ""
-          : "",
-      };
-
-      console.log("Patient payload:", payload);
-
-      /* ========================================================
-       Update / Create Patient
-    ======================================================== */
-
-      if (editingPatient) {
-        const patientId = getPatientId(editingPatient);
-
-        if (!patientId) {
-          throw new Error("Patient ID is missing");
+          message.success(
+            "Patient updated successfully",
+          );
         }
 
-        await updatePatient(patientId, payload);
+        /* ================================================
+           CREATE
+        ================================================ */
 
-        message.success("Patient updated successfully");
-      } else {
-        await createPatient(payload);
+        else {
+          await createPatient(
+            payload,
+          );
 
-        message.success("Patient added successfully");
+          message.success(
+            "Patient added successfully",
+          );
+        }
+
+        closeModal();
+
+        await loadPatients();
+      } catch (error) {
+        if (
+          error?.errorFields
+        ) {
+          return;
+        }
+
+        console.error(
+          "Failed to save patient:",
+          error,
+        );
+
+        message.error(
+          error?.response?.data
+            ?.message ||
+            error?.message ||
+            "Failed to save patient",
+        );
+      } finally {
+        setSaving(false);
       }
+    };
 
-      closeModal();
+  /* ======================================================
+     DELETE PATIENT
+  ====================================================== */
 
-      await loadPatients();
-    } catch (error) {
-      if (error?.errorFields) {
-        return;
+  const handleDelete =
+    async (patient) => {
+      try {
+        const patientId =
+          getPatientId(
+            patient,
+          );
+
+        if (!patientId) {
+          throw new Error(
+            "Patient ID is missing",
+          );
+        }
+
+        await deletePatient(
+          patientId,
+        );
+
+        message.success(
+          "Patient deleted successfully",
+        );
+
+        await loadPatients();
+      } catch (error) {
+        console.error(
+          "Failed to delete patient:",
+          error,
+        );
+
+        message.error(
+          error?.response?.data
+            ?.message ||
+            error?.message ||
+            "Failed to delete patient",
+        );
       }
+    };
 
-      console.error("Failed to save patient:", error);
-
-      message.error(
-        error?.response?.data?.message ||
-          error?.message ||
-          "Failed to save patient",
-      );
-    } finally {
-      setSaving(false);
-    }
-  };
-  /* ------------------------------------------------------
-     Delete patient
-  ------------------------------------------------------ */
-
-  const handleDelete = async (patient) => {
-    try {
-      const patientId = getPatientId(patient);
-
-      if (!patientId) {
-        throw new Error("Patient ID is missing");
-      }
-
-      await deletePatient(patientId);
-
-      message.success("Patient deleted successfully");
-
-      await loadPatients();
-    } catch (error) {
-      console.error("Failed to delete patient:", error);
-
-      message.error(
-        error?.response?.data?.message ||
-          error?.message ||
-          "Failed to delete patient",
-      );
-    }
-  };
-
-  /* ------------------------------------------------------
-     Table columns
-  ------------------------------------------------------ */
+  /* ======================================================
+     TABLE COLUMNS
+  ====================================================== */
 
   const columns = [
     {
       title: "Patient ID",
+
       key: "patient_id",
+
       width: 150,
-      render: (_, record) => (
-        <div className="patient-id-badge">{getPatientId(record) || "-"}</div>
+
+      render: (
+        _,
+        record,
+      ) => (
+        <div className="patient-id-badge">
+          {getPatientId(
+            record,
+          ) || "-"}
+        </div>
       ),
     },
+
     {
       title: "Patient",
-      key: "patient",
-      width: 300,
-      render: (_, record) => {
-        const hasAllergy = patientHasAllergies(record);
 
-        const allergyDetails = getPatientAllergyDetails(record);
+      key: "patient",
+
+      width: 300,
+
+      render: (
+        _,
+        record,
+      ) => {
+        const hasAllergy =
+          patientHasAllergies(
+            record,
+          );
+
+        const allergyDetails =
+          getPatientAllergyDetails(
+            record,
+          );
 
         return (
-          <Space size={11} align="start">
+          <Space
+            size={11}
+            align="start"
+          >
             <Avatar
               size={42}
-              icon={<UserOutlined />}
+              icon={
+                <UserOutlined />
+              }
               className={
                 hasAllergy
                   ? "patient-avatar patient-avatar--allergy"
@@ -705,13 +1244,22 @@ const Patients = () => {
             />
 
             <div className="patient-name-cell">
-              <Space size={6} wrap>
-                <Text strong>{getPatientName(record) || "-"}</Text>
+              <Space
+                size={6}
+                wrap
+              >
+                <Text strong>
+                  {getPatientName(
+                    record,
+                  ) || "-"}
+                </Text>
 
                 {hasAllergy && (
                   <Tag
                     color="red"
-                    icon={<ExclamationCircleFilled />}
+                    icon={
+                      <ExclamationCircleFilled />
+                    }
                     className="allergy-alert-tag"
                   >
                     Allergy
@@ -719,100 +1267,195 @@ const Patients = () => {
                 )}
               </Space>
 
-              {hasAllergy && allergyDetails && (
-                <Tooltip title={allergyDetails}>
-                  <Text type="danger" className="patient-allergy-preview">
-                    {allergyDetails}
-                  </Text>
-                </Tooltip>
-              )}
+              {hasAllergy &&
+                allergyDetails && (
+                  <Tooltip
+                    title={
+                      allergyDetails
+                    }
+                  >
+                    <Text
+                      type="danger"
+                      className="patient-allergy-preview"
+                    >
+                      {
+                        allergyDetails
+                      }
+                    </Text>
+                  </Tooltip>
+                )}
             </div>
           </Space>
         );
       },
     },
+
     {
       title: "Phone",
+
       key: "phone",
+
       width: 170,
-      render: (_, record) => (
+
+      render: (
+        _,
+        record,
+      ) => (
         <Space size={7}>
           <PhoneOutlined className="patient-phone-icon" />
 
-          <Text>{getPatientPhone(record) || "-"}</Text>
+          <Text>
+            {getPatientPhone(
+              record,
+            ) || "-"}
+          </Text>
         </Space>
       ),
     },
-    {
-      title: "Location From the Clinic",
-      key: "location",
-      width: 190,
-      render: (_, record) => {
-        const location = getPatientLocation(record);
 
-        const distance = getPatientDistance(record);
+    {
+      title:
+        "Location From the Clinic",
+
+      key: "location",
+
+      width: 210,
+
+      render: (
+        _,
+        record,
+      ) => {
+        const location =
+          getPatientLocation(
+            record,
+          );
+
+        const distance =
+          getPatientDistance(
+            record,
+          );
 
         return (
           <div className="patient-location-cell">
-            <Text strong>{location || "-"}</Text>
+            <Text strong>
+              {location || "-"}
+            </Text>
 
             {distance !== "" && (
               <Text type="secondary">
-                {" "}
-                {"- ("}
-                {distance} km
+                {" - ("}
+                {distance} km)
               </Text>
             )}
           </div>
         );
       },
     },
+
     {
       title: "Gender",
+
       dataIndex: "gender",
+
       key: "gender",
+
       width: 110,
-      render: (value) => <Text>{value || "-"}</Text>,
+
+      render: (value) => (
+        <Text>
+          {value || "-"}
+        </Text>
+      ),
     },
+
     {
       title: "Address",
+
       dataIndex: "address",
+
       key: "address",
+
       width: 250,
+
       ellipsis: true,
+
       render: (value) => (
-        <Tooltip title={value || ""}>
-          <Text type="secondary">{value || "-"}</Text>
+        <Tooltip
+          title={value || ""}
+        >
+          <Text type="secondary">
+            {value || "-"}
+          </Text>
         </Tooltip>
       ),
     },
+
     {
       title: "Status",
+
       dataIndex: "status",
+
       key: "status",
+
       width: 115,
+
       render: (status) => {
-        const isInactive = normalizeStatus(status) === "inactive";
+        const isInactive =
+          normalizeStatus(
+            status,
+          ) === "inactive";
 
         return (
-          <Tag color={isInactive ? "default" : "green"}>
-            {status || "Active"}
+          <Tag
+            color={
+              isInactive
+                ? "default"
+                : "green"
+            }
+          >
+            {status ||
+              "Active"}
           </Tag>
         );
       },
     },
+
     {
       title: "Actions",
+
       key: "actions",
+
       width: 255,
+
       fixed: "right",
-      render: (_, record) => (
+
+      render: (
+        _,
+        record,
+      ) => (
         <Space size={7}>
-          <Tooltip title="View complete patient details">
+          {/* ============================================
+              VIEW PATIENT
+
+              This now opens:
+              Overview
+              Appointments
+              Treatments
+              Payments
+              Media
+          ============================================ */}
+
+          <Tooltip title="View patient profile, history and media">
             <Button
               size="small"
-              icon={<EyeOutlined />}
-              onClick={() => openViewModal(record)}
+              icon={
+                <EyeOutlined />
+              }
+              onClick={() =>
+                openViewModal(
+                  record,
+                )
+              }
             >
               View
             </Button>
@@ -821,8 +1464,14 @@ const Patients = () => {
           <Button
             type="primary"
             size="small"
-            icon={<EditOutlined />}
-            onClick={() => openEditModal(record)}
+            icon={
+              <EditOutlined />
+            }
+            onClick={() =>
+              openEditModal(
+                record,
+              )
+            }
           >
             Edit
           </Button>
@@ -830,17 +1479,30 @@ const Patients = () => {
           <Popconfirm
             title="Delete Patient"
             description={`Are you sure you want to delete ${
-              getPatientName(record) || "this patient"
+              getPatientName(
+                record,
+              ) ||
+              "this patient"
             }?`}
             okText="Delete"
             cancelText="Cancel"
             okButtonProps={{
               danger: true,
             }}
-            onConfirm={() => handleDelete(record)}
+            onConfirm={() =>
+              handleDelete(
+                record,
+              )
+            }
           >
             <Tooltip title="Delete patient">
-              <Button danger size="small" icon={<DeleteOutlined />} />
+              <Button
+                danger
+                size="small"
+                icon={
+                  <DeleteOutlined />
+                }
+              />
             </Tooltip>
           </Popconfirm>
         </Space>
@@ -848,17 +1510,27 @@ const Patients = () => {
     },
   ];
 
+  /* ======================================================
+     RENDER
+  ====================================================== */
+
   return (
     <ClinicPage
       title="Patients"
-      subtitle="Manage registered patients, allergy information, treatment history and payments."
-      icon={<TeamOutlined />}
+      subtitle="Manage patients, clinical history, payments, allergies and patient media."
+      icon={
+        <TeamOutlined />
+      }
       actions={[
         <Button
           key="refresh"
-          icon={<ReloadOutlined />}
+          icon={
+            <ReloadOutlined />
+          }
           loading={loading}
-          onClick={loadPatients}
+          onClick={
+            loadPatients
+          }
         >
           Refresh
         </Button>,
@@ -866,161 +1538,282 @@ const Patients = () => {
         <Button
           key="add-patient"
           type="primary"
-          icon={<PlusOutlined />}
-          onClick={openAddModal}
+          icon={
+            <PlusOutlined />
+          }
+          onClick={
+            openAddModal
+          }
         >
           Add Patient
         </Button>,
       ]}
     >
-      {/* Patient summary */}
+      {/* ==================================================
+          SUMMARY
+      ================================================== */}
 
-      <Row gutter={[16, 16]} className="patient-summary-row">
-        <Col xs={24} sm={12} xl={6}>
+      <Row
+        gutter={[16, 16]}
+        className="patient-summary-row"
+      >
+        <Col
+          xs={24}
+          sm={12}
+          xl={6}
+        >
           <PatientSummaryCard
             title="Total Patients"
-            value={patientCounts.total}
+            value={
+              patientCounts.total
+            }
             helper="Registered patients"
             tone="blue"
-            icon={<TeamOutlined />}
-            onClick={() => setAllergyFilter("all")}
+            icon={
+              <TeamOutlined />
+            }
+            onClick={() =>
+              setAllergyFilter(
+                "all",
+              )
+            }
           />
         </Col>
 
-        <Col xs={24} sm={12} xl={6}>
+        <Col
+          xs={24}
+          sm={12}
+          xl={6}
+        >
           <PatientSummaryCard
             title="Allergy Alerts"
-            value={patientCounts.allergy}
+            value={
+              patientCounts.allergy
+            }
             helper="Require extra attention"
             tone="red"
-            icon={<ExclamationCircleFilled />}
-            onClick={() => setAllergyFilter("allergy")}
+            icon={
+              <ExclamationCircleFilled />
+            }
+            onClick={() =>
+              setAllergyFilter(
+                "allergy",
+              )
+            }
           />
         </Col>
 
-        <Col xs={24} sm={12} xl={6}>
+        <Col
+          xs={24}
+          sm={12}
+          xl={6}
+        >
           <PatientSummaryCard
             title="Active Patients"
-            value={patientCounts.active}
+            value={
+              patientCounts.active
+            }
             helper="Currently active"
             tone="green"
-            icon={<UserAddOutlined />}
+            icon={
+              <UserAddOutlined />
+            }
           />
         </Col>
 
-        <Col xs={24} sm={12} xl={6}>
+        <Col
+          xs={24}
+          sm={12}
+          xl={6}
+        >
           <PatientSummaryCard
             title="Inactive Patients"
-            value={patientCounts.inactive}
+            value={
+              patientCounts.inactive
+            }
             helper="Inactive records"
             tone="orange"
-            icon={<UserDeleteOutlined />}
+            icon={
+              <UserDeleteOutlined />
+            }
           />
         </Col>
       </Row>
 
-      {/* Patient directory */}
+      {/* ==================================================
+          PATIENT DIRECTORY
+      ================================================== */}
 
-      <Card bordered={false} className="patient-directory-card">
+      <Card
+        bordered={false}
+        className="patient-directory-card"
+      >
         <div className="patient-directory-header">
           <div>
-            <Title level={4}>Patient Directory</Title>
+            <Title level={4}>
+              Patient Directory
+            </Title>
 
             <Text type="secondary">
-              Search, review and manage patient records.
+              Search, review and
+              manage patient records.
             </Text>
           </div>
 
-          <Tag color="blue" className="patient-result-count">
-            {filteredPatients.length} result
-            {filteredPatients.length !== 1 ? "s" : ""}
+          <Tag
+            color="blue"
+            className="patient-result-count"
+          >
+            {
+              filteredPatients.length
+            }{" "}
+            result
+            {filteredPatients.length !==
+            1
+              ? "s"
+              : ""}
           </Tag>
         </div>
 
         <div className="patient-table-toolbar">
           <Input
             allowClear
-            prefix={<SearchOutlined />}
-            placeholder="Search ID, name, phone, address or allergy"
+            prefix={
+              <SearchOutlined />
+            }
+            placeholder="Search ID, name, phone, address, location or allergy"
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) =>
+              setSearch(
+                event.target.value,
+              )
+            }
             className="patient-search-input"
           />
 
           <Segmented
-            value={allergyFilter}
-            onChange={setAllergyFilter}
+            value={
+              allergyFilter
+            }
+            onChange={
+              setAllergyFilter
+            }
             className="patient-allergy-filter"
             options={[
               {
                 label: `All (${patientCounts.total})`,
                 value: "all",
               },
+
               {
                 label: `Allergies (${patientCounts.allergy})`,
-                value: "allergy",
+                value:
+                  "allergy",
               },
+
               {
                 label: `No Allergies (${patientCounts.noAllergy})`,
-                value: "no-allergy",
+                value:
+                  "no-allergy",
               },
             ]}
           />
         </div>
 
         <Table
-          rowKey={(record) => getPatientId(record)}
+          rowKey={(record) =>
+            getPatientId(
+              record,
+            )
+          }
           loading={loading}
           columns={columns}
-          dataSource={filteredPatients}
-          rowClassName={(record) =>
-            patientHasAllergies(record) ? "allergy-patient-row" : ""
+          dataSource={
+            filteredPatients
+          }
+          rowClassName={(
+            record,
+          ) =>
+            patientHasAllergies(
+              record,
+            )
+              ? "allergy-patient-row"
+              : ""
           }
           pagination={{
             pageSize: 8,
-            showSizeChanger: false,
-            showTotal: (total) => `${total} patient${total !== 1 ? "s" : ""}`,
+
+            showSizeChanger:
+              false,
+
+            showTotal: (
+              total,
+            ) =>
+              `${total} patient${
+                total !== 1
+                  ? "s"
+                  : ""
+              }`,
           }}
           scroll={{
-            x: 1540,
+            x: 1560,
           }}
           locale={{
             emptyText: (
               <Empty
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                image={
+                  Empty.PRESENTED_IMAGE_SIMPLE
+                }
                 description={
-                  search || allergyFilter !== "all"
+                  search ||
+                  allergyFilter !==
+                    "all"
                     ? "No matching patients found"
                     : "No patients have been registered"
                 }
               >
-                {!search && allergyFilter === "all" && (
-                  <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={openAddModal}
-                  >
-                    Add First Patient
-                  </Button>
-                )}
+                {!search &&
+                  allergyFilter ===
+                    "all" && (
+                    <Button
+                      type="primary"
+                      icon={
+                        <PlusOutlined />
+                      }
+                      onClick={
+                        openAddModal
+                      }
+                    >
+                      Add First
+                      Patient
+                    </Button>
+                  )}
               </Empty>
             ),
           }}
         />
       </Card>
 
-      {/* Add/Edit patient modal */}
+      {/* ==================================================
+          ADD / EDIT PATIENT
+      ================================================== */}
 
       <Modal
         title={
           <div className="patient-modal-title">
             <div className="patient-modal-title__icon">
-              {editingPatient ? <EditOutlined /> : <UserAddOutlined />}
+              {editingPatient ? (
+                <EditOutlined />
+              ) : (
+                <UserAddOutlined />
+              )}
             </div>
 
             <div>
               <Text strong>
-                {editingPatient ? "Edit Patient" : "Add New Patient"}
+                {editingPatient
+                  ? "Edit Patient"
+                  : "Add New Patient"}
               </Text>
 
               <Text type="secondary">
@@ -1035,9 +1828,17 @@ const Patients = () => {
         onCancel={closeModal}
         onOk={handleSubmit}
         confirmLoading={saving}
-        okText={editingPatient ? "Update Patient" : "Add Patient"}
+        okText={
+          editingPatient
+            ? "Update Patient"
+            : "Add Patient"
+        }
         cancelText="Cancel"
-        width={showMoreOptions ? 920 : 560}
+        width={
+          showMoreOptions
+            ? 920
+            : 560
+        }
         centered
         destroyOnHidden
         className="patient-form-modal"
@@ -1046,12 +1847,27 @@ const Patients = () => {
           form={form}
           layout="vertical"
           initialValues={{
-            has_allergies: false,
+            has_allergies:
+              false,
+
             status: "Active",
           }}
         >
-          <Row gutter={[22, 0]}>
-            <Col xs={24} md={showMoreOptions ? 12 : 24}>
+          <Row
+            gutter={[22, 0]}
+          >
+            <Col
+              xs={24}
+              md={
+                showMoreOptions
+                  ? 12
+                  : 24
+              }
+            >
+              {/* ========================================
+                  BASIC INFORMATION
+              ======================================== */}
+
               <div className="patient-form-section">
                 <div className="patient-form-section__header">
                   <div className="patient-form-section__icon">
@@ -1059,9 +1875,14 @@ const Patients = () => {
                   </div>
 
                   <div>
-                    <Text strong>Basic Information</Text>
+                    <Text strong>
+                      Basic Information
+                    </Text>
 
-                    <Text type="secondary">Required patient details</Text>
+                    <Text type="secondary">
+                      Required patient
+                      details
+                    </Text>
                   </div>
                 </div>
 
@@ -1070,15 +1891,22 @@ const Patients = () => {
                   name="name"
                   rules={[
                     {
-                      required: true,
-                      whitespace: true,
-                      message: "Please enter patient name",
+                      required:
+                        true,
+
+                      whitespace:
+                        true,
+
+                      message:
+                        "Please enter patient name",
                     },
                   ]}
                 >
                   <Input
                     placeholder="Example: Nimal Perera"
-                    prefix={<UserOutlined />}
+                    prefix={
+                      <UserOutlined />
+                    }
                   />
                 </Form.Item>
 
@@ -1087,56 +1915,96 @@ const Patients = () => {
                   name="phone"
                   rules={[
                     {
-                      required: true,
-                      message: "Please enter phone number",
+                      required:
+                        true,
+
+                      message:
+                        "Please enter phone number",
                     },
+
                     {
-                      pattern: /^[0-9]{10}$/,
-                      message: "Please enter a valid 10-digit phone number",
+                      pattern:
+                        /^[0-9]{10}$/,
+
+                      message:
+                        "Please enter a valid 10-digit phone number",
                     },
                   ]}
                 >
                   <Input
                     placeholder="Example: 0771234567"
-                    prefix={<PhoneOutlined />}
+                    prefix={
+                      <PhoneOutlined />
+                    }
                     maxLength={10}
                   />
                 </Form.Item>
+
                 <Form.Item
                   label="Patient Location"
                   name="location"
                   rules={[
                     {
-                      required: true,
-                      message: "Please select the patient's location",
+                      required:
+                        true,
+
+                      message:
+                        "Please select the patient's location",
                     },
                   ]}
                 >
                   <Select
                     showSearch
                     allowClear
-                    placeholder="Search and select city"
-                    options={locationOptions}
-                    optionFilterProp="label"
-                    filterOption={(input, option) =>
-                      String(option?.label || "")
-                        .toLowerCase()
-                        .includes(input.trim().toLowerCase())
+                    loading={
+                      locationsLoading
                     }
-                    onChange={(city) => {
-                      const selectedLocation = patientLocations.find(
-                        (location) => location.city === city,
-                      );
+                    placeholder="Search and select city"
+                    options={
+                      locationOptions
+                    }
+                    optionFilterProp="label"
+                    filterOption={(
+                      input,
+                      option,
+                    ) =>
+                      String(
+                        option?.label ||
+                          "",
+                      )
+                        .toLowerCase()
+                        .includes(
+                          input
+                            .trim()
+                            .toLowerCase(),
+                        )
+                    }
+                    onChange={(
+                      city,
+                    ) => {
+                      const selectedLocation =
+                        patientLocations.find(
+                          (
+                            location,
+                          ) =>
+                            location.city ===
+                            city,
+                        );
 
                       form.setFieldValue(
                         "distance",
-                        selectedLocation?.distance,
+                        selectedLocation
+                          ?.distance ??
+                          "",
                       );
                     }}
                   />
                 </Form.Item>
 
-                <Form.Item label="Distance from Clinic" name="distance">
+                <Form.Item
+                  label="Distance from Clinic"
+                  name="distance"
+                >
                   <Input
                     disabled
                     suffix="km"
@@ -1145,6 +2013,10 @@ const Patients = () => {
                 </Form.Item>
               </div>
 
+              {/* ========================================
+                  ALLERGY INFORMATION
+              ======================================== */}
+
               <div className="patient-form-section patient-allergy-section">
                 <div className="patient-form-section__header">
                   <div className="patient-form-section__icon patient-form-section__icon--allergy">
@@ -1152,9 +2024,14 @@ const Patients = () => {
                   </div>
 
                   <div>
-                    <Text strong>Allergy Information</Text>
+                    <Text strong>
+                      Allergy Information
+                    </Text>
 
-                    <Text type="secondary">Important for patient safety</Text>
+                    <Text type="secondary">
+                      Important for
+                      patient safety
+                    </Text>
                   </div>
                 </div>
 
@@ -1166,16 +2043,21 @@ const Patients = () => {
                     <Button
                       htmlType="button"
                       className={
-                        hasAllergies === false
+                        hasAllergies ===
+                        false
                           ? "allergy-choice allergy-choice--selected-no"
                           : "allergy-choice"
                       }
                       onClick={() => {
-                        form.setFieldsValue({
-                          has_allergies: false,
+                        form.setFieldsValue(
+                          {
+                            has_allergies:
+                              false,
 
-                          allergy_details: "",
-                        });
+                            allergy_details:
+                              "",
+                          },
+                        );
                       }}
                     >
                       No Allergies
@@ -1185,12 +2067,16 @@ const Patients = () => {
                       htmlType="button"
                       danger
                       className={
-                        hasAllergies === true
+                        hasAllergies ===
+                        true
                           ? "allergy-choice allergy-choice--selected-yes"
                           : "allergy-choice"
                       }
                       onClick={() => {
-                        form.setFieldValue("has_allergies", true);
+                        form.setFieldValue(
+                          "has_allergies",
+                          true,
+                        );
                       }}
                     >
                       Has Allergies
@@ -1198,11 +2084,15 @@ const Patients = () => {
                   </div>
                 </Form.Item>
 
-                <Form.Item name="has_allergies" hidden>
+                <Form.Item
+                  name="has_allergies"
+                  hidden
+                >
                   <Input type="hidden" />
                 </Form.Item>
 
-                {hasAllergies === true && (
+                {hasAllergies ===
+                  true && (
                   <Alert
                     type="error"
                     showIcon
@@ -1215,8 +2105,12 @@ const Patients = () => {
                         className="allergy-details-form-item"
                         rules={[
                           {
-                            required: true,
-                            whitespace: true,
+                            required:
+                              true,
+
+                            whitespace:
+                              true,
+
                             message:
                               "Please enter the patient's allergy details",
                           },
@@ -1224,7 +2118,9 @@ const Patients = () => {
                       >
                         <Input.TextArea
                           rows={3}
-                          maxLength={500}
+                          maxLength={
+                            500
+                          }
                           showCount
                           placeholder="Example: Penicillin, latex, peanuts or local anaesthetic"
                         />
@@ -1234,11 +2130,22 @@ const Patients = () => {
                 )}
               </div>
 
+              {/* ========================================
+                  MORE OPTIONS
+              ======================================== */}
+
               <div className="patient-more-options">
                 <Button
                   htmlType="button"
                   type="link"
-                  onClick={() => setShowMoreOptions((previous) => !previous)}
+                  onClick={() =>
+                    setShowMoreOptions(
+                      (
+                        previous,
+                      ) =>
+                        !previous,
+                    )
+                  }
                 >
                   {showMoreOptions
                     ? "Hide additional information"
@@ -1247,8 +2154,15 @@ const Patients = () => {
               </div>
             </Col>
 
+            {/* ==========================================
+                ADDITIONAL INFORMATION
+            ========================================== */}
+
             {showMoreOptions && (
-              <Col xs={24} md={12}>
+              <Col
+                xs={24}
+                md={12}
+              >
                 <div className="patient-form-section patient-form-section--additional">
                   <div className="patient-form-section__header">
                     <div className="patient-form-section__icon patient-form-section__icon--additional">
@@ -1256,34 +2170,57 @@ const Patients = () => {
                     </div>
 
                     <div>
-                      <Text strong>Additional Information</Text>
+                      <Text strong>
+                        Additional
+                        Information
+                      </Text>
 
-                      <Text type="secondary">Optional patient details</Text>
+                      <Text type="secondary">
+                        Optional patient
+                        details
+                      </Text>
                     </div>
                   </div>
 
-                  <Form.Item label="Gender" name="gender">
+                  <Form.Item
+                    label="Gender"
+                    name="gender"
+                  >
                     <Select
                       allowClear
                       placeholder="Select gender"
                       options={[
                         {
-                          label: "Male",
-                          value: "Male",
+                          label:
+                            "Male",
+
+                          value:
+                            "Male",
                         },
+
                         {
-                          label: "Female",
-                          value: "Female",
+                          label:
+                            "Female",
+
+                          value:
+                            "Female",
                         },
+
                         {
-                          label: "Other",
-                          value: "Other",
+                          label:
+                            "Other",
+
+                          value:
+                            "Other",
                         },
                       ]}
                     />
                   </Form.Item>
 
-                  <Form.Item label="Address" name="address">
+                  <Form.Item
+                    label="Address"
+                    name="address"
+                  >
                     <Input.TextArea
                       rows={4}
                       maxLength={500}
@@ -1292,17 +2229,27 @@ const Patients = () => {
                     />
                   </Form.Item>
 
-                  <Form.Item label="Patient Status" name="status">
+                  <Form.Item
+                    label="Patient Status"
+                    name="status"
+                  >
                     <Select
                       placeholder="Select patient status"
                       options={[
                         {
-                          label: "Active",
-                          value: "Active",
+                          label:
+                            "Active",
+
+                          value:
+                            "Active",
                         },
+
                         {
-                          label: "Inactive",
-                          value: "Inactive",
+                          label:
+                            "Inactive",
+
+                          value:
+                            "Inactive",
                         },
                       ]}
                     />
@@ -1314,14 +2261,37 @@ const Patients = () => {
         </Form>
       </Modal>
 
-      {/* Full patient details modal */}
+      {/* ==================================================
+          COMPLETE PATIENT DETAILS
+
+          PatientDetailsModal now contains:
+
+          Overview
+          Appointments
+          Treatments
+          Payments
+          Media
+
+          Media is automatically connected to the
+          currently selected patient.
+      ================================================== */}
 
       <PatientDetailsModal
         open={viewModalOpen}
-        patientId={getPatientId(selectedPatient) || null}
-        initialPatient={selectedPatient}
-        onClose={closeViewModal}
-        onEdit={handleEditFromDetails}
+        patientId={
+          getPatientId(
+            selectedPatient,
+          ) || null
+        }
+        initialPatient={
+          selectedPatient
+        }
+        onClose={
+          closeViewModal
+        }
+        onEdit={
+          handleEditFromDetails
+        }
         showEdit
       />
     </ClinicPage>

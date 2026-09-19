@@ -1,0 +1,76 @@
+.patient-media-upload-patient {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  background: var(
+    --patient-media-patient-bg,
+    #f5f8ff
+  );
+}
+
+.patient-media-upload-patient__icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 18px;
+  color: #1677ff;
+  background: rgba(
+    22,
+    119,
+    255,
+    0.1
+  );
+}
+
+.patient-media-upload-info {
+  margin-bottom: 16px;
+}
+
+.patient-media-upload-dragger {
+  margin-bottom: 18px;
+}
+
+.patient-media-upload-files {
+  margin-top: 18px;
+}
+
+.patient-media-upload-files__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.patient-media-upload-file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  padding: 10px 12px;
+  margin-bottom: 8px;
+
+  border: 1px solid
+    rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+}
+
+.patient-media-upload-file-icon {
+  font-size: 24px;
+  color: #1677ff;
+}
+
+.patient-media-upload-file-icon--pdf {
+  color: #cf1322;
+}
+
+.patient-media-upload-progress {
+  margin-top: 18px;
+}

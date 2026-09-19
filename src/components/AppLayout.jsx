@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   Button,
@@ -17,20 +17,18 @@ import {
   CarryOutOutlined,
   DashboardOutlined,
   DollarOutlined,
-  HistoryOutlined,
+  FileImageOutlined,
   LogoutOutlined,
+  MedicineBoxOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  MedicineBoxOutlined,
+  MessageOutlined,
   PhoneOutlined,
-  ScheduleOutlined,
   SolutionOutlined,
   TeamOutlined,
   UserAddOutlined,
   UserOutlined,
   WalletOutlined,
-  FileImageOutlined,
-  MessageOutlined,
 } from "@ant-design/icons";
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -40,53 +38,72 @@ import { useAuth } from "../context/AuthContext";
 import "./css/AppLayout.css";
 
 const { Header, Sider, Content } = Layout;
-
 const { Title, Text } = Typography;
-
 const { useBreakpoint } = Grid;
 
-/* --------------------------------------------------------
-   Role constants
--------------------------------------------------------- */
+/* ========================================================
+   ROLE CONFIGURATION
+======================================================== */
 
-const ROLES = {
+const ROLES = Object.freeze({
   ADMIN: "Admin",
   DENTIST: "Dentist",
   RECEPTIONIST: "Receptionist",
   CASHIER: "Cashier",
-};
+});
 
-const ALL_ROLES = [
+const ALL_ROLES = Object.freeze([
   ROLES.ADMIN,
   ROLES.DENTIST,
   ROLES.RECEPTIONIST,
   ROLES.CASHIER,
-];
+]);
 
-const CLINIC_ROLES = [ROLES.ADMIN, ROLES.DENTIST, ROLES.RECEPTIONIST];
+const CLINIC_ROLES = Object.freeze([
+  ROLES.ADMIN,
+  ROLES.DENTIST,
+  ROLES.RECEPTIONIST,
+]);
 
-/* --------------------------------------------------------
-   Role helper
--------------------------------------------------------- */
+const PAYMENT_ROLES = Object.freeze([
+  ROLES.ADMIN,
+  ROLES.CASHIER,
+  ROLES.DENTIST,
+]);
 
-const normalizeRole = (role = "") => {
-  return String(role).trim().toLowerCase();
+const DOCTOR_ROLES = Object.freeze([ROLES.ADMIN, ROLES.DENTIST]);
+
+/* ========================================================
+   HELPERS
+======================================================== */
+
+const normalizeRole = (role) =>
+  String(role ?? "")
+    .trim()
+    .toLowerCase();
+
+const hasRoleAccess = (allowedRoles, userRole) => {
+  const normalizedUserRole = normalizeRole(userRole);
+
+  return allowedRoles.some(
+    (role) => normalizeRole(role) === normalizedUserRole,
+  );
 };
 
-/* --------------------------------------------------------
-   Menu items
--------------------------------------------------------- */
+/* ========================================================
+   MENU CONFIGURATION
+======================================================== */
 
-const allMenuItems = [
+const MENU_CONFIG = [
   {
     type: "group",
     label: "Overview",
     children: [
       {
         key: "/",
+        title: "Dashboard",
         icon: <DashboardOutlined />,
         roles: ALL_ROLES,
-        label: <Link to="/">Dashboard</Link>,
       },
     ],
   },
@@ -97,39 +114,28 @@ const allMenuItems = [
     children: [
       {
         key: "/patients",
+        title: "Patients",
         icon: <TeamOutlined />,
         roles: CLINIC_ROLES,
-        label: <Link to="/patients">Patients</Link>,
       },
+
       {
-        key: "/patient-media-upload",
-        icon: <FileImageOutlined />,
-        roles: CLINIC_ROLES,
-        label: <Link to="/patient-media-upload">Patient Media</Link>,
-      },
-      {
-        key: "/patient-media",
-        icon: <FileImageOutlined />,
-        roles: CLINIC_ROLES,
-        label: <Link to="/patient-media">Patient Media Library</Link>,
+        key: "/ortho",
+        title: "Orthodontic Patients",
+        icon: <MedicineBoxOutlined />,
+        roles: ALL_ROLES,
       },
       {
         key: "/dentists",
+        title: "Dentists",
         icon: <MedicineBoxOutlined />,
         roles: [ROLES.ADMIN],
-        label: <Link to="/dentists">Dentists</Link>,
       },
-      // {
-      //   key: "/patient-history",
-      //   icon: <HistoryOutlined />,
-      //   roles: ALL_ROLES,
-      //   label: <Link to="/patient-history">Patient History</Link>,
-      // },
       {
         key: "/follow-up-patients",
+        title: "Follow-up Patients",
         icon: <PhoneOutlined />,
         roles: CLINIC_ROLES,
-        label: <Link to="/follow-up-patients">Follow-up Patients</Link>,
       },
     ],
   },
@@ -140,38 +146,34 @@ const allMenuItems = [
     children: [
       {
         key: "/appointments",
+        title: "Appointments",
         icon: <CalendarOutlined />,
         roles: CLINIC_ROLES,
-        label: <Link to="/appointments">Appointments</Link>,
       },
       {
         key: "/appointment-history",
+        title: "Appointment History",
         icon: <CarryOutOutlined />,
         roles: CLINIC_ROLES,
-        label: <Link to="/appointment-history">Appointment History</Link>,
       },
-{
-        key: "/sms-management",
-        icon: <MessageOutlined />,
-        roles: CLINIC_ROLES,
-        label: <Link to="/sms-management">SMS Management</Link>,
-      },
+      // {
+      //   key: "/sms-management",
+      //   title: "SMS Management",
+      //   icon: <MessageOutlined />,
+      //   roles: CLINIC_ROLES,
+      // },
       {
-        key: "/queue-manager", //simple-appointment-maintenance
+        key: "/queue-manager",
+        title: "Queue Manager",
         icon: <SolutionOutlined />,
         roles: CLINIC_ROLES,
-        label: <Link to="/queue-manager">Queue Manager</Link>,
       },
-      {
-        key: "/simple-appointment-maintenance", //simple-appointment-maintenance
-        icon: <SolutionOutlined />,
-        roles: CLINIC_ROLES,
-        label: (
-          <Link to="/simple-appointment-maintenance">
-            Appointment Maintenance
-          </Link>
-        ),
-      },
+      // {
+      //   key: "/simple-appointment-maintenance",
+      //   title: "Appointment Maintenance",
+      //   icon: <SolutionOutlined />,
+      //   roles: CLINIC_ROLES,
+      // },
     ],
   },
 
@@ -181,114 +183,145 @@ const allMenuItems = [
     children: [
       {
         key: "/current-treatment",
+        title: "Doctor Treatment",
         icon: <MedicineBoxOutlined />,
-        roles: [ROLES.ADMIN, ROLES.DENTIST],
-        label: <Link to="/current-treatment">Doctor Treatment</Link>,
+        roles: DOCTOR_ROLES,
       },
       {
         key: "/cashier-payment",
+        title: "Cashier Payment",
         icon: <WalletOutlined />,
-        roles: [ROLES.ADMIN, ROLES.CASHIER, ROLES.DENTIST],
-        label: <Link to="/cashier-payment">Cashier Payment</Link>,
+        roles: PAYMENT_ROLES,
       },
       {
         key: "/payments",
+        title: "Payments",
         icon: <DollarOutlined />,
-        roles: [ROLES.ADMIN, ROLES.CASHIER, ROLES.DENTIST],
-        label: <Link to="/payments">Payments</Link>,
+        roles: PAYMENT_ROLES,
       },
       {
         key: "/daily-income",
+        title: "Payment History",
         icon: <DollarOutlined />,
-        roles: [ROLES.ADMIN, ROLES.DENTIST],
-        label: <Link to="/daily-income">Payment History</Link>,
+        roles: DOCTOR_ROLES,
       },
     ],
   },
 
- {
-    type: "group",
-    label: "Orthodontic Patients",
-    children: [
-      {
-        key: "/ortho",
-        icon: <MedicineBoxOutlined />,
-        roles: ALL_ROLES,
-        label: <Link to="/ortho">Orthodontic Patients</Link>,
-      },
-    ],
-  },
   {
     type: "group",
     label: "System Administration",
     children: [
       {
         key: "/user-registration",
+        title: "Register User",
         icon: <UserAddOutlined />,
         roles: [ROLES.ADMIN],
-        label: <Link to="/user-registration">Register User</Link>,
       },
       {
         key: "/common-treatments",
+        title: "Common Treatments",
         icon: <MedicineBoxOutlined />,
         roles: [ROLES.ADMIN],
-        label: <Link to="/common-treatments">Common Treatments</Link>,
       },
       {
         key: "/drugs",
+        title: "Drugs",
         icon: <MedicineBoxOutlined />,
         roles: [ROLES.ADMIN],
-        label: <Link to="/drugs">Drugs</Link>,
       },
       {
         key: "/locations",
+        title: "Locations",
         icon: <MedicineBoxOutlined />,
         roles: [ROLES.ADMIN],
-        label: <Link to="/locations">Locations</Link>,
       },
     ],
   },
 ];
 
-/* --------------------------------------------------------
-   Filter menu by user role
--------------------------------------------------------- */
+/* ========================================================
+   BUILD MENU FOR CURRENT ROLE
+======================================================== */
 
-const getMenuItemsByRole = (menuItems, userRole) => {
-  const normalizedUserRole = normalizeRole(userRole);
+const buildMenuItems = (userRole) => {
+  return MENU_CONFIG.reduce((groups, group) => {
+    const children = (group.children ?? [])
+      .filter((item) => hasRoleAccess(item.roles ?? [], userRole))
+      .map(({ roles, title, ...item }) => ({
+        ...item,
+        label: <Link to={item.key}>{title}</Link>,
+      }));
 
-  return menuItems
-    .map((group) => {
-      const allowedChildren = (group.children || [])
-        .filter((item) => {
-          const allowedRoles = item.roles || [];
+    if (children.length === 0) {
+      return groups;
+    }
 
-          return allowedRoles.some(
-            (role) => normalizeRole(role) === normalizedUserRole,
-          );
-        })
-        .map((item) => {
-          const { roles, ...cleanMenuItem } = item;
+    groups.push({
+      type: group.type,
+      label: group.label,
+      children,
+    });
 
-          return cleanMenuItem;
-        });
-
-      return {
-        ...group,
-        children: allowedChildren,
-      };
-    })
-    .filter((group) => group.children.length > 0);
+    return groups;
+  }, []);
 };
 
-/* --------------------------------------------------------
-   Sidebar content
--------------------------------------------------------- */
+/* ========================================================
+   FIND ACTIVE MENU ITEM
+======================================================== */
 
-const SidebarContent = ({ collapsed = false, selectedKey, menuItems }) => {
+const getSelectedMenuKey = (pathname, menuItems) => {
+  if (pathname === "/") {
+    return "/";
+  }
+
+  const items = menuItems.flatMap((group) => group.children ?? []);
+
+  /*
+   * Match:
+   *
+   * /patients
+   * /patients/123
+   *
+   * But avoid accidental matches such as:
+   *
+   * /patient
+   * matching
+   * /patient-media
+   */
+  const matches = items.filter((item) => {
+    if (item.key === "/") {
+      return false;
+    }
+
+    return pathname === item.key || pathname.startsWith(`${item.key}/`);
+  });
+
+  if (matches.length === 0) {
+    return pathname;
+  }
+
+  /*
+   * Longest route wins.
+   *
+   * Example:
+   * /patient-media
+   * should win over any shorter matching route.
+   */
+  return matches.reduce((bestMatch, currentItem) =>
+    currentItem.key.length > bestMatch.key.length ? currentItem : bestMatch,
+  ).key;
+};
+
+/* ========================================================
+   SIDEBAR
+======================================================== */
+
+const SidebarContent = memo(({ collapsed = false, selectedKey, menuItems }) => {
   return (
     <>
-      {/* Opens Queue Display in a new browser tab */}
+      {/* Clinic Brand / Queue Display */}
 
       <a
         href="/patient-queue"
@@ -299,9 +332,9 @@ const SidebarContent = ({ collapsed = false, selectedKey, menuItems }) => {
         aria-label="Open Queue Display in a new tab"
       >
         <div
-          className={`clinic-brand ${
-            collapsed ? "clinic-brand-collapsed" : ""
-          }`}
+          className={["clinic-brand", collapsed ? "clinic-brand-collapsed" : ""]
+            .filter(Boolean)
+            .join(" ")}
         >
           <div className="clinic-brand-logo">
             <MedicineBoxOutlined />
@@ -319,6 +352,8 @@ const SidebarContent = ({ collapsed = false, selectedKey, menuItems }) => {
         </div>
       </a>
 
+      {/* Navigation */}
+
       <div className="clinic-menu-scroll">
         <Menu
           theme="dark"
@@ -331,72 +366,90 @@ const SidebarContent = ({ collapsed = false, selectedKey, menuItems }) => {
       </div>
     </>
   );
-};
+});
 
-/* --------------------------------------------------------
-   Main component
--------------------------------------------------------- */
+SidebarContent.displayName = "SidebarContent";
+
+/* ========================================================
+   APP LAYOUT
+======================================================== */
 
 const AppLayout = ({ children }) => {
   const location = useLocation();
-
   const navigate = useNavigate();
-
   const screens = useBreakpoint();
 
   const { user: currentUser, logout } = useAuth();
 
-  const isMobile = !screens.lg;
-
   const [collapsed, setCollapsed] = useState(false);
-
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const currentUserRole = currentUser?.role || "";
+  /* ======================================================
+     RESPONSIVE STATE
+  ====================================================== */
 
-  /* --------------------------------------------------------
-     Visible menu
-  -------------------------------------------------------- */
+  const isMobile = screens.lg === false;
 
-  const menuItems = useMemo(() => {
-    return getMenuItemsByRole(allMenuItems, currentUserRole);
-  }, [currentUserRole]);
+  /* ======================================================
+     CURRENT USER
+  ====================================================== */
 
-  /* --------------------------------------------------------
-     Close mobile menu after navigation
-  -------------------------------------------------------- */
+  const currentUserRole = currentUser?.role ?? "";
+
+  const currentUserName = currentUser?.name || currentUser?.username || "User";
+
+  const currentUserRoleLabel = currentUser?.role || "Dental Clinic";
+
+  /* ======================================================
+     ROLE-BASED MENU
+  ====================================================== */
+
+  const menuItems = useMemo(
+    () => buildMenuItems(currentUserRole),
+    [currentUserRole],
+  );
+
+  /* ======================================================
+     ACTIVE MENU ITEM
+  ====================================================== */
+
+  const selectedKey = useMemo(
+    () => getSelectedMenuKey(location.pathname, menuItems),
+    [location.pathname, menuItems],
+  );
+
+  /* ======================================================
+     CLOSE MOBILE MENU AFTER NAVIGATION
+  ====================================================== */
 
   useEffect(() => {
-    setMobileMenuOpen(false);
+    if (mobileMenuOpen) {
+      setMobileMenuOpen(false);
+    }
   }, [location.pathname]);
 
-  /* --------------------------------------------------------
-     Selected menu key
-  -------------------------------------------------------- */
+  /* ======================================================
+     SIDEBAR TOGGLE
+  ====================================================== */
 
-  const selectedKey = useMemo(() => {
-    if (location.pathname === "/") {
-      return "/";
+  const handleMenuToggle = useCallback(() => {
+    if (isMobile) {
+      setMobileMenuOpen(true);
+      return;
     }
 
-    const visibleMenuItems = menuItems.flatMap((group) => group.children || []);
+    setCollapsed((currentValue) => !currentValue);
+  }, [isMobile]);
 
-    const matchedItems = visibleMenuItems.filter(
-      (item) => item.key !== "/" && location.pathname.startsWith(item.key),
-    );
+  const handleMobileMenuClose = useCallback(() => {
+    setMobileMenuOpen(false);
+  }, []);
 
-    matchedItems.sort(
-      (firstItem, secondItem) => secondItem.key.length - firstItem.key.length,
-    );
+  /* ======================================================
+     LOGOUT
+  ====================================================== */
 
-    return matchedItems[0]?.key || location.pathname;
-  }, [location.pathname, menuItems]);
-
-  /* --------------------------------------------------------
-     Logout
-  -------------------------------------------------------- */
-
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     logout();
 
     message.success("Logged out successfully.");
@@ -404,54 +457,72 @@ const AppLayout = ({ children }) => {
     navigate("/login", {
       replace: true,
     });
-  };
+  }, [logout, navigate]);
 
-  /* --------------------------------------------------------
-     Profile dropdown
-  -------------------------------------------------------- */
+  /* ======================================================
+     PROFILE MENU
+  ====================================================== */
 
-  const profileMenuItems = [
-    {
-      key: "profile-information",
-      disabled: true,
-      label: (
-        <div className="clinic-dropdown-user">
-          <Text strong>
-            {currentUser?.name || currentUser?.username || "User"}
-          </Text>
+  const profileMenuItems = useMemo(
+    () => [
+      {
+        key: "profile-information",
+        disabled: true,
+        label: (
+          <div className="clinic-dropdown-user">
+            <Text strong>{currentUserName}</Text>
 
-          <Text type="secondary" className="clinic-dropdown-role">
-            {currentUser?.role || "Dental Clinic"}
-          </Text>
-
-          {currentUser?.email && (
-            <Text type="secondary" className="clinic-dropdown-email">
-              {currentUser.email}
+            <Text type="secondary" className="clinic-dropdown-role">
+              {currentUserRoleLabel}
             </Text>
-          )}
-        </div>
-      ),
-    },
-    {
-      type: "divider",
-    },
-    {
-      key: "logout",
-      danger: true,
-      icon: <LogoutOutlined />,
-      label: "Logout",
-    },
-  ];
 
-  const handleProfileMenuClick = ({ key }) => {
-    if (key === "logout") {
-      handleLogout();
-    }
-  };
+            {currentUser?.email && (
+              <Text type="secondary" className="clinic-dropdown-email">
+                {currentUser.email}
+              </Text>
+            )}
+          </div>
+        ),
+      },
+
+      {
+        type: "divider",
+      },
+
+      {
+        key: "logout",
+        danger: true,
+        icon: <LogoutOutlined />,
+        label: "Logout",
+      },
+    ],
+    [currentUser?.email, currentUserName, currentUserRoleLabel],
+  );
+
+  const handleProfileMenuClick = useCallback(
+    ({ key }) => {
+      if (key === "logout") {
+        handleLogout();
+      }
+    },
+    [handleLogout],
+  );
+
+  /* ======================================================
+     SIDEBAR WIDTH
+  ====================================================== */
+
+  const sidebarWidth = collapsed ? 84 : 270;
+
+  /* ======================================================
+     RENDER
+  ====================================================== */
 
   return (
     <Layout className="clinic-app-layout">
-      {/* Desktop sidebar */}
+      {/* ==================================================
+          DESKTOP SIDEBAR
+      ================================================== */}
 
       {!isMobile && (
         <Sider
@@ -470,13 +541,15 @@ const AppLayout = ({ children }) => {
         </Sider>
       )}
 
-      {/* Mobile sidebar */}
+      {/* ==================================================
+          MOBILE SIDEBAR
+      ================================================== */}
 
       <Drawer
         placement="left"
         width={280}
         open={mobileMenuOpen}
-        onClose={() => setMobileMenuOpen(false)}
+        onClose={handleMobileMenuClose}
         closable={false}
         className="clinic-mobile-drawer"
         styles={{
@@ -492,16 +565,22 @@ const AppLayout = ({ children }) => {
         />
       </Drawer>
 
-      {/* Main layout */}
+      {/* ==================================================
+          MAIN LAYOUT
+      ================================================== */}
 
       <Layout
         className="clinic-main-layout"
         style={{
-          marginLeft: isMobile ? 0 : collapsed ? 84 : 270,
+          marginLeft: isMobile ? 0 : sidebarWidth,
         }}
       >
+        {/* =================================================
+            HEADER
+        ================================================= */}
+
         <Header className="clinic-header">
-          {/* Header left */}
+          {/* Header Left */}
 
           <Space size={14}>
             <Button
@@ -521,15 +600,7 @@ const AppLayout = ({ children }) => {
                   <MenuFoldOutlined />
                 )
               }
-              onClick={() => {
-                if (isMobile) {
-                  setMobileMenuOpen(true);
-
-                  return;
-                }
-
-                setCollapsed((currentValue) => !currentValue);
-              }}
+              onClick={handleMenuToggle}
             />
 
             <div className="clinic-header-information">
@@ -543,7 +614,7 @@ const AppLayout = ({ children }) => {
             </div>
           </Space>
 
-          {/* Header right */}
+          {/* Header Right */}
 
           <Dropdown
             menu={{
@@ -565,12 +636,10 @@ const AppLayout = ({ children }) => {
 
                 {!isMobile && (
                   <div className="clinic-admin-details">
-                    <Text className="clinic-admin-name">
-                      {currentUser?.name || currentUser?.username || "User"}
-                    </Text>
+                    <Text className="clinic-admin-name">{currentUserName}</Text>
 
                     <Text className="clinic-admin-role">
-                      {currentUser?.role || "Dental Clinic"}
+                      {currentUserRoleLabel}
                     </Text>
                   </div>
                 )}
@@ -578,6 +647,10 @@ const AppLayout = ({ children }) => {
             </Button>
           </Dropdown>
         </Header>
+
+        {/* =================================================
+            PAGE CONTENT
+        ================================================= */}
 
         <Content className="clinic-content">
           <div className="clinic-content-container">{children}</div>

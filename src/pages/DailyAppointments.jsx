@@ -82,7 +82,7 @@ const COMPLETED_STATUSES = [
 
 const getDefaultDateRange = () => {
   return [
-    dayjs().startOf("month"),
+    dayjs().subtract(6, "day").startOf("day"),
     dayjs(),
   ];
 };

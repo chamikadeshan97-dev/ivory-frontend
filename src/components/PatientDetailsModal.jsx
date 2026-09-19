@@ -30,6 +30,7 @@ import {
   DollarOutlined,
   EditOutlined,
   ExclamationCircleOutlined,
+  FileImageOutlined,
   HistoryOutlined,
   MedicineBoxOutlined,
   PhoneOutlined,
@@ -43,6 +44,8 @@ import {
   getPatientFullDetails,
 } from "../api/endPoints";
 
+import PatientMediaTab from "./patient-media/PatientMediaTab";
+
 import "./css/PatientDetailsModal.css";
 
 const {
@@ -50,9 +53,9 @@ const {
   Text,
 } = Typography;
 
-/* --------------------------------------------------------
-   General helpers
--------------------------------------------------------- */
+/* ========================================================
+   GENERAL HELPERS
+======================================================== */
 
 const toBoolean = (value) => {
   return (
@@ -112,22 +115,9 @@ const formatDate = (value) => {
   );
 };
 
-const formatDateTime = (
-  date,
-  time,
-) => {
-  if (!date) {
-    return "-";
-  }
-
-  return `${formatDate(date)}${
-    time ? ` at ${time}` : ""
-  }`;
-};
-
-/* --------------------------------------------------------
-   Payment helpers
--------------------------------------------------------- */
+/* ========================================================
+   PAYMENT HELPERS
+======================================================== */
 
 const getPaymentStatus = (
   payment,
@@ -147,7 +137,9 @@ const getPaymentStatus = (
     return "Full";
   }
 
-  if (savedStatus === "partial") {
+  if (
+    savedStatus === "partial"
+  ) {
     return "Partial";
   }
 
@@ -193,9 +185,9 @@ const appointmentStatusColors = {
   Cancelled: "error",
 };
 
-/* --------------------------------------------------------
-   Summary card
--------------------------------------------------------- */
+/* ========================================================
+   SUMMARY CARD
+======================================================== */
 
 const PatientHistorySummaryCard = ({
   title,
@@ -237,9 +229,9 @@ const PatientHistorySummaryCard = ({
   );
 };
 
-/* --------------------------------------------------------
-   Patient details modal
--------------------------------------------------------- */
+/* ========================================================
+   PATIENT DETAILS MODAL
+======================================================== */
 
 const PatientDetailsModal = ({
   open,
@@ -249,36 +241,65 @@ const PatientDetailsModal = ({
   onEdit,
   showEdit = true,
 }) => {
-  const [loading, setLoading] =
-    useState(false);
+  /* ======================================================
+     STATE
+  ====================================================== */
 
-  const [details, setDetails] =
-    useState(null);
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
 
-  const [activeTab, setActiveTab] =
-    useState("overview");
+  const [
+    details,
+    setDetails,
+  ] = useState(null);
+
+  const [
+    activeTab,
+    setActiveTab,
+  ] = useState(
+    "overview",
+  );
+
+  /*
+   * Media count is maintained by
+   * PatientMediaTab.
+   */
+  const [
+    mediaCount,
+    setMediaCount,
+  ] = useState(0);
+
+  /* ======================================================
+     SELECTED PATIENT ID
+  ====================================================== */
 
   const selectedPatientId =
     patientId ||
     initialPatient?.id ||
     initialPatient?.patient_id;
 
-  /* ------------------------------------------------------
-     Reset selected tab
-  ------------------------------------------------------ */
+  /* ======================================================
+     RESET WHEN PATIENT CHANGES
+  ====================================================== */
 
   useEffect(() => {
     if (open) {
-      setActiveTab("overview");
+      setActiveTab(
+        "overview",
+      );
+
+      setMediaCount(0);
     }
   }, [
     open,
     selectedPatientId,
   ]);
 
-  /* ------------------------------------------------------
-     Load complete patient details
-  ------------------------------------------------------ */
+  /* ======================================================
+     LOAD COMPLETE PATIENT DETAILS
+  ====================================================== */
 
   useEffect(() => {
     if (!open) {
@@ -292,51 +313,64 @@ const PatientDetailsModal = ({
 
     let cancelled = false;
 
-    const loadDetails = async () => {
-      setLoading(true);
+    const loadDetails =
+      async () => {
+        setLoading(true);
 
-      try {
-        const response =
-          await getPatientFullDetails(
-            selectedPatientId,
+        try {
+          const response =
+            await getPatientFullDetails(
+              selectedPatientId,
+            );
+
+          const data =
+            response?.data
+              ?.data ||
+            response?.data ||
+            null;
+
+          if (!cancelled) {
+            setDetails(
+              data,
+            );
+          }
+        } catch (error) {
+          console.error(
+            "Failed to load patient details:",
+            error,
           );
 
-        const data =
-          response?.data?.data ||
-          response?.data ||
-          null;
+          if (!cancelled) {
+            setDetails({
+              patient:
+                initialPatient,
 
-        if (!cancelled) {
-          setDetails(data);
-        }
-      } catch (error) {
-        console.error(
-          "Failed to load patient details:",
-          error,
-        );
+              summary: {},
 
-        if (!cancelled) {
-          setDetails({
-            patient: initialPatient,
-            summary: {},
-            appointments: [],
-            treatments: [],
-            payments: [],
-          });
+              appointments:
+                [],
 
-          message.error(
-            error?.response?.data
-              ?.message ||
-              error?.message ||
-              "Failed to load patient details",
-          );
+              treatments: [],
+
+              payments: [],
+            });
+
+            message.error(
+              error?.response
+                ?.data
+                ?.message ||
+                error?.message ||
+                "Failed to load patient details",
+            );
+          }
+        } finally {
+          if (!cancelled) {
+            setLoading(
+              false,
+            );
+          }
         }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    };
+      };
 
     loadDetails();
 
@@ -349,9 +383,9 @@ const PatientDetailsModal = ({
     initialPatient,
   ]);
 
-  /* ------------------------------------------------------
-     Response data
-  ------------------------------------------------------ */
+  /* ======================================================
+     RESPONSE DATA
+  ====================================================== */
 
   const patient =
     details?.patient ||
@@ -359,23 +393,27 @@ const PatientDetailsModal = ({
     null;
 
   const summary =
-    details?.summary || {};
+    details?.summary ||
+    {};
 
-  const appointments = toArray(
-    details?.appointments,
-  );
+  const appointments =
+    toArray(
+      details?.appointments,
+    );
 
-  const treatments = toArray(
-    details?.treatments,
-  );
+  const treatments =
+    toArray(
+      details?.treatments,
+    );
 
-  const payments = toArray(
-    details?.payments,
-  );
+  const payments =
+    toArray(
+      details?.payments,
+    );
 
-  /* ------------------------------------------------------
-     Patient values
-  ------------------------------------------------------ */
+  /* ======================================================
+     PATIENT VALUES
+  ====================================================== */
 
   const patientName =
     patient?.name ||
@@ -404,7 +442,9 @@ const PatientDetailsModal = ({
         patient?.is_allergies,
     ) ||
     Boolean(
-      String(allergyDetails).trim(),
+      String(
+        allergyDetails,
+      ).trim(),
     );
 
   const isInactive =
@@ -412,79 +452,100 @@ const PatientDetailsModal = ({
       patient?.status,
     ) === "inactive";
 
-  /* ------------------------------------------------------
-     Summary fallbacks
-  ------------------------------------------------------ */
+  /* ======================================================
+     SUMMARY FALLBACKS
+  ====================================================== */
 
-  const calculatedSummary = useMemo(() => {
-    const totalPaid =
-      payments.reduce(
-        (total, payment) =>
-          total +
-          toNumber(
-            payment?.payment_amount ??
-              payment?.amount,
-          ),
-        0,
-      );
-
-    const totalCharges =
-      treatments.reduce(
-        (total, treatment) =>
-          total +
-          toNumber(
-            treatment?.treatment_fee ??
-              treatment?.treatment_charge,
-          ),
-        0,
-      );
-
-    const fullPayments =
-      payments.filter(
-        (payment) =>
-          getPaymentStatus(
+  const calculatedSummary =
+    useMemo(() => {
+      const totalPaid =
+        payments.reduce(
+          (
+            total,
             payment,
-          ) === "Full",
-      ).length;
+          ) =>
+            total +
+            toNumber(
+              payment?.payment_amount ??
+                payment?.amount,
+            ),
+          0,
+        );
 
-    const partialPayments =
-      payments.filter(
-        (payment) =>
-          getPaymentStatus(
-            payment,
-          ) === "Partial",
-      ).length;
+      const totalCharges =
+        treatments.reduce(
+          (
+            total,
+            treatment,
+          ) =>
+            total +
+            toNumber(
+              treatment?.treatment_fee ??
+                treatment?.treatment_charge,
+            ),
+          0,
+        );
 
-    return {
-      totalPaid,
-      totalCharges,
-      fullPayments,
-      partialPayments,
+      const fullPayments =
+        payments.filter(
+          (payment) =>
+            getPaymentStatus(
+              payment,
+            ) === "Full",
+        ).length;
 
-      outstanding: Math.max(
-        totalCharges - totalPaid,
-        0,
-      ),
-    };
-  }, [
-    treatments,
-    payments,
-  ]);
+      const partialPayments =
+        payments.filter(
+          (payment) =>
+            getPaymentStatus(
+              payment,
+            ) ===
+            "Partial",
+        ).length;
+
+      return {
+        totalPaid,
+
+        totalCharges,
+
+        fullPayments,
+
+        partialPayments,
+
+        outstanding:
+          Math.max(
+            totalCharges -
+              totalPaid,
+            0,
+          ),
+      };
+    }, [
+      treatments,
+      payments,
+    ]);
 
   const outstandingBalance =
     summary.outstanding_balance ??
     calculatedSummary.outstanding;
 
-  /* ------------------------------------------------------
-     Appointment columns
-  ------------------------------------------------------ */
+  /* ======================================================
+     APPOINTMENT COLUMNS
+  ====================================================== */
 
   const appointmentColumns = [
     {
-      title: "Appointment ID",
-      key: "appointment_id",
+      title:
+        "Appointment ID",
+
+      key:
+        "appointment_id",
+
       width: 155,
-      render: (_, record) => (
+
+      render: (
+        _,
+        record,
+      ) => (
         <div className="patient-history-id">
           {record?.appointment_id ||
             record?.id ||
@@ -492,11 +553,19 @@ const PatientDetailsModal = ({
         </div>
       ),
     },
+
     {
-      title: "Date and Time",
+      title:
+        "Date and Time",
+
       key: "date_time",
+
       width: 190,
-      render: (_, record) => (
+
+      render: (
+        _,
+        record,
+      ) => (
         <div>
           <Text strong>
             {formatDate(
@@ -513,21 +582,34 @@ const PatientDetailsModal = ({
         </div>
       ),
     },
+
     {
       title: "Reason",
+
       key: "reason",
-      render: (_, record) => (
+
+      render: (
+        _,
+        record,
+      ) => (
         <Text type="secondary">
           {record?.reason_for_visit ||
             "-"}
         </Text>
       ),
     },
+
     {
       title: "Status",
+
       key: "status",
+
       width: 145,
-      render: (_, record) => {
+
+      render: (
+        _,
+        record,
+      ) => {
         const status =
           record?.status ||
           "Unknown";
@@ -537,7 +619,8 @@ const PatientDetailsModal = ({
             color={
               appointmentStatusColors[
                 status
-              ] || "default"
+              ] ||
+              "default"
             }
           >
             {status}
@@ -547,16 +630,24 @@ const PatientDetailsModal = ({
     },
   ];
 
-  /* ------------------------------------------------------
-     Treatment columns
-  ------------------------------------------------------ */
+  /* ======================================================
+     TREATMENT COLUMNS
+  ====================================================== */
 
   const treatmentColumns = [
     {
-      title: "Treatment ID",
-      key: "treatment_id",
+      title:
+        "Treatment ID",
+
+      key:
+        "treatment_id",
+
       width: 150,
-      render: (_, record) => (
+
+      render: (
+        _,
+        record,
+      ) => (
         <div className="patient-history-id patient-history-id--purple">
           {record?.treatment_id ||
             record?.id ||
@@ -564,11 +655,18 @@ const PatientDetailsModal = ({
         </div>
       ),
     },
+
     {
       title: "Treatment",
+
       key: "treatment",
+
       width: 210,
-      render: (_, record) => (
+
+      render: (
+        _,
+        record,
+      ) => (
         <Text strong>
           {record?.treatment_performed ||
             record?.treatment_name ||
@@ -576,20 +674,33 @@ const PatientDetailsModal = ({
         </Text>
       ),
     },
+
     {
       title: "Date",
+
       key: "date",
+
       width: 140,
-      render: (_, record) =>
+
+      render: (
+        _,
+        record,
+      ) =>
         formatDate(
           record?.treatment_date ||
             record?.created_at,
         ),
     },
+
     {
       title: "Notes",
+
       key: "notes",
-      render: (_, record) => (
+
+      render: (
+        _,
+        record,
+      ) => (
         <Text type="secondary">
           {record?.doctor_notes ||
             record?.notes ||
@@ -598,21 +709,37 @@ const PatientDetailsModal = ({
         </Text>
       ),
     },
+
     {
       title: "Next Visit",
-      key: "next_appointment",
+
+      key:
+        "next_appointment",
+
       width: 145,
-      render: (_, record) =>
+
+      render: (
+        _,
+        record,
+      ) =>
         formatDate(
           record?.next_appointment_date,
         ),
     },
+
     {
       title: "Fee",
+
       key: "fee",
+
       align: "right",
+
       width: 145,
-      render: (_, record) => (
+
+      render: (
+        _,
+        record,
+      ) => (
         <Text strong>
           {formatCurrency(
             record?.treatment_fee ??
@@ -623,16 +750,23 @@ const PatientDetailsModal = ({
     },
   ];
 
-  /* ------------------------------------------------------
-     Payment columns
-  ------------------------------------------------------ */
+  /* ======================================================
+     PAYMENT COLUMNS
+  ====================================================== */
 
   const paymentColumns = [
     {
-      title: "Payment ID",
+      title:
+        "Payment ID",
+
       key: "payment_id",
+
       width: 145,
-      render: (_, record) => (
+
+      render: (
+        _,
+        record,
+      ) => (
         <div className="patient-history-id patient-history-id--green">
           {record?.payment_id ||
             record?.id ||
@@ -640,40 +774,69 @@ const PatientDetailsModal = ({
         </div>
       ),
     },
+
     {
       title: "Receipt",
+
       key: "receipt",
+
       width: 145,
-      render: (_, record) => (
+
+      render: (
+        _,
+        record,
+      ) => (
         <Text strong>
           {record?.receipt_number ||
             "-"}
         </Text>
       ),
     },
+
     {
       title: "Date",
+
       key: "date",
+
       width: 140,
-      render: (_, record) =>
+
+      render: (
+        _,
+        record,
+      ) =>
         formatDate(
           record?.payment_date,
         ),
     },
+
     {
       title: "Method",
+
       key: "method",
+
       width: 140,
-      render: (_, record) =>
+
+      render: (
+        _,
+        record,
+      ) =>
         record?.payment_method ||
         "-",
     },
+
     {
       title: "Amount",
+
       key: "amount",
+
       align: "right",
+
       width: 160,
-      render: (_, record) => (
+
+      render: (
+        _,
+        record,
+      ) => (
         <Text strong>
           {formatCurrency(
             record?.payment_amount ??
@@ -682,13 +845,22 @@ const PatientDetailsModal = ({
         </Text>
       ),
     },
+
     {
       title: "Status",
+
       key: "status",
+
       width: 120,
-      render: (_, record) => {
+
+      render: (
+        _,
+        record,
+      ) => {
         const status =
-          getPaymentStatus(record);
+          getPaymentStatus(
+            record,
+          );
 
         return (
           <Tag
@@ -705,12 +877,16 @@ const PatientDetailsModal = ({
     },
   ];
 
-  /* ------------------------------------------------------
-     Overview
-  ------------------------------------------------------ */
+  /* ======================================================
+     OVERVIEW CONTENT
+  ====================================================== */
 
   const overviewContent = (
     <div className="patient-overview">
+      {/* ================================================
+          ALLERGY WARNING
+      ================================================ */}
+
       {hasAllergies && (
         <Alert
           type="error"
@@ -726,6 +902,10 @@ const PatientDetailsModal = ({
           className="patient-overview-allergy-alert"
         />
       )}
+
+      {/* ================================================
+          PATIENT INFORMATION
+      ================================================ */}
 
       <Card
         bordered={false}
@@ -815,7 +995,8 @@ const PatientDetailsModal = ({
                     <ExclamationCircleOutlined />
                   }
                 >
-                  Allergy Recorded
+                  Allergy
+                  Recorded
                 </Tag>
 
                 <Text type="danger">
@@ -830,12 +1011,17 @@ const PatientDetailsModal = ({
                   <CheckCircleOutlined />
                 }
               >
-                No known allergies
+                No known
+                allergies
               </Tag>
             )}
           </Descriptions.Item>
         </Descriptions>
       </Card>
+
+      {/* ================================================
+          PATIENT SUMMARY
+      ================================================ */}
 
       <div className="patient-details-section-heading patient-details-section-heading--summary">
         <div>
@@ -844,13 +1030,16 @@ const PatientDetailsModal = ({
           </Title>
 
           <Text type="secondary">
-            Appointment, treatment and
-            payment activity.
+            Appointment,
+            treatment and payment
+            activity.
           </Text>
         </div>
       </div>
 
-      <Row gutter={[14, 14]}>
+      <Row
+        gutter={[14, 14]}
+      >
         <Col
           xs={24}
           sm={12}
@@ -949,7 +1138,9 @@ const PatientDetailsModal = ({
         >
           <PatientHistorySummaryCard
             title="Outstanding Balance"
-            value={outstandingBalance}
+            value={
+              outstandingBalance
+            }
             tone={
               toNumber(
                 outstandingBalance,
@@ -967,46 +1158,68 @@ const PatientDetailsModal = ({
     </div>
   );
 
-  /* ------------------------------------------------------
-     Tabs
-  ------------------------------------------------------ */
+  /* ======================================================
+     TABS
+  ====================================================== */
 
   const tabs = [
+    /* ====================================================
+       OVERVIEW
+    ==================================================== */
+
     {
       key: "overview",
+
       label: (
         <Space size={7}>
           <UserOutlined />
+
           Overview
         </Space>
       ),
-      children: overviewContent,
+
+      children:
+        overviewContent,
     },
+
+    /* ====================================================
+       APPOINTMENTS
+    ==================================================== */
+
     {
-      key: "appointments",
+      key:
+        "appointments",
+
       label: (
         <Space size={7}>
           <CalendarOutlined />
+
           Appointments
 
           <Tag className="patient-tab-count">
-            {appointments.length}
+            {
+              appointments.length
+            }
           </Tag>
         </Space>
       ),
+
       children:
-        appointments.length > 0 ? (
+        appointments.length >
+        0 ? (
           <div className="patient-history-section">
             <div className="patient-details-section-heading">
               <div>
                 <Title level={4}>
-                  Appointment History
+                  Appointment
+                  History
                 </Title>
 
                 <Text type="secondary">
-                  Previous and current
-                  appointments for this
-                  patient.
+                  Previous and
+                  current
+                  appointments for
+                  this patient.
                 </Text>
               </div>
             </div>
@@ -1028,8 +1241,12 @@ const PatientDetailsModal = ({
               }
               pagination={{
                 pageSize: 5,
-                showSizeChanger: false,
-                hideOnSinglePage: true,
+
+                showSizeChanger:
+                  false,
+
+                hideOnSinglePage:
+                  true,
               }}
               scroll={{
                 x: 800,
@@ -1046,29 +1263,43 @@ const PatientDetailsModal = ({
           />
         ),
     },
+
+    /* ====================================================
+       TREATMENTS
+    ==================================================== */
+
     {
-      key: "treatments",
+      key:
+        "treatments",
+
       label: (
         <Space size={7}>
           <MedicineBoxOutlined />
+
           Treatments
 
           <Tag className="patient-tab-count">
-            {treatments.length}
+            {
+              treatments.length
+            }
           </Tag>
         </Space>
       ),
+
       children:
-        treatments.length > 0 ? (
+        treatments.length >
+        0 ? (
           <div className="patient-history-section">
             <div className="patient-details-section-heading">
               <div>
                 <Title level={4}>
-                  Treatment History
+                  Treatment
+                  History
                 </Title>
 
                 <Text type="secondary">
-                  Diagnoses, treatments,
+                  Diagnoses,
+                  treatments,
                   doctor notes and
                   follow-up dates.
                 </Text>
@@ -1087,11 +1318,17 @@ const PatientDetailsModal = ({
               columns={
                 treatmentColumns
               }
-              dataSource={treatments}
+              dataSource={
+                treatments
+              }
               pagination={{
                 pageSize: 5,
-                showSizeChanger: false,
-                hideOnSinglePage: true,
+
+                showSizeChanger:
+                  false,
+
+                hideOnSinglePage:
+                  true,
               }}
               scroll={{
                 x: 1000,
@@ -1108,30 +1345,44 @@ const PatientDetailsModal = ({
           />
         ),
     },
+
+    /* ====================================================
+       PAYMENTS
+    ==================================================== */
+
     {
       key: "payments",
+
       label: (
         <Space size={7}>
           <DollarOutlined />
+
           Payments
 
           <Tag className="patient-tab-count">
-            {payments.length}
+            {
+              payments.length
+            }
           </Tag>
         </Space>
       ),
+
       children:
-        payments.length > 0 ? (
+        payments.length >
+        0 ? (
           <div className="patient-history-section">
             <div className="patient-details-section-heading">
               <div>
                 <Title level={4}>
-                  Payment History
+                  Payment
+                  History
                 </Title>
 
                 <Text type="secondary">
-                  Receipts, payment methods
-                  and payment status.
+                  Receipts,
+                  payment methods
+                  and payment
+                  status.
                 </Text>
               </div>
             </div>
@@ -1149,11 +1400,17 @@ const PatientDetailsModal = ({
               columns={
                 paymentColumns
               }
-              dataSource={payments}
+              dataSource={
+                payments
+              }
               pagination={{
                 pageSize: 5,
-                showSizeChanger: false,
-                hideOnSinglePage: true,
+
+                showSizeChanger:
+                  false,
+
+                hideOnSinglePage:
+                  true,
               }}
               scroll={{
                 x: 850,
@@ -1170,7 +1427,43 @@ const PatientDetailsModal = ({
           />
         ),
     },
+
+    /* ====================================================
+       MEDIA
+    ==================================================== */
+
+    {
+      key: "media",
+
+      label: (
+        <Space size={7}>
+          <FileImageOutlined />
+
+          Media
+
+          <Tag className="patient-tab-count">
+            {mediaCount}
+          </Tag>
+        </Space>
+      ),
+
+      children: (
+        <PatientMediaTab
+          patientId={
+            displayPatientId
+          }
+          patient={patient}
+          onCountChange={
+            setMediaCount
+          }
+        />
+      ),
+    },
   ];
+
+  /* ======================================================
+     RENDER
+  ====================================================== */
 
   return (
     <Modal
@@ -1193,7 +1486,8 @@ const PatientDetailsModal = ({
           Close
         </Button>,
 
-        ...(showEdit && onEdit
+        ...(showEdit &&
+        onEdit
           ? [
               <Button
                 key="edit"
@@ -1201,9 +1495,13 @@ const PatientDetailsModal = ({
                 icon={
                   <EditOutlined />
                 }
-                disabled={!patient}
+                disabled={
+                  !patient
+                }
                 onClick={() =>
-                  onEdit(patient)
+                  onEdit(
+                    patient,
+                  )
                 }
               >
                 Edit Patient
@@ -1213,18 +1511,28 @@ const PatientDetailsModal = ({
       ]}
       styles={{
         body: {
-          maxHeight: "80vh",
-          overflowY: "auto",
+          maxHeight:
+            "80vh",
+
+          overflowY:
+            "auto",
         },
       }}
     >
-      <Spin spinning={loading}>
-        {!patient && !loading ? (
+      <Spin
+        spinning={loading}
+      >
+        {!patient &&
+        !loading ? (
           <div className="patient-details-empty">
             <Empty description="Patient details not available" />
           </div>
         ) : (
           <>
+            {/* ============================================
+                PATIENT HEADER
+            ============================================ */}
+
             <div className="patient-details-header">
               <div className="patient-details-header__patient">
                 <Avatar
@@ -1244,8 +1552,12 @@ const PatientDetailsModal = ({
                     wrap
                     size={8}
                   >
-                    <Title level={3}>
-                      {patientName}
+                    <Title
+                      level={3}
+                    >
+                      {
+                        patientName
+                      }
                     </Title>
 
                     <Tag
@@ -1264,7 +1576,9 @@ const PatientDetailsModal = ({
                     <span>
                       <UserOutlined />
 
-                      {displayPatientId}
+                      {
+                        displayPatientId
+                      }
                     </span>
 
                     <span>
@@ -1285,9 +1599,22 @@ const PatientDetailsModal = ({
                         ? "s"
                         : ""}
                     </span>
+
+                    {/* MEDIA COUNT */}
+
+                    <span>
+                      <FileImageOutlined />
+
+                      {mediaCount}{" "}
+                      media
+                    </span>
                   </div>
                 </div>
               </div>
+
+              {/* ==========================================
+                  ALLERGY HEADER ALERT
+              ========================================== */}
 
               {hasAllergies && (
                 <div className="patient-details-header__allergy">
@@ -1307,10 +1634,18 @@ const PatientDetailsModal = ({
               )}
             </div>
 
+            {/* ============================================
+                TABS
+            ============================================ */}
+
             <div className="patient-details-tabs-wrapper">
               <Tabs
-                activeKey={activeTab}
-                onChange={setActiveTab}
+                activeKey={
+                  activeTab
+                }
+                onChange={
+                  setActiveTab
+                }
                 items={tabs}
                 className="patient-details-tabs"
               />

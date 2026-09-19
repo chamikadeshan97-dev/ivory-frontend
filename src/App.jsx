@@ -33,6 +33,7 @@ import PatientMediaLibrary from "./pages/PatientMediaLibrary";
 import SMSManagement from "./pages/SMSManagement";
 import OrthoPatients from "./pages/OrthoPatients";
 import OrthoPatientDetails from "./pages/OrthoPatientDetails.jsx";
+import Unauthorized from "./pages/Unauthorized";
 /* --------------------------------------------------------
    Layout wrapper
 -------------------------------------------------------- */
@@ -319,7 +320,10 @@ const App = () => {
           </RoleRoute>
         }
       />
-
+<Route
+  path="/unauthorized"
+  element={<Unauthorized />}
+/>
       {/* Unknown routes */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

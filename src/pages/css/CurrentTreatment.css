@@ -1,4 +1,119 @@
-/* --------------------------------------------------------
+/* ========================================================
+   PAYMENT SECTION
+======================================================== */
+
+.current-treatment-payment-card {
+  border: 1px solid #e8eef5 !important;
+  background: #ffffff;
+}
+
+.current-treatment-finish-icon--payment {
+  color: #1677ff;
+  background: #e6f4ff;
+}
+
+.current-treatment-payment-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.current-treatment-payment-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding: 14px 12px;
+  border: 1px solid #e8eef5;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.current-treatment-payment-stat .ant-typography {
+  margin: 0;
+}
+
+.current-treatment-payment-stat > .ant-typography:last-child {
+  font-size: 16px;
+}
+
+.current-treatment-payment-paid {
+  color: #389e0d !important;
+}
+
+.current-treatment-full-payment-button {
+  height: 44px;
+  margin-bottom: 18px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.current-treatment-payment-quick-section {
+  margin-top: 2px;
+}
+
+.current-treatment-payment-quick-section
+  .current-treatment-quick-label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.current-treatment-payment-method {
+  margin-top: 20px;
+  margin-bottom: 16px;
+}
+
+.current-treatment-payment-alert {
+  margin-top: 16px;
+}
+
+.current-treatment-clear-payment {
+  margin-top: 6px;
+}
+
+/* ========================================================
+   PAYMENT RESPONSIVE
+======================================================== */
+
+@media (max-width: 575px) {
+  .current-treatment-payment-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .current-treatment-payment-stat {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+/* ========================================================
+   DARK THEME PAYMENT
+======================================================== */
+
+[data-theme="dark"] .current-treatment-payment-card,
+.dark .current-treatment-payment-card {
+  border-color: #303030 !important;
+  background: #141414;
+}
+
+[data-theme="dark"] .current-treatment-payment-stat,
+.dark .current-treatment-payment-stat {
+  border-color: #303030;
+  background: #1f1f1f;
+}
+
+[data-theme="dark"] .current-treatment-finish-icon--payment,
+.dark .current-treatment-finish-icon--payment {
+  color: #69b1ff;
+  background: rgba(22, 119, 255, 0.16);
+}
+
+[data-theme="dark"] .current-treatment-payment-paid,
+.dark .current-treatment-payment-paid {
+  color: #73d13d !important;
+}/* --------------------------------------------------------
    Page and selectors
 -------------------------------------------------------- */
 /* ========================================================
@@ -1626,4 +1741,417 @@
     flex-direction: column;
     gap: 8px;
   }
+}
+
+/* ========================================================
+   PAYMENT SECTION
+======================================================== */
+
+.current-treatment-payment-card {
+  border: 1px solid #e8eef5 !important;
+  background: #ffffff;
+}
+
+.current-treatment-finish-icon--payment {
+  color: #1677ff;
+  background: #e6f4ff;
+}
+
+.current-treatment-payment-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.current-treatment-payment-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding: 14px 12px;
+  border: 1px solid #e8eef5;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.current-treatment-payment-stat .ant-typography {
+  margin: 0;
+}
+
+.current-treatment-payment-stat > .ant-typography:last-child {
+  font-size: 16px;
+}
+
+.current-treatment-payment-paid {
+  color: #389e0d !important;
+}
+
+.current-treatment-full-payment-button {
+  height: 44px;
+  margin-bottom: 18px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.current-treatment-payment-quick-section {
+  margin-top: 2px;
+}
+
+.current-treatment-payment-quick-section
+  .current-treatment-quick-label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.current-treatment-payment-method {
+  margin-top: 20px;
+  margin-bottom: 16px;
+}
+
+.current-treatment-payment-alert {
+  margin-top: 16px;
+}
+
+.current-treatment-clear-payment {
+  margin-top: 6px;
+}
+
+/* ========================================================
+   PAYMENT RESPONSIVE
+======================================================== */
+
+@media (max-width: 575px) {
+  .current-treatment-payment-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .current-treatment-payment-stat {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+/* ========================================================
+   FINISH TABS
+======================================================== */
+
+.current-treatment-finish-tabs {
+  width: 100%;
+}
+
+.current-treatment-finish-tabs > .ant-tabs-nav {
+  margin-bottom: 18px;
+}
+
+.current-treatment-finish-tabs > .ant-tabs-nav::before {
+  border-bottom-color: #e8edf3;
+}
+
+.current-treatment-finish-tabs .ant-tabs-tab {
+  padding: 11px 18px;
+  border-radius: 8px 8px 0 0;
+}
+
+.current-treatment-finish-tabs .ant-tabs-tab-btn {
+  font-weight: 600;
+}
+
+.current-treatment-finish-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
+  font-weight: 700;
+}
+
+.current-treatment-finish-tab-content {
+  width: 100%;
+}
+
+.current-treatment-finish-tab-content
+  .current-treatment-finish-card {
+  width: 100%;
+}
+
+/* ========================================================
+   DARK MODE
+======================================================== */
+
+[data-theme="dark"]
+  .current-treatment-finish-tabs
+  > .ant-tabs-nav::before,
+.dark
+  .current-treatment-finish-tabs
+  > .ant-tabs-nav::before {
+  border-bottom-color: #303030;
+}
+
+/* ========================================================
+   MOBILE
+======================================================== */
+
+@media (max-width: 575px) {
+  .current-treatment-finish-tabs .ant-tabs-tab {
+    padding: 10px 8px;
+  }
+
+  .current-treatment-finish-tabs
+    > .ant-tabs-nav
+    .ant-tabs-nav-list {
+    width: 100%;
+  }
+
+  .current-treatment-finish-tabs
+    > .ant-tabs-nav
+    .ant-tabs-tab {
+    flex: 1;
+    justify-content: center;
+  }
+}
+/* ========================================================
+   SIMPLE PAYMENT LAYOUT
+======================================================== */
+
+.current-treatment-payment-panel {
+  height: 100%;
+  padding: 20px;
+  border: 1px solid #e8edf3;
+  border-radius: 12px;
+  background: #fafbfc;
+}
+
+.current-treatment-payment-actions-panel {
+  background: #fff;
+}
+
+.current-treatment-payment-panel-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 30px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e8edf3;
+  font-size: 16px;
+}
+
+/* ========================================================
+   TREATMENT
+======================================================== */
+
+.current-treatment-payment-treatment {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 16px;
+}
+
+.current-treatment-payment-standard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f0f9eb;
+}
+
+.current-treatment-payment-standard > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ========================================================
+   FORM
+======================================================== */
+
+.current-treatment-simple-form-item {
+  margin-bottom: 18px;
+}
+
+.current-treatment-simple-form-item
+  .ant-input-number {
+  width: 100%;
+}
+
+/* ========================================================
+   SUMMARY
+======================================================== */
+
+.current-treatment-simple-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  overflow: hidden;
+  margin-top: 4px;
+  border: 1px solid #e8edf3;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.current-treatment-simple-summary > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  border-right: 1px solid #e8edf3;
+}
+
+.current-treatment-simple-summary > div:last-child {
+  border-right: 0;
+}
+
+.current-treatment-simple-summary
+  > div
+  > .ant-typography:last-child {
+  font-size: 16px;
+}
+
+/* ========================================================
+   STATUS
+======================================================== */
+
+.current-treatment-simple-status {
+  margin-top: 16px;
+}
+
+/* ========================================================
+   PAYMENT ACTIONS
+======================================================== */
+
+.current-treatment-simple-full-payment {
+  min-height: 46px;
+  margin-bottom: 18px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.current-treatment-simple-quick {
+  margin-bottom: 20px;
+}
+
+.current-treatment-simple-quick
+  > .ant-typography {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.current-treatment-simple-quick-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.current-treatment-simple-payment-method {
+  margin-top: 6px;
+  margin-bottom: 12px;
+}
+
+.current-treatment-simple-clear {
+  margin-top: 4px;
+}
+
+/* ========================================================
+   DARK MODE
+======================================================== */
+
+[data-theme="dark"] .current-treatment-payment-panel,
+.dark .current-treatment-payment-panel {
+  border-color: #303030;
+  background: #1f1f1f;
+}
+
+[data-theme="dark"]
+  .current-treatment-payment-actions-panel,
+.dark
+  .current-treatment-payment-actions-panel {
+  background: #141414;
+}
+
+[data-theme="dark"]
+  .current-treatment-payment-panel-title,
+.dark
+  .current-treatment-payment-panel-title {
+  border-bottom-color: #303030;
+}
+
+[data-theme="dark"]
+  .current-treatment-payment-standard,
+.dark
+  .current-treatment-payment-standard {
+  background: rgba(82, 196, 26, 0.1);
+}
+
+[data-theme="dark"]
+  .current-treatment-simple-summary,
+.dark
+  .current-treatment-simple-summary {
+  border-color: #303030;
+  background: #141414;
+}
+
+[data-theme="dark"]
+  .current-treatment-simple-summary
+  > div,
+.dark
+  .current-treatment-simple-summary
+  > div {
+  border-right-color: #303030;
+}
+
+/* ========================================================
+   MOBILE
+======================================================== */
+
+@media (max-width: 575px) {
+  .current-treatment-payment-panel {
+    padding: 16px;
+  }
+
+  .current-treatment-simple-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .current-treatment-simple-summary > div {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    border-right: 0;
+    border-bottom: 1px solid #e8edf3;
+  }
+
+  .current-treatment-simple-summary
+    > div:last-child {
+    border-bottom: 0;
+  }
+
+  .current-treatment-simple-quick-buttons
+    .ant-btn {
+    flex: 1 1 calc(50% - 4px);
+  }
+}
+/* ========================================================
+   DARK THEME PAYMENT
+======================================================== */
+
+[data-theme="dark"] .current-treatment-payment-card,
+.dark .current-treatment-payment-card {
+  border-color: #303030 !important;
+  background: #141414;
+}
+
+[data-theme="dark"] .current-treatment-payment-stat,
+.dark .current-treatment-payment-stat {
+  border-color: #303030;
+  background: #1f1f1f;
+}
+
+[data-theme="dark"] .current-treatment-finish-icon--payment,
+.dark .current-treatment-finish-icon--payment {
+  color: #69b1ff;
+  background: rgba(22, 119, 255, 0.16);
+}
+
+[data-theme="dark"] .current-treatment-payment-paid,
+.dark .current-treatment-payment-paid {
+  color: #73d13d !important;
 }

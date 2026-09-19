@@ -1,5 +1,3 @@
-// src/pages/OrthoPatients.jsx
-
 import React, {
   useCallback,
   useEffect,
@@ -9,10 +7,12 @@ import React, {
 
 import {
   Alert,
+  Avatar,
   Button,
   Card,
   Col,
   DatePicker,
+  Empty,
   Form,
   Input,
   InputNumber,
@@ -21,7 +21,6 @@ import {
   Select,
   Space,
   Spin,
-  Statistic,
   Table,
   Tag,
   Tooltip,
@@ -31,6 +30,8 @@ import {
 
 import {
   CalendarOutlined,
+  CheckCircleOutlined,
+  DollarOutlined,
   EyeOutlined,
   MedicineBoxOutlined,
   PlusOutlined,
@@ -39,6 +40,7 @@ import {
   TeamOutlined,
   UserAddOutlined,
   UserOutlined,
+  WalletOutlined,
   WarningOutlined,
 } from "@ant-design/icons";
 
@@ -54,58 +56,45 @@ import {
   getPatients,
 } from "../api/endPoints";
 
-const {
-  Title,
-  Text,
-} = Typography;
+import ClinicPage from "../components/ClinicPage";
+
+import "./css/OrthoPatients.css";
+
+const { Title, Text } = Typography;
 
 /* ========================================================
    HELPERS
 ======================================================== */
 
-const clean = (value) =>
-  String(value ?? "").trim();
+const clean = (value) => String(value ?? "").trim();
 
-const normalize = (value) =>
-  clean(value).toLowerCase();
+const normalize = (value) => clean(value).toLowerCase();
 
 const numberValue = (value) => {
-  const number =
-    Number(value);
+  const number = Number(value);
 
-  return Number.isFinite(number)
-    ? number
-    : 0;
+  return Number.isFinite(number) ? number : 0;
 };
 
 const formatMoney = (value) =>
-  `Rs. ${numberValue(
-    value,
-  ).toLocaleString("en-LK")}`;
+  `Rs. ${numberValue(value).toLocaleString("en-LK")}`;
 
 const formatDate = (value) => {
   if (!value) {
     return "-";
   }
 
-  const parsed =
-    dayjs(value);
+  const parsed = dayjs(value);
 
   if (!parsed.isValid()) {
     return value;
   }
 
-  return parsed.format(
-    "DD/MM/YYYY",
-  );
+  return parsed.format("DD/MM/YYYY");
 };
 
-const getStatusColor = (
-  status,
-) => {
-  switch (
-    normalize(status)
-  ) {
+const getStatusColor = (status) => {
+  switch (normalize(status)) {
     case "active":
       return "green";
 
@@ -123,9 +112,7 @@ const getStatusColor = (
   }
 };
 
-const getNextVisitState = (
-  date,
-) => {
+const getNextVisitState = (date) => {
   if (!date) {
     return {
       text: "-",
@@ -134,17 +121,10 @@ const getNextVisitState = (
     };
   }
 
-  const nextVisit =
-    dayjs(date).startOf(
-      "day",
-    );
+  const nextVisit = dayjs(date).startOf("day");
+  const today = dayjs().startOf("day");
 
-  const today =
-    dayjs().startOf("day");
-
-  if (
-    !nextVisit.isValid()
-  ) {
+  if (!nextVisit.isValid()) {
     return {
       text: date,
       color: null,
@@ -152,49 +132,26 @@ const getNextVisitState = (
     };
   }
 
-  if (
-    nextVisit.isBefore(
-      today,
-    )
-  ) {
+  if (nextVisit.isBefore(today)) {
     return {
-      text:
-        formatDate(date),
-
-      color:
-        "red",
-
-      overdue:
-        true,
+      text: formatDate(date),
+      color: "red",
+      overdue: true,
     };
   }
 
-  if (
-    nextVisit.isSame(
-      today,
-    )
-  ) {
+  if (nextVisit.isSame(today)) {
     return {
-      text:
-        "Today",
-
-      color:
-        "orange",
-
-      overdue:
-        false,
+      text: "Today",
+      color: "orange",
+      overdue: false,
     };
   }
 
   return {
-    text:
-      formatDate(date),
-
-    color:
-      "green",
-
-    overdue:
-      false,
+    text: formatDate(date),
+    color: "green",
+    overdue: false,
   };
 };
 
@@ -202,25 +159,13 @@ const getNextVisitState = (
    PATIENT HELPERS
 ======================================================== */
 
-const getPatientId = (
-  patient,
-) =>
-  clean(
-    patient?.patient_id ||
-      patient?.id,
-  );
+const getPatientId = (patient) =>
+  clean(patient?.patient_id || patient?.id);
 
-const getPatientName = (
-  patient,
-) =>
-  clean(
-    patient?.name ||
-      patient?.patient_name,
-  );
+const getPatientName = (patient) =>
+  clean(patient?.name || patient?.patient_name);
 
-const getPatientPhone = (
-  patient,
-) =>
+const getPatientPhone = (patient) =>
   clean(
     patient?.phone ||
       patient?.mobile ||
@@ -228,265 +173,235 @@ const getPatientPhone = (
   );
 
 /* ========================================================
+   SUMMARY CARD
+======================================================== */
+
+const OrthoSummaryCard = ({
+  title,
+  value,
+  helper,
+  icon,
+  tone,
+  prefix = "",
+  onClick,
+}) => {
+  return (
+    <Card
+      bordered={false}
+      className={`ortho-summary-card ortho-summary-card--${tone}`}
+      onClick={onClick}
+    >
+      <div className="ortho-summary-card__content">
+        <div>
+          <Text className="ortho-summary-card__title">
+            {title}
+          </Text>
+
+          <div className="ortho-summary-card__value">
+            {prefix}
+            {value}
+          </div>
+
+          <Text className="ortho-summary-card__helper">
+            {helper}
+          </Text>
+        </div>
+
+        <div className="ortho-summary-card__icon">
+          {icon}
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+/* ========================================================
    COMPONENT
 ======================================================== */
 
 const OrthoPatients = () => {
-  const navigate =
-    useNavigate();
+  const navigate = useNavigate();
 
   /* ======================================================
      MAIN STATE
   ====================================================== */
 
-  const [
-    loading,
-    setLoading,
-  ] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [
-    error,
-    setError,
-  ] = useState("");
+  const [error, setError] = useState("");
 
-  const [
-    cases,
-    setCases,
-  ] = useState([]);
+  const [cases, setCases] = useState([]);
 
-  const [
-    searchText,
-    setSearchText,
-  ] = useState("");
+  const [searchText, setSearchText] = useState("");
 
-  const [
-    statusFilter,
-    setStatusFilter,
-  ] = useState(
-    "all",
-  );
+  const [statusFilter, setStatusFilter] = useState("all");
 
   /* ======================================================
      PATIENT STATE
   ====================================================== */
 
-  const [
-    patients,
-    setPatients,
-  ] = useState([]);
+  const [patients, setPatients] = useState([]);
 
-  const [
-    patientsLoading,
-    setPatientsLoading,
-  ] = useState(false);
+  const [patientsLoading, setPatientsLoading] = useState(false);
 
   /* ======================================================
      CREATE ORTHO CASE MODAL
   ====================================================== */
 
-  const [
-    caseModalOpen,
-    setCaseModalOpen,
-  ] = useState(false);
+  const [caseModalOpen, setCaseModalOpen] = useState(false);
 
-  const [
-    savingCase,
-    setSavingCase,
-  ] = useState(false);
+  const [savingCase, setSavingCase] = useState(false);
 
-  const [caseForm] =
-    Form.useForm();
+  const [caseForm] = Form.useForm();
 
-  const selectedPatientId =
-    Form.useWatch(
-      "patient_id",
-      caseForm,
-    );
+  const selectedPatientId = Form.useWatch(
+    "patient_id",
+    caseForm,
+  );
 
   /* ======================================================
      CREATE PATIENT MODAL
   ====================================================== */
 
-  const [
-    patientModalOpen,
-    setPatientModalOpen,
-  ] = useState(false);
+  const [patientModalOpen, setPatientModalOpen] =
+    useState(false);
 
-  const [
-    savingPatient,
-    setSavingPatient,
-  ] = useState(false);
+  const [savingPatient, setSavingPatient] = useState(false);
 
-  const [patientForm] =
-    Form.useForm();
+  const [patientForm] = Form.useForm();
 
-  const patientHasAllergies =
-    Form.useWatch(
-      "has_allergies",
-      patientForm,
-    );
+  const patientHasAllergies = Form.useWatch(
+    "has_allergies",
+    patientForm,
+  );
 
   /* ======================================================
      LOAD PATIENTS
   ====================================================== */
 
-  const loadPatients =
-    useCallback(async () => {
-      try {
-        setPatientsLoading(
-          true,
-        );
+  const loadPatients = useCallback(async () => {
+    try {
+      setPatientsLoading(true);
 
-        const response =
-          await getPatients();
+      const response = await getPatients();
 
-        const patientRows =
-          response?.data?.data ||
-          response?.data
-            ?.patients ||
-          [];
+      const patientRows =
+        response?.data?.data ||
+        response?.data?.patients ||
+        [];
 
-        const safeRows =
-          Array.isArray(
-            patientRows,
-          )
-            ? patientRows
-            : [];
+      const safeRows = Array.isArray(patientRows)
+        ? patientRows
+        : [];
 
-        setPatients(
-          safeRows,
-        );
+      setPatients(safeRows);
 
-        return safeRows;
-      } catch (err) {
-        console.error(
-          "Failed to load patients:",
-          err,
-        );
+      return safeRows;
+    } catch (err) {
+      console.error("Failed to load patients:", err);
 
-        message.error(
-          err?.response?.data
-            ?.message ||
-            "Failed to load patients.",
-        );
+      message.error(
+        err?.response?.data?.message ||
+          "Failed to load patients.",
+      );
 
-        return [];
-      } finally {
-        setPatientsLoading(
-          false,
-        );
-      }
-    }, []);
+      return [];
+    } finally {
+      setPatientsLoading(false);
+    }
+  }, []);
 
   /* ======================================================
      LOAD ORTHO CASES
   ====================================================== */
 
-  const loadOrthoCases =
-    useCallback(async () => {
-      try {
-        setLoading(true);
+  const loadOrthoCases = useCallback(async () => {
+    try {
+      setLoading(true);
 
-        setError("");
+      setError("");
 
-        const response =
-          await getAllOrthoCases();
+      const response = await getAllOrthoCases();
 
-        const caseRows =
-          response?.data?.data ||
-          [];
+      const rawCaseRows =
+        response?.data?.data ||
+        response?.data?.cases ||
+        response?.data ||
+        [];
 
-        /*
-         * Payments are stored separately.
-         * Load financial totals per Ortho case.
-         */
+      const caseRows = Array.isArray(rawCaseRows)
+        ? rawCaseRows
+        : [];
 
-        const rowsWithFinancials =
-          await Promise.all(
-            caseRows.map(
-              async (
-                item,
-              ) => {
-                try {
-                  const paymentResponse =
-                    await getOrthoPaymentsByCase(
-                      item.ortho_case_id,
-                    );
+      /*
+       * Payments are stored separately.
+       * Load financial totals per Ortho case.
+       */
 
-                  const totalPaid =
-                    numberValue(
-                      paymentResponse
-                        ?.data
-                        ?.total_paid,
-                    );
+      const rowsWithFinancials = await Promise.all(
+        caseRows.map(async (item) => {
+          try {
+            const paymentResponse =
+              await getOrthoPaymentsByCase(
+                item.ortho_case_id,
+              );
 
-                  const totalFee =
-                    numberValue(
-                      item.total_treatment_fee,
-                    );
+            const totalPaid = numberValue(
+              paymentResponse?.data?.total_paid ??
+                paymentResponse?.data?.data?.total_paid,
+            );
 
-                  return {
-                    ...item,
+            const totalFee = numberValue(
+              item.total_treatment_fee,
+            );
 
-                    total_paid:
-                      totalPaid,
+            return {
+              ...item,
 
-                    balance:
-                      Math.max(
-                        totalFee -
-                          totalPaid,
-                        0,
-                      ),
-                  };
-                } catch (
-                  paymentError
-                ) {
-                  console.error(
-                    `Failed to load payments for ${item.ortho_case_id}:`,
-                    paymentError,
-                  );
+              total_paid: totalPaid,
 
-                  return {
-                    ...item,
+              balance: Math.max(
+                totalFee - totalPaid,
+                0,
+              ),
+            };
+          } catch (paymentError) {
+            console.error(
+              `Failed to load payments for ${item.ortho_case_id}:`,
+              paymentError,
+            );
 
-                    total_paid:
-                      0,
+            return {
+              ...item,
 
-                    balance:
-                      numberValue(
-                        item.total_treatment_fee,
-                      ),
-                  };
-                }
-              },
-            ),
-          );
+              total_paid: 0,
 
-        setCases(
-          rowsWithFinancials,
-        );
-      } catch (err) {
-        console.error(
-          "Failed to load Ortho cases:",
-          err,
-        );
+              balance: numberValue(
+                item.total_treatment_fee,
+              ),
+            };
+          }
+        }),
+      );
 
-        const errorMessage =
-          err?.response?.data
-            ?.message ||
-          "Failed to load Ortho patients.";
+      setCases(rowsWithFinancials);
+    } catch (err) {
+      console.error(
+        "Failed to load Ortho cases:",
+        err,
+      );
 
-        setError(
-          errorMessage,
-        );
+      const errorMessage =
+        err?.response?.data?.message ||
+        "Failed to load Ortho patients.";
 
-        message.error(
-          errorMessage,
-        );
-      } finally {
-        setLoading(false);
-      }
-    }, []);
+      setError(errorMessage);
+
+      message.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   /* ======================================================
      INITIAL LOAD
@@ -494,635 +409,406 @@ const OrthoPatients = () => {
 
   useEffect(() => {
     loadOrthoCases();
-
     loadPatients();
-  }, [
-    loadOrthoCases,
-    loadPatients,
-  ]);
+  }, [loadOrthoCases, loadPatients]);
 
   /* ======================================================
      PATIENT OPTIONS
   ====================================================== */
 
-  const patientOptions =
-    useMemo(() => {
-      return patients
-        .map(
-          (patient) => {
-            const patientId =
-              getPatientId(
-                patient,
-              );
+  const patientOptions = useMemo(() => {
+    return patients
+      .map((patient) => {
+        const patientId = getPatientId(patient);
 
-            if (!patientId) {
-              return null;
-            }
+        if (!patientId) {
+          return null;
+        }
 
-            const name =
-              getPatientName(
-                patient,
-              );
+        const name = getPatientName(patient);
+        const phone = getPatientPhone(patient);
 
-            const phone =
-              getPatientPhone(
-                patient,
-              );
+        const parts = [
+          name || "Unnamed Patient",
+          patientId,
+          phone,
+        ].filter(Boolean);
 
-            const parts = [
-              name ||
-                "Unnamed Patient",
+        return {
+          value: patientId,
+          label: parts.join(" • "),
+        };
+      })
+      .filter(Boolean);
+  }, [patients]);
 
-              patientId,
+  const selectedPatient = useMemo(() => {
+    if (!selectedPatientId) {
+      return null;
+    }
 
-              phone,
-            ].filter(Boolean);
-
-            return {
-              value:
-                patientId,
-
-              label:
-                parts.join(
-                  " • ",
-                ),
-            };
-          },
-        )
-        .filter(Boolean);
-    }, [patients]);
-
-  const selectedPatient =
-    useMemo(() => {
-      if (
-        !selectedPatientId
-      ) {
-        return null;
-      }
-
-      return (
-        patients.find(
-          (patient) =>
-            getPatientId(
-              patient,
-            ) ===
-            clean(
-              selectedPatientId,
-            ),
-        ) || null
-      );
-    }, [
-      patients,
-      selectedPatientId,
-    ]);
+    return (
+      patients.find(
+        (patient) =>
+          getPatientId(patient) ===
+          clean(selectedPatientId),
+      ) || null
+    );
+  }, [patients, selectedPatientId]);
 
   /* ======================================================
      FILTERED CASES
   ====================================================== */
 
-  const filteredCases =
-    useMemo(() => {
-      let result = [
-        ...cases,
-      ];
+  const filteredCases = useMemo(() => {
+    let result = [...cases];
 
-      if (
-        statusFilter &&
-        statusFilter !==
-          "all"
-      ) {
-        result =
-          result.filter(
-            (item) =>
-              normalize(
-                item.status,
-              ) ===
-              normalize(
-                statusFilter,
-              ),
-          );
-      }
+    if (
+      statusFilter &&
+      statusFilter !== "all"
+    ) {
+      result = result.filter(
+        (item) =>
+          normalize(item.status) ===
+          normalize(statusFilter),
+      );
+    }
 
-      const keyword =
-        normalize(
-          searchText,
+    const keyword = normalize(searchText);
+
+    if (keyword) {
+      result = result.filter((item) => {
+        const searchable = [
+          item.ortho_case_id,
+          item.patient_id,
+          item.patient_name,
+          item.dentist_id,
+          item.treatment_type,
+          item.treatment_area,
+          item.diagnosis,
+          item.status,
+        ];
+
+        return searchable.some((value) =>
+          normalize(value).includes(keyword),
         );
+      });
+    }
 
-      if (keyword) {
-        result =
-          result.filter(
-            (item) => {
-              const searchable =
-                [
-                  item.ortho_case_id,
-                  item.patient_id,
-                  item.patient_name,
-                  item.dentist_id,
-                  item.treatment_type,
-                  item.treatment_area,
-                  item.diagnosis,
-                  item.status,
-                ];
-
-              return searchable.some(
-                (
-                  value,
-                ) =>
-                  normalize(
-                    value,
-                  ).includes(
-                    keyword,
-                  ),
-              );
-            },
-          );
-      }
-
-      return result;
-    }, [
-      cases,
-      searchText,
-      statusFilter,
-    ]);
+    return result;
+  }, [cases, searchText, statusFilter]);
 
   /* ======================================================
      SUMMARY
   ====================================================== */
 
-  const summary =
-    useMemo(() => {
-      const active =
-        cases.filter(
-          (item) =>
-            normalize(
-              item.status,
-            ) ===
-            "active",
-        ).length;
+  const summary = useMemo(() => {
+    const active = cases.filter(
+      (item) =>
+        normalize(item.status) === "active",
+    ).length;
 
-      const completed =
-        cases.filter(
-          (item) =>
-            normalize(
-              item.status,
-            ) ===
-            "completed",
-        ).length;
+    const completed = cases.filter(
+      (item) =>
+        normalize(item.status) === "completed",
+    ).length;
 
-      const totalPaid =
-        cases.reduce(
-          (
-            sum,
-            item,
-          ) =>
-            sum +
-            numberValue(
-              item.total_paid,
-            ),
-          0,
-        );
+    const totalPaid = cases.reduce(
+      (sum, item) =>
+        sum + numberValue(item.total_paid),
+      0,
+    );
 
-      const totalBalance =
-        cases.reduce(
-          (
-            sum,
-            item,
-          ) =>
-            sum +
-            numberValue(
-              item.balance,
-            ),
-          0,
-        );
+    const totalBalance = cases.reduce(
+      (sum, item) =>
+        sum + numberValue(item.balance),
+      0,
+    );
 
-      const overdue =
-        cases.filter(
-          (item) => {
-            if (
-              normalize(
-                item.status,
-              ) !==
-              "active"
-            ) {
-              return false;
-            }
+    const overdue = cases.filter((item) => {
+      if (
+        normalize(item.status) !== "active"
+      ) {
+        return false;
+      }
 
-            if (
-              !item.next_visit_date
-            ) {
-              return false;
-            }
+      if (!item.next_visit_date) {
+        return false;
+      }
 
-            const date =
-              dayjs(
-                item.next_visit_date,
-              ).startOf(
-                "day",
-              );
+      const date = dayjs(
+        item.next_visit_date,
+      ).startOf("day");
 
-            return (
-              date.isValid() &&
-              date.isBefore(
-                dayjs().startOf(
-                  "day",
-                ),
-              )
-            );
-          },
-        ).length;
+      return (
+        date.isValid() &&
+        date.isBefore(dayjs().startOf("day"))
+      );
+    }).length;
 
-      return {
-        total:
-          cases.length,
+    return {
+      total: cases.length,
+      active,
+      completed,
+      totalPaid,
+      totalBalance,
+      overdue,
+    };
+  }, [cases]);
 
-        active,
+  /* ======================================================
+     SUMMARY FILTER ACTIONS
+  ====================================================== */
 
-        completed,
-
-        totalPaid,
-
-        totalBalance,
-
-        overdue,
-      };
-    }, [cases]);
+  const handleSummaryFilter = (status) => {
+    setSearchText("");
+    setStatusFilter(status);
+  };
 
   /* ======================================================
      NEW ORTHO CASE
   ====================================================== */
 
-  const handleNewCase =
-    () => {
+  const handleNewCase = () => {
+    caseForm.resetFields();
+
+    caseForm.setFieldsValue({
+      start_date: dayjs(),
+    });
+
+    setCaseModalOpen(true);
+  };
+
+  const handleCloseCaseModal = () => {
+    if (savingCase) {
+      return;
+    }
+
+    setCaseModalOpen(false);
+
+    caseForm.resetFields();
+  };
+
+  const handleCreateCase = async () => {
+    try {
+      const values =
+        await caseForm.validateFields();
+
+      setSavingCase(true);
+
+      const payload = {
+        patient_id: clean(values.patient_id),
+
+        dentist_id: clean(values.dentist_id),
+
+        start_date: values.start_date
+          ? values.start_date.format("YYYY-MM-DD")
+          : "",
+
+        treatment_type: clean(
+          values.treatment_type,
+        ),
+
+        treatment_area: clean(
+          values.treatment_area,
+        ),
+
+        diagnosis: clean(values.diagnosis),
+
+        estimated_duration: clean(
+          values.estimated_duration,
+        ),
+
+        total_treatment_fee: numberValue(
+          values.total_treatment_fee,
+        ),
+
+        payment_plan: clean(
+          values.payment_plan,
+        ),
+
+        monthly_payment: numberValue(
+          values.monthly_payment,
+        ),
+
+        next_visit_date: values.next_visit_date
+          ? values.next_visit_date.format(
+              "YYYY-MM-DD",
+            )
+          : "",
+
+        notes: clean(values.notes),
+      };
+
+      await createOrthoCase(payload);
+
+      message.success(
+        "Ortho case created successfully.",
+      );
+
+      setCaseModalOpen(false);
+
       caseForm.resetFields();
 
-      caseForm.setFieldsValue(
-        {
-          start_date:
-            dayjs(),
-        },
-      );
-
-      setCaseModalOpen(
-        true,
-      );
-    };
-
-  const handleCloseCaseModal =
-    () => {
-      if (savingCase) {
+      await loadOrthoCases();
+    } catch (err) {
+      if (err?.errorFields) {
         return;
       }
 
-      setCaseModalOpen(
-        false,
+      console.error(
+        "Failed to create Ortho case:",
+        err,
       );
 
-      caseForm.resetFields();
-    };
-
-  const handleCreateCase =
-    async () => {
-      try {
-        const values =
-          await caseForm.validateFields();
-
-        setSavingCase(
-          true,
-        );
-
-        const payload = {
-          patient_id:
-            clean(
-              values.patient_id,
-            ),
-
-          dentist_id:
-            clean(
-              values.dentist_id,
-            ),
-
-          start_date:
-            values.start_date
-              ? values.start_date.format(
-                  "YYYY-MM-DD",
-                )
-              : "",
-
-          treatment_type:
-            clean(
-              values.treatment_type,
-            ),
-
-          treatment_area:
-            clean(
-              values.treatment_area,
-            ),
-
-          diagnosis:
-            clean(
-              values.diagnosis,
-            ),
-
-          estimated_duration:
-            clean(
-              values.estimated_duration,
-            ),
-
-          total_treatment_fee:
-            numberValue(
-              values.total_treatment_fee,
-            ),
-
-          payment_plan:
-            clean(
-              values.payment_plan,
-            ),
-
-          monthly_payment:
-            numberValue(
-              values.monthly_payment,
-            ),
-
-          next_visit_date:
-            values.next_visit_date
-              ? values.next_visit_date.format(
-                  "YYYY-MM-DD",
-                )
-              : "",
-
-          notes:
-            clean(
-              values.notes,
-            ),
-        };
-
-        await createOrthoCase(
-          payload,
-        );
-
-        message.success(
-          "Ortho case created successfully.",
-        );
-
-        setCaseModalOpen(
-          false,
-        );
-
-        caseForm.resetFields();
-
-        await loadOrthoCases();
-      } catch (err) {
-        if (
-          err?.errorFields
-        ) {
-          return;
-        }
-
-        console.error(
-          "Failed to create Ortho case:",
-          err,
-        );
-
-        message.error(
-          err?.response?.data
-            ?.message ||
-            "Failed to create Ortho case.",
-        );
-      } finally {
-        setSavingCase(
-          false,
-        );
-      }
-    };
+      message.error(
+        err?.response?.data?.message ||
+          "Failed to create Ortho case.",
+      );
+    } finally {
+      setSavingCase(false);
+    }
+  };
 
   /* ======================================================
      NEW PATIENT ACTIONS
   ====================================================== */
 
-  const handleOpenNewPatient =
-    () => {
+  const handleOpenNewPatient = () => {
+    patientForm.resetFields();
+
+    patientForm.setFieldsValue({
+      gender: undefined,
+      status: "Active",
+      has_allergies: "No",
+    });
+
+    setPatientModalOpen(true);
+  };
+
+  const handleClosePatientModal = () => {
+    if (savingPatient) {
+      return;
+    }
+
+    setPatientModalOpen(false);
+
+    patientForm.resetFields();
+  };
+
+  const handleCreatePatient = async () => {
+    try {
+      const values =
+        await patientForm.validateFields();
+
+      setSavingPatient(true);
+
+      const payload = {
+        name: clean(values.name),
+
+        phone: clean(values.phone),
+
+        age: values.age
+          ? numberValue(values.age)
+          : "",
+
+        gender: clean(values.gender),
+
+        address: clean(values.address),
+
+        location: clean(values.location),
+
+        distance: clean(values.distance),
+
+        status:
+          clean(values.status) || "Active",
+
+        has_allergies:
+          normalize(values.has_allergies) === "yes"
+            ? "Yes"
+            : "No",
+
+        allergy_details:
+          normalize(values.has_allergies) === "yes"
+            ? clean(values.allergy_details)
+            : "",
+      };
+
+      const response =
+        await createPatient(payload);
+
+      const createdPatient =
+        response?.data?.data ||
+        response?.data?.patient ||
+        {};
+
+      let newPatientId =
+        getPatientId(createdPatient);
+
+      const updatedPatients =
+        await loadPatients();
+
+      if (!newPatientId) {
+        const createdMatch =
+          updatedPatients.find((patient) => {
+            const samePhone =
+              getPatientPhone(patient) ===
+              clean(values.phone);
+
+            const sameName =
+              normalize(
+                getPatientName(patient),
+              ) === normalize(values.name);
+
+            return samePhone && sameName;
+          });
+
+        newPatientId =
+          getPatientId(createdMatch);
+      }
+
+      if (newPatientId) {
+        caseForm.setFieldValue(
+          "patient_id",
+          newPatientId,
+        );
+      }
+
+      message.success(
+        "Patient created successfully.",
+      );
+
+      setPatientModalOpen(false);
+
       patientForm.resetFields();
-
-      patientForm.setFieldsValue(
-        {
-          gender:
-            undefined,
-
-          status:
-            "Active",
-
-          has_allergies:
-            "No",
-        },
-      );
-
-      setPatientModalOpen(
-        true,
-      );
-    };
-
-  const handleClosePatientModal =
-    () => {
-      if (
-        savingPatient
-      ) {
+    } catch (err) {
+      if (err?.errorFields) {
         return;
       }
 
-      setPatientModalOpen(
-        false,
+      console.error(
+        "Failed to create patient:",
+        err,
       );
 
-      patientForm.resetFields();
-    };
-
-  const handleCreatePatient =
-    async () => {
-      try {
-        const values =
-          await patientForm.validateFields();
-
-        setSavingPatient(
-          true,
-        );
-
-        const payload = {
-          name:
-            clean(
-              values.name,
-            ),
-
-          phone:
-            clean(
-              values.phone,
-            ),
-
-          age:
-            values.age
-              ? numberValue(
-                  values.age,
-                )
-              : "",
-
-          gender:
-            clean(
-              values.gender,
-            ),
-
-          address:
-            clean(
-              values.address,
-            ),
-
-          location:
-            clean(
-              values.location,
-            ),
-
-          distance:
-            clean(
-              values.distance,
-            ),
-
-          status:
-            clean(
-              values.status,
-            ) ||
-            "Active",
-
-          has_allergies:
-            normalize(
-              values.has_allergies,
-            ) ===
-            "yes"
-              ? "Yes"
-              : "No",
-
-          allergy_details:
-            normalize(
-              values.has_allergies,
-            ) ===
-            "yes"
-              ? clean(
-                  values.allergy_details,
-                )
-              : "",
-        };
-
-        const response =
-          await createPatient(
-            payload,
-          );
-
-        const createdPatient =
-          response?.data?.data ||
-          response?.data?.patient ||
-          {};
-
-        let newPatientId =
-          getPatientId(
-            createdPatient,
-          );
-
-        /*
-         * Refresh patient list after creation.
-         */
-        const updatedPatients =
-          await loadPatients();
-
-        /*
-         * If createPatient did not return the patient ID,
-         * find the newly created patient from the refreshed list.
-         */
-        if (
-          !newPatientId
-        ) {
-          const createdMatch =
-            updatedPatients.find(
-              (patient) => {
-                const samePhone =
-                  getPatientPhone(
-                    patient,
-                  ) ===
-                  clean(
-                    values.phone,
-                  );
-
-                const sameName =
-                  normalize(
-                    getPatientName(
-                      patient,
-                    ),
-                  ) ===
-                  normalize(
-                    values.name,
-                  );
-
-                return (
-                  samePhone &&
-                  sameName
-                );
-              },
-            );
-
-          newPatientId =
-            getPatientId(
-              createdMatch,
-            );
-        }
-
-        if (
-          newPatientId
-        ) {
-          caseForm.setFieldValue(
-            "patient_id",
-            newPatientId,
-          );
-        }
-
-        message.success(
-          "Patient created successfully.",
-        );
-
-        setPatientModalOpen(
-          false,
-        );
-
-        patientForm.resetFields();
-      } catch (err) {
-        if (
-          err?.errorFields
-        ) {
-          return;
-        }
-
-        console.error(
-          "Failed to create patient:",
-          err,
-        );
-
-        message.error(
-          err?.response?.data
-            ?.message ||
-            "Failed to create patient.",
-        );
-      } finally {
-        setSavingPatient(
-          false,
-        );
-      }
-    };
+      message.error(
+        err?.response?.data?.message ||
+          "Failed to create patient.",
+      );
+    } finally {
+      setSavingPatient(false);
+    }
+  };
 
   /* ======================================================
      OPEN CASE
   ====================================================== */
 
-  const handleOpenCase =
-    (record) => {
-      navigate(
-        `/ortho/${record.ortho_case_id}`,
-      );
-    };
+  const handleOpenCase = (record) => {
+    navigate(
+      `/ortho/${record.ortho_case_id}`,
+    );
+  };
 
   /* ======================================================
      TABLE COLUMNS
@@ -1130,122 +816,81 @@ const OrthoPatients = () => {
 
   const columns = [
     {
-      title:
-        "Case",
+      title: "Case",
+      dataIndex: "ortho_case_id",
+      key: "ortho_case_id",
+      width: 135,
 
-      dataIndex:
-        "ortho_case_id",
-
-      key:
-        "ortho_case_id",
-
-      width:
-        125,
-
-      render: (
-        value,
-      ) => (
-        <Text strong>
-          {value}
-        </Text>
+      render: (value) => (
+        <div className="ortho-case-id">
+          {value || "-"}
+        </div>
       ),
     },
 
     {
-      title:
-        "Patient",
+      title: "Patient",
+      key: "patient",
+      width: 230,
 
-      key:
-        "patient",
+      render: (_, record) => (
+        <div className="ortho-patient-cell">
+          <Avatar
+            size={38}
+            icon={<UserOutlined />}
+            className="ortho-patient-avatar"
+          />
 
-      render: (
-        _,
-        record,
-      ) => (
-        <Space
-          direction="vertical"
-          size={0}
-        >
-          <Space size={6}>
-            <UserOutlined />
-
-            <Text strong>
+          <div>
+            <Text
+              strong
+              className="ortho-patient-name"
+            >
               {record.patient_name ||
                 record.patient_id ||
                 "-"}
             </Text>
-          </Space>
 
-          {record.patient_name &&
-            record.patient_id && (
-              <Text
-                type="secondary"
-                style={{
-                  fontSize:
-                    12,
-                }}
-              >
-                {
-                  record.patient_id
-                }
-              </Text>
-            )}
-        </Space>
+            {record.patient_name &&
+              record.patient_id && (
+                <Text
+                  type="secondary"
+                  className="ortho-patient-id"
+                >
+                  {record.patient_id}
+                </Text>
+              )}
+          </div>
+        </div>
       ),
     },
 
     {
-      title:
-        "Started",
+      title: "Started",
+      dataIndex: "start_date",
+      key: "start_date",
+      width: 120,
 
-      dataIndex:
-        "start_date",
-
-      key:
-        "start_date",
-
-      width:
-        120,
-
-      render: (
-        value,
-      ) =>
-        formatDate(
-          value,
-        ),
+      render: (value) => formatDate(value),
     },
 
     {
-      title:
-        "Treatment",
+      title: "Treatment",
+      key: "treatment",
+      width: 190,
 
-      key:
-        "treatment",
-
-      render: (
-        _,
-        record,
-      ) => (
-        <Space
-          direction="vertical"
-          size={0}
-        >
-          <Text>
-            {record.treatment_type ||
-              "-"}
+      render: (_, record) => (
+        <Space direction="vertical" size={0}>
+          <Text strong>
+            {record.treatment_type || "-"}
           </Text>
 
           {record.treatment_area && (
             <Text
               type="secondary"
-              style={{
-                fontSize:
-                  12,
-              }}
+              className="ortho-secondary-text"
             >
-              {
-                record.treatment_area
-              }
+              {record.treatment_area}
             </Text>
           )}
         </Space>
@@ -1253,164 +898,98 @@ const OrthoPatients = () => {
     },
 
     {
-      title:
-        "Doctor",
+      title: "Doctor",
+      dataIndex: "dentist_id",
+      key: "dentist_id",
+      width: 120,
 
-      dataIndex:
-        "dentist_id",
-
-      key:
-        "dentist_id",
-
-      render: (
-        value,
-      ) =>
-        value ||
-        "-",
+      render: (value) => value || "-",
     },
 
     {
-      title:
-        "Fee",
+      title: "Fee",
+      dataIndex: "total_treatment_fee",
+      key: "total_treatment_fee",
+      align: "right",
+      width: 145,
 
-      dataIndex:
-        "total_treatment_fee",
-
-      key:
-        "total_treatment_fee",
-
-      align:
-        "right",
-
-      render: (
-        value,
-      ) => (
-        <Text>
-          {formatMoney(
-            value,
-          )}
+      render: (value) => (
+        <Text strong>
+          {formatMoney(value)}
         </Text>
       ),
     },
 
     {
-      title:
-        "Paid",
+      title: "Paid",
+      dataIndex: "total_paid",
+      key: "total_paid",
+      align: "right",
+      width: 145,
 
-      dataIndex:
-        "total_paid",
-
-      key:
-        "total_paid",
-
-      align:
-        "right",
-
-      render: (
-        value,
-      ) => (
-        <Text type="success">
-          {formatMoney(
-            value,
-          )}
+      render: (value) => (
+        <Text type="success" strong>
+          {formatMoney(value)}
         </Text>
       ),
     },
 
     {
-      title:
-        "Balance",
+      title: "Balance",
+      dataIndex: "balance",
+      key: "balance",
+      align: "right",
+      width: 145,
 
-      dataIndex:
-        "balance",
+      render: (value) => {
+        const hasBalance =
+          numberValue(value) > 0;
 
-      key:
-        "balance",
-
-      align:
-        "right",
-
-      render: (
-        value,
-      ) => (
-        <Text
-          strong={
-            numberValue(
-              value,
-            ) >
-            0
-          }
-          type={
-            numberValue(
-              value,
-            ) >
-            0
-              ? "danger"
-              : "success"
-          }
-        >
-          {formatMoney(
-            value,
-          )}
-        </Text>
-      ),
+        return (
+          <Text
+            strong
+            type={
+              hasBalance
+                ? "danger"
+                : "success"
+            }
+          >
+            {formatMoney(value)}
+          </Text>
+        );
+      },
     },
 
     {
-      title:
-        "Next Visit",
+      title: "Next Visit",
+      dataIndex: "next_visit_date",
+      key: "next_visit_date",
+      width: 150,
 
-      dataIndex:
-        "next_visit_date",
-
-      key:
-        "next_visit_date",
-
-      width:
-        145,
-
-      render: (
-        value,
-      ) => {
+      render: (value) => {
         const state =
-          getNextVisitState(
-            value,
-          );
+          getNextVisitState(value);
 
-        if (
-          state.overdue
-        ) {
+        if (state.overdue) {
           return (
             <Tooltip title="Next visit date has passed">
               <Tag
                 color="red"
-                icon={
-                  <WarningOutlined />
-                }
+                icon={<WarningOutlined />}
               >
-                {
-                  state.text
-                }
+                {state.text}
               </Tag>
             </Tooltip>
           );
         }
 
-        if (
-          state.color
-        ) {
+        if (state.color) {
           return (
             <Tag
-              color={
-                state.color
-              }
-              icon={
-                <CalendarOutlined />
-              }
+              color={state.color}
+              icon={<CalendarOutlined />}
             >
-              {
-                state.text
-              }
+              {state.text}
             </Tag>
           );
         }
@@ -1420,60 +999,36 @@ const OrthoPatients = () => {
     },
 
     {
-      title:
-        "Status",
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      width: 115,
 
-      dataIndex:
-        "status",
-
-      key:
-        "status",
-
-      width:
-        110,
-
-      render: (
-        value,
-      ) => (
-        <Tag
-          color={getStatusColor(
-            value,
-          )}
-        >
-          {value ||
-            "Unknown"}
+      render: (value) => (
+        <Tag color={getStatusColor(value)}>
+          {value || "Unknown"}
         </Tag>
       ),
     },
 
     {
-      title: "",
+      title: "Actions",
+      key: "action",
+      fixed: "right",
+      width: 100,
 
-      key:
-        "action",
-
-      fixed:
-        "right",
-
-      width:
-        70,
-
-      render: (
-        _,
-        record,
-      ) => (
+      render: (_, record) => (
         <Tooltip title="Open Ortho Case">
           <Button
             type="primary"
-            icon={
-              <EyeOutlined />
-            }
+            size="small"
+            icon={<EyeOutlined />}
             onClick={() =>
-              handleOpenCase(
-                record,
-              )
+              handleOpenCase(record)
             }
-          />
+          >
+            View
+          </Button>
         </Tooltip>
       ),
     },
@@ -1484,84 +1039,30 @@ const OrthoPatients = () => {
   ====================================================== */
 
   return (
-    <div
-      style={{
-        padding:
-          24,
-      }}
+    <ClinicPage
+      title="Orthodontic Patients"
+      subtitle="Manage orthodontic treatments, visits, payments and progress."
+      icon={<MedicineBoxOutlined />}
+      actions={[
+        <Button
+          key="refresh"
+          icon={<ReloadOutlined />}
+          loading={loading}
+          onClick={loadOrthoCases}
+        >
+          Refresh
+        </Button>,
+
+        <Button
+          key="new-case"
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={handleNewCase}
+        >
+          New Ortho Case
+        </Button>,
+      ]}
     >
-      {/* ==================================================
-          HEADER
-      ================================================== */}
-
-      <Row
-        gutter={[
-          16,
-          16,
-        ]}
-        align="middle"
-        justify="space-between"
-        style={{
-          marginBottom:
-            20,
-        }}
-      >
-        <Col>
-          <Space
-            direction="vertical"
-            size={2}
-          >
-            <Title
-              level={2}
-              style={{
-                margin:
-                  0,
-              }}
-            >
-              <MedicineBoxOutlined />{" "}
-              Orthodontic Patients
-            </Title>
-
-            <Text type="secondary">
-              Manage orthodontic
-              treatments, visits,
-              payments and
-              progress.
-            </Text>
-          </Space>
-        </Col>
-
-        <Col>
-          <Space wrap>
-            <Button
-              icon={
-                <ReloadOutlined />
-              }
-              onClick={
-                loadOrthoCases
-              }
-              loading={
-                loading
-              }
-            >
-              Refresh
-            </Button>
-
-            <Button
-              type="primary"
-              icon={
-                <PlusOutlined />
-              }
-              onClick={
-                handleNewCase
-              }
-            >
-              New Ortho Case
-            </Button>
-          </Space>
-        </Col>
-      </Row>
-
       {/* ==================================================
           ERROR
       ================================================== */}
@@ -1571,16 +1072,9 @@ const OrthoPatients = () => {
           type="error"
           showIcon
           closable
-          message={
-            error
-          }
-          style={{
-            marginBottom:
-              16,
-          }}
-          onClose={() =>
-            setError("")
-          }
+          message={error}
+          className="ortho-error-alert"
+          onClose={() => setError("")}
         />
       )}
 
@@ -1589,287 +1083,211 @@ const OrthoPatients = () => {
       ================================================== */}
 
       <Row
-        gutter={[
-          16,
-          16,
-        ]}
-        style={{
-          marginBottom:
-            20,
-        }}
+        gutter={[16, 16]}
+        className="ortho-summary-row"
       >
-        <Col
-          xs={24}
-          sm={12}
-          md={8}
-          xl={4}
-        >
-          <Card>
-            <Statistic
-              title="Total Cases"
-              value={
-                summary.total
-              }
-              prefix={
-                <TeamOutlined />
-              }
-            />
-          </Card>
+        <Col xs={24} sm={12} md={8} xl={4}>
+          <OrthoSummaryCard
+            title="Total Cases"
+            value={summary.total}
+            helper="Registered cases"
+            tone="blue"
+            icon={<TeamOutlined />}
+            onClick={() =>
+              handleSummaryFilter("all")
+            }
+          />
         </Col>
 
-        <Col
-          xs={24}
-          sm={12}
-          md={8}
-          xl={4}
-        >
-          <Card>
-            <Statistic
-              title="Active"
-              value={
-                summary.active
-              }
-              prefix={
-                <MedicineBoxOutlined />
-              }
-            />
-          </Card>
+        <Col xs={24} sm={12} md={8} xl={4}>
+          <OrthoSummaryCard
+            title="Active"
+            value={summary.active}
+            helper="In treatment"
+            tone="green"
+            icon={<MedicineBoxOutlined />}
+            onClick={() =>
+              handleSummaryFilter("Active")
+            }
+          />
         </Col>
 
-        <Col
-          xs={24}
-          sm={12}
-          md={8}
-          xl={4}
-        >
-          <Card>
-            <Statistic
-              title="Completed"
-              value={
-                summary.completed
-              }
-            />
-          </Card>
+        <Col xs={24} sm={12} md={8} xl={4}>
+          <OrthoSummaryCard
+            title="Completed"
+            value={summary.completed}
+            helper="Finished cases"
+            tone="purple"
+            icon={<CheckCircleOutlined />}
+            onClick={() =>
+              handleSummaryFilter("Completed")
+            }
+          />
         </Col>
 
-        <Col
-          xs={24}
-          sm={12}
-          md={8}
-          xl={4}
-        >
-          <Card>
-            <Statistic
-              title="Collected"
-              value={
-                summary.totalPaid
-              }
-              prefix="Rs."
-              precision={0}
-            />
-          </Card>
+        <Col xs={24} sm={12} md={8} xl={4}>
+          <OrthoSummaryCard
+            title="Collected"
+            value={numberValue(
+              summary.totalPaid,
+            ).toLocaleString("en-LK")}
+            prefix="Rs. "
+            helper="Total payments"
+            tone="cyan"
+            icon={<DollarOutlined />}
+          />
         </Col>
 
-        <Col
-          xs={24}
-          sm={12}
-          md={8}
-          xl={4}
-        >
-          <Card>
-            <Statistic
-              title="Outstanding"
-              value={
-                summary.totalBalance
-              }
-              prefix="Rs."
-              precision={0}
-            />
-          </Card>
+        <Col xs={24} sm={12} md={8} xl={4}>
+          <OrthoSummaryCard
+            title="Outstanding"
+            value={numberValue(
+              summary.totalBalance,
+            ).toLocaleString("en-LK")}
+            prefix="Rs. "
+            helper="Remaining balance"
+            tone="orange"
+            icon={<WalletOutlined />}
+          />
         </Col>
 
-        <Col
-          xs={24}
-          sm={12}
-          md={8}
-          xl={4}
-        >
-          <Card>
-            <Statistic
-              title="Overdue Visits"
-              value={
-                summary.overdue
-              }
-              prefix={
-                <WarningOutlined />
-              }
-            />
-          </Card>
+        <Col xs={24} sm={12} md={8} xl={4}>
+          <OrthoSummaryCard
+            title="Overdue Visits"
+            value={summary.overdue}
+            helper="Require follow-up"
+            tone="red"
+            icon={<WarningOutlined />}
+          />
         </Col>
       </Row>
 
       {/* ==================================================
-          FILTERS
+          ORTHO DIRECTORY
       ================================================== */}
 
       <Card
-        style={{
-          marginBottom:
-            16,
-        }}
+        bordered={false}
+        className="ortho-directory-card"
       >
-        <Row
-          gutter={[
-            12,
-            12,
-          ]}
-          align="middle"
-        >
-          <Col
-            xs={24}
-            md={14}
-            lg={10}
-          >
-            <Input
-              allowClear
-              prefix={
-                <SearchOutlined />
-              }
-              placeholder="Search case, patient, treatment, doctor..."
-              value={
-                searchText
-              }
-              onChange={(
-                e,
-              ) =>
-                setSearchText(
-                  e.target
-                    .value,
-                )
-              }
-            />
-          </Col>
+        <div className="ortho-directory-header">
+          <div>
+            <Title level={4}>
+              Orthodontic Cases
+            </Title>
 
-          <Col
-            xs={24}
-            sm={12}
-            md={6}
-          >
-            <Select
-              style={{
-                width:
-                  "100%",
-              }}
-              value={
-                statusFilter
-              }
-              onChange={
-                setStatusFilter
-              }
-              options={[
-                {
-                  value:
-                    "all",
-                  label:
-                    "All Statuses",
-                },
-                {
-                  value:
-                    "Active",
-                  label:
-                    "Active",
-                },
-                {
-                  value:
-                    "On Hold",
-                  label:
-                    "On Hold",
-                },
-                {
-                  value:
-                    "Completed",
-                  label:
-                    "Completed",
-                },
-                {
-                  value:
-                    "Cancelled",
-                  label:
-                    "Cancelled",
-                },
-              ]}
-            />
-          </Col>
-
-          <Col>
             <Text type="secondary">
-              {
-                filteredCases.length
-              }{" "}
-              record
-              {filteredCases.length ===
-              1
-                ? ""
-                : "s"}
+              Search, review and manage
+              orthodontic patient cases.
             </Text>
-          </Col>
-        </Row>
-      </Card>
+          </div>
 
-      {/* ==================================================
-          TABLE
-      ================================================== */}
+          <Tag
+            color="blue"
+            className="ortho-result-count"
+          >
+            {filteredCases.length} result
+            {filteredCases.length !== 1
+              ? "s"
+              : ""}
+          </Tag>
+        </div>
 
-      <Card
-        styles={{
-          body: {
-            padding:
-              0,
-          },
-        }}
-      >
-        <Spin
-          spinning={
-            loading
-          }
-        >
-          <Table
-            rowKey="ortho_case_id"
-            columns={
-              columns
+        <div className="ortho-table-toolbar">
+          <Input
+            allowClear
+            prefix={<SearchOutlined />}
+            placeholder="Search case, patient, treatment or doctor"
+            value={searchText}
+            onChange={(event) =>
+              setSearchText(
+                event.target.value,
+              )
             }
-            dataSource={
-              filteredCases
-            }
-            scroll={{
-              x: 1450,
-            }}
-            pagination={{
-              pageSize:
-                10,
-
-              showSizeChanger:
-                true,
-
-              pageSizeOptions: [
-                10,
-                20,
-                50,
-                100,
-              ],
-
-              showTotal: (
-                total,
-              ) =>
-                `${total} Ortho case${
-                  total ===
-                  1
-                    ? ""
-                    : "s"
-                }`,
-            }}
+            className="ortho-search-input"
           />
-        </Spin>
+
+          <Select
+            value={statusFilter}
+            onChange={setStatusFilter}
+            className="ortho-status-filter"
+            options={[
+              {
+                value: "all",
+                label: "All Statuses",
+              },
+              {
+                value: "Active",
+                label: "Active",
+              },
+              {
+                value: "On Hold",
+                label: "On Hold",
+              },
+              {
+                value: "Completed",
+                label: "Completed",
+              },
+              {
+                value: "Cancelled",
+                label: "Cancelled",
+              },
+            ]}
+          />
+        </div>
+
+        <Table
+          rowKey="ortho_case_id"
+          loading={loading}
+          columns={columns}
+          dataSource={filteredCases}
+          className="ortho-directory-table"
+          scroll={{
+            x: 1500,
+          }}
+          pagination={{
+            pageSize: 10,
+            showSizeChanger: true,
+            pageSizeOptions: [
+              10,
+              20,
+              50,
+              100,
+            ],
+            showTotal: (total) =>
+              `${total} Ortho case${
+                total === 1 ? "" : "s"
+              }`,
+          }}
+          locale={{
+            emptyText: (
+              <Empty
+                image={
+                  Empty.PRESENTED_IMAGE_SIMPLE
+                }
+                description={
+                  searchText ||
+                  statusFilter !== "all"
+                    ? "No matching Ortho cases found"
+                    : "No Ortho cases have been created"
+                }
+              >
+                {!searchText &&
+                  statusFilter === "all" && (
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={
+                        handleNewCase
+                      }
+                    >
+                      Create First Ortho Case
+                    </Button>
+                  )}
+              </Empty>
+            ),
+          }}
+        />
       </Card>
 
       {/* ==================================================
@@ -1878,647 +1296,528 @@ const OrthoPatients = () => {
 
       <Modal
         title={
-          <Space>
-            <MedicineBoxOutlined />
+          <div className="ortho-modal-title">
+            <div className="ortho-modal-title__icon">
+              <MedicineBoxOutlined />
+            </div>
 
-            Create New Ortho Case
-          </Space>
+            <div>
+              <Text strong>
+                Create New Ortho Case
+              </Text>
+
+              <Text type="secondary">
+                Register a new orthodontic
+                treatment case.
+              </Text>
+            </div>
+          </div>
         }
-        open={
-          caseModalOpen
-        }
-        onCancel={
-          handleCloseCaseModal
-        }
-        onOk={
-          handleCreateCase
-        }
+        open={caseModalOpen}
+        onCancel={handleCloseCaseModal}
+        onOk={handleCreateCase}
         okText="Create Ortho Case"
-        confirmLoading={
-          savingCase
-        }
-        width={820}
+        confirmLoading={savingCase}
+        width={850}
+        centered
         destroyOnHidden
-        maskClosable={
-          !savingCase
-        }
-        closable={
-          !savingCase
-        }
+        maskClosable={!savingCase}
+        closable={!savingCase}
+        className="ortho-case-modal"
       >
         <Form
-          form={
-            caseForm
-          }
+          form={caseForm}
           layout="vertical"
-          style={{
-            marginTop:
-              20,
-          }}
+          className="ortho-case-form"
         >
-          <Row
-            gutter={[
-              16,
-              0,
-            ]}
-          >
-            {/* ============================================
-                PATIENT SELECTION
-            ============================================ */}
+          {/* ==============================================
+              PATIENT
+          ============================================== */}
 
-            <Col span={24}>
-              <div
-                style={{
-                  display:
-                    "flex",
-
-                  justifyContent:
-                    "space-between",
-
-                  alignItems:
-                    "center",
-
-                  marginBottom:
-                    8,
-
-                  gap:
-                    12,
-                }}
-              >
+          <div className="ortho-modal-section">
+            <div className="ortho-modal-section__header">
+              <div>
                 <Text strong>
-                  Patient{" "}
-                  <Text type="danger">
-                    *
-                  </Text>
+                  Patient Information
                 </Text>
 
-                <Button
-                  type="link"
-                  size="small"
-                  icon={
-                    <UserAddOutlined />
-                  }
-                  onClick={
-                    handleOpenNewPatient
-                  }
+                <Text
+                  type="secondary"
+                  className="ortho-section-description"
                 >
-                  Add New Patient
-                </Button>
+                  Select the patient for
+                  this orthodontic case.
+                </Text>
               </div>
 
-              <Form.Item
-                name="patient_id"
-                rules={[
-                  {
-                    required:
-                      true,
-
-                    message:
-                      "Please select a patient.",
-                  },
-                ]}
+              <Button
+                type="link"
+                size="small"
+                icon={<UserAddOutlined />}
+                onClick={
+                  handleOpenNewPatient
+                }
               >
-                <Select
-                  showSearch
-                  allowClear
-                  loading={
-                    patientsLoading
-                  }
-                  placeholder="Search and select existing patient"
-                  optionFilterProp="label"
-                  options={
-                    patientOptions
-                  }
-                  notFoundContent={
-                    patientsLoading
-                      ? (
-                          <Spin size="small" />
-                        )
-                      : (
-                          <div
-                            style={{
-                              padding:
-                                12,
+                Add New Patient
+              </Button>
+            </div>
 
-                              textAlign:
-                                "center",
-                            }}
-                          >
-                            <Text type="secondary">
-                              No patient found
-                            </Text>
+            <Form.Item
+              name="patient_id"
+              label="Patient"
+              rules={[
+                {
+                  required: true,
+                  message:
+                    "Please select a patient.",
+                },
+              ]}
+            >
+              <Select
+                showSearch
+                allowClear
+                loading={patientsLoading}
+                placeholder="Search and select existing patient"
+                optionFilterProp="label"
+                options={patientOptions}
+                notFoundContent={
+                  patientsLoading ? (
+                    <Spin size="small" />
+                  ) : (
+                    <div className="ortho-patient-not-found">
+                      <Text type="secondary">
+                        No patient found
+                      </Text>
 
-                            <div
-                              style={{
-                                marginTop:
-                                  8,
-                              }}
-                            >
-                              <Button
-                                size="small"
-                                type="primary"
-                                icon={
-                                  <UserAddOutlined />
-                                }
-                                onClick={
-                                  handleOpenNewPatient
-                                }
-                              >
-                                Add New Patient
-                              </Button>
-                            </div>
-                          </div>
-                        )
-                  }
-                />
-              </Form.Item>
-            </Col>
-
-            {/* ============================================
-                SELECTED PATIENT INFO
-            ============================================ */}
+                      <Button
+                        size="small"
+                        type="primary"
+                        icon={
+                          <UserAddOutlined />
+                        }
+                        onClick={
+                          handleOpenNewPatient
+                        }
+                      >
+                        Add New Patient
+                      </Button>
+                    </div>
+                  )
+                }
+              />
+            </Form.Item>
 
             {selectedPatient && (
-              <Col span={24}>
-                <Alert
-                  type="info"
-                  showIcon
-                  icon={
-                    <UserOutlined />
-                  }
-                  style={{
-                    marginBottom:
-                      20,
-                  }}
-                  message={
-                    getPatientName(
+              <Alert
+                type="info"
+                showIcon
+                icon={<UserOutlined />}
+                className="ortho-selected-patient"
+                message={
+                  getPatientName(
+                    selectedPatient,
+                  ) ||
+                  getPatientId(
+                    selectedPatient,
+                  )
+                }
+                description={
+                  <Space wrap size={16}>
+                    <span>
+                      ID:{" "}
+                      <strong>
+                        {getPatientId(
+                          selectedPatient,
+                        )}
+                      </strong>
+                    </span>
+
+                    {getPatientPhone(
                       selectedPatient,
-                    ) ||
-                    getPatientId(
-                      selectedPatient,
-                    )
-                  }
-                  description={
-                    <Space
-                      wrap
-                      size={16}
-                    >
+                    ) && (
                       <span>
-                        ID:{" "}
+                        Phone:{" "}
                         <strong>
-                          {getPatientId(
+                          {getPatientPhone(
                             selectedPatient,
                           )}
                         </strong>
                       </span>
+                    )}
 
-                      {getPatientPhone(
-                        selectedPatient,
-                      ) && (
-                        <span>
-                          Phone:{" "}
-                          <strong>
-                            {getPatientPhone(
-                              selectedPatient,
-                            )}
-                          </strong>
-                        </span>
-                      )}
+                    {selectedPatient.gender && (
+                      <span>
+                        Gender:{" "}
+                        <strong>
+                          {
+                            selectedPatient.gender
+                          }
+                        </strong>
+                      </span>
+                    )}
 
-                      {selectedPatient.gender && (
-                        <span>
-                          Gender:{" "}
-                          <strong>
-                            {
-                              selectedPatient.gender
-                            }
-                          </strong>
-                        </span>
-                      )}
-
-                      {selectedPatient.age && (
-                        <span>
-                          Age:{" "}
-                          <strong>
-                            {
-                              selectedPatient.age
-                            }
-                          </strong>
-                        </span>
-                      )}
-                    </Space>
-                  }
-                />
-              </Col>
+                    {selectedPatient.age && (
+                      <span>
+                        Age:{" "}
+                        <strong>
+                          {selectedPatient.age}
+                        </strong>
+                      </span>
+                    )}
+                  </Space>
+                }
+              />
             )}
+          </div>
 
-            {/* ============================================
-                DENTIST
-            ============================================ */}
+          {/* ==============================================
+              TREATMENT
+          ============================================== */}
 
-            <Col
-              xs={24}
-              md={12}
-            >
-              <Form.Item
-                name="dentist_id"
-                label="Dentist"
-              >
-                <Input
-                  placeholder="Dentist ID"
-                  autoComplete="off"
-                />
-              </Form.Item>
-            </Col>
+          <div className="ortho-modal-section">
+            <div className="ortho-modal-section__header">
+              <div>
+                <Text strong>
+                  Treatment Information
+                </Text>
 
-            {/* ============================================
-                START DATE
-            ============================================ */}
+                <Text
+                  type="secondary"
+                  className="ortho-section-description"
+                >
+                  Basic information about
+                  the orthodontic treatment.
+                </Text>
+              </div>
+            </div>
 
-            <Col
-              xs={24}
-              md={12}
-            >
-              <Form.Item
-                name="start_date"
-                label="Treatment Start Date"
-                rules={[
-                  {
-                    required:
-                      true,
+            <Row gutter={[16, 0]}>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  name="dentist_id"
+                  label="Dentist"
+                >
+                  <Input
+                    placeholder="Dentist ID"
+                    autoComplete="off"
+                  />
+                </Form.Item>
+              </Col>
 
-                    message:
-                      "Please select the treatment start date.",
-                  },
-                ]}
-              >
-                <DatePicker
-                  style={{
-                    width:
-                      "100%",
-                  }}
-                  format="DD/MM/YYYY"
-                />
-              </Form.Item>
-            </Col>
-
-            {/* ============================================
-                TREATMENT TYPE
-            ============================================ */}
-
-            <Col
-              xs={24}
-              md={12}
-            >
-              <Form.Item
-                name="treatment_type"
-                label="Treatment Type"
-                rules={[
-                  {
-                    required:
-                      true,
-
-                    message:
-                      "Please select the treatment type.",
-                  },
-                ]}
-              >
-                <Select
-                  placeholder="Select treatment type"
-                  options={[
+              <Col xs={24} md={12}>
+                <Form.Item
+                  name="start_date"
+                  label="Treatment Start Date"
+                  rules={[
                     {
-                      value:
-                        "Fixed Braces",
-
-                      label:
-                        "Fixed Braces",
-                    },
-                    {
-                      value:
-                        "Removable Appliance",
-
-                      label:
-                        "Removable Appliance",
-                    },
-                    {
-                      value:
-                        "Clear Aligners",
-
-                      label:
-                        "Clear Aligners",
-                    },
-                    {
-                      value:
-                        "Retainer",
-
-                      label:
-                        "Retainer",
-                    },
-                    {
-                      value:
-                        "Other",
-
-                      label:
-                        "Other",
+                      required: true,
+                      message:
+                        "Please select the treatment start date.",
                     },
                   ]}
-                />
-              </Form.Item>
-            </Col>
+                >
+                  <DatePicker
+                    className="ortho-full-width"
+                    format="DD/MM/YYYY"
+                  />
+                </Form.Item>
+              </Col>
 
-            {/* ============================================
-                TREATMENT AREA
-            ============================================ */}
-
-            <Col
-              xs={24}
-              md={12}
-            >
-              <Form.Item
-                name="treatment_area"
-                label="Treatment Area"
-              >
-                <Select
-                  allowClear
-                  placeholder="Select treatment area"
-                  options={[
+              <Col xs={24} md={12}>
+                <Form.Item
+                  name="treatment_type"
+                  label="Treatment Type"
+                  rules={[
                     {
-                      value:
-                        "Upper & Lower",
-
-                      label:
-                        "Upper & Lower",
-                    },
-                    {
-                      value:
-                        "Upper Only",
-
-                      label:
-                        "Upper Only",
-                    },
-                    {
-                      value:
-                        "Lower Only",
-
-                      label:
-                        "Lower Only",
+                      required: true,
+                      message:
+                        "Please select the treatment type.",
                     },
                   ]}
-                />
-              </Form.Item>
-            </Col>
+                >
+                  <Select
+                    placeholder="Select treatment type"
+                    options={[
+                      {
+                        value:
+                          "Fixed Braces",
+                        label:
+                          "Fixed Braces",
+                      },
+                      {
+                        value:
+                          "Removable Appliance",
+                        label:
+                          "Removable Appliance",
+                      },
+                      {
+                        value:
+                          "Clear Aligners",
+                        label:
+                          "Clear Aligners",
+                      },
+                      {
+                        value:
+                          "Retainer",
+                        label:
+                          "Retainer",
+                      },
+                      {
+                        value: "Other",
+                        label: "Other",
+                      },
+                    ]}
+                  />
+                </Form.Item>
+              </Col>
 
-            {/* ============================================
-                ESTIMATED DURATION
-            ============================================ */}
+              <Col xs={24} md={12}>
+                <Form.Item
+                  name="treatment_area"
+                  label="Treatment Area"
+                >
+                  <Select
+                    allowClear
+                    placeholder="Select treatment area"
+                    options={[
+                      {
+                        value:
+                          "Upper & Lower",
+                        label:
+                          "Upper & Lower",
+                      },
+                      {
+                        value:
+                          "Upper Only",
+                        label:
+                          "Upper Only",
+                      },
+                      {
+                        value:
+                          "Lower Only",
+                        label:
+                          "Lower Only",
+                      },
+                    ]}
+                  />
+                </Form.Item>
+              </Col>
 
-            <Col
-              xs={24}
-              md={12}
-            >
-              <Form.Item
-                name="estimated_duration"
-                label="Estimated Duration"
-              >
-                <Input
-                  placeholder="Example: 18 Months"
-                  autoComplete="off"
-                />
-              </Form.Item>
-            </Col>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  name="estimated_duration"
+                  label="Estimated Duration"
+                >
+                  <Input
+                    placeholder="Example: 18 Months"
+                    autoComplete="off"
+                  />
+                </Form.Item>
+              </Col>
 
-            {/* ============================================
-                DIAGNOSIS
-            ============================================ */}
+              <Col xs={24} md={12}>
+                <Form.Item
+                  name="next_visit_date"
+                  label="Next Visit Date"
+                >
+                  <DatePicker
+                    className="ortho-full-width"
+                    format="DD/MM/YYYY"
+                  />
+                </Form.Item>
+              </Col>
 
-            <Col span={24}>
-              <Form.Item
-                name="diagnosis"
-                label="Diagnosis / Main Problem"
-              >
-                <Input.TextArea
-                  rows={3}
-                  placeholder="Example: Crowding, spacing, malocclusion..."
-                  maxLength={
-                    1000
-                  }
-                  showCount
-                />
-              </Form.Item>
-            </Col>
+              <Col span={24}>
+                <Form.Item
+                  name="diagnosis"
+                  label="Diagnosis / Main Problem"
+                >
+                  <Input.TextArea
+                    rows={3}
+                    placeholder="Example: Crowding, spacing, malocclusion..."
+                    maxLength={1000}
+                    showCount
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          </div>
 
-            {/* ============================================
-                TOTAL FEE
-            ============================================ */}
+          {/* ==============================================
+              FINANCIAL
+          ============================================== */}
 
-            <Col
-              xs={24}
-              md={12}
-            >
-              <Form.Item
-                name="total_treatment_fee"
-                label="Total Treatment Fee"
-                rules={[
-                  {
-                    required:
-                      true,
+          <div className="ortho-modal-section">
+            <div className="ortho-modal-section__header">
+              <div>
+                <Text strong>
+                  Financial Information
+                </Text>
 
-                    message:
-                      "Please enter the total treatment fee.",
-                  },
-                ]}
-              >
-                <InputNumber
-                  style={{
-                    width:
-                      "100%",
-                  }}
-                  min={0}
-                  step={1000}
-                  placeholder="180000"
-                  formatter={(
-                    value,
-                  ) => {
-                    if (
-                      value ===
-                        undefined ||
-                      value ===
-                        null ||
-                      value ===
-                        ""
-                    ) {
-                      return "";
-                    }
+                <Text
+                  type="secondary"
+                  className="ortho-section-description"
+                >
+                  Treatment fee and payment
+                  plan information.
+                </Text>
+              </div>
+            </div>
 
-                    return `Rs. ${String(
-                      value,
-                    ).replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ",",
-                    )}`;
-                  }}
-                  parser={(
-                    value,
-                  ) =>
-                    String(
-                      value ??
+            <Row gutter={[16, 0]}>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  name="total_treatment_fee"
+                  label="Total Treatment Fee"
+                  rules={[
+                    {
+                      required: true,
+                      message:
+                        "Please enter the total treatment fee.",
+                    },
+                  ]}
+                >
+                  <InputNumber
+                    className="ortho-full-width"
+                    min={0}
+                    step={1000}
+                    placeholder="180000"
+                    formatter={(value) => {
+                      if (
+                        value === undefined ||
+                        value === null ||
+                        value === ""
+                      ) {
+                        return "";
+                      }
+
+                      return `Rs. ${String(
+                        value,
+                      ).replace(
+                        /\B(?=(\d{3})+(?!\d))/g,
+                        ",",
+                      )}`;
+                    }}
+                    parser={(value) =>
+                      String(
+                        value ?? "",
+                      ).replace(
+                        /Rs.\s?|,/g,
                         "",
-                    ).replace(
-                      /Rs.\s?|,/g,
-                      "",
-                    )
-                  }
-                />
-              </Form.Item>
-            </Col>
-
-            {/* ============================================
-                PAYMENT PLAN
-            ============================================ */}
-
-            <Col
-              xs={24}
-              md={12}
-            >
-              <Form.Item
-                name="payment_plan"
-                label="Payment Plan"
-              >
-                <Select
-                  allowClear
-                  placeholder="Select payment plan"
-                  options={[
-                    {
-                      value:
-                        "Monthly",
-
-                      label:
-                        "Monthly",
-                    },
-                    {
-                      value:
-                        "Installments",
-
-                      label:
-                        "Installments",
-                    },
-                    {
-                      value:
-                        "Full Payment",
-
-                      label:
-                        "Full Payment",
-                    },
-                    {
-                      value:
-                        "Custom",
-
-                      label:
-                        "Custom",
-                    },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-
-            {/* ============================================
-                MONTHLY PAYMENT
-            ============================================ */}
-
-            <Col
-              xs={24}
-              md={12}
-            >
-              <Form.Item
-                name="monthly_payment"
-                label="Expected Monthly Payment"
-              >
-                <InputNumber
-                  style={{
-                    width:
-                      "100%",
-                  }}
-                  min={0}
-                  step={1000}
-                  placeholder="10000"
-                  formatter={(
-                    value,
-                  ) => {
-                    if (
-                      value ===
-                        undefined ||
-                      value ===
-                        null ||
-                      value ===
-                        ""
-                    ) {
-                      return "";
+                      )
                     }
+                  />
+                </Form.Item>
+              </Col>
 
-                    return `Rs. ${String(
-                      value,
-                    ).replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ",",
-                    )}`;
-                  }}
-                  parser={(
-                    value,
-                  ) =>
-                    String(
-                      value ??
+              <Col xs={24} md={12}>
+                <Form.Item
+                  name="payment_plan"
+                  label="Payment Plan"
+                >
+                  <Select
+                    allowClear
+                    placeholder="Select payment plan"
+                    options={[
+                      {
+                        value: "Monthly",
+                        label: "Monthly",
+                      },
+                      {
+                        value:
+                          "Installments",
+                        label:
+                          "Installments",
+                      },
+                      {
+                        value:
+                          "Full Payment",
+                        label:
+                          "Full Payment",
+                      },
+                      {
+                        value: "Custom",
+                        label: "Custom",
+                      },
+                    ]}
+                  />
+                </Form.Item>
+              </Col>
+
+              <Col xs={24} md={12}>
+                <Form.Item
+                  name="monthly_payment"
+                  label="Expected Monthly Payment"
+                >
+                  <InputNumber
+                    className="ortho-full-width"
+                    min={0}
+                    step={1000}
+                    placeholder="10000"
+                    formatter={(value) => {
+                      if (
+                        value === undefined ||
+                        value === null ||
+                        value === ""
+                      ) {
+                        return "";
+                      }
+
+                      return `Rs. ${String(
+                        value,
+                      ).replace(
+                        /\B(?=(\d{3})+(?!\d))/g,
+                        ",",
+                      )}`;
+                    }}
+                    parser={(value) =>
+                      String(
+                        value ?? "",
+                      ).replace(
+                        /Rs.\s?|,/g,
                         "",
-                    ).replace(
-                      /Rs.\s?|,/g,
-                      "",
-                    )
-                  }
-                />
-              </Form.Item>
-            </Col>
+                      )
+                    }
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          </div>
 
-            {/* ============================================
-                NEXT VISIT
-            ============================================ */}
+          {/* ==============================================
+              NOTES
+          ============================================== */}
 
-            <Col
-              xs={24}
-              md={12}
+          <div className="ortho-modal-section">
+            <div className="ortho-modal-section__header">
+              <div>
+                <Text strong>
+                  Initial Notes
+                </Text>
+
+                <Text
+                  type="secondary"
+                  className="ortho-section-description"
+                >
+                  Additional clinical or
+                  treatment information.
+                </Text>
+              </div>
+            </div>
+
+            <Form.Item
+              name="notes"
+              label="Notes"
+              className="ortho-last-form-item"
             >
-              <Form.Item
-                name="next_visit_date"
-                label="Next Visit Date"
-              >
-                <DatePicker
-                  style={{
-                    width:
-                      "100%",
-                  }}
-                  format="DD/MM/YYYY"
-                />
-              </Form.Item>
-            </Col>
-
-            {/* ============================================
-                NOTES
-            ============================================ */}
-
-            <Col span={24}>
-              <Form.Item
-                name="notes"
-                label="Initial Notes"
-              >
-                <Input.TextArea
-                  rows={4}
-                  placeholder="Any additional notes about the Ortho treatment..."
-                  maxLength={
-                    1500
-                  }
-                  showCount
-                />
-              </Form.Item>
-            </Col>
-          </Row>
+              <Input.TextArea
+                rows={4}
+                placeholder="Any additional notes about the Ortho treatment..."
+                maxLength={1500}
+                showCount
+              />
+            </Form.Item>
+          </div>
         </Form>
       </Modal>
 
@@ -2528,124 +1827,95 @@ const OrthoPatients = () => {
 
       <Modal
         title={
-          <Space>
-            <UserAddOutlined />
+          <div className="ortho-modal-title">
+            <div className="ortho-modal-title__icon ortho-modal-title__icon--patient">
+              <UserAddOutlined />
+            </div>
 
-            Add New Patient
-          </Space>
+            <div>
+              <Text strong>
+                Add New Patient
+              </Text>
+
+              <Text type="secondary">
+                Register a patient before
+                creating the Ortho case.
+              </Text>
+            </div>
+          </div>
         }
-        open={
-          patientModalOpen
-        }
-        onCancel={
-          handleClosePatientModal
-        }
-        onOk={
-          handleCreatePatient
-        }
+        open={patientModalOpen}
+        onCancel={handleClosePatientModal}
+        onOk={handleCreatePatient}
         okText="Create Patient"
-        confirmLoading={
-          savingPatient
-        }
+        confirmLoading={savingPatient}
         width={720}
+        centered
         destroyOnHidden
-        maskClosable={
-          !savingPatient
-        }
-        closable={
-          !savingPatient
-        }
+        maskClosable={!savingPatient}
+        closable={!savingPatient}
+        className="ortho-patient-modal"
       >
         <Alert
           type="info"
           showIcon
           message="New Patient"
-          description="Create the patient first. After saving, the patient will automatically be selected for the new Ortho case."
-          style={{
-            marginBottom:
-              20,
-          }}
+          description="After saving, this patient will automatically be selected for the new Ortho case."
+          className="ortho-new-patient-alert"
         />
 
         <Form
-          form={
-            patientForm
-          }
+          form={patientForm}
           layout="vertical"
         >
-          <Row
-            gutter={[
-              16,
-              0,
-            ]}
-          >
-            {/* ============================================
-                NAME
-            ============================================ */}
-
-            <Col
-              xs={24}
-              md={12}
-            >
+          <Row gutter={[16, 0]}>
+            <Col xs={24} md={12}>
               <Form.Item
                 name="name"
                 label="Patient Name"
                 rules={[
                   {
-                    required:
-                      true,
-
+                    required: true,
+                    whitespace: true,
                     message:
                       "Please enter the patient name.",
                   },
                 ]}
               >
                 <Input
-                  prefix={
-                    <UserOutlined />
-                  }
+                  prefix={<UserOutlined />}
                   placeholder="Patient name"
                   autoComplete="off"
                 />
               </Form.Item>
             </Col>
 
-            {/* ============================================
-                PHONE
-            ============================================ */}
-
-            <Col
-              xs={24}
-              md={12}
-            >
+            <Col xs={24} md={12}>
               <Form.Item
                 name="phone"
                 label="Phone Number"
                 rules={[
                   {
-                    required:
-                      true,
-
+                    required: true,
                     message:
                       "Please enter the phone number.",
+                  },
+                  {
+                    pattern: /^[0-9]{10}$/,
+                    message:
+                      "Please enter a valid 10-digit phone number.",
                   },
                 ]}
               >
                 <Input
                   placeholder="0771234567"
+                  maxLength={10}
                   autoComplete="off"
                 />
               </Form.Item>
             </Col>
 
-            {/* ============================================
-                AGE
-            ============================================ */}
-
-            <Col
-              xs={24}
-              md={12}
-            >
+            <Col xs={24} md={12}>
               <Form.Item
                 name="age"
                 label="Age"
@@ -2654,22 +1924,12 @@ const OrthoPatients = () => {
                   min={0}
                   max={120}
                   placeholder="Age"
-                  style={{
-                    width:
-                      "100%",
-                  }}
+                  className="ortho-full-width"
                 />
               </Form.Item>
             </Col>
 
-            {/* ============================================
-                GENDER
-            ============================================ */}
-
-            <Col
-              xs={24}
-              md={12}
-            >
+            <Col xs={24} md={12}>
               <Form.Item
                 name="gender"
                 label="Gender"
@@ -2679,39 +1939,23 @@ const OrthoPatients = () => {
                   placeholder="Select gender"
                   options={[
                     {
-                      value:
-                        "Male",
-
-                      label:
-                        "Male",
+                      value: "Male",
+                      label: "Male",
                     },
                     {
-                      value:
-                        "Female",
-
-                      label:
-                        "Female",
+                      value: "Female",
+                      label: "Female",
                     },
                     {
-                      value:
-                        "Other",
-
-                      label:
-                        "Other",
+                      value: "Other",
+                      label: "Other",
                     },
                   ]}
                 />
               </Form.Item>
             </Col>
 
-            {/* ============================================
-                LOCATION
-            ============================================ */}
-
-            <Col
-              xs={24}
-              md={12}
-            >
+            <Col xs={24} md={12}>
               <Form.Item
                 name="location"
                 label="Location"
@@ -2723,14 +1967,7 @@ const OrthoPatients = () => {
               </Form.Item>
             </Col>
 
-            {/* ============================================
-                DISTANCE
-            ============================================ */}
-
-            <Col
-              xs={24}
-              md={12}
-            >
+            <Col xs={24} md={12}>
               <Form.Item
                 name="distance"
                 label="Distance"
@@ -2741,10 +1978,6 @@ const OrthoPatients = () => {
                 />
               </Form.Item>
             </Col>
-
-            {/* ============================================
-                ADDRESS
-            ============================================ */}
 
             <Col span={24}>
               <Form.Item
@@ -2758,14 +1991,7 @@ const OrthoPatients = () => {
               </Form.Item>
             </Col>
 
-            {/* ============================================
-                ALLERGIES
-            ============================================ */}
-
-            <Col
-              xs={24}
-              md={12}
-            >
+            <Col xs={24} md={12}>
               <Form.Item
                 name="has_allergies"
                 label="Has Allergies?"
@@ -2773,32 +1999,19 @@ const OrthoPatients = () => {
                 <Select
                   options={[
                     {
-                      value:
-                        "No",
-
-                      label:
-                        "No",
+                      value: "No",
+                      label: "No",
                     },
                     {
-                      value:
-                        "Yes",
-
-                      label:
-                        "Yes",
+                      value: "Yes",
+                      label: "Yes",
                     },
                   ]}
                 />
               </Form.Item>
             </Col>
 
-            {/* ============================================
-                STATUS
-            ============================================ */}
-
-            <Col
-              xs={24}
-              md={12}
-            >
+            <Col xs={24} md={12}>
               <Form.Item
                 name="status"
                 label="Patient Status"
@@ -2806,61 +2019,56 @@ const OrthoPatients = () => {
                 <Select
                   options={[
                     {
-                      value:
-                        "Active",
-
-                      label:
-                        "Active",
+                      value: "Active",
+                      label: "Active",
                     },
                     {
-                      value:
-                        "Inactive",
-
-                      label:
-                        "Inactive",
+                      value: "Inactive",
+                      label: "Inactive",
                     },
                   ]}
                 />
               </Form.Item>
             </Col>
 
-            {/* ============================================
-                ALLERGY DETAILS
-            ============================================ */}
-
             {normalize(
               patientHasAllergies,
-            ) ===
-              "yes" && (
+            ) === "yes" && (
               <Col span={24}>
-                <Form.Item
-                  name="allergy_details"
-                  label="Allergy Details"
-                  rules={[
-                    {
-                      required:
-                        true,
-
-                      message:
-                        "Please enter allergy details.",
-                    },
-                  ]}
-                >
-                  <Input.TextArea
-                    rows={3}
-                    maxLength={
-                      1000
-                    }
-                    showCount
-                    placeholder="Enter allergy details..."
-                  />
-                </Form.Item>
+                <Alert
+                  type="error"
+                  showIcon
+                  message="Allergy Information"
+                  className="ortho-allergy-alert"
+                  description={
+                    <Form.Item
+                      name="allergy_details"
+                      label="Allergy Details"
+                      rules={[
+                        {
+                          required: true,
+                          whitespace: true,
+                          message:
+                            "Please enter allergy details.",
+                        },
+                      ]}
+                      className="ortho-allergy-form-item"
+                    >
+                      <Input.TextArea
+                        rows={3}
+                        maxLength={1000}
+                        showCount
+                        placeholder="Enter allergy details..."
+                      />
+                    </Form.Item>
+                  }
+                />
               </Col>
             )}
           </Row>
         </Form>
       </Modal>
-    </div>
+    </ClinicPage>
   );
 };
 

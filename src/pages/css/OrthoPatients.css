@@ -1,0 +1,503 @@
+/* ========================================================
+   General
+======================================================== */
+
+.ortho-error-alert {
+  margin-bottom: 16px;
+}
+
+.ortho-full-width {
+  width: 100%;
+}
+
+.ortho-secondary-text {
+  font-size: 12px;
+}
+
+/* ========================================================
+   Summary
+======================================================== */
+
+.ortho-summary-row {
+  margin-bottom: 20px;
+}
+
+.ortho-summary-card {
+  height: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: default;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.ortho-summary-card[onclick] {
+  cursor: pointer;
+}
+
+.ortho-summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
+}
+
+.ortho-summary-card .ant-card-body {
+  padding: 20px;
+}
+
+.ortho-summary-card__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.ortho-summary-card__title {
+  display: block;
+  margin-bottom: 5px;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ortho-summary-card__value {
+  margin-bottom: 3px;
+
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 700;
+
+  word-break: break-word;
+}
+
+.ortho-summary-card__helper {
+  font-size: 12px;
+}
+
+.ortho-summary-card__icon {
+  width: 46px;
+  height: 46px;
+
+  flex: 0 0 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 13px;
+
+  font-size: 21px;
+}
+
+/* ========================================================
+   Summary tones
+======================================================== */
+
+.ortho-summary-card--blue {
+  border-top: 3px solid #1677ff;
+}
+
+.ortho-summary-card--blue
+  .ortho-summary-card__icon {
+  color: #1677ff;
+  background: rgba(22, 119, 255, 0.1);
+}
+
+.ortho-summary-card--green {
+  border-top: 3px solid #52c41a;
+}
+
+.ortho-summary-card--green
+  .ortho-summary-card__icon {
+  color: #52c41a;
+  background: rgba(82, 196, 26, 0.1);
+}
+
+.ortho-summary-card--purple {
+  border-top: 3px solid #722ed1;
+}
+
+.ortho-summary-card--purple
+  .ortho-summary-card__icon {
+  color: #722ed1;
+  background: rgba(114, 46, 209, 0.1);
+}
+
+.ortho-summary-card--cyan {
+  border-top: 3px solid #13c2c2;
+}
+
+.ortho-summary-card--cyan
+  .ortho-summary-card__icon {
+  color: #13c2c2;
+  background: rgba(19, 194, 194, 0.1);
+}
+
+.ortho-summary-card--orange {
+  border-top: 3px solid #fa8c16;
+}
+
+.ortho-summary-card--orange
+  .ortho-summary-card__icon {
+  color: #fa8c16;
+  background: rgba(250, 140, 22, 0.1);
+}
+
+.ortho-summary-card--red {
+  border-top: 3px solid #ff4d4f;
+}
+
+.ortho-summary-card--red
+  .ortho-summary-card__icon {
+  color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.1);
+}
+
+/* ========================================================
+   Directory
+======================================================== */
+
+.ortho-directory-card {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.ortho-directory-card > .ant-card-body {
+  padding: 0;
+}
+
+.ortho-directory-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  padding: 20px 20px 16px;
+}
+
+.ortho-directory-header h4.ant-typography {
+  margin: 0 0 3px;
+}
+
+.ortho-result-count {
+  margin: 0;
+
+  padding-inline: 10px;
+
+  border-radius: 20px;
+}
+
+/* ========================================================
+   Toolbar
+======================================================== */
+
+.ortho-table-toolbar {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 14px 20px;
+
+  border-top: 1px solid rgba(5, 5, 5, 0.06);
+  border-bottom: 1px solid rgba(5, 5, 5, 0.06);
+}
+
+.ortho-search-input {
+  width: min(430px, 100%);
+}
+
+.ortho-status-filter {
+  width: 180px;
+}
+
+/* ========================================================
+   Table
+======================================================== */
+
+.ortho-directory-table
+  .ant-table-thead
+  > tr
+  > th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ortho-directory-table
+  .ant-table-tbody
+  > tr
+  > td {
+  vertical-align: middle;
+}
+
+.ortho-directory-card .ant-pagination {
+  padding-inline: 20px;
+}
+
+/* ========================================================
+   Case
+======================================================== */
+
+.ortho-case-id {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 4px 9px;
+
+  border-radius: 7px;
+
+  background: rgba(22, 119, 255, 0.09);
+  color: #1677ff;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ========================================================
+   Patient cell
+======================================================== */
+
+.ortho-patient-cell {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.ortho-patient-avatar {
+  flex-shrink: 0;
+
+  color: #1677ff;
+  background: rgba(22, 119, 255, 0.1);
+}
+
+.ortho-patient-name {
+  display: block;
+}
+
+.ortho-patient-id {
+  display: block;
+
+  margin-top: 1px;
+
+  font-size: 12px;
+}
+
+/* ========================================================
+   Modal title
+======================================================== */
+
+.ortho-modal-title {
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+}
+
+.ortho-modal-title__icon {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 38px;
+
+  border-radius: 10px;
+
+  color: #722ed1;
+  background: rgba(114, 46, 209, 0.1);
+
+  font-size: 18px;
+}
+
+.ortho-modal-title__icon--patient {
+  color: #1677ff;
+  background: rgba(22, 119, 255, 0.1);
+}
+
+.ortho-modal-title > div:last-child {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ========================================================
+   Case modal
+======================================================== */
+
+.ortho-case-modal .ant-modal-content,
+.ortho-patient-modal .ant-modal-content {
+  border-radius: 16px;
+}
+
+.ortho-case-form {
+  margin-top: 20px;
+}
+
+.ortho-modal-section {
+  margin-bottom: 16px;
+  padding: 17px;
+
+  border: 1px solid rgba(5, 5, 5, 0.08);
+  border-radius: 12px;
+}
+
+.ortho-modal-section:last-child {
+  margin-bottom: 0;
+}
+
+.ortho-modal-section__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-bottom: 15px;
+}
+
+.ortho-modal-section__header > div:first-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.ortho-section-description {
+  display: block;
+
+  margin-top: 2px;
+
+  font-size: 12px;
+}
+
+.ortho-last-form-item {
+  margin-bottom: 0;
+}
+
+/* ========================================================
+   Selected patient
+======================================================== */
+
+.ortho-selected-patient {
+  margin-top: 4px;
+}
+
+.ortho-patient-not-found {
+  padding: 12px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 8px;
+
+  text-align: center;
+}
+
+/* ========================================================
+   New patient
+======================================================== */
+
+.ortho-new-patient-alert {
+  margin: 18px 0 20px;
+}
+
+.ortho-allergy-alert {
+  margin-bottom: 20px;
+}
+
+.ortho-allergy-form-item {
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+/* ========================================================
+   Dark theme / Ant Design dark algorithm compatibility
+======================================================== */
+
+[data-theme="dark"] .ortho-table-toolbar,
+.dark .ortho-table-toolbar {
+  border-color: rgba(255, 255, 255, 0.09);
+}
+
+[data-theme="dark"] .ortho-modal-section,
+.dark .ortho-modal-section {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .ortho-summary-card:hover,
+.dark .ortho-summary-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+[data-theme="dark"] .ortho-case-id,
+.dark .ortho-case-id {
+  background: rgba(22, 119, 255, 0.16);
+}
+
+/* ========================================================
+   Responsive
+======================================================== */
+
+@media (max-width: 992px) {
+  .ortho-summary-card__value {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 768px) {
+  .ortho-directory-header {
+    flex-direction: column;
+  }
+
+  .ortho-table-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ortho-search-input,
+  .ortho-status-filter {
+    width: 100%;
+  }
+
+  .ortho-summary-card .ant-card-body {
+    padding: 16px;
+  }
+
+  .ortho-summary-card__value {
+    font-size: 22px;
+  }
+
+  .ortho-modal-section {
+    padding: 14px;
+  }
+
+  .ortho-modal-section__header {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 576px) {
+  .ortho-summary-card__icon {
+    width: 42px;
+    height: 42px;
+
+    flex-basis: 42px;
+
+    font-size: 19px;
+  }
+
+  .ortho-directory-header {
+    padding: 16px;
+  }
+
+  .ortho-table-toolbar {
+    padding: 12px 16px;
+  }
+
+  .ortho-directory-card .ant-pagination {
+    padding-inline: 12px;
+  }
+}

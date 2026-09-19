@@ -2172,3 +2172,347 @@
     animation: none !important;
   }
 }
+
+
+/* ========================================================
+   Active Queue + Treatment Progress Layout
+======================================================== */
+
+.queue-active-progress-layout {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    300px;
+  gap: 18px;
+  align-items: stretch;
+  margin-top: 18px;
+}
+
+.queue-active-column {
+  min-width: 0;
+}
+
+.queue-progress-column {
+  min-width: 0;
+}
+
+
+/* ========================================================
+   Treatment / Payment Progress Panel
+======================================================== */
+
+.queue-progress-panel {
+  height: 100%;
+  min-height: 260px;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 16px;
+
+  background: #fafafa;
+
+  border: 1px solid #e8e8e8;
+  border-radius: 14px;
+}
+
+
+/* ========================================================
+   Progress Header
+======================================================== */
+
+.queue-progress-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding-bottom: 13px;
+  margin-bottom: 13px;
+
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.queue-progress-eyebrow {
+  margin-bottom: 2px;
+
+  color: #8c8c8c;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+}
+
+.queue-progress-title {
+  margin: 0 !important;
+
+  font-weight: 700 !important;
+}
+
+
+/* ========================================================
+   Progress List
+======================================================== */
+
+.queue-progress-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 9px;
+
+  max-height: 540px;
+
+  overflow-y: auto;
+
+  padding-right: 3px;
+}
+
+
+/* ========================================================
+   Individual Progress Patient
+======================================================== */
+
+.queue-progress-card {
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 11px;
+
+  background: #ffffff;
+
+  border: 1px solid #e8e8e8;
+  border-radius: 11px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.queue-progress-card:hover {
+  border-color: #d9d9d9;
+
+  box-shadow:
+    0 4px 14px
+    rgba(0, 0, 0, 0.06);
+
+  transform:
+    translateY(-1px);
+}
+
+
+/* ========================================================
+   Appointment Number
+======================================================== */
+
+.queue-progress-card-number {
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #f0f5ff;
+
+  color: #1677ff;
+
+  font-size: 14px;
+  font-weight: 800;
+}
+
+
+/* ========================================================
+   Patient Details
+======================================================== */
+
+.queue-progress-card-content {
+  flex: 1;
+
+  min-width: 0;
+}
+
+.queue-progress-card-name {
+  overflow: hidden;
+
+  margin-bottom: 5px;
+
+  color: #262626;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.queue-progress-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 6px;
+
+  color: #8c8c8c;
+
+  font-size: 11px;
+}
+
+.queue-progress-status {
+  margin-inline-end: 0 !important;
+
+  font-size: 10px;
+
+  white-space: nowrap;
+}
+
+
+/* ========================================================
+   Scrollbar
+======================================================== */
+
+.queue-progress-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.queue-progress-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.queue-progress-list::-webkit-scrollbar-thumb {
+  background: #d9d9d9;
+
+  border-radius: 10px;
+}
+
+
+/* ========================================================
+   Dark Theme
+======================================================== */
+
+[data-theme="dark"]
+.queue-progress-panel,
+.dark
+.queue-progress-panel {
+  background: #141414;
+
+  border-color: #303030;
+}
+
+[data-theme="dark"]
+.queue-progress-panel-header,
+.dark
+.queue-progress-panel-header {
+  border-color: #303030;
+}
+
+[data-theme="dark"]
+.queue-progress-card,
+.dark
+.queue-progress-card {
+  background: #1f1f1f;
+
+  border-color: #303030;
+}
+
+[data-theme="dark"]
+.queue-progress-card:hover,
+.dark
+.queue-progress-card:hover {
+  border-color: #434343;
+
+  box-shadow:
+    0 4px 14px
+    rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"]
+.queue-progress-card-name,
+.dark
+.queue-progress-card-name {
+  color: rgba(
+    255,
+    255,
+    255,
+    0.88
+  );
+}
+
+[data-theme="dark"]
+.queue-progress-card-number,
+.dark
+.queue-progress-card-number {
+  background: rgba(
+    22,
+    119,
+    255,
+    0.14
+  );
+
+  color: #69b1ff;
+}
+
+
+/* ========================================================
+   Responsive
+======================================================== */
+
+@media (
+  max-width: 1100px
+) {
+  .queue-active-progress-layout {
+    grid-template-columns:
+      minmax(0, 1fr)
+      260px;
+  }
+}
+
+@media (
+  max-width: 900px
+) {
+  .queue-active-progress-layout {
+    grid-template-columns:
+      1fr;
+  }
+
+  .queue-progress-column {
+    order: 2;
+  }
+
+  .queue-progress-list {
+    max-height: 300px;
+  }
+}
+
+@media (
+  max-width: 576px
+) {
+  .queue-active-progress-layout {
+    gap: 12px;
+  }
+
+  .queue-progress-panel {
+    padding: 12px;
+
+    border-radius: 10px;
+  }
+
+  .queue-progress-card {
+    padding: 9px;
+  }
+
+  .queue-progress-card-number {
+    width: 38px;
+    height: 38px;
+
+    flex-basis: 38px;
+  }
+}
