@@ -3,7 +3,6 @@
    LIGHT + DARK THEME
 ======================================================== */
 
-
 /* ========================================================
    THEME VARIABLES
 ======================================================== */
@@ -24,22 +23,15 @@ html[data-theme="light"] {
   --patient-media-preview-bg: #f5f7fa;
 
   --patient-media-blue: #1677ff;
-  --patient-media-blue-soft:
-    rgba(22, 119, 255, 0.1);
+  --patient-media-blue-soft: rgba(22, 119, 255, 0.1);
 
   --patient-media-red: #cf1322;
-  --patient-media-red-soft:
-    rgba(255, 77, 79, 0.1);
+  --patient-media-red-soft: rgba(255, 77, 79, 0.1);
 
-  --patient-media-shadow:
-    0 6px 18px
-    rgba(15, 23, 42, 0.045);
+  --patient-media-shadow: 0 6px 18px rgba(15, 23, 42, 0.045);
 
-  --patient-media-shadow-hover:
-    0 12px 26px
-    rgba(15, 23, 42, 0.09);
+  --patient-media-shadow-hover: 0 12px 26px rgba(15, 23, 42, 0.09);
 }
-
 
 html[data-theme="dark"] {
   --patient-media-surface: #101a29;
@@ -56,22 +48,15 @@ html[data-theme="dark"] {
   --patient-media-preview-bg: #0f1927;
 
   --patient-media-blue: #60a5fa;
-  --patient-media-blue-soft:
-    rgba(59, 130, 246, 0.14);
+  --patient-media-blue-soft: rgba(59, 130, 246, 0.14);
 
   --patient-media-red: #f87171;
-  --patient-media-red-soft:
-    rgba(239, 68, 68, 0.14);
+  --patient-media-red-soft: rgba(239, 68, 68, 0.14);
 
-  --patient-media-shadow:
-    0 8px 22px
-    rgba(0, 0, 0, 0.2);
+  --patient-media-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
 
-  --patient-media-shadow-hover:
-    0 14px 30px
-    rgba(0, 0, 0, 0.32);
+  --patient-media-shadow-hover: 0 14px 30px rgba(0, 0, 0, 0.32);
 }
-
 
 /* ========================================================
    TAB
@@ -80,7 +65,6 @@ html[data-theme="dark"] {
 .patient-media-tab {
   width: 100%;
 }
-
 
 /* ========================================================
    HEADER
@@ -99,16 +83,12 @@ html[data-theme="dark"] {
 .patient-media-tab-header h4 {
   margin: 0 0 3px !important;
 
-  color:
-    var(--patient-media-text) !important;
+  color: var(--patient-media-text) !important;
 }
 
-.patient-media-tab-header
-  .ant-typography-secondary {
-  color:
-    var(--patient-media-text-secondary) !important;
+.patient-media-tab-header .ant-typography-secondary {
+  color: var(--patient-media-text-secondary) !important;
 }
-
 
 /* ========================================================
    FILTER
@@ -126,26 +106,20 @@ html[data-theme="dark"] {
   display: none;
 }
 
-.patient-media-tab-filter
-  .ant-segmented {
+.patient-media-tab-filter .ant-segmented {
   min-width: max-content;
 
   padding: 4px;
 
-  background:
-    var(--patient-media-surface-secondary);
+  background: var(--patient-media-surface-secondary);
 
-  border:
-    1px solid
-    var(--patient-media-border);
+  border: 1px solid var(--patient-media-border);
 
   border-radius: 10px;
 }
 
-.patient-media-tab-filter
-  .ant-segmented-item {
-  color:
-    var(--patient-media-text-secondary);
+.patient-media-tab-filter .ant-segmented-item {
+  color: var(--patient-media-text-secondary);
 
   border-radius: 7px;
 
@@ -154,33 +128,21 @@ html[data-theme="dark"] {
     background-color 0.2s ease;
 }
 
-.patient-media-tab-filter
-  .ant-segmented-item:hover {
-  color:
-    var(--patient-media-text);
+.patient-media-tab-filter .ant-segmented-item:hover {
+  color: var(--patient-media-text);
 }
 
-.patient-media-tab-filter
-  .ant-segmented-item-selected {
-  color:
-    var(--patient-media-text);
+.patient-media-tab-filter .ant-segmented-item-selected {
+  color: var(--patient-media-text);
 
-  background:
-    var(--patient-media-surface);
+  background: var(--patient-media-surface);
 
-  box-shadow:
-    0 2px 6px
-    rgba(15, 23, 42, 0.06);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
 }
 
-html[data-theme="dark"]
-  .patient-media-tab-filter
-  .ant-segmented-item-selected {
-  box-shadow:
-    0 2px 7px
-    rgba(0, 0, 0, 0.24);
+html[data-theme="dark"] .patient-media-tab-filter .ant-segmented-item-selected {
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.24);
 }
-
 
 /* ========================================================
    LOADING
@@ -196,10 +158,8 @@ html[data-theme="dark"]
 
   gap: 14px;
 
-  color:
-    var(--patient-media-text-secondary);
+  color: var(--patient-media-text-secondary);
 }
-
 
 /* ========================================================
    MEDIA ITEM CARD
@@ -210,17 +170,13 @@ html[data-theme="dark"]
 
   overflow: hidden;
 
-  background:
-    var(--patient-media-surface);
+  background: var(--patient-media-surface);
 
-  border:
-    1px solid
-    var(--patient-media-border) !important;
+  border: 1px solid var(--patient-media-border) !important;
 
   border-radius: 14px !important;
 
-  box-shadow:
-    var(--patient-media-shadow);
+  box-shadow: var(--patient-media-shadow);
 
   transition:
     transform 0.2s ease,
@@ -230,21 +186,16 @@ html[data-theme="dark"]
 }
 
 .patient-media-item-card:hover {
-  transform:
-    translateY(-2px);
+  transform: translateY(-2px);
 
-  border-color:
-    rgba(22, 119, 255, 0.22) !important;
+  border-color: rgba(22, 119, 255, 0.22) !important;
 
-  box-shadow:
-    var(--patient-media-shadow-hover);
+  box-shadow: var(--patient-media-shadow-hover);
 }
 
-.patient-media-item-card
-  .ant-card-body {
+.patient-media-item-card .ant-card-body {
   padding: 16px;
 }
-
 
 /* ========================================================
    PREVIEW
@@ -261,12 +212,9 @@ html[data-theme="dark"]
 
   overflow: hidden;
 
-  background:
-    var(--patient-media-preview-bg);
+  background: var(--patient-media-preview-bg);
 
-  border-bottom:
-    1px solid
-    var(--patient-media-border-soft);
+  border-bottom: 1px solid var(--patient-media-border-soft);
 }
 
 .patient-media-item-image {
@@ -275,24 +223,19 @@ html[data-theme="dark"]
 
   object-fit: cover;
 
-  transition:
-    transform 0.25s ease;
+  transition: transform 0.25s ease;
 }
 
-.patient-media-item-card:hover
-  .patient-media-item-image {
-  transform:
-    scale(1.025);
+.patient-media-item-card:hover .patient-media-item-image {
+  transform: scale(1.025);
 }
-
 
 /* ========================================================
    LARGE FILE ICON
 ======================================================== */
 
 .patient-media-item-large-icon {
-  color:
-    var(--patient-media-text-muted);
+  color: var(--patient-media-text-muted);
 
   font-size: 58px;
 
@@ -300,12 +243,10 @@ html[data-theme="dark"]
 }
 
 .patient-media-item-large-icon--pdf {
-  color:
-    var(--patient-media-red);
+  color: var(--patient-media-red);
 
   opacity: 0.9;
 }
-
 
 /* ========================================================
    BODY
@@ -320,7 +261,6 @@ html[data-theme="dark"]
   gap: 9px;
 }
 
-
 /* ========================================================
    FILE NAME
 ======================================================== */
@@ -332,15 +272,13 @@ html[data-theme="dark"]
 
   overflow: hidden;
 
-  color:
-    var(--patient-media-text) !important;
+  color: var(--patient-media-text) !important;
 
   font-weight: 600;
 
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
 
 /* ========================================================
    DESCRIPTION
@@ -353,42 +291,35 @@ html[data-theme="dark"]
 
   overflow: hidden;
 
-  color:
-    var(--patient-media-text-secondary) !important;
+  color: var(--patient-media-text-secondary) !important;
 
   font-size: 12px;
   line-height: 1.5;
 
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
 }
-
 
 /* ========================================================
    DATE
 ======================================================== */
 
 .patient-media-item-date {
-  color:
-    var(--patient-media-text-muted) !important;
+  color: var(--patient-media-text-muted) !important;
 
   font-size: 12px;
 }
-
 
 /* ========================================================
    TAGS
 ======================================================== */
 
-.patient-media-item-card
-  .ant-tag {
+.patient-media-item-card .ant-tag {
   margin-inline-end: 4px;
 
   border-radius: 6px;
 
   font-size: 11px;
 }
-
 
 /* ========================================================
    ACTIONS
@@ -402,8 +333,7 @@ html[data-theme="dark"]
   padding-top: 6px;
 }
 
-.patient-media-item-actions
-  .ant-btn {
+.patient-media-item-actions .ant-btn {
   flex: 1;
 
   min-width: 0;
@@ -411,70 +341,50 @@ html[data-theme="dark"]
   border-radius: 8px;
 }
 
-
 /* ========================================================
    GENERAL TYPOGRAPHY
 ======================================================== */
 
-.patient-media-tab
-  .ant-typography:not(
-    .ant-typography-secondary
-  ) {
-  color:
-    var(--patient-media-text);
+.patient-media-tab .ant-typography:not(.ant-typography-secondary) {
+  color: var(--patient-media-text);
 }
 
-.patient-media-tab
-  .ant-typography-secondary {
-  color:
-    var(--patient-media-text-secondary);
+.patient-media-tab .ant-typography-secondary {
+  color: var(--patient-media-text-secondary);
 }
-
 
 /* ========================================================
    EMPTY STATE
 ======================================================== */
 
-.patient-media-tab
-  .ant-empty-description {
-  color:
-    var(--patient-media-text-secondary);
+.patient-media-tab .ant-empty-description {
+  color: var(--patient-media-text-secondary);
 }
-
 
 /* ========================================================
    DARK MODE CARD FIX
 ======================================================== */
 
-html[data-theme="dark"]
-  .patient-media-item-card.ant-card {
-  color:
-    var(--patient-media-text);
+html[data-theme="dark"] .patient-media-item-card.ant-card {
+  color: var(--patient-media-text);
 
-  background:
-    var(--patient-media-surface);
+  background: var(--patient-media-surface);
 }
-
 
 /* ========================================================
    DARK SEGMENTED FIX
 ======================================================== */
 
-html[data-theme="dark"]
-  .patient-media-tab
-  .ant-segmented-thumb {
-  background:
-    var(--patient-media-surface);
+html[data-theme="dark"] .patient-media-tab .ant-segmented-thumb {
+  background: var(--patient-media-surface);
 }
-
 
 /* ========================================================
    TRANSITIONS
 ======================================================== */
 
 .patient-media-item-card,
-.patient-media-tab-filter
-  .ant-segmented,
+.patient-media-tab-filter .ant-segmented,
 .patient-media-item-preview {
   transition:
     background-color 0.25s ease,
@@ -482,7 +392,6 @@ html[data-theme="dark"]
     color 0.25s ease,
     box-shadow 0.25s ease;
 }
-
 
 /* ========================================================
    RESPONSIVE
@@ -495,14 +404,11 @@ html[data-theme="dark"]
     align-items: stretch;
   }
 
-  .patient-media-tab-header
-    > .ant-space {
+  .patient-media-tab-header > .ant-space {
     width: 100%;
   }
 
-  .patient-media-tab-header
-    > .ant-space
-    .ant-btn {
+  .patient-media-tab-header > .ant-space .ant-btn {
     flex: 1;
   }
 
@@ -519,7 +425,6 @@ html[data-theme="dark"]
   }
 }
 
-
 @media (max-width: 576px) {
   .patient-media-item-preview {
     height: 190px;
@@ -529,8 +434,7 @@ html[data-theme="dark"]
     height: 190px !important;
   }
 
-  .patient-media-item-card
-    .ant-card-body {
+  .patient-media-item-card .ant-card-body {
     padding: 14px;
   }
 

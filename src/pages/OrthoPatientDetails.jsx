@@ -2031,6 +2031,8 @@ const OrthoPatientDetails = () => {
         ================================================== */}
 
       <Modal
+        rootClassName="ortho-common-modal"
+
         title={
           <Space>
             <MedicineBoxOutlined />
@@ -2205,6 +2207,8 @@ const OrthoPatientDetails = () => {
         ================================================== */}
 
       <Modal
+        rootClassName="ortho-common-modal"
+
         title={
           <Space>
             <DollarOutlined />
@@ -2420,6 +2424,8 @@ const OrthoPatientDetails = () => {
         ================================================== */}
 
       <Modal
+        rootClassName="ortho-common-modal"
+
         title={
           <Space>
             <UploadOutlined />
@@ -2633,6 +2639,8 @@ const OrthoPatientDetails = () => {
         ================================================== */}
 
       <Modal
+        rootClassName="ortho-common-modal"
+
         open={previewOpen}
         title={
           <Space>

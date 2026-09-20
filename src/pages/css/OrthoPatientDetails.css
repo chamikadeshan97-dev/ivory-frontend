@@ -2018,3 +2018,617 @@ html[data-theme="dark"]
     min-height: 350px;
   }
 }
+
+/* ========================================================
+   COMMON ORTHO MODAL
+======================================================== */
+
+.ortho-common-modal .ant-modal-content {
+  padding: 0;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow:
+    0 24px 60px rgba(15, 23, 42, 0.18);
+}
+
+.ortho-common-modal .ant-modal-header {
+  margin: 0;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.ortho-common-modal .ant-modal-title {
+  color: #172033;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.ortho-common-modal .ant-modal-body {
+  padding: 22px 24px;
+  background: #f8fafc;
+}
+
+.ortho-common-modal .ant-modal-footer {
+  margin: 0;
+  padding: 14px 24px;
+  border-top: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+/* ========================================================
+   MODAL CLOSE BUTTON
+======================================================== */
+
+.ortho-common-modal .ant-modal-close {
+  top: 15px;
+  right: 16px;
+  color: #64748b;
+  border-radius: 8px;
+}
+
+.ortho-common-modal .ant-modal-close:hover {
+  color: #1e293b;
+  background: #f1f5f9;
+}
+
+/* ========================================================
+   FORM LABELS
+======================================================== */
+
+.ortho-common-modal .ant-form-item-label > label {
+  color: #334155;
+  font-weight: 500;
+}
+
+.ortho-common-modal .ant-form-item-required::before {
+  color: #ef4444 !important;
+}
+
+/* ========================================================
+   INPUT
+======================================================== */
+
+.ortho-common-modal .ant-input,
+.ortho-common-modal .ant-input-affix-wrapper {
+  min-height: 34px;
+  color: #1e293b;
+  background: #ffffff;
+  border-color: #d8e1ec;
+  border-radius: 10px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.ortho-common-modal textarea.ant-input {
+  min-height: unset;
+}
+
+.ortho-common-modal .ant-input::placeholder,
+.ortho-common-modal textarea.ant-input::placeholder {
+  color: #94a3b8;
+}
+
+/* ========================================================
+   INPUT NUMBER
+======================================================== */
+
+.ortho-common-modal .ant-input-number {
+  width: 100%;
+  color: #1e293b;
+  background: #ffffff;
+  border-color: #d8e1ec;
+  border-radius: 10px;
+}
+
+.ortho-common-modal
+  .ant-input-number
+  .ant-input-number-input {
+  color: #1e293b;
+  background: transparent;
+}
+
+.ortho-common-modal
+  .ant-input-number
+  .ant-input-number-input::placeholder {
+  color: #94a3b8;
+}
+
+/* ========================================================
+   SELECT
+======================================================== */
+
+.ortho-common-modal
+  .ant-select:not(.ant-select-customize-input)
+  .ant-select-selector {
+  color: #1e293b !important;
+  background: #ffffff !important;
+  border-color: #d8e1ec !important;
+  border-radius: 10px !important;
+}
+
+.ortho-common-modal .ant-select-selection-item {
+  color: #1e293b !important;
+}
+
+.ortho-common-modal .ant-select-selection-placeholder {
+  color: #94a3b8 !important;
+}
+
+.ortho-common-modal .ant-select-arrow,
+.ortho-common-modal .ant-select-clear {
+  color: #64748b;
+}
+
+/* ========================================================
+   DATE PICKER
+======================================================== */
+
+.ortho-common-modal .ant-picker {
+  min-height: 34px;
+  color: #1e293b;
+  background: #ffffff;
+  border-color: #d8e1ec;
+  border-radius: 10px;
+}
+
+.ortho-common-modal
+  .ant-picker
+  .ant-picker-input > input {
+  color: #1e293b;
+}
+
+.ortho-common-modal
+  .ant-picker
+  .ant-picker-input > input::placeholder {
+  color: #94a3b8;
+}
+
+.ortho-common-modal .ant-picker-suffix,
+.ortho-common-modal .ant-picker-clear {
+  color: #64748b;
+}
+
+/* ========================================================
+   HOVER
+======================================================== */
+
+.ortho-common-modal .ant-input:hover,
+.ortho-common-modal .ant-input-affix-wrapper:hover,
+.ortho-common-modal .ant-input-number:hover,
+.ortho-common-modal .ant-picker:hover,
+.ortho-common-modal
+  .ant-select:not(.ant-select-disabled):hover
+  .ant-select-selector {
+  border-color: #3b82f6 !important;
+}
+
+/* ========================================================
+   FOCUS
+======================================================== */
+
+.ortho-common-modal .ant-input:focus,
+.ortho-common-modal .ant-input-focused,
+.ortho-common-modal .ant-input-affix-wrapper-focused,
+.ortho-common-modal .ant-input-number-focused,
+.ortho-common-modal .ant-picker-focused,
+.ortho-common-modal
+  .ant-select-focused
+  .ant-select-selector {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12) !important;
+}
+
+/* ========================================================
+   TEXTAREA CHARACTER COUNT
+======================================================== */
+
+.ortho-common-modal .ant-input-data-count,
+.ortho-common-modal .ant-input-show-count-suffix {
+  color: #64748b;
+}
+
+/* ========================================================
+   UPLOAD DRAGGER
+======================================================== */
+
+.ortho-common-modal .ant-upload-wrapper .ant-upload-drag {
+  border-color: #cbd5e1;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.ortho-common-modal
+  .ant-upload-wrapper
+  .ant-upload-drag:hover {
+  border-color: #3b82f6;
+}
+
+.ortho-common-modal
+  .ant-upload-wrapper
+  .ant-upload-drag
+  .ant-upload-drag-icon {
+  color: #2563eb;
+}
+
+.ortho-common-modal
+  .ant-upload-wrapper
+  .ant-upload-drag
+  .ant-upload-text {
+  color: #334155;
+}
+
+.ortho-common-modal
+  .ant-upload-wrapper
+  .ant-upload-drag
+  .ant-upload-hint {
+  color: #64748b;
+}
+
+/* ========================================================
+   DESCRIPTIONS
+======================================================== */
+
+.ortho-common-modal .ant-descriptions {
+  color: #334155;
+}
+
+.ortho-common-modal
+  .ant-descriptions-bordered
+  .ant-descriptions-item-label {
+  color: #475569;
+  background: #f8fafc;
+}
+
+.ortho-common-modal
+  .ant-descriptions-bordered
+  .ant-descriptions-item-content {
+  color: #1e293b;
+  background: #ffffff;
+}
+
+/* ========================================================
+   LIGHT THEME BUTTON FOOTER
+======================================================== */
+
+.ortho-common-modal .ant-modal-footer .ant-btn-default {
+  color: #334155;
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.ortho-common-modal
+  .ant-modal-footer
+  .ant-btn-default:hover {
+  color: #2563eb;
+  border-color: #2563eb;
+}
+
+/* ========================================================
+   DARK THEME - MODAL
+======================================================== */
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-modal-content {
+  background: #0f1b2a;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.42);
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-modal-header {
+  border-bottom-color: #24364b;
+  background: #0f1b2a;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-modal-title {
+  color: #edf4fc;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-modal-body {
+  background: #0f1b2a;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-modal-footer {
+  border-top-color: #24364b;
+  background: #0f1b2a;
+}
+
+/* ========================================================
+   DARK THEME - CLOSE BUTTON
+======================================================== */
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-modal-close {
+  color: #94a3b8;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-modal-close:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ========================================================
+   DARK THEME - LABELS
+======================================================== */
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-form-item-label > label {
+  color: #dbe5f1;
+}
+
+/* ========================================================
+   DARK THEME - INPUT
+======================================================== */
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-input,
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-input-affix-wrapper {
+  color: #e5edf7 !important;
+  background: #142336 !important;
+  border-color: #32465c !important;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-input::placeholder,
+[data-theme="dark"]
+  .ortho-common-modal
+  textarea.ant-input::placeholder {
+  color: #708196 !important;
+}
+
+/* ========================================================
+   DARK THEME - INPUT NUMBER
+======================================================== */
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-input-number {
+  color: #e5edf7 !important;
+  background: #142336 !important;
+  border-color: #32465c !important;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-input-number-input {
+  color: #e5edf7 !important;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-input-number-input::placeholder {
+  color: #708196 !important;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-input-number-handler-wrap {
+  background: #17283d;
+  border-color: #32465c;
+}
+
+/* ========================================================
+   DARK THEME - SELECT
+======================================================== */
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-select:not(.ant-select-customize-input)
+  .ant-select-selector {
+  color: #e5edf7 !important;
+  background: #142336 !important;
+  border-color: #32465c !important;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-select-selection-item {
+  color: #e5edf7 !important;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-select-selection-placeholder {
+  color: #708196 !important;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-select-arrow,
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-select-clear {
+  color: #94a3b8;
+}
+
+/* ========================================================
+   DARK THEME - DATE PICKER
+======================================================== */
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-picker {
+  color: #e5edf7 !important;
+  background: #142336 !important;
+  border-color: #32465c !important;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-picker-input > input {
+  color: #e5edf7 !important;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-picker-input > input::placeholder {
+  color: #708196 !important;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-picker-suffix,
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-picker-clear {
+  color: #94a3b8;
+}
+
+/* ========================================================
+   DARK THEME - HOVER / FOCUS
+======================================================== */
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-input:hover,
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-input-number:hover,
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-picker:hover,
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-select:not(.ant-select-disabled):hover
+  .ant-select-selector {
+  border-color: #3b82f6 !important;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-input:focus,
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-input-focused,
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-input-number-focused,
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-picker-focused,
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-select-focused
+  .ant-select-selector {
+  border-color: #3b82f6 !important;
+  box-shadow:
+    0 0 0 2px rgba(59, 130, 246, 0.16) !important;
+}
+
+/* ========================================================
+   DARK THEME - CHARACTER COUNT
+======================================================== */
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-input-data-count,
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-input-show-count-suffix {
+  color: #8392a6;
+}
+
+/* ========================================================
+   DARK THEME - UPLOAD
+======================================================== */
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-upload-wrapper
+  .ant-upload-drag {
+  border-color: #32465c;
+  background: #142336;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-upload-wrapper
+  .ant-upload-drag:hover {
+  border-color: #3b82f6;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-upload-wrapper
+  .ant-upload-drag
+  .ant-upload-text {
+  color: #e5edf7;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-upload-wrapper
+  .ant-upload-drag
+  .ant-upload-hint {
+  color: #8392a6;
+}
+
+/* ========================================================
+   DARK THEME - DESCRIPTIONS
+======================================================== */
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-descriptions-bordered
+  .ant-descriptions-item-label {
+  color: #b9c6d6;
+  background: #142336;
+  border-color: #32465c;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-descriptions-bordered
+  .ant-descriptions-item-content {
+  color: #e5edf7;
+  background: #0f1b2a;
+  border-color: #32465c;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-descriptions-view {
+  border-color: #32465c;
+}
+
+/* ========================================================
+   DARK THEME - FOOTER BUTTON
+======================================================== */
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-modal-footer
+  .ant-btn-default {
+  color: #dbe5f1;
+  background: #142336;
+  border-color: #32465c;
+}
+
+[data-theme="dark"]
+  .ortho-common-modal
+  .ant-modal-footer
+  .ant-btn-default:hover {
+  color: #60a5fa;
+  border-color: #3b82f6;
+  background: #17283d;
+}
