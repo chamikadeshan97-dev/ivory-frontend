@@ -6,53 +6,42 @@ import React, {
   useState,
 } from "react";
 
-import {
-  Alert,
-  Spin,
-  Typography,
-} from "antd";
+import { Alert, Spin, Typography } from "antd";
 
 import {
   CalendarOutlined,
   CheckCircleFilled,
   ClockCircleOutlined,
-  LoadingOutlined,
   MedicineBoxOutlined,
   MoonOutlined,
-  ReloadOutlined,
-  RightOutlined,
+  SoundFilled,
   SunOutlined,
   TeamOutlined,
-  ThunderboltFilled,
 } from "@ant-design/icons";
 
 import dayjs from "dayjs";
 
-import {
-  getAppointmentsByDate,
-  getQueueOrderByDate,
-} from "../api/endPoints";
+import { getAppointmentsByDate, getQueueOrderByDate } from "../api/endPoints";
 
 import "./css/PatientQueueDisplay.css";
 
 const { Title, Text } = Typography;
 
-/* ========================================================
-   CONFIGURATION
-======================================================== */
+/* =========================================================
+   CONFIG
+========================================================= */
 
 const REFRESH_INTERVAL = 10000;
 
 const READY_PATIENT_COUNT = 2;
 
-const UPCOMING_PATIENT_COUNT = 8;
+const UPCOMING_PATIENT_COUNT = 100;
 
-const THEME_STORAGE_KEY =
-  "patient-queue-display-theme";
+const THEME_STORAGE_KEY = "patient-queue-display-theme";
 
-/* ========================================================
-   STATUSES
-======================================================== */
+/* =========================================================
+   STATUS CONFIG
+========================================================= */
 
 const COMPLETED_STATUSES = [
   "treatment done",
@@ -64,138 +53,92 @@ const COMPLETED_STATUSES = [
   "canceled",
 ];
 
-const IN_TREATMENT_STATUSES = [
-  "in treatment",
-];
+const IN_TREATMENT_STATUSES = ["in treatment"];
 
-/* ========================================================
-   HELPERS
-======================================================== */
+/* =========================================================
+   BASIC HELPERS
+========================================================= */
 
 const normalize = (value) =>
   String(value ?? "")
     .trim()
     .toLowerCase();
 
-const clean = (value) =>
-  String(value ?? "").trim();
+const clean = (value) => String(value ?? "").trim();
 
-const getAppointmentId = (
-  appointment,
-) =>
-  clean(
-    appointment?.id ??
-      appointment?.appointment_id,
-  );
+const getAppointmentId = (appointment) =>
+  clean(appointment?.id ?? appointment?.appointment_id);
 
-const getAppointmentNumber = (
-  appointment,
-) =>
-  clean(
-    appointment?.appointment_number,
-  );
+const getAppointmentNumber = (appointment) =>
+  clean(appointment?.appointment_number);
 
-/* ========================================================
+const isWaitingAppointment = (appointment) =>
+  normalize(appointment?.status) === "waiting";
+
+/* =========================================================
    RESPONSE HELPERS
-======================================================== */
+========================================================= */
 
-const extractAppointments = (
-  response,
-) => {
-  const data =
-    response?.data?.data ??
-    response?.data ??
-    [];
+const extractAppointments = (response) => {
+  const data = response?.data?.data ?? response?.data ?? [];
 
   if (Array.isArray(data)) {
     return data;
   }
 
-  if (
-    Array.isArray(
-      data?.appointments,
-    )
-  ) {
+  if (Array.isArray(data?.appointments)) {
     return data.appointments;
   }
 
   return [];
 };
 
-const extractQueueOrder = (
-  response,
-) => {
+const extractQueueOrder = (response) => {
   const queueOrder =
-    response?.data?.data
-      ?.queue_order ??
-    response?.data?.queue_order ??
-    [];
+    response?.data?.data?.queue_order ?? response?.data?.queue_order ?? [];
 
   if (!Array.isArray(queueOrder)) {
     return [];
   }
 
-  return queueOrder.map((id) =>
-    clean(id),
-  );
+  return queueOrder.map((id) => clean(id));
 };
 
-/* ========================================================
-   GET INITIAL THEME
-======================================================== */
+/* =========================================================
+   INITIAL THEME
+========================================================= */
 
 const getInitialTheme = () => {
   try {
-    const savedTheme =
-      localStorage.getItem(
-        THEME_STORAGE_KEY,
-      );
+    const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
 
-    if (
-      savedTheme === "light" ||
-      savedTheme === "dark"
-    ) {
+    if (savedTheme === "light" || savedTheme === "dark") {
       return savedTheme;
     }
 
-    const prefersDark =
-      window.matchMedia?.(
-        "(prefers-color-scheme: dark)",
-      )?.matches;
+    const prefersDark = window.matchMedia?.(
+      "(prefers-color-scheme: dark)",
+    )?.matches;
 
-    return prefersDark
-      ? "dark"
-      : "light";
+    return prefersDark ? "dark" : "light";
   } catch {
     return "dark";
   }
 };
 
-/* ========================================================
+/* =========================================================
    APPOINTMENT NUMBER
-======================================================== */
+========================================================= */
 
-const AppointmentNumber = ({
-  appointment,
-  className = "",
-  showHash = true,
-}) => {
-  const number =
-    getAppointmentNumber(
-      appointment,
-    );
+const AppointmentNumber = ({ appointment, className = "" }) => {
+  const number = getAppointmentNumber(appointment);
 
   if (!appointment || !number) {
     return (
       <div
-        className={[
-          "pq-number",
-          "pq-number-empty",
-          className,
-        ]
+        className={["pq-number", "pq-number-empty", className]
           .filter(Boolean)
           .join(" ")}
-        aria-hidden="true"
       >
         —
       </div>
@@ -203,462 +146,277 @@ const AppointmentNumber = ({
   }
 
   return (
-    <div
-      className={[
-        "pq-number",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
-    >
-      {showHash && (
-        <span className="pq-number-hash">
-          
-        </span>
-      )}
-
-      <span>{number}</span>
+    <div className={["pq-number", className].filter(Boolean).join(" ")}>
+      {number}
     </div>
   );
 };
 
-/* ========================================================
-   PATIENT QUEUE DISPLAY
-======================================================== */
+/* =========================================================
+   COMPONENT
+========================================================= */
 
 const PatientQueueDisplay = () => {
-  const [
-    currentDateTime,
-    setCurrentDateTime,
-  ] = useState(dayjs());
+  /* =======================================================
+     STATE
+  ======================================================= */
 
-  const [
-    appointments,
-    setAppointments,
-  ] = useState([]);
+  const [currentDateTime, setCurrentDateTime] = useState(dayjs());
 
-  const [
-    savedQueue,
-    setSavedQueue,
-  ] = useState([]);
+  const [appointments, setAppointments] = useState([]);
 
-  const [
-    loading,
-    setLoading,
-  ] = useState(true);
+  const [savedQueue, setSavedQueue] = useState([]);
 
-  const [
-    refreshing,
-    setRefreshing,
-  ] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const [
-    loadError,
-    setLoadError,
-  ] = useState("");
+  const [loadError, setLoadError] = useState("");
 
-  const [
-    lastUpdated,
-    setLastUpdated,
-  ] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
-  const isFirstLoad =
-    useRef(true);
+  const isFirstLoad = useRef(true);
 
-  /* ======================================================
+  /* =======================================================
      THEME
-  ====================================================== */
+  ======================================================= */
 
-  const [
-    themeMode,
-    setThemeMode,
-  ] = useState(getInitialTheme);
+  const [themeMode, setThemeMode] = useState(getInitialTheme);
 
-  const isDarkMode =
-    themeMode === "dark";
+  const isDarkMode = themeMode === "dark";
 
-  const handleThemeChange =
-    useCallback(() => {
-      setThemeMode((currentTheme) =>
-        currentTheme === "dark"
-          ? "light"
-          : "dark",
-      );
-    }, []);
+  const handleThemeChange = useCallback(() => {
+    setThemeMode((currentTheme) =>
+      currentTheme === "dark" ? "light" : "dark",
+    );
+  }, []);
 
   useEffect(() => {
     try {
-      localStorage.setItem(
-        THEME_STORAGE_KEY,
-        themeMode,
-      );
+      localStorage.setItem(THEME_STORAGE_KEY, themeMode);
     } catch (error) {
-      console.warn(
-        "Unable to save queue display theme:",
-        error,
-      );
+      console.warn("Unable to save queue display theme:", error);
     }
   }, [themeMode]);
 
-  /* ======================================================
+  /* =======================================================
      CURRENT DATE
-  ====================================================== */
+  ======================================================= */
 
-  const currentDate =
-    useMemo(
-      () =>
-        currentDateTime.format(
-          "YYYY-MM-DD",
-        ),
-      [currentDateTime],
-    );
+  const currentDate = useMemo(
+    () => currentDateTime.format("YYYY-MM-DD"),
+    [currentDateTime],
+  );
 
-  /* ======================================================
+  /* =======================================================
      CLOCK
-  ====================================================== */
+  ======================================================= */
 
   useEffect(() => {
-    const timer =
-      window.setInterval(() => {
-        setCurrentDateTime(
-          dayjs(),
-        );
-      }, 1000);
+    const timer = window.setInterval(() => {
+      setCurrentDateTime(dayjs());
+    }, 1000);
 
-    return () =>
-      window.clearInterval(
-        timer,
-      );
+    return () => window.clearInterval(timer);
   }, []);
 
-  /* ======================================================
+  /* =======================================================
      LOAD QUEUE
-  ====================================================== */
+  ======================================================= */
 
-  const loadQueue =
-    useCallback(
-      async ({
-        silent = false,
-      } = {}) => {
-        try {
-          if (!silent) {
-            setRefreshing(true);
-          }
+  const loadQueue = useCallback(async () => {
+    try {
+      setLoadError("");
 
-          setLoadError("");
+      const [appointmentResponse, queueResponse] = await Promise.all([
+        getAppointmentsByDate(currentDate),
 
-          const [
-            appointmentResponse,
-            queueResponse,
-          ] = await Promise.all([
-            getAppointmentsByDate(
-              currentDate,
-            ),
+        getQueueOrderByDate(currentDate),
+      ]);
 
-            getQueueOrderByDate(
-              currentDate,
-            ),
-          ]);
+      setAppointments(extractAppointments(appointmentResponse));
 
-          setAppointments(
-            extractAppointments(
-              appointmentResponse,
-            ),
-          );
+      setSavedQueue(extractQueueOrder(queueResponse));
 
-          setSavedQueue(
-            extractQueueOrder(
-              queueResponse,
-            ),
-          );
+      setLastUpdated(dayjs());
+    } catch (error) {
+      console.error("Failed to load patient queue:", error);
 
-          setLastUpdated(dayjs());
-        } catch (error) {
-          console.error(
-            "Failed to load patient queue:",
-            error,
-          );
+      setLoadError(
+        error?.response?.data?.message || "Unable to refresh patient queue.",
+      );
+    } finally {
+      if (isFirstLoad.current) {
+        isFirstLoad.current = false;
 
-          setLoadError(
-            error?.response?.data
-              ?.message ||
-              "Unable to refresh patient queue.",
-          );
-        } finally {
-          setRefreshing(false);
+        setLoading(false);
+      }
+    }
+  }, [currentDate]);
 
-          if (isFirstLoad.current) {
-            isFirstLoad.current = false;
-
-            setLoading(false);
-          }
-        }
-      },
-      [currentDate],
-    );
-
-  /* ======================================================
+  /* =======================================================
      INITIAL LOAD
-  ====================================================== */
+  ======================================================= */
 
   useEffect(() => {
     setLoading(true);
 
     isFirstLoad.current = true;
 
-    loadQueue({ silent: true });
+    loadQueue();
   }, [loadQueue]);
 
-  /* ======================================================
+  /* =======================================================
      AUTO REFRESH
-  ====================================================== */
+  ======================================================= */
 
   useEffect(() => {
-    const interval =
-      window.setInterval(
-        () =>
-          loadQueue({
-            silent: true,
-          }),
-        REFRESH_INTERVAL,
-      );
+    const interval = window.setInterval(loadQueue, REFRESH_INTERVAL);
 
-    return () =>
-      window.clearInterval(
-        interval,
-      );
+    return () => window.clearInterval(interval);
   }, [loadQueue]);
 
-  /* ======================================================
-     MANUAL REFRESH
-  ====================================================== */
-
-  const handleManualRefresh =
-    useCallback(() => {
-      loadQueue({ silent: false });
-    }, [loadQueue]);
-
-  /* ======================================================
+  /* =======================================================
      APPOINTMENT MAP
-  ====================================================== */
+  ======================================================= */
 
-  const appointmentMap =
-    useMemo(() => {
-      return new Map(
-        appointments.map(
-          (appointment) => [
-            getAppointmentId(
-              appointment,
-            ),
-            appointment,
-          ],
-        ),
-      );
-    }, [appointments]);
+  const appointmentMap = useMemo(() => {
+    return new Map(
+      appointments.map((appointment) => [
+        getAppointmentId(appointment),
+        appointment,
+      ]),
+    );
+  }, [appointments]);
 
-  /* ======================================================
+  /* =======================================================
      ORDERED QUEUE
-  ====================================================== */
+  ======================================================= */
 
-  const orderedQueue =
-    useMemo(() => {
-      return savedQueue
-        .map((appointmentId) =>
-          appointmentMap.get(
-            appointmentId,
-          ),
-        )
-        .filter(Boolean)
-        .filter((appointment) =>
-          Boolean(
-            getAppointmentNumber(
-              appointment,
-            ),
-          ),
-        );
-    }, [
-      savedQueue,
-      appointmentMap,
-    ]);
+  const orderedQueue = useMemo(() => {
+    return savedQueue
+      .map((appointmentId) => appointmentMap.get(appointmentId))
+      .filter(Boolean)
+      .filter((appointment) => Boolean(getAppointmentNumber(appointment)));
+  }, [savedQueue, appointmentMap]);
 
-  /* ======================================================
+  /* =======================================================
      NOW SERVING
-  ====================================================== */
+  ======================================================= */
 
-  const nowServing =
-    useMemo(() => {
-      return (
-        orderedQueue.find(
-          (appointment) =>
-            IN_TREATMENT_STATUSES.includes(
-              normalize(
-                appointment.status,
-              ),
-            ),
-        ) ?? null
-      );
-    }, [orderedQueue]);
-
-  /* ======================================================
-     WAITING QUEUE
-  ====================================================== */
-
-  const waitingQueue =
-    useMemo(() => {
-      return orderedQueue.filter(
-        (appointment) => {
-          const status =
-            normalize(
-              appointment.status,
-            );
-
-          if (
-            IN_TREATMENT_STATUSES.includes(
-              status,
-            )
-          ) {
-            return false;
-          }
-
-          if (
-            COMPLETED_STATUSES.includes(
-              status,
-            )
-          ) {
-            return false;
-          }
-
-          return true;
-        },
-      );
-    }, [orderedQueue]);
-
-  /* ======================================================
-     READY PATIENTS
-  ====================================================== */
-
-  const readyPatients =
-    useMemo(
-      () =>
-        waitingQueue.slice(
-          0,
-          READY_PATIENT_COUNT,
-        ),
-      [waitingQueue],
+  const nowServing = useMemo(() => {
+    return (
+      appointments.find((appointment) =>
+        IN_TREATMENT_STATUSES.includes(normalize(appointment?.status)),
+      ) ?? null
     );
+  }, [appointments]);
 
-  /* ======================================================
-     UPCOMING PATIENTS
-  ====================================================== */
+  /* =======================================================
+     ACTIVE QUEUE
+  ======================================================= */
 
-  const upcomingPatients =
-    useMemo(
-      () =>
-        waitingQueue.slice(
-          READY_PATIENT_COUNT,
-          READY_PATIENT_COUNT +
-            UPCOMING_PATIENT_COUNT,
-        ),
-      [waitingQueue],
-    );
+  const waitingQueue = useMemo(() => {
+    return orderedQueue.filter((appointment) => {
+      const status = normalize(appointment?.status);
 
-  /* ======================================================
-     COMPLETED COUNT
-  ====================================================== */
-
-  const completedCount =
-    useMemo(() => {
-      return orderedQueue.filter(
-        (appointment) =>
-          COMPLETED_STATUSES.includes(
-            normalize(
-              appointment.status,
-            ),
-          ),
-      ).length;
-    }, [orderedQueue]);
-
-  /* ======================================================
-     EMPTY STATE
-  ====================================================== */
-
-  const queueEmpty =
-    !nowServing &&
-    waitingQueue.length === 0;
-
-  /* ======================================================
-     ANNOUNCEMENT (SR)
-  ====================================================== */
-
-  const liveAnnouncement =
-    useMemo(() => {
-      if (loading) {
-        return "Loading patient queue";
+      if (IN_TREATMENT_STATUSES.includes(status)) {
+        return false;
       }
 
-      if (queueEmpty) {
-        return "Queue not started. No patients waiting.";
+      if (COMPLETED_STATUSES.includes(status)) {
+        return false;
       }
 
-      const currentNumber =
-        getAppointmentNumber(
-          nowServing,
-        );
+      return true;
+    });
+  }, [orderedQueue]);
 
-      const nextNumber =
-        getAppointmentNumber(
-          readyPatients[0],
-        );
+  /* =======================================================
+     NEXT TWO
+  ======================================================= */
 
-      if (currentNumber && nextNumber) {
-        return `Now serving appointment ${currentNumber}. Next is appointment ${nextNumber}.`;
-      }
+  const readyPatients = useMemo(
+    () => waitingQueue.slice(0, READY_PATIENT_COUNT),
+    [waitingQueue],
+  );
 
-      if (currentNumber) {
-        return `Now serving appointment ${currentNumber}.`;
-      }
+  /* =======================================================
+     UPCOMING EIGHT
+  ======================================================= */
 
-      if (nextNumber) {
-        return `Next appointment is ${nextNumber}.`;
-      }
+  const upcomingPatients = useMemo(
+    () =>
+      waitingQueue.slice(
+        READY_PATIENT_COUNT,
+        READY_PATIENT_COUNT + UPCOMING_PATIENT_COUNT,
+      ),
+    [waitingQueue],
+  );
 
-      return "Queue updated.";
-    }, [
-      loading,
-      queueEmpty,
-      nowServing,
-      readyPatients,
-    ]);
+  /* =======================================================
+     EMPTY QUEUE
+  ======================================================= */
 
-  /* ======================================================
-     LAST UPDATED LABEL
-  ====================================================== */
+  const queueEmpty = !nowServing && waitingQueue.length === 0;
 
-  const lastUpdatedLabel =
-    useMemo(() => {
-      if (!lastUpdated) {
-        return "—";
-      }
+  /* =======================================================
+     SCREEN READER ANNOUNCEMENT
+  ======================================================= */
 
-      return lastUpdated.format(
-        "hh:mm:ss A",
-      );
-    }, [lastUpdated]);
+  const liveAnnouncement = useMemo(() => {
+    if (loading) {
+      return "Loading patient queue.";
+    }
 
-  /* ======================================================
+    if (queueEmpty) {
+      return "No patients are currently waiting.";
+    }
+
+    const currentNumber = getAppointmentNumber(nowServing);
+
+    const nextNumber = getAppointmentNumber(readyPatients[0]);
+
+    if (currentNumber && nextNumber) {
+      return `Now serving appointment ${currentNumber}. Next appointment ${nextNumber}.`;
+    }
+
+    if (currentNumber) {
+      return `Now serving appointment ${currentNumber}.`;
+    }
+
+    if (nextNumber) {
+      return `Next appointment ${nextNumber}.`;
+    }
+
+    return "Patient queue updated.";
+  }, [loading, queueEmpty, nowServing, readyPatients]);
+
+  /* =======================================================
+     LAST UPDATED
+  ======================================================= */
+
+  const lastUpdatedLabel = useMemo(() => {
+    if (!lastUpdated) {
+      return "";
+    }
+
+    return lastUpdated.format("hh:mm:ss A");
+  }, [lastUpdated]);
+
+  /* =======================================================
      RENDER
-  ====================================================== */
+  ======================================================= */
 
   return (
     <div
       className={[
         "pq-page",
-        isDarkMode
-          ? "pq-theme-dark"
-          : "pq-theme-light",
+        isDarkMode ? "pq-theme-dark" : "pq-theme-light",
       ].join(" ")}
     >
-      {/* Screen-reader live region */}
+      {/* ===================================================
+          ACCESSIBILITY
+      =================================================== */}
+
       <div
         className="pq-sr-only"
         role="status"
@@ -668,485 +426,365 @@ const PatientQueueDisplay = () => {
         {liveAnnouncement}
       </div>
 
-      {/* ==================================================
+      {/* ===================================================
           HEADER
       =================================================== */}
 
       <header className="pq-header">
+        {/* BRAND */}
+
         <div className="pq-brand">
-          <div
-            className="pq-brand-logo"
-            aria-hidden="true"
-          >
+          <div className="pq-brand-logo">
             <MedicineBoxOutlined />
           </div>
 
-          <div className="pq-brand-content">
-            <div className="pq-brand-eyebrow">
-              PATIENT QUEUE
-            </div>
+          <div className="pq-brand-main">
+            <div className="pq-brand-name">IVORY DENTAL CLINIC</div>
 
-            <h1 className="pq-brand-title">
-              Dental Clinic
-            </h1>
-
-            <div className="pq-brand-description">
-              Live appointment queue
-            </div>
+            <div className="pq-brand-subtitle">Live Appointment Queue</div>
           </div>
         </div>
 
+        {/* HEADER RIGHT */}
+
         <div className="pq-header-right">
-          {/* ==============================================
-              SUMMARY
-          =============================================== */}
-
-          <div
-            className="pq-header-summary"
-            aria-label="Queue summary"
-          >
-            <div className="pq-summary-item">
-              <div
-                className="pq-summary-icon"
-                aria-hidden="true"
-              >
-                <TeamOutlined />
-              </div>
-
-              <div>
-                <span className="pq-summary-value">
-                  {
-                    waitingQueue.length
-                  }
-                </span>
-
-                <span className="pq-summary-label">
-                  Waiting
-                </span>
-              </div>
-            </div>
-
-            <div
-              className="pq-summary-divider"
-              aria-hidden="true"
-            />
-
-            <div className="pq-summary-item">
-              <div
-                className="pq-summary-icon pq-summary-icon-success"
-                aria-hidden="true"
-              >
-                <CheckCircleFilled />
-              </div>
-
-              <div>
-                <span className="pq-summary-value">
-                  {completedCount}
-                </span>
-
-                <span className="pq-summary-label">
-                  Completed
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* ==============================================
-              REFRESH BUTTON
-          =============================================== */}
-
-          <button
-            type="button"
-            className="pq-theme-toggle"
-            onClick={
-              handleManualRefresh
-            }
-            disabled={refreshing}
-            aria-label="Refresh queue"
-            title={`Last updated ${lastUpdatedLabel}`}
-          >
-            <span className="pq-theme-toggle-icon">
-              {refreshing ? (
-                <LoadingOutlined />
-              ) : (
-                <ReloadOutlined />
-              )}
-            </span>
-
-            <span className="pq-theme-toggle-text">
-              Refresh
-            </span>
-          </button>
-
-          {/* ==============================================
-              THEME BUTTON
-          =============================================== */}
-
-          <button
-            type="button"
-            className="pq-theme-toggle"
-            onClick={
-              handleThemeChange
-            }
-            aria-label={
-              isDarkMode
-                ? "Switch to light mode"
-                : "Switch to dark mode"
-            }
-            title={
-              isDarkMode
-                ? "Switch to Light Mode"
-                : "Switch to Dark Mode"
-            }
-          >
-            <span className="pq-theme-toggle-icon">
-              {isDarkMode ? (
-                <SunOutlined />
-              ) : (
-                <MoonOutlined />
-              )}
-            </span>
-
-            <span className="pq-theme-toggle-text">
-              {isDarkMode
-                ? "Light"
-                : "Dark"}
-            </span>
-          </button>
-
-          {/* ==============================================
-              CLOCK
-          =============================================== */}
+          {/* DATE / CLOCK */}
 
           <div className="pq-clock">
             <div className="pq-date">
               <CalendarOutlined />
 
-              <span>
-                {currentDateTime.format(
-                  "dddd, DD MMMM YYYY",
-                )}
-              </span>
+              <span>{currentDateTime.format("dddd, DD MMMM YYYY")}</span>
             </div>
 
-            <div
-              className="pq-time"
-              aria-live="off"
-            >
-              {currentDateTime.format(
-                "hh:mm:ss A",
-              )}
+            <div className="pq-time">
+              {currentDateTime.format("hh:mm:ss A")}
             </div>
 
-            <div className="pq-live-status">
+            <div className="pq-live">
               <span className="pq-live-dot" />
-
-              Live Queue
+              LIVE QUEUE
             </div>
           </div>
+
+          {/* THEME */}
+
+          <button
+            type="button"
+            className="pq-theme-button"
+            onClick={handleThemeChange}
+            aria-label={
+              isDarkMode ? "Switch to light mode" : "Switch to dark mode"
+            }
+          >
+            <span className="pq-theme-button-icon">
+              {isDarkMode ? <SunOutlined /> : <MoonOutlined />}
+            </span>
+          </button>
         </div>
       </header>
 
-      {/* ==================================================
+      {/* ===================================================
           ERROR
       =================================================== */}
 
       {loadError && (
-        <div className="pq-alert-container">
+        <div className="pq-alert-wrapper">
           <Alert
-            type="warning"
             showIcon
+            type="warning"
             message="Connection problem"
-            description="Displaying the latest available queue. Reconnecting automatically."
+            description={`Displaying the latest queue information${
+              lastUpdatedLabel ? ` from ${lastUpdatedLabel}` : ""
+            }. Reconnecting automatically.`}
           />
         </div>
       )}
 
-      {/* ==================================================
-          CONTENT
+      {/* ===================================================
+          LOADING
       =================================================== */}
 
-      <div className="pq-content">
-        {loading &&
-        orderedQueue.length === 0 ? (
-          <div
-            className="pq-state-screen"
-            role="status"
-            aria-live="polite"
-          >
-            <Spin size="large" />
+      {loading ? (
+        <div className="pq-state-screen">
+          <Spin size="large" />
 
-            <Title level={3}>
-              Loading patient queue
-            </Title>
+          <Title level={2}>Loading Queue</Title>
 
-            <Text type="secondary">
-              Please wait a moment
-            </Text>
+          <Text type="secondary">Please wait a moment</Text>
+        </div>
+      ) : queueEmpty ? (
+        /* =================================================
+           EMPTY
+        ================================================= */
+
+        <div className="pq-state-screen">
+          <div className="pq-empty-icon">
+            <ClockCircleOutlined />
           </div>
-        ) : queueEmpty ? (
-          <div
-            className="pq-state-screen"
-            role="status"
-          >
-            <div
-              className="pq-empty-icon"
-              aria-hidden="true"
-            >
-              <ClockCircleOutlined />
-            </div>
 
-            <Title level={2}>
-              Queue Not Started
-            </Title>
+          <Title level={2}>Queue Not Started</Title>
 
-            <Text type="secondary">
-              No patients are currently
-              waiting.
-            </Text>
-          </div>
-        ) : (
-          <main className="pq-main">
-            {/* ============================================
-                MAIN TOP GRID
+          <Text type="secondary">No patients are currently waiting.</Text>
+        </div>
+      ) : (
+        /* =================================================
+           QUEUE CONTENT
+        ================================================= */
+
+        <main className="pq-content">
+          <div className="pq-layout">
+            {/* =============================================
+                LEFT — NOW SERVING
             ============================================= */}
 
-            <div className="pq-top-grid">
-              {/* ==========================================
-                  NOW SERVING
-              =========================================== */}
+            <section className="pq-serving-panel">
+             
+             <div className="pq-floating-clock">
+  <div className="pq-serving-digital-clock">
+    <ClockCircleOutlined className="pq-serving-clock-icon" />
 
-              <section
-                className="pq-serving"
-                aria-label="Now serving"
-              >
-                <div className="pq-serving-top">
-                  <div className="pq-serving-status">
-                    <span className="pq-serving-status-dot" />
+    <span className="pq-serving-clock-time">
+      {currentDateTime.format("hh:mm:ss")}
+    </span>
 
-                    CURRENT PATIENT
-                  </div>
+    <span className="pq-serving-clock-period">
+      {currentDateTime.format("A")}
+    </span>
+  </div>
+</div>
 
-                  <div
-                    className="pq-serving-icon"
-                    aria-hidden="true"
-                  >
-                    <CheckCircleFilled />
-                  </div>
-                </div>
 
-                <div className="pq-serving-content">
-                  <div className="pq-serving-title">
-                    Now Serving
-                  </div>
+              <div className="pq-serving-title">Now Serving</div>
 
+              {/* BIG NUMBER */}
+
+              <div className="pq-serving-number-area">
+                <div className="pq-serving-ring">
                   <div className="pq-serving-circle">
                     <AppointmentNumber
-                      appointment={
-                        nowServing
-                      }
+                      appointment={nowServing}
                       className="pq-serving-number"
                     />
                   </div>
-
-                  
                 </div>
+              </div>
 
-               
-              </section>
+              {/* MESSAGE */}
+            </section>
 
-              {/* ==========================================
+            {/* =============================================
+                RIGHT SIDE
+            ============================================= */}
+
+            <div className="pq-right-column">
+              {/* ===========================================
                   NEXT PATIENTS
               =========================================== */}
 
-              <section
-                className="pq-next-section"
-                aria-label="Next patients"
-              >
-                <div className="pq-section-heading">
-                  <div>
-                    <div className="pq-section-eyebrow">
-                      PLEASE GET READY
-                    </div>
-
-                    <h2 className="pq-section-title">
-                      Next Patients
-                    </h2>
+              <section className="pq-next-panel">
+                <div className="pq-panel-heading">
+                  <div className="pq-panel-heading-icon">
+                    <TeamOutlined />
                   </div>
 
-                  <div className="pq-section-pill">
-                    Next{" "}
-                    {
-                      READY_PATIENT_COUNT
-                    }
+                  <div>
+                    <h2>Next Patients</h2>
                   </div>
                 </div>
 
                 <div className="pq-next-grid">
                   {Array.from({
-                    length:
-                      READY_PATIENT_COUNT,
-                  }).map(
-                    (_, index) => {
-                      const appointment =
-                        readyPatients[
-                          index
-                        ];
+                    length: READY_PATIENT_COUNT,
+                  }).map((_, index) => {
+                    const appointment = readyPatients[index];
 
-                      return (
-                        <article
-                          key={index}
-                          className={[
-                            "pq-next-card",
+                    const waiting = isWaitingAppointment(appointment);
 
-                            index === 0
-                              ? "pq-next-card-primary"
-                              : "",
+                    return (
+                      <article
+                        key={
+                          appointment ? getAppointmentId(appointment) : index
+                        }
+                        className={[
+                          "pq-next-card",
 
-                            !appointment
-                              ? "pq-next-card-empty"
-                              : "",
-                          ]
-                            .filter(Boolean)
-                            .join(" ")}
-                        >
-                          <div className="pq-next-card-top">
-                            <div className="pq-next-position">
-                              {index === 0
+                          index === 0
+                            ? "pq-next-card-primary"
+                            : "pq-next-card-secondary",
+
+                          waiting ? "pq-next-card-waiting" : "",
+
+                          !appointment ? "pq-card-empty" : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
+                      >
+                        {/* TOP */}
+
+                        <div className="pq-next-card-top">
+                          <div className="pq-next-sequence">{index + 1}</div>
+
+                          <div className="pq-next-label">
+                            {waiting
+                              ? "WAITING"
+                              : index === 0
                                 ? "NEXT"
                                 : "AFTER NEXT"}
-                            </div>
-
-                            <div className="pq-next-order">
-                              {index + 1}
-                            </div>
                           </div>
 
-                          <div className="pq-next-circle">
+                          {waiting && (
+                            <ClockCircleOutlined className="pq-next-waiting-icon" />
+                          )}
+                        </div>
+
+                        {/* NUMBER */}
+
+                        <div className="pq-next-number-area">
+                          <div className="pq-next-number-circle">
                             <AppointmentNumber
-                              appointment={
-                                appointment
-                              }
+                              appointment={appointment}
                               className="pq-next-number"
                             />
                           </div>
-
-                          <div className="pq-next-message">
-                            {appointment
-                              ? index ===
-                                  0
-                                ? "Please stay ready near the treatment room"
-                                : "Please stay ready in the waiting area"
-                              : "Waiting for patient"}
-                          </div>
-                        </article>
-                      );
-                    },
-                  )}
-                </div>
-              </section>
-            </div>
-
-            {/* ============================================
-                UPCOMING QUEUE
-            ============================================= */}
-
-            <section
-              className="pq-upcoming"
-              aria-label="Upcoming patients"
-            >
-              <div className="pq-upcoming-heading">
-                <div>
-                  <div className="pq-section-eyebrow">
-                    WAITING LIST
-                  </div>
-
-                  <h2 className="pq-section-title">
-                    Upcoming Patients
-                  </h2>
-                </div>
-
-                <div className="pq-waiting-pill">
-                  <TeamOutlined />
-
-                  <strong>
-                    {
-                      waitingQueue.length
-                    }
-                  </strong>
-
-                  <span>
-                    patients waiting
-                  </span>
-                </div>
-              </div>
-
-              {upcomingPatients.length >
-              0 ? (
-                <div className="pq-upcoming-grid">
-                  {upcomingPatients.map(
-                    (
-                      appointment,
-                      index,
-                    ) => (
-                      <article
-                        key={getAppointmentId(
-                          appointment,
-                        )}
-                        className="pq-upcoming-card"
-                      >
-                        <div className="pq-upcoming-position">
-                          <span>
-                            QUEUE
-                          </span>
-
-                          <strong>
-                            {index +
-                              READY_PATIENT_COUNT +
-                              1}
-                          </strong>
                         </div>
 
-                        <div className="pq-upcoming-number-circle">
-                          <AppointmentNumber
-                            appointment={
-                              appointment
-                            }
-                            className="pq-upcoming-number"
-                          />
+                        {/* MESSAGE */}
+
+                        <div className="pq-next-message">
+                          <MedicineBoxOutlined />
+
+                          <span>
+                            {!appointment
+                              ? "Waiting for patient"
+                              : waiting
+                                ? "Please wait until called"
+                                : index === 0
+                                  ? "Please stay ready near the treatment room"
+                                  : "Please stay ready in the waiting area"}
+                          </span>
                         </div>
                       </article>
-                    ),
-                  )}
+                    );
+                  })}
                 </div>
-              ) : (
-                <div className="pq-no-upcoming">
-                  <CheckCircleFilled />
+              </section>
 
-                  <div>
-                    <strong>
-                      Queue is clear
-                    </strong>
+              {/* ===========================================
+                  UPCOMING
+              =========================================== */}
 
-                    <span>
-                      No additional
-                      patients are
-                      currently waiting.
-                    </span>
+              <section className="pq-upcoming-panel">
+                {/* HEADER */}
+
+                <div className="pq-upcoming-header">
+                  <div className="pq-panel-heading">
+                    <div className="pq-panel-heading-icon pq-upcoming-heading-icon">
+                      <CalendarOutlined />
+                    </div>
+
+                    <div>
+                      <h2>Upcoming Patients</h2>
+                    </div>
                   </div>
                 </div>
-              )}
-            </section>
-          </main>
-        )}
-      </div>
 
-      {/* ==================================================
-          FOOTER
-      =================================================== */}
+                {/* GRID */}
 
-      
-      
+                {upcomingPatients.length > 0 ? (
+                  <div className="pq-upcoming-scroll-window">
+                    <div
+                      className={[
+                        "pq-upcoming-scroll-track",
+                        upcomingPatients.length <= 4
+                          ? "pq-upcoming-scroll-track-static"
+                          : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    >
+                      {/* FIRST COPY */}
+                      <div className="pq-upcoming-row">
+                        {upcomingPatients.map((appointment, index) => {
+                          const waiting = isWaitingAppointment(appointment);
+
+                          return (
+                            <article
+                              key={`original-${getAppointmentId(appointment)}`}
+                              className={[
+                                "pq-upcoming-card",
+                                waiting ? "pq-upcoming-card-waiting" : "",
+                              ]
+                                .filter(Boolean)
+                                .join(" ")}
+                            >
+                              <div className="pq-upcoming-number-area">
+                                <div className="pq-upcoming-circle">
+                                  <AppointmentNumber
+                                    appointment={appointment}
+                                    className="pq-upcoming-number"
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="pq-queue-position">
+                                QUEUE {index + READY_PATIENT_COUNT + 1}
+                              </div>
+                            </article>
+                          );
+                        })}
+                      </div>
+
+                      {/* SECOND COPY FOR SEAMLESS LOOP */}
+                      {upcomingPatients.length > 4 && (
+                        <div className="pq-upcoming-row" aria-hidden="true">
+                          {upcomingPatients.map((appointment, index) => {
+                            const waiting = isWaitingAppointment(appointment);
+
+                            return (
+                              <article
+                                key={`duplicate-${getAppointmentId(appointment)}`}
+                                className={[
+                                  "pq-upcoming-card",
+                                  waiting ? "pq-upcoming-card-waiting" : "",
+                                ]
+                                  .filter(Boolean)
+                                  .join(" ")}
+                              >
+                                <div className="pq-upcoming-number-area">
+                                  <div className="pq-upcoming-circle">
+                                    <AppointmentNumber
+                                      appointment={appointment}
+                                      className="pq-upcoming-number"
+                                    />
+                                  </div>
+                                </div>
+
+                                <div className="pq-queue-position">
+                                  QUEUE {index + READY_PATIENT_COUNT + 1}
+                                </div>
+                              </article>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="pq-no-upcoming">
+                    <CheckCircleFilled />
+
+                    <div>
+                      <strong>Queue is clear</strong>
+                      <span>No additional patients are currently waiting.</span>
+                    </div>
+                  </div>
+                )}
+              </section>
+            </div>
+          </div>
+        </main>
+      )}
     </div>
   );
 };

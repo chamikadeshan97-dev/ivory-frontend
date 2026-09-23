@@ -1739,577 +1739,559 @@ const CurrentTreatment = () => {
         </div>
 
         <Tabs
-  defaultActiveKey="payment"
-  className="current-treatment-finish-tabs"
-  items={[
-    {
-      key: "payment",
-      label: (
-        <Space size={8}>
-          <WalletOutlined />
-          <span>Payment</span>
+          defaultActiveKey="payment"
+          className="current-treatment-finish-tabs"
+          items={[
+            {
+              key: "payment",
+              label: (
+                <Space size={8}>
+                  <WalletOutlined />
+                  <span>Payment</span>
 
-          {isFullyPaid && (
-            <Tag color="green" style={{ marginInlineEnd: 0 }}>
-              Paid
-            </Tag>
-          )}
+                  {isFullyPaid && (
+                    <Tag color="green" style={{ marginInlineEnd: 0 }}>
+                      Paid
+                    </Tag>
+                  )}
 
-          {hasPayment && !isFullyPaid && (
-            <Tag color="orange" style={{ marginInlineEnd: 0 }}>
-              Partial
-            </Tag>
-          )}
-        </Space>
-      ),
+                  {hasPayment && !isFullyPaid && (
+                    <Tag color="orange" style={{ marginInlineEnd: 0 }}>
+                      Partial
+                    </Tag>
+                  )}
+                </Space>
+              ),
 
-      children: (
-       <div className="current-treatment-finish-tab-content">
-  <Card
-    bordered={false}
-    className="current-treatment-finish-card current-treatment-payment-card"
-  >
-    <div className="current-treatment-finish-heading">
-      <div className="current-treatment-finish-icon current-treatment-finish-icon--payment">
-        <WalletOutlined />
-      </div>
+              children: (
+                <div className="current-treatment-finish-tab-content">
+                  <Card
+                    bordered={false}
+                    className="current-treatment-finish-card current-treatment-payment-card"
+                  >
+                    <div className="current-treatment-finish-heading">
+                      <div className="current-treatment-finish-icon current-treatment-finish-icon--payment">
+                        <WalletOutlined />
+                      </div>
 
-      <div>
-        <Title level={4}>Payment</Title>
+                      <div>
+                        <Title level={4}>Payment</Title>
 
-        <Text type="secondary">
-          Confirm the treatment fee and collect payment.
-        </Text>
-      </div>
-    </div>
+                        <Text type="secondary">
+                          Confirm the treatment fee and collect payment.
+                        </Text>
+                      </div>
+                    </div>
 
-    <Row gutter={[24, 24]} align="stretch">
-      {/* =====================================================
+                    <Row gutter={[24, 24]} align="stretch">
+                      {/* =====================================================
           LEFT SIDE — PAYMENT DETAILS
       ====================================================== */}
 
-      <Col xs={24} lg={12}>
-        <div className="current-treatment-payment-panel">
-          <div className="current-treatment-payment-panel-title">
-            <Text strong>Payment Details</Text>
+                      <Col xs={24} lg={12}>
+                        <div className="current-treatment-payment-panel">
+                          <div className="current-treatment-payment-panel-title">
+                            <Text strong>Payment Details</Text>
 
-            {isFullyPaid ? (
-              <Tag color="green" icon={<CheckCircleOutlined />}>
-                Paid
-              </Tag>
-            ) : hasPayment ? (
-              <Tag color="orange">Partial</Tag>
-            ) : (
-              <Tag>Not Paid</Tag>
-            )}
-          </div>
+                            {isFullyPaid ? (
+                              <Tag color="green" icon={<CheckCircleOutlined />}>
+                                Paid
+                              </Tag>
+                            ) : hasPayment ? (
+                              <Tag color="orange">Partial</Tag>
+                            ) : (
+                              <Tag>Not Paid</Tag>
+                            )}
+                          </div>
 
-          {/* Treatment */}
+                          {/* Treatment */}
 
-          <div className="current-treatment-payment-treatment">
-            <Text type="secondary">Treatment</Text>
+                          <div className="current-treatment-payment-treatment">
+                            <Text type="secondary">Treatment</Text>
 
-            <Text strong>
-              {selectedTreatment || "Dental Treatment"}
-            </Text>
-          </div>
+                            <Text strong>
+                              {selectedTreatment || "Dental Treatment"}
+                            </Text>
+                          </div>
 
-          {/* Standard Fee */}
+                          {/* Standard Fee */}
 
-          {selectedCommonTreatmentFee > 0 && (
-            <div className="current-treatment-payment-standard">
-              <div>
-                <Text type="secondary">Standard Fee</Text>
+                          {selectedCommonTreatmentFee > 0 && (
+                            <div className="current-treatment-payment-standard">
+                              <div>
+                                <Text type="secondary">Standard Fee</Text>
 
-                <Text strong>
-                  {formatCurrency(selectedCommonTreatmentFee)}
-                </Text>
-              </div>
+                                <Text strong>
+                                  {formatCurrency(selectedCommonTreatmentFee)}
+                                </Text>
+                              </div>
 
-              {treatmentCharge !== selectedCommonTreatmentFee && (
-                <Button
-                  htmlType="button"
-                  type="link"
-                  size="small"
-                  onClick={() =>
-                    setTreatmentFee(selectedCommonTreatmentFee)
-                  }
-                >
-                  Use Standard
-                </Button>
-              )}
-            </div>
-          )}
+                              {treatmentCharge !==
+                                selectedCommonTreatmentFee && (
+                                <Button
+                                  htmlType="button"
+                                  type="link"
+                                  size="small"
+                                  onClick={() =>
+                                    setTreatmentFee(selectedCommonTreatmentFee)
+                                  }
+                                >
+                                  Use Standard
+                                </Button>
+                              )}
+                            </div>
+                          )}
 
-          {/* Treatment Fee */}
+                          {/* Treatment Fee */}
 
-          <Form.Item
-            label={<Text strong>Treatment Fee</Text>}
-            name="treatment_charge"
-            rules={[
-              {
-                required: true,
-                message: "Please enter the treatment fee",
-              },
-              {
-                type: "number",
-                min: 1,
-                message: "The fee must be greater than 0",
-              },
-            ]}
-            className="current-treatment-simple-form-item"
-          >
-            <InputNumber
-              min={1}
-              precision={2}
-              prefix="Rs."
-              size="large"
-              placeholder="Treatment fee"
-              formatter={(value) =>
-                value
-                  ? `${value}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ",",
-                    )
-                  : ""
-              }
-              parser={(value) =>
-                value ? value.replace(/,/g, "") : ""
-              }
-              className="current-treatment-fee-input"
-            />
-          </Form.Item>
+                          <Form.Item
+                            label={<Text strong>Treatment Fee</Text>}
+                            name="treatment_charge"
+                            className="current-treatment-simple-form-item"
+                          >
+                            <InputNumber
+                              min={1}
+                              precision={2}
+                              prefix="Rs."
+                              size="large"
+                              placeholder="Treatment fee"
+                              formatter={(value) =>
+                                value
+                                  ? `${value}`.replace(
+                                      /\B(?=(\d{3})+(?!\d))/g,
+                                      ",",
+                                    )
+                                  : ""
+                              }
+                              parser={(value) =>
+                                value ? value.replace(/,/g, "") : ""
+                              }
+                              className="current-treatment-fee-input"
+                            />
+                          </Form.Item>
 
-          {/* Summary */}
+                          {/* Summary */}
 
-          <div className="current-treatment-simple-summary">
-            <div>
-              <Text type="secondary">Fee</Text>
+                          <div className="current-treatment-simple-summary">
+                            <div>
+                              <Text type="secondary">Fee</Text>
 
-              <Text strong>
-                {formatCurrency(treatmentCharge)}
-              </Text>
-            </div>
+                              <Text strong>
+                                {formatCurrency(treatmentCharge)}
+                              </Text>
+                            </div>
 
-            <div>
-              <Text type="secondary">Paid</Text>
+                            <div>
+                              <Text type="secondary">Paid</Text>
 
-              <Text
-                strong
-                className={
-                  hasPayment
-                    ? "current-treatment-payment-paid"
-                    : undefined
-                }
-              >
-                {formatCurrency(paymentAmount)}
-              </Text>
-            </div>
+                              <Text
+                                strong
+                                className={
+                                  hasPayment
+                                    ? "current-treatment-payment-paid"
+                                    : undefined
+                                }
+                              >
+                                {formatCurrency(paymentAmount)}
+                              </Text>
+                            </div>
 
-            <div>
-              <Text type="secondary">Balance</Text>
+                            <div>
+                              <Text type="secondary">Balance</Text>
 
-              <Text
-                strong
-                type={
-                  remainingAmount > 0
-                    ? "danger"
-                    : undefined
-                }
-              >
-                {formatCurrency(remainingAmount)}
-              </Text>
-            </div>
-          </div>
+                              <Text
+                                strong
+                                type={
+                                  remainingAmount > 0 ? "danger" : undefined
+                                }
+                              >
+                                {formatCurrency(remainingAmount)}
+                              </Text>
+                            </div>
+                          </div>
 
-          {/* Status */}
+                          {/* Status */}
 
-          {isFullyPaid ? (
-            <Alert
-              type="success"
-              showIcon
-              message="Full payment received"
-              className="current-treatment-simple-status"
-            />
-          ) : hasPayment ? (
-            <Alert
-              type="warning"
-              showIcon
-              message={`Balance: ${formatCurrency(
-                remainingAmount,
-              )}`}
-              className="current-treatment-simple-status"
-            />
-          ) : (
-            <Alert
-              type="info"
-              showIcon
-              message="Payment not collected"
-              className="current-treatment-simple-status"
-            />
-          )}
-        </div>
-      </Col>
+                          {isFullyPaid ? (
+                            <Alert
+                              type="success"
+                              showIcon
+                              message="Full payment received"
+                              className="current-treatment-simple-status"
+                            />
+                          ) : hasPayment ? (
+                            <Alert
+                              type="warning"
+                              showIcon
+                              message={`Balance: ${formatCurrency(
+                                remainingAmount,
+                              )}`}
+                              className="current-treatment-simple-status"
+                            />
+                          ) : (
+                            <Alert
+                              type="info"
+                              showIcon
+                              message="Payment not collected"
+                              className="current-treatment-simple-status"
+                            />
+                          )}
+                        </div>
+                      </Col>
 
-      {/* =====================================================
+                      {/* =====================================================
           RIGHT SIDE — PAYMENT ACTIONS
       ====================================================== */}
 
-      <Col xs={24} lg={12}>
-        <div className="current-treatment-payment-panel current-treatment-payment-actions-panel">
-          <div className="current-treatment-payment-panel-title">
-            <Text strong>Collect Payment</Text>
+                      <Col xs={24} lg={12}>
+                        <div className="current-treatment-payment-panel current-treatment-payment-actions-panel">
+                          <div className="current-treatment-payment-panel-title">
+                            <Text strong>Collect Payment</Text>
 
-            <DollarOutlined />
-          </div>
+                            <DollarOutlined />
+                          </div>
 
-          {/* Payment Amount */}
+                          {/* Payment Amount */}
 
-          <Form.Item
-            label={<Text strong>Amount Paying Now</Text>}
-            name="payment_amount"
-            rules={[
-              {
-                validator: (_, value) => {
-                  const amount = Number(value || 0);
+                          <Form.Item
+                            label={<Text strong>Amount Paying Now</Text>}
+                            name="payment_amount"
+                            rules={[
+                              {
+                                validator: (_, value) => {
+                                  const amount = Number(value || 0);
 
-                  const charge = Number(
-                    form.getFieldValue(
-                      "treatment_charge",
-                    ) || 0,
-                  );
+                                  const charge = Number(
+                                    form.getFieldValue("treatment_charge") || 0,
+                                  );
 
-                  if (amount < 0) {
-                    return Promise.reject(
-                      new Error(
-                        "Payment cannot be negative",
-                      ),
-                    );
-                  }
+                                  if (amount < 0) {
+                                    return Promise.reject(
+                                      new Error("Payment cannot be negative"),
+                                    );
+                                  }
 
-                  if (amount > charge) {
-                    return Promise.reject(
-                      new Error(
-                        "Payment cannot exceed the treatment fee",
-                      ),
-                    );
-                  }
+                                  if (amount > charge) {
+                                    return Promise.reject(
+                                      new Error(
+                                        "Payment cannot exceed the treatment fee",
+                                      ),
+                                    );
+                                  }
 
-                  return Promise.resolve();
-                },
-              },
-            ]}
-            className="current-treatment-simple-form-item"
-          >
-            <InputNumber
-              min={0}
-              max={
-                treatmentCharge > 0
-                  ? treatmentCharge
-                  : undefined
-              }
-              precision={2}
-              prefix="Rs."
-              size="large"
-              placeholder="Enter amount"
-              formatter={(value) =>
-                value
-                  ? `${value}`.replace(
-                      /\B(?=(\d{3})+(?!\d))/g,
-                      ",",
-                    )
-                  : ""
-              }
-              parser={(value) =>
-                value
-                  ? value.replace(/,/g, "")
-                  : ""
-              }
-              className="current-treatment-fee-input"
-            />
-          </Form.Item>
+                                  return Promise.resolve();
+                                },
+                              },
+                            ]}
+                            className="current-treatment-simple-form-item"
+                          >
+                            <InputNumber
+                              min={0}
+                              max={
+                                treatmentCharge > 0
+                                  ? treatmentCharge
+                                  : undefined
+                              }
+                              precision={2}
+                              prefix="Rs."
+                              size="large"
+                              placeholder="Enter amount"
+                              formatter={(value) =>
+                                value
+                                  ? `${value}`.replace(
+                                      /\B(?=(\d{3})+(?!\d))/g,
+                                      ",",
+                                    )
+                                  : ""
+                              }
+                              parser={(value) =>
+                                value ? value.replace(/,/g, "") : ""
+                              }
+                              className="current-treatment-fee-input"
+                            />
+                          </Form.Item>
 
-          {/* Full Payment */}
+                          {/* Full Payment */}
 
-          {treatmentCharge > 0 && (
-            <Button
-              htmlType="button"
-              block
-              size="large"
-              type="primary"
-              icon={<CheckCircleOutlined />}
-              onClick={setFullPayment}
-              className="current-treatment-simple-full-payment"
-            >
-              Pay Full Amount —{" "}
-              {formatCurrency(treatmentCharge)}
-            </Button>
-          )}
+                          {treatmentCharge > 0 && (
+                            <Button
+                              htmlType="button"
+                              block
+                              size="large"
+                              type="primary"
+                              icon={<CheckCircleOutlined />}
+                              onClick={setFullPayment}
+                              className="current-treatment-simple-full-payment"
+                            >
+                              Pay Full Amount —{" "}
+                              {formatCurrency(treatmentCharge)}
+                            </Button>
+                          )}
 
-          {/* Quick Amounts */}
+                          {/* Quick Amounts */}
 
-          <div className="current-treatment-simple-quick">
-            <Text type="secondary">
-              Quick amount
-            </Text>
+                          <div className="current-treatment-simple-quick">
+                            <Text type="secondary">Quick amount</Text>
 
-            <div className="current-treatment-simple-quick-buttons">
-              {QUICK_PAYMENT_AMOUNTS.filter(
-                (amount) =>
-                  treatmentCharge <= 0 ||
-                  amount < treatmentCharge,
-              ).map((amount) => (
-                <Button
-                  key={amount}
-                  htmlType="button"
-                  type={
-                    paymentAmount === amount
-                      ? "primary"
-                      : "default"
-                  }
-                  onClick={() =>
-                    setPaymentAmount(amount)
-                  }
-                >
-                  Rs. {amount.toLocaleString()}
-                </Button>
-              ))}
-            </div>
-          </div>
+                            <div className="current-treatment-simple-quick-buttons">
+                              {QUICK_PAYMENT_AMOUNTS.filter(
+                                (amount) =>
+                                  treatmentCharge <= 0 ||
+                                  amount < treatmentCharge,
+                              ).map((amount) => (
+                                <Button
+                                  key={amount}
+                                  htmlType="button"
+                                  type={
+                                    paymentAmount === amount
+                                      ? "primary"
+                                      : "default"
+                                  }
+                                  onClick={() => setPaymentAmount(amount)}
+                                >
+                                  Rs. {amount.toLocaleString()}
+                                </Button>
+                              ))}
+                            </div>
+                          </div>
 
-          {/* Payment Method */}
+                          {/* Payment Method */}
 
-          {hasPayment && (
-            <Form.Item
-              label={<Text strong>Payment Method</Text>}
-              name="payment_method"
-              rules={[
-                {
-                  required: true,
-                  message:
-                    "Please select the payment method",
-                },
-              ]}
-              className="current-treatment-simple-payment-method"
-            >
-              <Select
-                size="large"
-                options={PAYMENT_METHOD_OPTIONS}
-                placeholder="Select payment method"
-                suffixIcon={
-                  <CreditCardOutlined />
-                }
-              />
-            </Form.Item>
-          )}
+                          {hasPayment && (
+                            <Form.Item
+                              label={<Text strong>Payment Method</Text>}
+                              name="payment_method"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "Please select the payment method",
+                                },
+                              ]}
+                              className="current-treatment-simple-payment-method"
+                            >
+                              <Select
+                                size="large"
+                                options={PAYMENT_METHOD_OPTIONS}
+                                placeholder="Select payment method"
+                                suffixIcon={<CreditCardOutlined />}
+                              />
+                            </Form.Item>
+                          )}
 
-          {/* Clear */}
+                          {/* Clear */}
 
-          {hasPayment && (
-            <Button
-              htmlType="button"
-              danger
-              block
-              onClick={clearPayment}
-              className="current-treatment-simple-clear"
-            >
-              Clear Payment
-            </Button>
-          )}
-        </div>
-      </Col>
-    </Row>
-  </Card>
-</div>
-      ),
-    },
+                          {hasPayment && (
+                            <Button
+                              htmlType="button"
+                              danger
+                              block
+                              onClick={clearPayment}
+                              className="current-treatment-simple-clear"
+                            >
+                              Clear Payment
+                            </Button>
+                          )}
+                        </div>
+                      </Col>
+                    </Row>
+                  </Card>
+                </div>
+              ),
+            },
 
-    /* =======================================================
+            /* =======================================================
        FOLLOW-UP TAB
     ======================================================== */
 
-    {
-      key: "follow-up",
+            {
+              key: "follow-up",
 
-      label: (
-        <Space size={8}>
-          <CalendarOutlined />
+              label: (
+                <Space size={8}>
+                  <CalendarOutlined />
 
-          <span>Follow-up Visit</span>
+                  <span>Follow-up Visit</span>
 
-          {nextAppointmentDate && (
-            <Tag color="green" style={{ marginInlineEnd: 0 }}>
-              Scheduled
-            </Tag>
-          )}
-        </Space>
-      ),
+                  {nextAppointmentDate && (
+                    <Tag color="green" style={{ marginInlineEnd: 0 }}>
+                      Scheduled
+                    </Tag>
+                  )}
+                </Space>
+              ),
 
-      children: (
-        <div className="current-treatment-finish-tab-content">
-          <Card
-            bordered={false}
-            className="current-treatment-finish-card current-treatment-finish-card--follow-up"
-          >
-            {/* =====================================================
+              children: (
+                <div className="current-treatment-finish-tab-content">
+                  <Card
+                    bordered={false}
+                    className="current-treatment-finish-card current-treatment-finish-card--follow-up"
+                  >
+                    {/* =====================================================
                 FOLLOW-UP HEADER
             ====================================================== */}
 
-            <div className="current-treatment-finish-heading">
-              <div className="current-treatment-finish-icon current-treatment-finish-icon--follow-up">
-                <CalendarOutlined />
-              </div>
+                    <div className="current-treatment-finish-heading">
+                      <div className="current-treatment-finish-icon current-treatment-finish-icon--follow-up">
+                        <CalendarOutlined />
+                      </div>
 
-              <div>
-                <Title level={4}>Follow-up Visit</Title>
+                      <div>
+                        <Title level={4}>Follow-up Visit</Title>
 
-                <Text type="secondary">
-                  Schedule another visit only when the patient needs to return.
-                </Text>
-              </div>
-            </div>
+                        <Text type="secondary">
+                          Schedule another visit only when the patient needs to
+                          return.
+                        </Text>
+                      </div>
+                    </div>
 
-            {/* =====================================================
+                    {/* =====================================================
                 NO FOLLOW-UP
             ====================================================== */}
 
-            <div className="current-treatment-follow-up-grid">
-              <Button
-                block
-                htmlType="button"
-                size="large"
-                type={selectedFollowUp === "none" ? "primary" : "default"}
-                className={
-                  selectedFollowUp === "none"
-                    ? "current-treatment-follow-up-button current-treatment-follow-up-button--none-selected"
-                    : "current-treatment-follow-up-button"
-                }
-                onClick={removeFollowUp}
-              >
-                No Follow-up Needed
-              </Button>
+                    <div className="current-treatment-follow-up-grid">
+                      <Button
+                        block
+                        htmlType="button"
+                        size="large"
+                        type={
+                          selectedFollowUp === "none" ? "primary" : "default"
+                        }
+                        className={
+                          selectedFollowUp === "none"
+                            ? "current-treatment-follow-up-button current-treatment-follow-up-button--none-selected"
+                            : "current-treatment-follow-up-button"
+                        }
+                        onClick={removeFollowUp}
+                      >
+                        No Follow-up Needed
+                      </Button>
 
-              {/* =================================================
+                      {/* =================================================
                   FOLLOW-UP OPTIONS
               ================================================== */}
 
-              <Row gutter={[9, 9]}>
-                {FOLLOW_UP_OPTIONS.map((option) => (
-                  <Col xs={12} key={option.key}>
-                    <Button
-                      block
-                      htmlType="button"
-                      size="large"
-                      type={
-                        selectedFollowUp === option.key ? "primary" : "default"
-                      }
-                      className="current-treatment-follow-up-button"
-                      onClick={() => setFollowUpOption(option)}
-                    >
-                      {option.label}
-                    </Button>
-                  </Col>
-                ))}
+                      <Row gutter={[9, 9]}>
+                        {FOLLOW_UP_OPTIONS.map((option) => (
+                          <Col xs={12} key={option.key}>
+                            <Button
+                              block
+                              htmlType="button"
+                              size="large"
+                              type={
+                                selectedFollowUp === option.key
+                                  ? "primary"
+                                  : "default"
+                              }
+                              className="current-treatment-follow-up-button"
+                              onClick={() => setFollowUpOption(option)}
+                            >
+                              {option.label}
+                            </Button>
+                          </Col>
+                        ))}
 
-                <Col xs={12}>
-                  <Button
-                    block
-                    htmlType="button"
-                    size="large"
-                    type={
-                      selectedFollowUp === "custom" ? "primary" : "default"
-                    }
-                    className="current-treatment-follow-up-button"
-                    onClick={selectCustomFollowUp}
-                  >
-                    Choose Date
-                  </Button>
-                </Col>
-              </Row>
-            </div>
+                        <Col xs={12}>
+                          <Button
+                            block
+                            htmlType="button"
+                            size="large"
+                            type={
+                              selectedFollowUp === "custom"
+                                ? "primary"
+                                : "default"
+                            }
+                            className="current-treatment-follow-up-button"
+                            onClick={selectCustomFollowUp}
+                          >
+                            Choose Date
+                          </Button>
+                        </Col>
+                      </Row>
+                    </div>
 
-            {/* =====================================================
+                    {/* =====================================================
                 CUSTOM DATE
             ====================================================== */}
 
-            {selectedFollowUp === "custom" && (
-              <Form.Item
-                label={<Text strong>Follow-up Date</Text>}
-                name="next_appointment_date"
-                className="current-treatment-custom-date"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please choose a follow-up date",
-                  },
-                ]}
-              >
-                <DatePicker
-                  size="large"
-                  format="YYYY-MM-DD"
-                  placeholder="Choose follow-up date"
-                  style={{ width: "100%" }}
-                  disabledDate={(date) =>
-                    date &&
-                    date.startOf("day").valueOf() <=
-                      dayjs().startOf("day").valueOf()
-                  }
-                />
-              </Form.Item>
-            )}
+                    {selectedFollowUp === "custom" && (
+                      <Form.Item
+                        label={<Text strong>Follow-up Date</Text>}
+                        name="next_appointment_date"
+                        className="current-treatment-custom-date"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Please choose a follow-up date",
+                          },
+                        ]}
+                      >
+                        <DatePicker
+                          size="large"
+                          format="YYYY-MM-DD"
+                          placeholder="Choose follow-up date"
+                          style={{ width: "100%" }}
+                          disabledDate={(date) =>
+                            date &&
+                            date.startOf("day").valueOf() <=
+                              dayjs().startOf("day").valueOf()
+                          }
+                        />
+                      </Form.Item>
+                    )}
 
-            {selectedFollowUp !== "custom" && (
-              <Form.Item name="next_appointment_date" hidden>
-                <DatePicker />
-              </Form.Item>
-            )}
+                    {selectedFollowUp !== "custom" && (
+                      <Form.Item name="next_appointment_date" hidden>
+                        <DatePicker />
+                      </Form.Item>
+                    )}
 
-            {/* =====================================================
+                    {/* =====================================================
                 SELECTED FOLLOW-UP
             ====================================================== */}
 
-            {nextAppointmentDate && (
-              <Alert
-                type="success"
-                showIcon
-                icon={<CalendarOutlined />}
-                message="Follow-up Scheduled"
-                description={
-                  <Space direction="vertical" size={2}>
-                    <Text strong>
-                      {dayjs(nextAppointmentDate).format(
-                        "dddd, DD MMMM YYYY",
-                      )}
-                    </Text>
+                    {nextAppointmentDate && (
+                      <Alert
+                        type="success"
+                        showIcon
+                        icon={<CalendarOutlined />}
+                        message="Follow-up Scheduled"
+                        description={
+                          <Space direction="vertical" size={2}>
+                            <Text strong>
+                              {dayjs(nextAppointmentDate).format(
+                                "dddd, DD MMMM YYYY",
+                              )}
+                            </Text>
 
-                    <Text type="secondary">
-                      This date will be saved with the treatment.
-                    </Text>
-                  </Space>
-                }
-                className="current-treatment-follow-up-alert"
-              />
-            )}
+                            <Text type="secondary">
+                              This date will be saved with the treatment.
+                            </Text>
+                          </Space>
+                        }
+                        className="current-treatment-follow-up-alert"
+                      />
+                    )}
 
-            {/* =====================================================
+                    {/* =====================================================
                 NO FOLLOW-UP INFO
             ====================================================== */}
 
-            {!nextAppointmentDate && selectedFollowUp === "none" && (
-              <Alert
-                type="info"
-                showIcon
-                message="No Follow-up Required"
-                description="The treatment can be completed without scheduling another visit."
-                className="current-treatment-follow-up-alert"
-              />
-            )}
-          </Card>
-        </div>
-      ),
-    },
-  ]}
-/>
+                    {!nextAppointmentDate && selectedFollowUp === "none" && (
+                      <Alert
+                        type="info"
+                        showIcon
+                        message="No Follow-up Required"
+                        description="The treatment can be completed without scheduling another visit."
+                        className="current-treatment-follow-up-alert"
+                      />
+                    )}
+                  </Card>
+                </div>
+              ),
+            },
+          ]}
+        />
       </div>
     );
   };
